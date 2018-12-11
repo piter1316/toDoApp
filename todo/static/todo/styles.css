@@ -1,5 +1,4 @@
 body {
-	background: rgba(44, 62, 80, .8);
 	font-family: 'Oswald', 'Futura', sans-serif;
 }
 #wrapper {
@@ -22,13 +21,12 @@ body {
 }
 .todo-completed {
 	text-decoration: line-through;
-	background: rgba(149, 165, 166, .3);
 }
 footer {
 	margin-top: 20px;
 	color: white;
 }
 
-.list-group-item{
-    color: black;
+.todo-completed:hover {
+	text-decoration: line-through;
 }
