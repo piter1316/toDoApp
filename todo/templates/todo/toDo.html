@@ -1,9 +1,9 @@
 {% extends 'todo/base.html' %}
-
+{% block body %}
 <div class="container-fluid" id="wrapper">
 
   <div class="row">
-    <div class="col-lg-4 col-lg-offset-4" id="content">
+    <div class="col-lg-4 mx-auto" id="content">
       <h2>WHAT DO YOU WANT TO DO TODAY?</h2>
 
       <form action="{% url 'add' %}" method="POST" role="form">
@@ -53,3 +53,4 @@
     </div>
   </div>
 </div>
+{% endblock %}
