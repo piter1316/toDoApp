@@ -8,7 +8,7 @@ def index(requsest):
 
     form = TodoForm()
     context = {'todo_list': todo_list, 'form': form}
-    return render(requsest, 'todo/index.html', context)
+    return render(requsest, 'todo/toDo.html', context)
 
 @require_POST
 def addTodo(request):
