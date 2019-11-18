@@ -23,15 +23,11 @@
     <autoscroll-to-editor value="false" />
     <autoscroll-from-editor value="true" />
     <show-object-properties value="true" />
-    <loaded-nodes>
-      <connection connection-id="eeedaff6-7ffa-4b48-b526-44f9d9c60199">
-        <schema name="mQEFKcmB7i" object-types="view, column, table, constraint, dataset trigger, index, function, procedure" />
-      </connection>
-    </loaded-nodes>
+    <loaded-nodes />
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
     <connection id="eeedaff6-7ffa-4b48-b526-44f9d9c60199">
-      <console name="Connection" type="STANDARD" schema="mQEFKcmB7i" session="Main" />
+      <console name="Connection" type="STANDARD" schema="" session="Main" />
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
