@@ -30,6 +30,7 @@ DEBUG = True
 
 INSTALLED_APPS = [
     'todo',
+    'passwordGenerator',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

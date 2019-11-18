@@ -1,0 +1,27 @@
+{% extends 'todo/base.html' %}
+{% block body %}
+<div class="container-fluid" id="wrapper">
+
+  <div class="row">
+    <div class="col-lg-4 mx-auto" id="content">
+      <h2>LOGIN FORM</h2>
+
+      <div class="row t10">
+        login form here
+      </div>
+
+      <ul class="list-group t20">
+        {% for todo in todo_list %}
+        {% if todo.complete %}
+        <li class="list-group-item todo-completed">{{todo.text}}</li>
+        {% else %}
+        <a href="{% url 'complete' todo.id %}">
+          <li class="list-group-item">{{todo.text}}</li>
+        </a>
+        {% endif %}
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

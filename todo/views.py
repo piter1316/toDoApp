@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
-from .models  import Todo
+from .models import Todo
 from .forms import TodoForm
 from django.views.decorators.http import require_POST
+
 
 def index(requsest):
     todo_list = Todo.objects.order_by('id')
@@ -9,6 +10,7 @@ def index(requsest):
     form = TodoForm()
     context = {'todo_list': todo_list, 'form': form}
     return render(requsest, 'todo/toDo.html', context)
+
 
 @require_POST
 def addTodo(request):
@@ -19,7 +21,6 @@ def addTodo(request):
         new_todo.save()
 
     return redirect('index')
-
 
 
 def completeTodo(request, todo_id):
@@ -39,3 +40,8 @@ def deleteCompleted(request):
 def deleteAll(request):
     Todo.objects.all().delete()
     return redirect('index')
+
+
+def login(request):
+    context = {}
+    return render(request, 'todo/login.html', context)
