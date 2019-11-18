@@ -12,3 +12,6 @@ DATABASES = {
         'PORT': '3306',
     }
 }
+
+ALLOWED_HOSTS = ['piter1316.pythonanywhere.com',
+                 'remotemysql.com']
