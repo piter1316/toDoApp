@@ -4,7 +4,7 @@
 
   <div class="row">
     <div class="col-lg-4 mx-auto" id="content">
-      <h2>DO ZROBIENIA...{{user}}</h2>
+      <h2>DO ZROBIENIA...</h2>
       <form action="{% url 'todo:add' %}" method="POST" role="form">
         {% csrf_token %}
         <div class="form-group">

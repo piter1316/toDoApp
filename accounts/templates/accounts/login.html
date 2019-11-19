@@ -1,16 +1,37 @@
 {% extends 'todo/base.html' %}
 
+
+
 {% block body %}
-    <h1>LOG IN</h1>
-    <form class="site-form" action="{% url 'accounts:login' %}" method="post">
-        {% csrf_token %}
-        {{form}}
-        {% if request.GET.next %}
-            <input type="hidden" name="next" value="{{request.GET.next}}">
-        {% endif %}
-        <input type="submit" value="Login">
-    </form>
+{% load static %}
 
+<div class="container">
+  <form class="form-signin d-block mx-auto mt-3 bg-light p-3 border border-dark rounded shadow shadow-lg "
+        action="{% url 'accounts:login' %}" method="post" style="max-width:400px;">
+    <img class="d-block mx-auto mb-2" src="{% static 'todo/img/user-ninja-solid.png' %}" alt="ninja"
+         width="150">
 
+    {% csrf_token %}
+    {{form.username}}
+    {{form.password}}
+    {% if form.errors %}
+      {% for error in form.non_field_errors %}
+        <div class="alert alert-danger m-1">
+          <strong>{{error}}</strong>
+        </div>
+      {% endfor %}
+    {% endif %}
 
+    {% if request.GET.next %}
+      <input type="hidden" name="next" value="{{request.GET.next}}">
+    {% endif %}
+    <button type="submit" class="btn btn-lg btn-primary btn-block mt-1">Zaloguj</button>
+  </form>
+</div> <!-- /container -->
 {% endblock %}
+
+
+
+
+
+

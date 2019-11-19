@@ -8,6 +8,8 @@ from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
 from django.views.decorators.csrf import csrf_exempt
 
+from accounts.forms import LoginForm
+
 
 def login_view(request):
     if request.method == 'POST':
@@ -16,11 +18,12 @@ def login_view(request):
             user = form.get_user()
             login(request, user)
             if 'next' in request.POST:
+                print(request.POST)
                 return redirect(request.POST.get('next'))
             else:
                 return redirect('todo:index')
     else:
-        form = AuthenticationForm()
+        form = LoginForm()
     return render(request, 'accounts/login.html', {'form': form})
 
 @csrf_exempt

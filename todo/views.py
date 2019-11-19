@@ -1,15 +1,17 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from .models import Todo
 from .forms import TodoForm
 from django.views.decorators.http import require_POST
 
 
-def index(requsest):
+@login_required(login_url='/accounts/login')
+def index(request):
     todo_list = Todo.objects.order_by('id')
 
     form = TodoForm()
     context = {'todo_list': todo_list, 'form': form}
-    return render(requsest, 'todo/toDo.html', context)
+    return render(request, 'todo/toDo.html', context)
 
 
 @require_POST
