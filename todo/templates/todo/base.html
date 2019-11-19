@@ -23,7 +23,7 @@
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="{% url 'login' %}">ORGAZNIZER</a>
+  <a class="navbar-brand" href="{% url 'todo:home' %}">ORGAZNIZER</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -33,7 +33,7 @@
         <a class="nav-link" href="#">Zakupy<span class="sr-only">(current)</span></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="{% url 'index' %}">To do</a>
+        <a class="nav-link" href="{% url 'todo:index' %}">To do</a>
       </li>
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="narzedzia" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -47,10 +47,14 @@
         </div>
       </li>
     </ul>
-    <form class="form-inline my-2 my-lg-0">
-      <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    {% if user.is_authenticated %}
+    <form class="logout-link ml-2" action="{% url 'accounts:logout' %}" method="post">
+      {% csrf_token %}
+      <button class="btn btn-danger" type="submit">Wyloguj</button>
     </form>
+    {% else %}
+      <a class="btn btn-success" href="{% url 'accounts:login' %}">Zaloguj</a>
+    {% endif %}
   </div>
 </nav>
 {% block body %}

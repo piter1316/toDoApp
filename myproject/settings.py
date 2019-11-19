@@ -32,6 +32,7 @@ ALLOWED_HOSTS = ['piter1316.pythonanywhere.com']
 INSTALLED_APPS = [
     'todo',
     'passwordGenerator',
+    'accounts',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

@@ -1,0 +1,27 @@
+{% extends 'todo/base.html' %}
+{% block body %}
+<div class="container-fluid" id="wrapper">
+
+  <div class="row">
+    <div class="col-lg-4 mx-auto" id="content">
+      <h2>HOME PAGE</h2>
+      <div class="">
+        <div class="">
+          {% if user.is_authenticated %}
+            <form class="logout-link ml-2 form-inline w-75 mx-auto" action="{% url 'accounts:logout' %}" method="post">
+              {% csrf_token %}
+              <label for="home-wyloguj" class="d-block mx-auto mb-3">Jesteś zalogowany jako {{user}}.</label>
+              <button id="home-wyloguj" class="btn btn-danger btn-block" type="submit">Wyloguj</button>
+            </form>
+          {% else %}
+          <form class="form-inline w-75 mx-auto">
+            <label for="home-zaloguj" class="d-block mx-auto mb-3">Zaloguj aby móc tworzyć listy toDo i listy zakupowe</label>
+            <a id="home-zaloguj" class="btn btn-success btn-block" href="{% url 'accounts:login' %}">Zaloguj</a>
+          </form>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

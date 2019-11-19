@@ -4,8 +4,8 @@
 
   <div class="row">
     <div class="col-lg-4 mx-auto" id="content">
-      <h2>DO ZROBIENIA...</h2>
-      <form action="{% url 'add' %}" method="POST" role="form">
+      <h2>DO ZROBIENIA...{{user}}</h2>
+      <form action="{% url 'todo:add' %}" method="POST" role="form">
         {% csrf_token %}
         <div class="form-group">
           <div class="input-group">
@@ -20,14 +20,14 @@
         <div class="col-lg-12">
           <div class="btn-toolbar">
             <div class="btn-group">
-              <a href="{% url 'deletecomplete' %}" class="mr-1">
+              <a href="{% url 'todo:deletecomplete' %}" class="mr-1">
                 <button type="button" class="btn btn-warning">
                   USUŃ ZAKOŃCZONE
                 </button>
               </a>
             </div>
             <div class="btn-group">
-              <a href="{% url 'deleteAll' %}">
+              <a href="{% url 'todo:deleteAll' %}">
                 <button type="button" class="btn btn-warning">
                   USUŃ WSZYSTKIE
                 </button>
@@ -42,7 +42,7 @@
         {% if todo.complete %}
         <li class="list-group-item todo-completed">{{todo.text}}</li>
         {% else %}
-        <a href="{% url 'complete' todo.id %}">
+        <a href="{% url 'todo:complete' todo.id %}">
           <li class="list-group-item">{{todo.text}}</li>
         </a>
         {% endif %}

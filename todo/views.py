@@ -44,4 +44,4 @@ def deleteAll(request):
 
 def login(request):
     context = {}
-    return render(request, 'todo/login.html', context)
+    return render(request, 'todo/home.html', context)
