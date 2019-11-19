@@ -24,10 +24,6 @@ body {
 	text-decoration: line-through;
 	background: rgba(149, 165, 166, .3);
 }
-footer {
-	margin-top: 20px;
-	color: white;
-}
 
 .list-group-item{
     color: black;

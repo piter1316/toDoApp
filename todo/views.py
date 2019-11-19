@@ -44,6 +44,6 @@ def deleteAll(request):
     return redirect('todo:index')
 
 
-def login(request):
+def home(request):
     context = {}
     return render(request, 'todo/home.html', context)
