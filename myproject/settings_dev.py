@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'todo',
     'passwordGenerator',
     'accounts',
+    'shopping',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
