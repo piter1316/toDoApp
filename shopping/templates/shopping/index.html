@@ -2,10 +2,15 @@
 
 {% block body %}
 <div class="container mt-2">
+    <div class="jumbotron p-2">
+    <h1 class="text-center">MOJE LISTY ZAKUPÓW</h1>
+    <hr class="my-2">
+    <a class="btn btn-primary btn-block" href="#" role="button">Dodaj nową listę</a>
+  </div>
   <div class="row">
     {% for shop, products in shopping_lists.items %}
-      <div class="col-12 col-md-4">
-        <div class="card" style="width: 18rem;">
+      <div class="col-12 col-md-4 ">
+        <div class="card text-center" >
           <div class="card-header">
             {{shop}}
           </div>
