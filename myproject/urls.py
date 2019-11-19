@@ -21,4 +21,5 @@ urlpatterns = [
     path('', include('todo.urls'), name='todo'),
     path('', include('passwordGenerator.urls')),
     path('', include('accounts.urls')),
+    path('', include('shopping.urls')),
 ]
