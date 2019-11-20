@@ -40,31 +40,44 @@
   </div>
   <div class="row">
     {% for shop, products in shopping_lists.items %}
-      <div class="col-12 col-md-4 mb-3">
-        <div class="card " >
-          <div class="card-header text-center">
-
-            <form action="{% url 'shopping:delete' shop.id %}">
-              <input type="hidden" name="to_delete" value="{{shop.id}}">
-              {{shop}}
-              <button type="submit">Usuń listę</button>
-            </form>
+    <div class="col-12 col-md-4 mb-3">
+      <div class="card ">
+        <div class="card-header text-center">
+          <div class="input-group mb-1">
+            <input type="text" readonly class="form-control" value="{{shop}}">
+            <div class="input-group-append">
+              <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown"
+                      aria-haspopup="true" aria-expanded="false">Opcje
+              </button>
+              <div class="dropdown-menu">
+                <form class="dropdown-item" action="{% url 'shopping:delete' shop.id %}">
+                  <input type="hidden" name="to_delete" value="{{shop.id}}">
+                  <button class="btn btn-danger btn-sm btn-block" type="submit">Usuń listę</button>
+                </form>
+              </div>
+            </div>
           </div>
-          <ul class="list-group list-group-flush">
-            {% for product in products %}
-              {% for prod, qt in product.items %}
+          <form class="input-group mb-3" action="{% url 'shopping:add_product' shop.id %}" method="POST" role="form">
+            {% csrf_token %}
+            {{form_2.quantity}}
+            {{form_2.product_name}}
+            <div class="input-group-append">
+              <button class="btn btn-outline-secondary" type="submit">+</button>
+            </div>
+          </form>
+        </div>
+        <ul class="list-group list-group-flush">
+          {% for product in products %}
+            {% for prod, qt in product.items %}
               <li class="list-group-item d-flex justify-content-between align-items-center">{{prod}}
                 <span class="badge badge-primary badge-pill">{{qt}}</span>
               </li>
-              {% endfor %}
             {% endfor %}
-          </ul>
-        </div>
+          {% endfor %}
+        </ul>
       </div>
+    </div>
     {% endfor %}
   </div>
-
 </div>
-
-
 {% endblock %}

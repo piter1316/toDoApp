@@ -1,11 +1,11 @@
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 
 # Create your views here.
 from django.views.decorators.http import require_POST
 
-from shopping.forms import ShoppingListForm
+from shopping.forms import ShoppingListForm, ProductsForm
 from shopping.models import ShoppingList, Products
 
 
@@ -14,6 +14,7 @@ def shopping_list_index(request):
     shopping_lists = ShoppingList.objects.filter(user_id=request.user.id)
     shopping_lists_dict = {}
     form = ShoppingListForm(request.POST)
+    form_2 = ProductsForm(request.POST)
     for i in range(len(shopping_lists)):
         products_on_shopping_list = Products.objects.filter(shopping_list_id=shopping_lists[i].id)
         products = []
@@ -26,6 +27,7 @@ def shopping_list_index(request):
     context = {
         'shopping_lists': shopping_lists_dict,
         'form': form,
+        'form_2': form_2,
     }
 
     return render(request, 'shopping/index.html', context)
@@ -34,6 +36,7 @@ def shopping_list_index(request):
 @require_POST
 def add_shopping_list(request):
     form = ShoppingListForm(request.POST)
+
 
     if form.is_valid():
         new_shopping_list = ShoppingList(name=request.POST['name'], user_id=request.user)
@@ -44,5 +47,18 @@ def add_shopping_list(request):
 
 def delete_shopping_list(request, shopping_list_id):
     ShoppingList.objects.filter(id=shopping_list_id).delete()
+
+    return redirect('shopping:shopping_list_index')
+
+@require_POST
+def add_product(request, shopping_list_id):
+    shopping_list = get_object_or_404(ShoppingList, pk=shopping_list_id)
+    form = ProductsForm(request.POST)
+
+    if form.is_valid():
+        new_products = Products(shopping_list_id=shopping_list,
+                                product_name=request.POST['product_name'],
+                                quantity=request.POST['quantity'])
+        new_products.save()
 
     return redirect('shopping:shopping_list_index')
