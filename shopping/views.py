@@ -37,8 +37,6 @@ def shopping_list_index(request):
 @require_POST
 def add_shopping_list(request):
     form = ShoppingListForm(request.POST)
-
-
     if form.is_valid():
         new_shopping_list = ShoppingList(name=request.POST['name'], user_id=request.user)
         new_shopping_list.save()
@@ -79,4 +77,11 @@ def delete_bought(request, shopping_list_id):
 
 def purge_list(request, shopping_list_id):
     Products.objects.filter(shopping_list_id=shopping_list_id).delete()
+    return redirect('shopping:shopping_list_index')
+
+
+def shopping_list_edit(request, shopping_list_id):
+    list_to_edit = ShoppingList.objects.get(pk=shopping_list_id)
+    list_to_edit.name = request.POST['name']
+    list_to_edit.save()
     return redirect('shopping:shopping_list_index')

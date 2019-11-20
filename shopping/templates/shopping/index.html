@@ -9,7 +9,99 @@
       Dodaj nową listę
     </button>
   </div>
-  <div class="modal fade" id="addNewList" tabindex="-1" role="dialog" aria-labelledby="addNewList" aria-hidden="true">
+  <div class="row">
+    {% for shop, products in shopping_lists.items %}
+    <div class="col-12 col-md-4 mb-3">
+      <div class="card ">
+        <div class="card-header text-center">
+          <div class="input-group mb-1">
+            <input type="text" readonly class="form-control" value="{{shop}}">
+            <div class="input-group-append">
+              <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown"
+                      aria-haspopup="true" aria-expanded="false">Opcje
+              </button>
+              <div class="dropdown-menu">
+                <div class="dropdown-item">
+                  <button type="button" class="btn btn-info btn-sm btn-block" data-toggle="modal" data-target="#editList_{{shop.id}}">
+                    Zmień nazwę
+                  </button>
+
+                </div>
+                <form class="dropdown-item" action="{% url 'shopping:delete' shop.id %}">
+                  <input type="hidden" name="to_delete" value="{{shop.id}}">
+                  <button class="btn btn-danger btn-sm btn-block" type="submit">Usuń listę</button>
+                </form>
+                <a class="dropdown-item" href="{% url 'shopping:delete_bought' shop.id %}">
+                  <button class="btn btn-warning btn-sm btn-block">Usuń kupione</button>
+                </a>
+                <a class="dropdown-item" href="{% url 'shopping:purge_list' shop.id %}">
+                  <button class="btn btn-warning btn-sm btn-block">Wyczyść listę</button>
+                </a>
+              </div>
+            </div>
+          </div>
+          <form class="input-group mb-3" action="{% url 'shopping:add_product' shop.id %}" method="POST" role="form">
+            {% csrf_token %}
+            {{form_2.quantity}}
+            {{form_2.product_name}}
+            <div class="input-group-append">
+              <button class="btn btn-outline-secondary" type="submit">+</button>
+            </div>
+          </form>
+        </div>
+        <div class="modal fade" id="editList_{{shop.id}}" tabindex="-1" role="dialog" aria-labelledby="#editList_{{shop.id}}" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="editListLabel">Zmiana nazwy</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <form action="{% url 'shopping:shopping_list_edit' shop.id %}" method="POST" role="form">
+                  {% csrf_token %}
+                  <div class="form-group">
+                    <div class="input-group">
+                      <input class="form-control" type="text" name="name" value="{{shop.name}}" >
+                      <span class="input-group-btn">
+                        <button type="submit" class="btn btn-success" id="edit-btn">Zmień nazwe</button>
+                      </span>
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ul class="list-group list-group-flush">
+          {% for product in products %}
+            {% for prod, qt in product.items %}
+              {% if qt.1 %}
+                <li class="list-group-item d-flex justify-content-between todo-completed align-items-center">{{prod}}
+                  <span class="badge badge-primary badge-pill">{{qt.0}}</span>
+                </li>
+              {% else %}
+                <a class="list-group-item" href=" {% url 'shopping:bought' qt.2 %}">
+                  <li class="d-flex justify-content-between align-items-center">{{prod}}
+                    <span class="badge badge-primary badge-pill">{{qt.0}}</span>
+                  </li>
+                </a>
+              {% endif %}
+            {% endfor %}
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!--MODALS-->
+<div class="modal fade" id="addNewList" tabindex="-1" role="dialog" aria-labelledby="addNewList" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -37,60 +129,6 @@
       </div>
     </div>
   </div>
-  <div class="row">
-    {% for shop, products in shopping_lists.items %}
-    <div class="col-12 col-md-4 mb-3">
-      <div class="card ">
-        <div class="card-header text-center">
-          <div class="input-group mb-1">
-            <input type="text" readonly class="form-control" value="{{shop}}">
-            <div class="input-group-append">
-              <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown"
-                      aria-haspopup="true" aria-expanded="false">Opcje
-              </button>
-              <div class="dropdown-menu">
-                <form class="dropdown-item" action="{% url 'shopping:delete' shop.id %}">
-                  <input type="hidden" name="to_delete" value="{{shop.id}}">
-                  <button class="btn btn-danger btn-sm btn-block" type="submit">Usuń listę</button>
-                </form>
-                <a class="dropdown-item" href="{% url 'shopping:delete_bought' shop.id %}">
-                  <button class="btn btn-warning btn-sm btn-block">Usuń kupione</button>
-                </a>
-                <a class="dropdown-item" href="{% url 'shopping:purge_list' shop.id %}">
-                  <button class="btn btn-warning btn-sm btn-block">Wyczyść listę</button>
-                </a>
-              </div>
-            </div>
-          </div>
-          <form class="input-group mb-3" action="{% url 'shopping:add_product' shop.id %}" method="POST" role="form">
-            {% csrf_token %}
-            {{form_2.quantity}}
-            {{form_2.product_name}}
-            <div class="input-group-append">
-              <button class="btn btn-outline-secondary" type="submit">+</button>
-            </div>
-          </form>
-        </div>
-        <ul class="list-group list-group-flush">
-          {% for product in products %}
-            {% for prod, qt in product.items %}
-              {% if qt.1 %}
-                <li class="list-group-item d-flex justify-content-between todo-completed align-items-center">{{prod}}
-                  <span class="badge badge-primary badge-pill">{{qt.0}}</span>
-                </li>
-              {% else %}
-                <a class="list-group-item" href=" {% url 'shopping:bought' qt.2 %}">
-                  <li class="d-flex justify-content-between align-items-center">{{prod}}
-                    <span class="badge badge-primary badge-pill">{{qt.0}}</span>
-                  </li>
-                </a>
-              {% endif %}
-            {% endfor %}
-          {% endfor %}
-        </ul>
-      </div>
-    </div>
-    {% endfor %}
-  </div>
-</div>
+
+
 {% endblock %}
