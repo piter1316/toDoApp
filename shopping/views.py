@@ -19,7 +19,8 @@ def shopping_list_index(request):
         products_on_shopping_list = Products.objects.filter(shopping_list_id=shopping_lists[i].id)
         products = []
         for product in products_on_shopping_list:
-            product_quantity = {product.product_name: product.quantity}
+            product_quantity_bought = [product.quantity, product.bought, product.id]
+            product_quantity = {product.product_name: product_quantity_bought}
             products.append(product_quantity)
 
         shopping_lists_dict[shopping_lists[i]] = products
@@ -61,4 +62,21 @@ def add_product(request, shopping_list_id):
                                 quantity=request.POST['quantity'])
         new_products.save()
 
+    return redirect('shopping:shopping_list_index')
+
+
+def bought(request, id):
+    product = Products.objects.get(pk=id)
+    product.bought = True
+    product.save()
+    return redirect('shopping:shopping_list_index')
+
+
+def delete_bought(request, shopping_list_id):
+    Products.objects.filter(bought__exact=True, shopping_list_id=shopping_list_id).delete()
+    return redirect('shopping:shopping_list_index')
+
+
+def purge_list(request, shopping_list_id):
+    Products.objects.filter(shopping_list_id=shopping_list_id).delete()
     return redirect('shopping:shopping_list_index')
