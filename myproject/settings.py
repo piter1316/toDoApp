@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'passwordGenerator',
     'accounts',
     'shopping',
+    'meals',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

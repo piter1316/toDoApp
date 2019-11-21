@@ -35,6 +35,9 @@
       <li class="nav-item">
         <a class="nav-link" href="{% url 'todo:index' %}">To do</a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'meals:index' %}">Jadłospis</a>
+      </li>
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="narzedzia" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           Narzędzia
@@ -42,8 +45,6 @@
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
           <a class="dropdown-item" href="{% url 'password_generator' %}">Generator haseł</a>
           <a class="dropdown-item" href="#">Kalkulator lokaty</a>
-          <div class="dropdown-divider"></div>
-          <a class="dropdown-item" href="#">Generator jadłospisu</a>
         </div>
       </li>
     </ul>

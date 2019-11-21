@@ -22,4 +22,5 @@ urlpatterns = [
     path('', include('passwordGenerator.urls')),
     path('', include('accounts.urls')),
     path('', include('shopping.urls')),
+    path('', include('meals.urls')),
 ]
