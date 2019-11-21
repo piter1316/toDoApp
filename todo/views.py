@@ -5,7 +5,7 @@ from .forms import TodoForm
 from django.views.decorators.http import require_POST
 
 
-@login_required
+@login_required(login_url='/accounts/login')
 def index(request):
     todo_list = Todo.objects.filter(user=request.user).order_by('id')
 
