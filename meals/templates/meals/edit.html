@@ -1,0 +1,36 @@
+{% extends 'todo/base.html' %}
+
+
+{% block body %}
+<div class="container-fluid bg-light py-2 mt-3">
+  <div class="row">
+    {% include 'meals/menu.html' %}
+    <div class="col-12 col-md-10">
+      <div class="row">
+      {% for meal_option, meals in meals_options_dict.items %}
+      <div class="col-12 col-md-6 col-lg-3 mb-2">
+        <ul class="list-group list-group-flush text-center">
+          <li class="list-group-item list-group-item-dark">{{meal_option}}</li>
+          {% for meal in meals %}
+          <li class="list-group-item list-group-item-secondary p-1"> {{meal}}</li>
+          {% endfor %}
+          <li class="list-group-item list-group-item-secondary p-1">
+            <form action="{% url 'meals:add_meal' meal_option.id %}" method="post" class="input-group">
+              {% csrf_token %}
+              {{form.name}}
+              <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="submiy" id="add_sn">Dodaj</button>
+              </div>
+            </form>
+          </li>
+        </ul>
+      </div>
+      {% endfor %}
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+{% endblock %}
