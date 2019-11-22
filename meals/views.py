@@ -60,10 +60,16 @@ def add_meal(request, meal_option_id):
         new_meal.save()
 
         ingredients = request.POST['ingredients']
-        print(ingredients)
-        # ingredients_list = ingredients.split(',')
-        # for ingredient in ingredients_list:
-        #     new_ingredient = Ingredient(user=request.user, meal_option=meal, name=ingredient,
-        #                                 shop=request.POST['shop'], )
-        #     new_ingredient.save()
+        ingredients_list = ingredients.splitlines()
+        # print(ingredients_list)
+        for item in ingredients_list:
+            ingredient_properties_list = item.split(' - ')
+            ingredient = ingredient_properties_list[0]
+            quantity = ingredient_properties_list[1]
+            shop = ingredient_properties_list[2]
+
+            # print(ingredient_properties_list)
+            new_ingredient = Ingredient(user=request.user, meal_option=meal, name=ingredient, quantity=quantity,
+                                        shop=shop)
+            new_ingredient.save()
     return redirect('meals:edit_meals')

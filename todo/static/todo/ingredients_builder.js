@@ -6,5 +6,8 @@ function build(id) {
   var to_add = ingredient + ' - ' + quantity + ' - ' + shop + '\n'
   var ingredients_ = document.getElementById('ingredients_'+id).value += to_add
 
+  document.getElementById('ingredient_'+id).value = ''
+  document.getElementById('quantity_'+id).value = 1
+  document.getElementById('shop_'+id).value = ''
 
 }
