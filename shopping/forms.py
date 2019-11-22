@@ -13,7 +13,4 @@ class ProductsForm(forms.Form):
         attrs={'class': 'form-control',
                'placeholder': 'Dodaj na listę', 'aria-label': 'shoppingList',
                'aria-describedby': 'add-btn'}))
-    quantity = forms.IntegerField(widget=forms.NumberInput(
-        attrs={'value': 1,
-               'style': 'max-width:20%;',
-               'class': 'form-control'}))
+
