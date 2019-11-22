@@ -26,7 +26,7 @@ def meals(request):
     context = {
         'meals_options_dict': meals_options_dict,
     }
-    return render(request, 'meals/index_2.html', context)
+    return render(request, 'meals/meals_list.html', context)
 
 def edit_meals(request):
     form = MealForm(request.POST)
