@@ -6,13 +6,20 @@
   <div class="row">
     {% include 'meals/menu.html' %}
     <div class="col-12 col-md-10">
+      <form class="input-group mb-3" method="POST" action="{% url 'meals:add_meal_option' %}">
+        {% csrf_token %}
+        {{form_meal_option.meal_option}}
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary" type="submit">Dodaj</button>
+        </div>
+      </form>
       <div class="row">
       {% for meal_option, meals in meals_options_dict.items %}
       <div class="col-12 col-md-6 col-lg-3 mb-2">
         <ul class="list-group list-group-flush text-center">
-          <li class="list-group-item list-group-item-dark">{{meal_option}}</li>
+          <li class="list-group-item list-group-item-dark">{{meal_option|upper}}</li>
           {% for meal in meals %}
-          <li class="list-group-item list-group-item-secondary p-1"> {{meal}}</li>
+          <li class="list-group-item list-group-item-secondary p-1">{{meal}}</li>
           {% endfor %}
           <li class="list-group-item list-group-item-secondary p-1">
             <!-- Button trigger modal -->
@@ -49,7 +56,7 @@
                         </div>
                       </div>
                         <textarea rows="5" class="form-control" placeholder="Składniki" type="text" name="ingredients" id="ingredients_{{meal_option.id}}"></textarea>
-                        <button class="btn btn-outline-success btn-block mb-2" type="submit" id="add_sn">Dodaj posiłek</button>
+                        <button class="btn btn-outline-success btn-block mb-2" type="submit" id="add_sn">Dodaj danie</button>
                     </form>
                   </div>
                   <div class="modal-footer">
@@ -59,8 +66,6 @@
                 </div>
               </div>
             </div>
-
-
           </li>
         </ul>
       </div>
