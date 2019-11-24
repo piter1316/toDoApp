@@ -70,7 +70,7 @@ def add_meal(request, meal_option_id):
             shop = ingredient_properties_list[2]
 
             # print(ingredient_properties_list)
-            new_ingredient = Ingredient(user=request.user, meal_option=meal, name=ingredient, quantity=quantity,
+            new_ingredient = Ingredient(user=request.user, meal_id=new_meal, name=ingredient, quantity=quantity,
                                         shop=shop)
             new_ingredient.save()
     return redirect('meals:edit_meals')

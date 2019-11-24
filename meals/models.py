@@ -21,7 +21,7 @@ class Meal(models.Model):
 
 class Ingredient(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
-    meal_option = models.ForeignKey(Meal, on_delete=models.DO_NOTHING)
+    meal_id = models.ForeignKey(Meal, on_delete=models.DO_NOTHING, default=1)
     name = models.TextField(max_length=50)
     shop = models.TextField(max_length=50)
     quantity = models.SmallIntegerField(default=1)
