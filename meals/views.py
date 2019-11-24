@@ -5,13 +5,14 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 
 from meals.forms import MealForm, IngredientForm, MealOptionForm
-from meals.models import MealOption, Meal, Ingredient
+from meals.models import MealOption, Meal, Ingredient, MealsList
 
 
 @login_required(login_url='/accounts/login')
 def meals(request):
     meals_options = MealOption.objects.filter(user=request.user)
     meals_options_dict = {}
+    meals_list = MealsList.objects.all()
     for i in range(len(meals_options)):
         meals_in_meals_options = Meal.objects.filter(meal_option=meals_options[i])
         meals = []
@@ -20,9 +21,12 @@ def meals(request):
             meals.append(meal)
 
         meals_options_dict[meals_options[i]] = meals
-    print(meals_options_dict)
+
+    user_meals_options = MealOption.objects.filter(user=request.user).order_by('position')
     context = {
         'meals_options_dict': meals_options_dict,
+        'meals_list': meals_list,
+        'user_meals_options': user_meals_options
     }
     return render(request, 'meals/meals_list.html', context)
 
@@ -84,3 +88,15 @@ def add_meal_option(request):
     new_meal_option.save()
 
     return redirect('meals:edit_meals')
+
+@require_POST
+def generate_meals_list(request):
+    user_meals_options = request.POST.getlist('mealsOptions[]')
+    how_many_days = request.POST['howManyDays']
+    twice_the_same_meal = request.POST['twiceTheSameMeal']
+    print('ILOSć DNI', how_many_days)
+    print('dwa razy', twice_the_same_meal)
+    print(user_meals_options)
+    for option in user_meals_options:
+        print(option, Meal.objects.filter(meal_option=option, user=request.user))
+    return redirect('meals:index')

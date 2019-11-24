@@ -32,6 +32,9 @@ class Ingredient(models.Model):
 
 
 class MealsList(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE, default=1)
     day = models.TextField(max_length=10)
     meals = models.TextField(max_length=100)
 
+
+z= {"Śniadanie": "jajecznica","Obiad": "schabowy z ziemniakami","Kolacja": "kanapka z burakiem"}

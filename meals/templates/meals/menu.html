@@ -6,6 +6,35 @@
        aria-controls="v-pills-messages" aria-selected="false">Messages</a>
     <a class="nav-link" id="v-pills-settings-tab" data-toggle="pill" href="#v-pills-settings" role="tab"
        aria-controls="v-pills-settings" aria-selected="false">Settings</a>
-    <a class="btn btn-info btn-block" href="#" id="v-pills-nowy_jadłospis">Generuj nowy jadłospis</a>
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-info btn-block" data-toggle="modal" data-target="#newMealsListModal">
+      Generuj nowy jadłospis
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="newMealsListModal" tabindex="-1" role="dialog" aria-hidden="true">
+      <form action="{% url 'meals:generate_meals_list' %}" method="post" class="modal-dialog" role="document">
+        {% csrf_token %}
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Generacja nowego jadłospisu</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            {% for option in user_meals_options %}
+            <label><input type="checkbox" value="{{option.id}}" name="mealsOptions[]" checked id="{{option}}">{{option|upper}}</label>
+            {% endfor %}
+            <label><input type="number" name="howManyDays">Na ile dni</label>
+            <label><input type="checkbox" checked name="twiceTheSameMeal">Jeden posiłek rzez dwa dni?</label>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuluj</button>
+            <button type="submit" class="btn btn-primary">Generuj</button>
+          </div>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
