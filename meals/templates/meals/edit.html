@@ -12,12 +12,17 @@
         <div class="input-group-append">
           <button class="btn btn-outline-secondary" type="submit">Dodaj</button>
         </div>
+        <div class="input-group-append">
+        <button class="btn btn-secondary" type="button">Zmień kolejność</button>
+      </div>
       </form>
+
+
       <div class="row">
       {% for meal_option, meals in meals_options_dict.items %}
       <div class="col-12 col-md-6 col-lg-3 mb-2">
         <ul class="list-group list-group-flush text-center">
-          <li class="list-group-item list-group-item-dark">{{meal_option|upper}}</li>
+          <li class="list-group-item list-group-item-dark">{{forloop.counter}}. {{meal_option|upper}}</li>
           {% for meal in meals %}
           <li class="list-group-item list-group-item-secondary p-1">{{meal}}</li>
           {% endfor %}

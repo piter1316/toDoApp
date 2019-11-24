@@ -31,7 +31,7 @@ def edit_meals(request):
     form = MealForm(request.POST)
     form_ingredient = IngredientForm(request.POST)
     form_meal_option = MealOptionForm(request.POST)
-    meals_options = MealOption.objects.filter(user=request.user)
+    meals_options = MealOption.objects.filter(user=request.user).order_by('position')
     meals_options_dict = {}
     for i in range(len(meals_options)):
         meals_in_meals_options = Meal.objects.filter(meal_option=meals_options[i])
