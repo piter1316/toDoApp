@@ -9,6 +9,16 @@ from meals.forms import MealForm, IngredientForm, MealOptionForm
 from meals.models import MealOption, Meal, Ingredient, MealsList
 
 
+def days_generator(first, how_many):
+    days = ['PN', 'WT', 'ŚR', 'CZW', 'PT', 'SB', 'ND']
+    days_list = []
+    for i in range(how_many):
+        days_list.append(days[first])
+        first += 1
+        if first == len(days):
+            first = 0
+    return days_list
+
 @login_required(login_url='/accounts/login')
 def meals(request):
     meals_options = MealOption.objects.filter(user=request.user)
@@ -105,21 +115,28 @@ def generate_meals_list(request):
     twice_the_same_meal = request.POST['twiceTheSameMeal']
     print('ILOSć DNI', how_many_days)
     print('dwa razy', twice_the_same_meal)
-
+    MealsList.objects.filter(user=request.user).delete()
     for option in user_meals_options:
         option_meals_list = []
         meals_in_option = Meal.objects.filter(meal_option=option, user=request.user)
-        meal_option = MealOption.objects.filter(user=request.user, pk=option)
+        meal_option = get_object_or_404(MealOption, pk=option, user=request.user)
         for meal in meals_in_option:
             option_meals_list.append(meal)
-            random_meals_list = []
-        limit = 0
+        random_meals_list = []
         for i in range(int(how_many_days)):
-            random_meal = random.choice(option_meals_list)
-            if random_meal not in random_meals_list:
-                random_meals_list.append(random_meal)
-            else:
-                break
+            while len(random_meals_list) < int(how_many_days):
+                item = random.choice(option_meals_list)
+                random_meals_list.append(item)
+                option_meals_list.remove(item)
+        #
+        days = days_generator(0,int(how_many_days))
+        for k in range(len(random_meals_list)):
+            print(days[k],random_meals_list[k],option,request.user)
 
-        print(meal_option, random_meals_list)
+            newMealsList = MealsList(day=days[k], meal_id=random_meals_list[k].id,meal_option_id=meal_option.id,user_id=request.user.id)
+            # newMealsList = MealsList(day='PN', meal_id=1,meal_option_id=11,user_id=request.user.id)
+            newMealsList.save()
+
+        # for meal_position in random_meals_list:
+        #     print('day', meal_option, meal_position, request.user )
     return redirect('meals:index')
