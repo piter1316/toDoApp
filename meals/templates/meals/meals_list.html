@@ -7,69 +7,29 @@
     {% include 'meals/menu.html' %}
     <div class="col-12 col-md-10 ">
       <div class="table-responsive-sm">
-            <table class="table table-hover table-dark">
-              <thead>
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">ŚNIADANIE</th>
-                <th scope="col">II ŚNIADANIE</th>
-                <th scope="col">OBIAD</th>
-                <th scope="col">KOLACJA</th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr>
-                <th scope="row">PN</th>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <th scope="row">WT</th>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <th scope="row">ŚR</th>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <th scope="row">CZW</th>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <th scope="row">PT</th>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <th scope="row">SB</th>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <th scope="row">ND</th>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              </tbody>
-            </table>
-          </div>
+        <table class="table table-hover table-dark">
+          <thead>
+          <tr>
+            <th scope="col">#</th>
+            {% for meal_option in user_meals_options %}
+            <th scope="col">{{meal_option|upper}}</th>
+            {% endfor %}
+          </tr>
+          </thead>
+          <tbody>
+          {% for item in day_meal_option_meal_list %}
+          {% for day, meals in item.items %}
+          <tr>
+            <th scope="row">{{day}}</th>
+            {% for meal in meals %}
+            <td>{{meal}}</td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 

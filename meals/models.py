@@ -32,9 +32,10 @@ class Ingredient(models.Model):
 
 
 class MealsList(models.Model):
-    user = models.ForeignKey(User,on_delete=models.CASCADE, default=1)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     day = models.TextField(max_length=10)
-    meals = models.TextField(max_length=100)
+    meal_option = models.ForeignKey(MealOption, on_delete=models.DO_NOTHING, default=1)
+    meal = models.ForeignKey(Meal, on_delete=models.DO_NOTHING, default=1)
 
-
-z= {"Śniadanie": "jajecznica","Obiad": "schabowy z ziemniakami","Kolacja": "kanapka z burakiem"}
+    def __str__(self):
+        return self.meal.name

@@ -12,7 +12,7 @@ from meals.models import MealOption, Meal, Ingredient, MealsList
 def meals(request):
     meals_options = MealOption.objects.filter(user=request.user)
     meals_options_dict = {}
-    meals_list = MealsList.objects.all()
+
     for i in range(len(meals_options)):
         meals_in_meals_options = Meal.objects.filter(meal_option=meals_options[i])
         meals = []
@@ -23,10 +23,30 @@ def meals(request):
         meals_options_dict[meals_options[i]] = meals
 
     user_meals_options = MealOption.objects.filter(user=request.user).order_by('position')
+    meals_list = MealsList.objects.all().filter(user=request.user)
+    days = []
+
+    day_meal_option_meal_list = []
+    for item in meals_list:
+        while item.day not in days:
+            days.append(item.day)
+
+    for day in days:
+        meals_on_day = MealsList.objects.all().filter(user=request.user, day=day).order_by('meal_option__position')
+        print(day)
+        day_meals_list = []
+        for meal in meals_on_day:
+            day_meals_list.append(meal.meal.name)
+        # print(day_meals_list)
+        day_meal_option_meal_list.append({day: day_meals_list})
+    print('>>>>>>>>>>>>>>>>>>>>>>>>>')
+    print(day_meal_option_meal_list)
+    print('>>>>>>>>>>>>>>>>>>>>>>>>>')
     context = {
         'meals_options_dict': meals_options_dict,
         'meals_list': meals_list,
-        'user_meals_options': user_meals_options
+        'user_meals_options': user_meals_options,
+        'day_meal_option_meal_list': day_meal_option_meal_list
     }
     return render(request, 'meals/meals_list.html', context)
 
