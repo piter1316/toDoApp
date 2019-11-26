@@ -12,11 +12,16 @@ from meals.models import MealOption, Meal, Ingredient, MealsList, Week
 def days_generator(first, how_many):
     days = ['PN', 'WT', 'ŚR', 'CZW', 'PT', 'SB', 'ND']
     days_list = []
+    itr = ''
+    space = ''
     for i in range(how_many):
-        days_list.append(days[first])
+        days_list.append(days[first]+space+str(itr))
         first += 1
         if first == len(days):
             first = 0
+            itr = 1
+            itr += 1
+            space ='_'
     return days_list
 
 
@@ -183,6 +188,8 @@ def generate_meals_list(request):
                     random_meals_list.append(item)
                     option_meals_list.remove(item)
         days = days_generator(first_day, int(how_many_days))
+        print(days)
+        print(len(random_meals_list))
         for k in range(len(random_meals_list)):
             new_meals_list = MealsList(day=days[k], meal_id=random_meals_list[k].id, meal_option_id=meal_option.id,
                                        user_id=request.user.id)
@@ -193,8 +200,6 @@ def generate_meals_list(request):
 def update_meals_list(request):
     print(request.POST)
     record_id = request.POST['record_id']
-    meal_option_id = request.POST['meal_option_id']
-    meal_id = request.POST['meal_id']
     to_update = request.POST['to_update']
 
     MealsList.objects.filter(pk=int(record_id)).update(meal_id=to_update)

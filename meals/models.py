@@ -35,10 +35,13 @@ class MealsList(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     day = models.TextField(max_length=10)
     meal_option = models.ForeignKey(MealOption, on_delete=models.DO_NOTHING, default=1)
-    meal = models.ForeignKey(Meal, on_delete=models.DO_NOTHING, default=1)
+    meal = models.ForeignKey(Meal, on_delete=models.DO_NOTHING, default=1, null=True, blank=True)
 
     def __str__(self):
-        return self.meal.name
+        if self.meal:
+            return self.meal.name
+        else:
+            return ''
 
 
 class Week(models.Model):
