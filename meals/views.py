@@ -55,9 +55,11 @@ def meals(request):
 
     for day in days:
         meals_on_day = MealsList.objects.all().filter(user=request.user, day=day).order_by('meal_option__position')
+
         day_meals_list = []
         for meal in meals_on_day:
-            day_meals_list.append(meal)
+            all_meals = Meal.objects.filter(user=request.user, meal_option_id=meal.meal_option.id)
+            day_meals_list.append({meal: all_meals})
         day_meal_option_meal_list.append({day: day_meals_list})
 
     maximum_no_of_days_to_generate = get_maximum_no_of_days(request)
@@ -189,11 +191,11 @@ def generate_meals_list(request):
 
 @require_POST
 def update_meals_list(request):
-    meals_list_item_id_list = request.POST.getlist('meals_list_item[]')
-    updated_meals_id_list = request.POST.getlist('options[]')
+    print(request.POST)
+    record_id = request.POST['record_id']
+    meal_option_id = request.POST['meal_option_id']
+    meal_id = request.POST['meal_id']
+    to_update = request.POST['to_update']
 
-    for i in range(len(meals_list_item_id_list)):
-        MealsList.objects.filter(pk=meals_list_item_id_list[i]).update(meal_id=updated_meals_id_list[i])
-    print(meals_list_item_id_list)
-    print(updated_meals_id_list)
+    MealsList.objects.filter(pk=int(record_id)).update(meal_id=to_update)
     return redirect('meals:index')

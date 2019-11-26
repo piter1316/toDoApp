@@ -23,17 +23,18 @@
           <tr>
             <th scope="row">{{day}}</th>
             {% for meal in meals %}
-            <td>{{meal}}</td>
-            {% endfor %}
-            <td>
-              <!-- Button trigger modal -->
-              <button type="button" class="btn  p-0" data-toggle="modal" data-target="#edit_meals_list_pos_{{day}}">
+            <td>{%for ch_meal, all in meal.items%}
+              {{ch_meal}}
+              <button type="button" class="btn  p-0" data-toggle="modal"
+                      data-target="#edit_meals_list_pos_{{ch_meal.id}}">
                 <i class=" fas fa-edit p-0 "></i>
               </button>
 
               <!-- Modal -->
-              <div class="modal fade" id="edit_meals_list_pos_{{day}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                <form action="{% url 'meals:update_meals_list' %}" method="post" class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal fade" id="edit_meals_list_pos_{{ch_meal.id}}" tabindex="-1" role="dialog"
+                   aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <form action="{% url 'meals:update_meals_list' %}" method="post"
+                      class="modal-dialog modal-dialog-centered" role="document">
                   {% csrf_token %}
                   <div class="modal-content">
                     <div class="modal-header">
@@ -43,20 +44,16 @@
                       </button>
                     </div>
                     <div class="modal-body text-dark">
-                     {% for id in meals %}
-                      <input type="hidden" value="{{id.id}}" name="meals_list_item[]">
-                      {% endfor %}
-                      {% for meal_option, all_meals in option_meals_dict.items %}
-                      {{ meal_option }} | {{meal_option.id}}
-{{item.0.id}}
-                      <select name="options[]">
-
-                      {% for meal in all_meals %}
-                        <option  value="{{meal.id}}">{{meal}}</option>
-                      {% endfor %}
+                      <input type="hidden" name="record_id" value="{{ch_meal.id}}">
+                      <input type="hidden" name="meal_option_id" value="{{ch_meal.meal_option_id}}">
+                      <input type="hidden" name="meal_id" value="{{ch_meal.meal_id}}">
+                      ---
+                      <select name="to_update">
+                        <option value="{{ch_meal.meal_id}}">{{ch_meal}}</option>
+                        {% for m in all %}
+                          <option value="{{m.id}}">{{m}}</option>
+                        {% endfor %}
                       </select>
-
-                      {% endfor %}
                     </div>
                     <div class="modal-footer">
                       <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -65,6 +62,11 @@
                   </div>
                 </form>
               </div>
+              {% endfor %}
+            </td>
+            {% endfor %}
+            <td>
+
 
             </td>
           </tr>
