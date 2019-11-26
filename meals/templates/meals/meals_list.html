@@ -11,8 +11,8 @@
           <thead>
           <tr>
             <th scope="col">#</th>
-            {% for meal_option in user_meals_options %}
-            <th scope="col">{{meal_option|upper}}</th>
+            {% for meal_option in generated_user_meals_options %}
+            <th scope="col">{{meal_option.meal_option__meal_option|upper}}</th>
             {% endfor %}
           </tr>
           </thead>

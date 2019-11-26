@@ -32,6 +32,7 @@ def meals(request):
         meals_options_dict[meals_options[i]] = meals_list
 
     user_meals_options = MealOption.objects.filter(user=request.user).order_by('position')
+    generated_user_meals_options = MealsList.objects.filter(user=request.user).order_by('meal_option__position').values('meal_option__meal_option').distinct()
     meals_list = MealsList.objects.all().filter(user=request.user)
     days = []
 
@@ -50,6 +51,7 @@ def meals(request):
         'meals_options_dict': meals_options_dict,
         'meals_list': meals_list,
         'user_meals_options': user_meals_options,
+        'generated_user_meals_options': generated_user_meals_options,
         'day_meal_option_meal_list': day_meal_option_meal_list
     }
     return render(request, 'meals/meals_list.html', context)
