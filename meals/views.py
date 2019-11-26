@@ -129,8 +129,10 @@ def add_meal_option(request):
 def generate_meals_list(request):
     user_meals_options = request.POST.getlist('mealsOptions[]')
     how_many_days = request.POST['howManyDays']
-    twice_the_same_meal = request.POST['twiceTheSameMeal']
+    twice_the_same_meal = request.POST.get('twice_the_same_meal', False)
     MealsList.objects.filter(user=request.user).delete()
+    if twice_the_same_meal:
+        print(twice_the_same_meal)
     for option in user_meals_options:
         option_meals_list = []
         meals_in_option = Meal.objects.filter(meal_option=option, user=request.user)
@@ -138,14 +140,38 @@ def generate_meals_list(request):
         for meal in meals_in_option:
             option_meals_list.append(meal)
         random_meals_list = []
-        for i in range(int(how_many_days)):
-            while len(random_meals_list) < int(how_many_days):
-                item = random.choice(option_meals_list)
-                random_meals_list.append(item)
-                option_meals_list.remove(item)
+        if twice_the_same_meal:
+            if int(how_many_days) % 2 == 0:
+                number_of_different_meals = int(int(how_many_days) / 2)
+                for k in range(number_of_different_meals):
+                    while len(random_meals_list) < int(how_many_days):
+                        item = random.choice(option_meals_list)
+                        random_meals_list.append(item)
+                        random_meals_list.append(item)
+                        option_meals_list.remove(item)
+            else:
+                number_of_different_meals = int((int(how_many_days) / 2)) + 1
+                for j in range(number_of_different_meals):
+                    while len(random_meals_list) < int(how_many_days):
+                        item = random.choice(option_meals_list)
+                        print(len(random_meals_list), int(how_many_days))
+                        if len(random_meals_list) == int(how_many_days) - 1:
+                            random_meals_list.append(item)
+                            break
+                        else:
+                            random_meals_list.append(item)
+                            random_meals_list.append(item)
+                            option_meals_list.remove(item)
+
+            print(random_meals_list)
+        else:
+            for i in range(int(how_many_days)):
+                while len(random_meals_list) < int(how_many_days):
+                    item = random.choice(option_meals_list)
+                    random_meals_list.append(item)
+                    option_meals_list.remove(item)
         days = days_generator(0, int(how_many_days))
         for k in range(len(random_meals_list)):
-            print(days[k], random_meals_list[k], option, request.user)
             new_meals_list = MealsList(day=days[k], meal_id=random_meals_list[k].id, meal_option_id=meal_option.id,
                                        user_id=request.user.id)
             new_meals_list.save()

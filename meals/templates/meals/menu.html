@@ -26,8 +26,8 @@
             {% for option in user_meals_options %}
             <label><input type="checkbox" value="{{option.id}}" name="mealsOptions[]" checked id="{{option}}">{{option|upper}}</label>
             {% endfor %}
-            <label><input type="number" name="howManyDays" max="{{maximum_no_of_days_to_generate}}">Na ile dni</label>
-            <label><input type="checkbox" checked name="twiceTheSameMeal">Jeden posiłek rzez dwa dni?</label>
+            <label><input type="number" name="howManyDays" min="1" max="{{maximum_no_of_days_to_generate}}">Na ile dni</label>
+            <label><input type="checkbox" checked name="twice_the_same_meal">Jeden posiłek rzez dwa dni?</label>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuluj</button>
