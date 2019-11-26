@@ -19,6 +19,16 @@ def days_generator(first, how_many):
             first = 0
     return days_list
 
+
+def get_maximum_no_of_days(request):
+    user_meals_options = MealOption.objects.filter(user=request.user)
+    no_of_meals_in_option = []
+    for option in user_meals_options:
+        meals = Meal.objects.filter(user=request.user, meal_option=option)
+        no_of_meals_in_option.append(len(meals))
+    return min(no_of_meals_in_option)
+
+
 @login_required(login_url='/accounts/login')
 def meals(request):
     meals_options = MealOption.objects.filter(user=request.user)
@@ -32,7 +42,8 @@ def meals(request):
         meals_options_dict[meals_options[i]] = meals_list
 
     user_meals_options = MealOption.objects.filter(user=request.user).order_by('position')
-    generated_user_meals_options = MealsList.objects.filter(user=request.user).order_by('meal_option__position').values('meal_option__meal_option').distinct()
+    generated_user_meals_options = MealsList.objects.filter(user=request.user).order_by('meal_option__position').values(
+        'meal_option__meal_option').distinct()
     meals_list = MealsList.objects.all().filter(user=request.user)
     days = []
 
@@ -47,12 +58,16 @@ def meals(request):
         for meal in meals_on_day:
             day_meals_list.append(meal.meal.name)
         day_meal_option_meal_list.append({day: day_meals_list})
+
+    maximum_no_of_days_to_generate = get_maximum_no_of_days(request)
+
     context = {
         'meals_options_dict': meals_options_dict,
         'meals_list': meals_list,
         'user_meals_options': user_meals_options,
         'generated_user_meals_options': generated_user_meals_options,
-        'day_meal_option_meal_list': day_meal_option_meal_list
+        'day_meal_option_meal_list': day_meal_option_meal_list,
+        'maximum_no_of_days_to_generate': maximum_no_of_days_to_generate
     }
     return render(request, 'meals/meals_list.html', context)
 
@@ -115,8 +130,6 @@ def generate_meals_list(request):
     user_meals_options = request.POST.getlist('mealsOptions[]')
     how_many_days = request.POST['howManyDays']
     twice_the_same_meal = request.POST['twiceTheSameMeal']
-    print('ILOSć DNI', how_many_days)
-    print('dwa razy', twice_the_same_meal)
     MealsList.objects.filter(user=request.user).delete()
     for option in user_meals_options:
         option_meals_list = []
@@ -130,15 +143,10 @@ def generate_meals_list(request):
                 item = random.choice(option_meals_list)
                 random_meals_list.append(item)
                 option_meals_list.remove(item)
-        #
-        days = days_generator(0,int(how_many_days))
+        days = days_generator(0, int(how_many_days))
         for k in range(len(random_meals_list)):
-            print(days[k],random_meals_list[k],option,request.user)
-
-            newMealsList = MealsList(day=days[k], meal_id=random_meals_list[k].id,meal_option_id=meal_option.id,user_id=request.user.id)
-            # newMealsList = MealsList(day='PN', meal_id=1,meal_option_id=11,user_id=request.user.id)
-            newMealsList.save()
-
-        # for meal_position in random_meals_list:
-        #     print('day', meal_option, meal_position, request.user )
+            print(days[k], random_meals_list[k], option, request.user)
+            new_meals_list = MealsList(day=days[k], meal_id=random_meals_list[k].id, meal_option_id=meal_option.id,
+                                       user_id=request.user.id)
+            new_meals_list.save()
     return redirect('meals:index')
