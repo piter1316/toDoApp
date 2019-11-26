@@ -62,6 +62,15 @@ def meals(request):
 
     maximum_no_of_days_to_generate = get_maximum_no_of_days(request)
     first_day_input_list = Week.objects.all()
+    user_meals_options_select = MealsList.objects.filter(user=request.user).order_by('meal_option__position').values('meal_option_id','meal_option_id__meal_option').distinct()
+    option_meals_dict = {}
+    for option in user_meals_options_select:
+        option_meals_list = []
+        meals_in_option = Meal.objects.filter(meal_option=option['meal_option_id'], user=request.user)
+        meal_option = get_object_or_404(MealOption, pk=option['meal_option_id'], user=request.user)
+        for meal in meals_in_option:
+            option_meals_list.append(meal)
+        option_meals_dict[meal_option] = option_meals_list
 
     context = {
         'meals_options_dict': meals_options_dict,
@@ -71,7 +80,8 @@ def meals(request):
         'day_meal_option_meal_list': day_meal_option_meal_list,
         'maximum_no_of_days_to_generate': maximum_no_of_days_to_generate,
         'in_meals_list': in_meals_list,
-        'first_day_input_list': first_day_input_list
+        'first_day_input_list': first_day_input_list,
+        'option_meals_dict':option_meals_dict
     }
     return render(request, 'meals/meals_list.html', context)
 
@@ -175,4 +185,15 @@ def generate_meals_list(request):
             new_meals_list = MealsList(day=days[k], meal_id=random_meals_list[k].id, meal_option_id=meal_option.id,
                                        user_id=request.user.id)
             new_meals_list.save()
+    return redirect('meals:index')
+
+@require_POST
+def update_meals_list(request):
+    meals_list_item_id_list = request.POST.getlist('meals_list_item[]')
+    updated_meals_id_list = request.POST.getlist('options[]')
+
+    for i in range(len(meals_list_item_id_list)):
+        MealsList.objects.filter(pk=meals_list_item_id_list[i]).update(meal_id=updated_meals_id_list[i])
+    print(meals_list_item_id_list)
+    print(updated_meals_id_list)
     return redirect('meals:index')
