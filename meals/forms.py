@@ -25,6 +25,6 @@ class IngredientForm(forms.Form):
 class MealOptionForm(forms.Form):
     meal_option = forms.CharField(max_length=100, widget=forms.TextInput(
         attrs={'class': 'form-control',
-               'placeholder': 'Nowy posiłek', 'aria-label': 'shoppingList',
+               'placeholder': 'Nowy posiłek. Np: Podwieczorek', 'aria-label': 'shoppingList',
                'aria-describedby': 'add-btn'}))
 
