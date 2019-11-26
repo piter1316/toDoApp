@@ -26,6 +26,12 @@
             {% endfor %}
             <label><input type="number" name="howManyDays" min="1" max="{{maximum_no_of_days_to_generate}}">Na ile dni</label>
             <label><input type="checkbox" checked name="twice_the_same_meal">Jeden posiłek rzez dwa dni?</label>
+            <label>Pierwszy dzień
+            <select name="first_day" id="first_day">
+              {% for day in first_day_input_list %}
+              <option value="{{day.id}}">{{day}}</option>
+              {% endfor %}
+            </select></label>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuluj</button>

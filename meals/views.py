@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 
 from meals.forms import MealForm, IngredientForm, MealOptionForm
-from meals.models import MealOption, Meal, Ingredient, MealsList
+from meals.models import MealOption, Meal, Ingredient, MealsList, Week
 
 
 def days_generator(first, how_many):
@@ -61,6 +61,7 @@ def meals(request):
         day_meal_option_meal_list.append({day: day_meals_list})
 
     maximum_no_of_days_to_generate = get_maximum_no_of_days(request)
+    first_day_input_list = Week.objects.all()
 
     context = {
         'meals_options_dict': meals_options_dict,
@@ -69,7 +70,8 @@ def meals(request):
         'generated_user_meals_options': generated_user_meals_options,
         'day_meal_option_meal_list': day_meal_option_meal_list,
         'maximum_no_of_days_to_generate': maximum_no_of_days_to_generate,
-        'in_meals_list': in_meals_list
+        'in_meals_list': in_meals_list,
+        'first_day_input_list': first_day_input_list
     }
     return render(request, 'meals/meals_list.html', context)
 
@@ -132,6 +134,7 @@ def generate_meals_list(request):
     user_meals_options = request.POST.getlist('mealsOptions[]')
     how_many_days = request.POST['howManyDays']
     twice_the_same_meal = request.POST.get('twice_the_same_meal', False)
+    first_day = int(request.POST['first_day'])
     MealsList.objects.filter(user=request.user).delete()
     for option in user_meals_options:
         option_meals_list = []
@@ -167,7 +170,7 @@ def generate_meals_list(request):
                     item = random.choice(option_meals_list)
                     random_meals_list.append(item)
                     option_meals_list.remove(item)
-        days = days_generator(0, int(how_many_days))
+        days = days_generator(first_day, int(how_many_days))
         for k in range(len(random_meals_list)):
             new_meals_list = MealsList(day=days[k], meal_id=random_meals_list[k].id, meal_option_id=meal_option.id,
                                        user_id=request.user.id)

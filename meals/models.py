@@ -5,7 +5,7 @@ from django.db import models
 class MealOption(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     meal_option = models.TextField(max_length=15)
-    position = models.SmallIntegerField(max_length=10, default=0)
+    position = models.SmallIntegerField(default=0)
 
     def __str__(self):
         return self.meal_option
@@ -39,3 +39,10 @@ class MealsList(models.Model):
 
     def __str__(self):
         return self.meal.name
+
+
+class Week(models.Model):
+    day_of_the_week = models.TextField(max_length=15)
+
+    def __str__(self):
+        return self.day_of_the_week
