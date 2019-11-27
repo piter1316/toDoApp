@@ -123,8 +123,13 @@ def add_meal(request, meal_option_id):
     form = MealForm(request.POST)
     meal_option = get_object_or_404(MealOption, pk=meal_option_id)
     meal = get_object_or_404(Meal, pk=meal_option_id)
+    special = request.POST['special']
+    if special:
+        special = True
+    else:
+        special = False
     if form.is_valid():
-        new_meal = Meal(name=request.POST['name'], user=request.user, meal_option=meal_option)
+        new_meal = Meal(name=request.POST['name'], user=request.user, meal_option=meal_option, special=special)
         new_meal.save()
 
         ingredients = request.POST['ingredients']
@@ -137,7 +142,7 @@ def add_meal(request, meal_option_id):
             shop = ingredient_properties_list[3]
 
             new_ingredient = Ingredient(user=request.user, meal_id=new_meal, name=ingredient, quantity=quantity,
-                                        shop=shop, unit_id = unit)
+                                        shop=shop, unit_id=unit)
             new_ingredient.save()
     return redirect('meals:edit_meals')
 
@@ -159,7 +164,7 @@ def generate_meals_list(request):
     MealsList.objects.filter(user=request.user).delete()
     for option in user_meals_options:
         option_meals_list = []
-        meals_in_option = Meal.objects.filter(meal_option=option, user=request.user)
+        meals_in_option = Meal.objects.filter(meal_option=option, user=request.user, special=0)
         meal_option = get_object_or_404(MealOption, pk=option, user=request.user)
         for meal in meals_in_option:
             option_meals_list.append(meal)

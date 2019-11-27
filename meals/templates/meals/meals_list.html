@@ -54,7 +54,7 @@
                       <select name="to_update">
                         <option value="{{ch_meal.meal_id}}">{{ch_meal}}</option>
                         {% for m in all %}
-                          <option value="{{m.id}}">{{m}}</option>
+                          <option value="{{m.id}}">{{m}}{% if m.special %} ** {% endif %}</option>
                         {% endfor %}
                       </select>
                     </div>
