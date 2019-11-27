@@ -32,7 +32,11 @@ def get_maximum_no_of_days(request):
     for option in user_meals_options:
         meals_in_option = Meal.objects.filter(user=request.user, meal_option=option)
         no_of_meals_in_option.append(len(meals_in_option))
-    return min(no_of_meals_in_option)
+    if len(no_of_meals_in_option) > 0:
+        min_no_of_meals_in_option = min(no_of_meals_in_option)
+        return min_no_of_meals_in_option
+    else:
+        return 0
 
 
 @login_required(login_url='/accounts/login')
@@ -123,7 +127,7 @@ def edit_meals(request):
 def add_meal(request, meal_option_id):
     form = MealForm(request.POST)
     meal_option = get_object_or_404(MealOption, pk=meal_option_id)
-    meal = get_object_or_404(Meal, pk=meal_option_id)
+    # meal = get_object_or_404(Meal, pk=meal_option_id)
     if 'special' in request.POST:
         special = request.POST['special']
         if special == 'on':
