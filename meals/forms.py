@@ -8,7 +8,7 @@ class MealForm(forms.Form):
         attrs={'class': 'form-control mb-2',
                'placeholder': 'Danie', 'aria-label': 'shoppingList',
                'aria-describedby': 'add-btn'}))
-    special = forms.BooleanField()
+    special = forms.BooleanField(required=False)
 
 
 class IngredientForm(forms.Form):

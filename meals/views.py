@@ -15,14 +15,14 @@ def days_generator(first, how_many):
     itr = ''
     space = ''
     for i in range(how_many):
-        days_list.append(days[first]+space+str(itr))
+        days_list.append(days[first] + space + str(itr))
         first += 1
         if first == len(days):
             first = 0
             if itr == '':
                 itr = 1
             itr += 1
-            space ='_'
+            space = '_'
     return days_list
 
 
@@ -37,7 +37,7 @@ def get_maximum_no_of_days(request):
 
 @login_required(login_url='/accounts/login')
 def meals(request):
-    in_meals_list =True
+    in_meals_list = True
     meals_options = MealOption.objects.filter(user=request.user)
     meals_options_dict = {}
 
@@ -70,7 +70,8 @@ def meals(request):
 
     maximum_no_of_days_to_generate = get_maximum_no_of_days(request)
     first_day_input_list = Week.objects.all()
-    user_meals_options_select = MealsList.objects.filter(user=request.user).order_by('meal_option__position').values('meal_option_id','meal_option_id__meal_option').distinct()
+    user_meals_options_select = MealsList.objects.filter(user=request.user).order_by('meal_option__position').values(
+        'meal_option_id', 'meal_option_id__meal_option').distinct()
     option_meals_dict = {}
     for option in user_meals_options_select:
         option_meals_list = []
@@ -89,7 +90,7 @@ def meals(request):
         'maximum_no_of_days_to_generate': maximum_no_of_days_to_generate,
         'in_meals_list': in_meals_list,
         'first_day_input_list': first_day_input_list,
-        'option_meals_dict':option_meals_dict
+        'option_meals_dict': option_meals_dict
     }
     return render(request, 'meals/meals_list.html', context)
 
@@ -123,9 +124,10 @@ def add_meal(request, meal_option_id):
     form = MealForm(request.POST)
     meal_option = get_object_or_404(MealOption, pk=meal_option_id)
     meal = get_object_or_404(Meal, pk=meal_option_id)
-    special = request.POST['special']
-    if special:
-        special = True
+    if 'special' in request.POST:
+        special = request.POST['special']
+        if special == 'on':
+            special = True
     else:
         special = False
     if form.is_valid():
@@ -204,6 +206,7 @@ def generate_meals_list(request):
                                        user_id=request.user.id)
             new_meals_list.save()
     return redirect('meals:index')
+
 
 @require_POST
 def update_meals_list(request):
