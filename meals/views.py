@@ -19,7 +19,8 @@ def days_generator(first, how_many):
         first += 1
         if first == len(days):
             first = 0
-            itr = 1
+            if itr == '':
+                itr = 1
             itr += 1
             space ='_'
     return days_list

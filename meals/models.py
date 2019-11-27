@@ -43,6 +43,9 @@ class MealsList(models.Model):
         else:
             return ''
 
+    def day_as_list(self):
+        return self.day.split('_')
+
 
 class Week(models.Model):
     day_of_the_week = models.TextField(max_length=15)

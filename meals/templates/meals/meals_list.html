@@ -2,6 +2,7 @@
 
 
 {% block body %}
+{% load split %}
 <div class="container-fluid bg-light py-2 mt-3">
   <div class="row">
     {% include 'meals/menu.html' %}
@@ -20,7 +21,11 @@
           {% for item in day_meal_option_meal_list %}
           {% for day, meals in item.items %}
           <tr>
-            <th scope="row">{{day}}</th>
+            <th scope="row">
+              {% with day_as_list=day|split %}
+              {{day_as_list.0}}
+              {% endwith %}
+            </th>
             {% for meal in meals %}
             <td>{%for ch_meal, all in meal.items%}
               {{ch_meal}}
@@ -28,7 +33,6 @@
                       data-target="#edit_meals_list_pos_{{ch_meal.id}}">
                 <i class=" fas fa-edit p-0 "></i>
               </button>
-
               <!-- Modal -->
               <div class="modal fade" id="edit_meals_list_pos_{{ch_meal.id}}" tabindex="-1" role="dialog"
                    aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -64,10 +68,6 @@
               {% endfor %}
             </td>
             {% endfor %}
-            <td>
-
-
-            </td>
           </tr>
           {% endfor %}
           {% endfor %}
@@ -76,7 +76,5 @@
       </div>
     </div>
   </div>
-
-
 </div>
 {% endblock %}
