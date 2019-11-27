@@ -14,3 +14,10 @@ class ProductsForm(forms.Form):
                'placeholder': 'Dodaj na listę', 'aria-label': 'shoppingList',
                'aria-describedby': 'add-btn'}))
 
+    quantity = forms.FloatField(widget=forms.NumberInput(
+        attrs={'value': 1,
+               'class': 'form-control',
+               'style': 'max-width:75px;'}))
+
+
+

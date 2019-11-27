@@ -8,12 +8,12 @@
     {% include 'meals/menu.html' %}
     <div class="col-12 col-md-10 ">
       <div class="table-responsive-sm">
-        <table class="table table-hover table-dark">
-          <thead>
+        <table class="table table-hover table-dark table-striped table-sm">
+          <thead class="bg-secondary">
           <tr>
-            <th scope="col">#</th>
+            <th scope="col"></th>
             {% for meal_option in generated_user_meals_options %}
-            <th scope="col">{{meal_option.meal_option__meal_option|upper}}</th>
+            <th scope="col"><b>{{meal_option.meal_option__meal_option|upper}}</b></th>
             {% endfor %}
           </tr>
           </thead>

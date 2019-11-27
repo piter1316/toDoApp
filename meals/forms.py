@@ -20,6 +20,9 @@ class IngredientForm(forms.Form):
     quantity = forms.IntegerField(widget=forms.NumberInput(
         attrs={'value': 1,
                'class': 'form-control'}))
+    unit = forms.ChoiceField(widget=forms.Select(
+        attrs={'class': 'form-control'}
+    ))
 
 
 class MealOptionForm(forms.Form):

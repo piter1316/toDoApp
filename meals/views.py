@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 
 from meals.forms import MealForm, IngredientForm, MealOptionForm
-from meals.models import MealOption, Meal, Ingredient, MealsList, Week
+from meals.models import MealOption, Meal, Ingredient, MealsList, Week, Unit
 
 
 def days_generator(first, how_many):
@@ -100,6 +100,7 @@ def edit_meals(request):
     form_meal_option = MealOptionForm(request.POST)
     meals_options = MealOption.objects.filter(user=request.user).order_by('position')
     meals_options_dict = {}
+    units = Unit.objects.all()
     for i in range(len(meals_options)):
         meals_in_meals_options = Meal.objects.filter(meal_option=meals_options[i])
         meals = []
@@ -112,6 +113,7 @@ def edit_meals(request):
         'meals_options_dict': meals_options_dict,
         'form_ingredient': form_ingredient,
         'form_meal_option': form_meal_option,
+        'units': units,
     }
     return render(request, 'meals/edit.html', context)
 
@@ -131,10 +133,11 @@ def add_meal(request, meal_option_id):
             ingredient_properties_list = item.split(' - ')
             ingredient = ingredient_properties_list[0]
             quantity = ingredient_properties_list[1]
-            shop = ingredient_properties_list[2]
+            unit = ingredient_properties_list[2]
+            shop = ingredient_properties_list[3]
 
             new_ingredient = Ingredient(user=request.user, meal_id=new_meal, name=ingredient, quantity=quantity,
-                                        shop=shop)
+                                        shop=shop, unit_id = unit)
             new_ingredient.save()
     return redirect('meals:edit_meals')
 

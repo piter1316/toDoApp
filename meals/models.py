@@ -20,12 +20,20 @@ class Meal(models.Model):
         return self.name
 
 
+class Unit(models.Model):
+    unit = models.TextField(max_length=5)
+
+    def __str__(self):
+        return self.unit
+
+
 class Ingredient(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
-    meal_id = models.ForeignKey(Meal, on_delete=models.DO_NOTHING, default=1)
+    meal_id = models.ForeignKey(Meal, on_delete=models.CASCADE, default=1)
     name = models.TextField(max_length=50)
     shop = models.TextField(max_length=50)
-    quantity = models.SmallIntegerField(default=1)
+    quantity = models.FloatField(default=1)
+    unit = models.ForeignKey(Unit, default=1, on_delete=models.DO_NOTHING)
 
     def __str__(self):
         return self.name

@@ -41,8 +41,13 @@
           </div>
           <form class="input-group mb-3" action="{% url 'shopping:add_product' shop.id %}" method="POST" role="form">
             {% csrf_token %}
-            {{form_2.quantity}}
             {{form_2.product_name}}
+            {{form_2.quantity}}
+            <select class="form-control" name="prod_unit" style="max-width:75px;">
+            {% for unit in units %}
+              <option value="{{unit.id}}">{{unit}}</option>
+              {% endfor %}
+            </select>
             <div class="input-group-append">
               <button class="btn btn-outline-secondary" type="submit">+</button>
             </div>
@@ -81,12 +86,18 @@
             {% for prod, qt in product.items %}
               {% if qt.1 %}
                 <li class="list-group-item d-flex justify-content-between todo-completed align-items-center">{{prod}}
-                  <span class="badge badge-primary badge-pill">{{qt.0}}</span>
+                  <span>
+                    <span class="badge badge-primary badge-pill todo-completed">{{qt.0}}</span>
+                    <span class="badge badge-primary badge-pill todo-completed">{{qt.3}}</span>
+                  </span>
                 </li>
               {% else %}
                 <a class="list-group-item" href=" {% url 'shopping:bought' qt.2 %}">
                   <li class="d-flex justify-content-between align-items-center">{{prod}}
-                    <span class="badge badge-primary badge-pill">{{qt.0}}</span>
+                    <span>
+                      <span class="badge badge-primary badge-pill">{{qt.0}}</span>
+                      <span class="badge badge-primary badge-pill">{{qt.3}}</span>
+                    </span>
                   </li>
                 </a>
               {% endif %}
