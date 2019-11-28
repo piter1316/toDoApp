@@ -31,7 +31,7 @@ def get_maximum_no_of_days(request):
     user_meals_options = MealOption.objects.filter(user=request.user)
     no_of_meals_in_option = []
     for option in user_meals_options:
-        meals_in_option = Meal.objects.filter(user=request.user, meal_option=option)
+        meals_in_option = Meal.objects.filter(user=request.user, meal_option=option, special=0)
         no_of_meals_in_option.append(len(meals_in_option))
     if len(no_of_meals_in_option) > 0:
         min_no_of_meals_in_option = min(no_of_meals_in_option)
@@ -229,10 +229,10 @@ def edit_meal(request, meal_id):
 
 def add_ingredient(request, meal_id):
     meal = get_object_or_404(Meal, pk=meal_id)
-    ingredient = request.POST['ingredient']
+    ingredient = request.POST['ingredient'].lower()
     quantity = request.POST['quantity']
     unit = request.POST['unit']
-    shop = request.POST['shop']
+    shop = request.POST['shop'].upper()
 
     new_ingredient = Ingredient(user=request.user, meal_id=meal, name=ingredient, quantity=quantity,
                                 shop=shop, unit_id=unit)

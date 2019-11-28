@@ -1,8 +1,7 @@
-{% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  {% load static %}
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,9 +9,6 @@
   <script src="https://kit.fontawesome.com/56500f3944.js" crossorigin="anonymous"></script>
   <script src="{% static 'todo/js_passwd_generator.js' %}" crossorigin="anonymous"></script>
   <script src="{% static 'todo/ingredients_builder.js' %}" crossorigin="anonymous"></script>
-
-
-
   <link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet">
 
   <!-- Bootstrap CSS -->
@@ -51,7 +47,7 @@
       </li>
     </ul>
     {% if user.is_authenticated %}
-    <form class="text-center" class="logout-link ml-2" action="{% url 'accounts:logout' %}" method="post">
+    <form class="text-center logout-link ml-2"  action="{% url 'accounts:logout' %}" method="post">
       {% csrf_token %}
       <div class="input-group">
         <div class="input-group-append mx-auto">
@@ -61,7 +57,7 @@
       </div>
      </form>
     {% else %}
-      <a class="btn btn-success" href="{% url 'accounts:login' %}">Zaloguj</a>
+      <a class="btn btn-success d-block mx-auto" href="{% url 'accounts:login' %}">Zaloguj</a>
     {% endif %}
   </div>
 </nav>
