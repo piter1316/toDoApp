@@ -238,3 +238,20 @@ def add_ingredient(request, meal_id):
                                 shop=shop, unit_id=unit)
     new_ingredient.save()
     return redirect('meals:edit_meal', meal_id=meal_id)
+
+
+def update_ingredient(request, ingredient_id, meal_id):
+    print(ingredient_id)
+    new_ingredient_name = request.POST['new_ingredient_name']
+    new_quantity = request.POST['new_quantity']
+    new_unit = request.POST['new_unit']
+    new_shop = request.POST['new_shop']
+
+    Ingredient.objects.filter(pk=ingredient_id).update(name=new_ingredient_name, quantity=new_quantity, unit=new_unit,
+                                                       shop=new_shop)
+    return redirect('meals:edit_meal', meal_id=meal_id)
+
+
+def delete_ingredient(request, meal_id, ingredient_id):
+    Ingredient.objects.filter(pk=ingredient_id).delete()
+    return redirect('meals:edit_meal', meal_id=meal_id)

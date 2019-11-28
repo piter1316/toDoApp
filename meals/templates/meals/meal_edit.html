@@ -21,7 +21,7 @@
               <span class="badge badge-primary badge-pill p-2">{{ingredient.shop}}</span>
               <span class="badge badge-primary badge-pill dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <div class="dropdown-menu p-3" aria-labelledby="dropdownMenuButton">
-                  <form class="form" action="x" method="post">{% csrf_token %}
+                  <form class="form" action="{% url 'meals:update_ingredient' meal.0.id ingredient.id  %}" method="post">{% csrf_token %}
                     <div class="from-group row">
                       <div class="col-12">
                         <input class="form-control" type="text" name="new_ingredient_name" value="{{ingredient}}">
@@ -43,13 +43,13 @@
                     </div>
                     <div class="from-group row">
                       <div class="col-12">
-                        <input class="form-control" type="text" name="new_product_name" value="{{ingredient.shop}}">
+                        <input class="form-control" type="text" name="new_shop" value="{{ingredient.shop}}">
                       </div>
                     </div>
                     <div class="form-group row mb-0">
                       <div class="col-12">
                         <button class="btn btn-primary btn-block" type="submit">Zmień</button>
-                        <button class="btn btn-danger btn-block" type="submit">Usuń składnik</button>
+                        <a href="{% url 'meals:delete_ingredient' meal.0.id  ingredient.id %}" class="btn btn-danger btn-block" type="button">Usuń składnik</a>
                       </div>
                     </div>
                   </form>
