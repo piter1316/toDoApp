@@ -16,38 +16,73 @@
           <li class="list-group-item d-flex justify-content-between align-items-center">
             {{ingredient}}
             <span>
-              <span class="badge badge-primary badge-pill">{{ingredient.quantity}}</span>
-              <span class="badge badge-primary badge-pill">{{ingredient.unit}}</span>
-              <span class="badge badge-primary badge-pill">{{ingredient.shop}}</span>
+              <span class="badge badge-primary badge-pill p-2">{{ingredient.quantity}}</span>
+              <span class="badge badge-primary badge-pill p-2">{{ingredient.unit}}</span>
+              <span class="badge badge-primary badge-pill p-2">{{ingredient.shop}}</span>
+              <span class="badge badge-primary badge-pill dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <div class="dropdown-menu p-3" aria-labelledby="dropdownMenuButton">
+                  <form class="form" action="x" method="post">{% csrf_token %}
+                    <div class="from-group row">
+                      <div class="col-12">
+                        <input class="form-control" type="text" name="new_ingredient_name" value="{{ingredient}}">
+                      </div>
+                    </div>
+                    <div class="from-group row">
+                      <div class="col-6 pr-0">
+                        <input class="form-control" type="number" name="new_quantity" value="{{ingredient.quantity}}">
+                      </div>
+                      <div class="col-6 pl-0">
+                        <select class="form-control" name="new_unit">
+                          <option value="{{ingredient.unit.id}}">{{ingredient.unit}}</option>
+                          <option disabled>-----</option>
+                          {% for unit in units %}
+                            <option value="{{unit.id}}">{{unit}}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                    </div>
+                    <div class="from-group row">
+                      <div class="col-12">
+                        <input class="form-control" type="text" name="new_product_name" value="{{ingredient.shop}}">
+                      </div>
+                    </div>
+                    <div class="form-group row mb-0">
+                      <div class="col-12">
+                        <button class="btn btn-primary btn-block" type="submit">Zmień</button>
+                        <button class="btn btn-danger btn-block" type="submit">Usuń składnik</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </span>
             </span>
           </li>
           {% endfor %}
           <li class="list-group-item">
-            <form action="x" method="post" >
-                {% csrf_token %}
-                  {{form.name}}
-                <div class="form-row mb-2">
-                  <div class="col">
-                    <input class="form-control" type="text" placeholder="Składnik" id="ingredient_{{meal_option.id}}">
-                  </div>
-                  <div class="col">
-                    <input class="form-control" type="number" placeholder="Ilość" id ="quantity_{{meal_option.id}}" value="1">
-                  </div>
-                  <div class="col">
-                    <select class="form-control" name="unit" id="unit_{{meal_option.id}}">
-                      {% for unit in units %}
-                      <option value="{{unit.id}}">{{unit}}</option>
-                      {% endfor %}
-                    </select>
-                  </div>
-                  <div class="col">
-                    <input class="form-control" type="text" placeholder="Sklep" id="shop_{{meal_option.id}}">
-                  </div>
-                  <div class="col">
-                    <button class="btn btn-success btn-block" type="button" type="submit">+Składnik</button>
-                  </div>
+            <form action="{% url 'meals:add_ingredient' meal.0.id %}" method="post">{% csrf_token %}
+              {{form.name}}
+              <div class="form-row mb-2">
+                <div class="col">
+                  <input class="form-control" type="text" placeholder="Składnik" name="ingredient">
                 </div>
-              </form>
+                <div class="col">
+                  <input class="form-control" type="number" placeholder="Ilość" name="quantity" value="1">
+                </div>
+                <div class="col">
+                  <select class="form-control" name="unit" name="unit">
+                    {% for unit in units %}
+                    <option value="{{unit.id}}">{{unit}}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col">
+                  <input class="form-control" type="text" placeholder="Sklep" name="shop">
+                </div>
+                <div class="col">
+                  <button class="btn btn-success btn-block" type="submit" type="submit">+Składnik</button>
+                </div>
+              </div>
+            </form>
           </li>
         </ul>
       </div>

@@ -3,6 +3,7 @@ import random
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 # Create your views here.
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from meals.forms import MealForm, IngredientForm, MealOptionForm
@@ -225,3 +226,15 @@ def edit_meal(request, meal_id):
     }
     return render(request, 'meals/meal_edit.html', context)
 
+
+def add_ingredient(request, meal_id):
+    meal = get_object_or_404(Meal, pk=meal_id)
+    ingredient = request.POST['ingredient']
+    quantity = request.POST['quantity']
+    unit = request.POST['unit']
+    shop = request.POST['shop']
+
+    new_ingredient = Ingredient(user=request.user, meal_id=meal, name=ingredient, quantity=quantity,
+                                shop=shop, unit_id=unit)
+    new_ingredient.save()
+    return redirect('meals:edit_meal', meal_id=meal_id)

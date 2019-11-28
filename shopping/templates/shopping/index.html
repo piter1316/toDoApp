@@ -91,35 +91,35 @@
                   <span>
                     <span class="badge badge-primary badge-pill">{{qt.0}}</span>
                     <span class="badge badge-primary badge-pill">{{qt.3}}</span>
-                      <span class="badge badge-primary badge-pill dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <div class="dropdown-menu p-3" aria-labelledby="dropdownMenuButton">
-                          <form class="form" action="{% url 'shopping:update_product' prod.id %}" method="post">{% csrf_token %}
-                            <div class="from-group row">
-                              <div class="col-12">
-                                <input class="form-control" type="text" name="new_product_name" value="{{prod}}">
-                              </div>
+                    <span class="badge badge-primary badge-pill dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <div class="dropdown-menu p-3" aria-labelledby="dropdownMenuButton">
+                        <form class="form" action="{% url 'shopping:update_product' prod.id %}" method="post">{% csrf_token %}
+                          <div class="from-group row">
+                            <div class="col-12">
+                              <input class="form-control" type="text" name="new_product_name" value="{{prod}}">
                             </div>
-                            <div class="from-group row">
-                              <div class="col-6 pr-0">
-                                <input class="form-control" type="number" name="new_quantity" value="{{qt.0}}">
-                              </div>
-                              <div class="col-6 pl-0">
-                                <select class="form-control" name="new_unit">
-                                  <option value="{{qt.3.id}}">{{qt.3}}</option>
-                                  <option disabled>-----</option>
-                                  {% for unit in units %}
-                                    <option value="{{unit.id}}">{{unit}}</option>
-                                  {% endfor %}
-                                </select>
-                              </div>
+                          </div>
+                          <div class="from-group row">
+                            <div class="col-6 pr-0">
+                              <input class="form-control" type="number" name="new_quantity" value="{{qt.0}}">
                             </div>
-                            <div class="form-group row mb-0">
-                              <div class="col-12">
-                                <button class="btn btn-primary btn-block" type="submit">Zmień</button>
-                              </div>
+                            <div class="col-6 pl-0">
+                              <select class="form-control" name="new_unit">
+                                <option value="{{qt.3.id}}">{{qt.3}}</option>
+                                <option disabled>-----</option>
+                                {% for unit in units %}
+                                  <option value="{{unit.id}}">{{unit}}</option>
+                                {% endfor %}
+                              </select>
                             </div>
-                          </form>
-                        </div>
+                          </div>
+                          <div class="form-group row mb-0">
+                            <div class="col-12">
+                              <button class="btn btn-primary btn-block" type="submit">Zmień</button>
+                            </div>
+                          </div>
+                        </form>
+                      </div>
                     </span>
                   </span>
                 </li>
