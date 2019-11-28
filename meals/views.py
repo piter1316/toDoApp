@@ -214,7 +214,13 @@ def delete_meal_option(request, meal_option_id):
     return redirect('meals:edit_meals')
 
 
-def edit_meal(request,meal_id):
+def edit_meal(request, meal_id):
     print(meal_id)
-    context = {}
+    meal = Meal.objects.filter(user_id=request.user, pk=meal_id)
+    ingredients = Ingredient.objects.filter(user=request.user, meal_id=meal_id)
+    print(ingredients)
+    context = {
+        'meal': meal,
+        'ingredients': ingredients
+    }
     return render(request, 'meals/meal_edit.html', context)
