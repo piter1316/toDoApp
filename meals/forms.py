@@ -7,7 +7,8 @@ class MealForm(forms.Form):
     name = forms.CharField(max_length=100, widget=forms.TextInput(
         attrs={'class': 'form-control mb-2',
                'placeholder': 'Danie', 'aria-label': 'shoppingList',
-               'aria-describedby': 'add-btn'}))
+               'aria-describedby': 'add-btn',
+               'required': 'True'}))
     special = forms.BooleanField(required=False)
 
 
