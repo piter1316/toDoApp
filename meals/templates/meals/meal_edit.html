@@ -51,7 +51,7 @@
                     <div class="form-group row mb-0">
                       <div class="col-12">
                         <button class="btn btn-primary btn-block" type="submit">Zmień</button>
-                        <a href="{% url 'meals:delete_ingredient' meal.0.id  ingredient.id %}" class="btn btn-danger btn-block" type="button">Usuń składnik</a>
+                        <a href="{% url 'meals:delete_ingredient' meal.0.id  ingredient.id %}" class="btn btn-danger btn-block">Usuń składnik</a>
                       </div>
                     </div>
                   </form>
@@ -92,6 +92,7 @@
                 </div>
               </div>
             </form>
+            <a href="{% url 'meals:delete_meal' meal.0.id  %}" class="btn btn-danger btn-block">Usuń {{meal.0.name}}</a>
           </li>
         </ul>
       </div>

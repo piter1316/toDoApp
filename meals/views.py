@@ -44,6 +44,7 @@ def get_maximum_no_of_days(request):
 def meals(request):
     in_meals_list = True
     meals_options = MealOption.objects.filter(user=request.user)
+
     meals_options_dict = {}
 
     for i in range(len(meals_options)):
@@ -255,3 +256,13 @@ def update_ingredient(request, ingredient_id, meal_id):
 def delete_ingredient(request, meal_id, ingredient_id):
     Ingredient.objects.filter(pk=ingredient_id).delete()
     return redirect('meals:edit_meal', meal_id=meal_id)
+
+
+def delete_meal(request, meal_id):
+    Meal.objects.filter(pk=meal_id).delete()
+    return redirect('meals:edit_meals')
+
+
+def purge_meals_list(request):
+    MealsList.objects.all().delete()
+    return redirect('meals:index')
