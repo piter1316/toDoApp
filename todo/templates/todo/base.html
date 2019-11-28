@@ -57,7 +57,10 @@
       </div>
      </form>
     {% else %}
-      <a class="btn btn-success d-block mx-auto" href="{% url 'accounts:login' %}">Zaloguj</a>
+    <div class="text-center">
+      <a class="btn btn-success btn-block" href="{% url 'accounts:login' %}">Zaloguj</a>
+    </div>
+
     {% endif %}
   </div>
 </nav>
