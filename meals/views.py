@@ -137,19 +137,6 @@ def add_meal(request, meal_option_id):
     if form.is_valid():
         new_meal = Meal(name=request.POST['name'], user=request.user, meal_option=meal_option, special=special)
         new_meal.save()
-
-        ingredients = request.POST['ingredients']
-        ingredients_list = ingredients.splitlines()
-        for item in ingredients_list:
-            ingredient_properties_list = item.split(' - ')
-            ingredient = ingredient_properties_list[0]
-            quantity = ingredient_properties_list[1]
-            unit = ingredient_properties_list[2]
-            shop = ingredient_properties_list[3]
-
-            new_ingredient = Ingredient(user=request.user, meal_id=new_meal, name=ingredient, quantity=quantity,
-                                        shop=shop, unit_id=unit)
-            new_ingredient.save()
     return redirect('meals:edit_meals')
 
 
@@ -220,3 +207,8 @@ def update_meals_list(request):
 
     MealsList.objects.filter(pk=int(record_id)).update(meal_id=to_update)
     return redirect('meals:index')
+
+
+def delete_meal_option(request, meal_option_id):
+    MealOption.objects.filter(pk=meal_option_id).delete()
+    return redirect('meals:edit_meals')
