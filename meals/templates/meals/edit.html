@@ -25,7 +25,7 @@
             <span class="badge badge-primary badge-pill">{{qt.0}}</span>
           </li>
           {% for meal in meals %}
-          <li class="list-group-item list-group-item-secondary p-1">{{meal}}{% if meal.special %} ** {% endif %}</li>
+          <a href="{% url 'meals:edit_meal' meal.id  %}" class="list-group-item list-group-item-secondary p-1">{{meal}}{% if meal.special %} ** {% endif %}</a>
           {% endfor %}
           <li style="cursor:pointer;"  id="mealOptionSettings_{{meal_option.id}}" class="meal_option_settings list-group-item list-group-item-secondary p-1 mt-2 mb-2"><i class="fas fa-cog"></i></li>
           <li class="list-group-item list-group-item-secondary p-1 d-none" id="settings_{{meal_option.id}}">

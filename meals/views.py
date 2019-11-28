@@ -212,3 +212,9 @@ def update_meals_list(request):
 def delete_meal_option(request, meal_option_id):
     MealOption.objects.filter(pk=meal_option_id).delete()
     return redirect('meals:edit_meals')
+
+
+def edit_meal(request,meal_id):
+    print(meal_id)
+    context = {}
+    return render(request, 'meals/meal_edit.html', context)

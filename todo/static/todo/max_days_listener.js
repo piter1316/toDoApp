@@ -21,12 +21,9 @@ $('#howManyDays').attr({
 
   $('.meal_option_settings').on('click', function(e){
       var id = $(e.target).closest('li').attr('id')
-
       var settings_id = id.split('_')
       var s_id = parseInt(settings_id[1])
-
       $('#settings_'+(s_id)).toggleClass('d-none');
-//      $('#c_'+c_id).addClass('my_highlight');
    });
 
 });
