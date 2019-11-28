@@ -23,7 +23,31 @@
           </li>
           {% endfor %}
           <li class="list-group-item">
-            add
+            <form action="x" method="post" >
+                {% csrf_token %}
+                  {{form.name}}
+                <div class="form-row mb-2">
+                  <div class="col">
+                    <input class="form-control" type="text" placeholder="Składnik" id="ingredient_{{meal_option.id}}">
+                  </div>
+                  <div class="col">
+                    <input class="form-control" type="number" placeholder="Ilość" id ="quantity_{{meal_option.id}}" value="1">
+                  </div>
+                  <div class="col">
+                    <select class="form-control" name="unit" id="unit_{{meal_option.id}}">
+                      {% for unit in units %}
+                      <option value="{{unit.id}}">{{unit}}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div class="col">
+                    <input class="form-control" type="text" placeholder="Sklep" id="shop_{{meal_option.id}}">
+                  </div>
+                  <div class="col">
+                    <button class="btn btn-success btn-block" type="button" type="submit">+Składnik</button>
+                  </div>
+                </div>
+              </form>
           </li>
         </ul>
       </div>
