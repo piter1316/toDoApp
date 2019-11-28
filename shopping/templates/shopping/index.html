@@ -41,13 +41,7 @@
           </div>
           <form class="input-group mb-3" action="{% url 'shopping:add_product' shop.id %}" method="POST" role="form">
             {% csrf_token %}
-            {{form_2.product_name}}
-            {{form_2.quantity}}
-            <select class="form-control" name="prod_unit" style="max-width:75px;">
-            {% for unit in units %}
-              <option value="{{unit.id}}">{{unit}}</option>
-              {% endfor %}
-            </select>
+            {% include 'shopping/product_form.html' %}
             <div class="input-group-append">
               <button class="btn btn-outline-secondary" type="submit">+</button>
             </div>
@@ -92,14 +86,29 @@
                   </span>
                 </li>
               {% else %}
-                <a class="list-group-item" href=" {% url 'shopping:bought' qt.2 %}">
-                  <li class="d-flex justify-content-between align-items-center">{{prod}}
-                    <span>
-                      <span class="badge badge-primary badge-pill">{{qt.0}}</span>
-                      <span class="badge badge-primary badge-pill">{{qt.3}}</span>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <a class="" href=" {% url 'shopping:bought' qt.2 %}">{{prod}} </a>
+                  <span>
+                    <span class="badge badge-primary badge-pill">{{qt.0}}</span>
+                    <span class="badge badge-primary badge-pill">{{qt.3}}</span>
+                      <span class="badge badge-primary badge-pill dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                          <form action="{% url 'shopping:update_product' prod.id %}" method="post">{% csrf_token %}
+                            <input type="text" name="new_product_name" value="{{prod}}">
+                            <input type="number" name="new_quantity" value="{{qt.0}}">
+                            <select name="new_unit">
+                              <option value="{{qt.3.id}}">{{qt.3}}</option>
+                              <option disabled>-----</option>
+                              {% for unit in units %}
+                                <option value="{{unit.id}}">{{unit}}</option>
+                              {% endfor %}
+                            </select>
+                            <input type="submit" value="Update">
+                          </form>
+                        </div>
                     </span>
-                  </li>
-                </a>
+                  </span>
+                </li>
               {% endif %}
             {% endfor %}
           {% endfor %}

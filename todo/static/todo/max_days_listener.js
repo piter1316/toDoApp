@@ -14,4 +14,9 @@ $('#howManyDays').attr({
         console.log('un_ch'+parseInt(max_days) )
     }
 });
+
+    $('.dropdown-menu').click(function(e){
+//
+e.stopPropagation();
+  })
 });

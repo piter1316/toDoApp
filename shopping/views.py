@@ -1,7 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
-
 # Create your views here.
 from django.views.decorators.http import require_POST
 
@@ -22,7 +20,7 @@ def shopping_list_index(request):
         products = []
         for product in products_on_shopping_list:
             product_quantity_bought = [product.quantity, product.bought, product.id, product.unit]
-            product_quantity = {product.product_name: product_quantity_bought}
+            product_quantity = {product: product_quantity_bought}
             products.append(product_quantity)
 
         shopping_lists_dict[shopping_lists[i]] = products
@@ -63,9 +61,16 @@ def add_product(request, shopping_list_id):
                                 quantity=request.POST['quantity'],
                                 unit_id=request.POST['prod_unit'])
         new_products.save()
-
-
     return redirect('shopping:shopping_list_index')
+
+
+def update_product(request, product_id):
+    new_name = request.POST['new_product_name']
+    new_quantity = request.POST['new_quantity']
+    new_unit = request.POST['new_unit']
+    Products.objects.filter(pk=product_id).update(product_name=new_name, quantity=new_quantity, unit=new_unit)
+    return redirect('shopping:shopping_list_index')
+
 
 
 def bought(request, id):
