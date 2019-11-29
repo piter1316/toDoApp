@@ -15,6 +15,7 @@ class Meal(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     meal_option = models.ForeignKey(MealOption, on_delete=models.CASCADE)
     name = models.TextField(max_length=100)
+    recipe = models.TextField(null=True, blank=True)
     special = models.BooleanField(default=False)
 
     def __str__(self):

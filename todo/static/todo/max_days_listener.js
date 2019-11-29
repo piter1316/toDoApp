@@ -26,4 +26,11 @@ $('#howManyDays').attr({
       $('#settings_'+(s_id)).toggleClass('d-none');
    });
 
+  $('#allow_update_recipe').on('click', function(e){
+        $('#allow_update_recipe').hide('slow');
+        $('#update_recipe_textarea').removeAttr('readonly');
+        $('#update_recipe_textarea').attr('rows', 5);
+        $('#update_recipe').toggleClass('d-none');
+     });
+
 });

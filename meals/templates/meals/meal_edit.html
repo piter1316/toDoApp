@@ -106,10 +106,10 @@
             </div>
             <ul class="list-group list-group-flush">
               <li class="list-group-item p-0">
-                <form>
-                  <textarea class="form-control" readonly>Przepis</textarea>
-                  <button type="button" class="btn btn-block btn-secondary">Edytuj</button>
-                  <button id="update_recipe" type="submit" class="btn btn-block btn-secondary d-none">Zapisz</button>
+                <form action="{% url 'meals:add_recipe' meal.0.id %}" method="post"> {% csrf_token %}
+                  <textarea name="update_recipe_textarea" id="update_recipe_textarea" class="form-control" placeholder="{% if not meal.0.recipe %}Wprowadź przepis...{% endif %}" rows="{{recipe_rows}}" readonly>{% if meal.0.recipe %}{{meal.0.recipe}}{% endif %}</textarea>
+                  <button id="allow_update_recipe" type="button" class="btn btn-block btn-secondary">Edytuj</button>
+                  <button id="update_recipe" type="submit" class="btn btn-block btn-success mt-0 d-none">Zapisz</button>
                 </form>
               </li>
             </ul>

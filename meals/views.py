@@ -220,10 +220,17 @@ def edit_meal(request, meal_id):
     meal = Meal.objects.filter(user_id=request.user, pk=meal_id)
     ingredients = Ingredient.objects.filter(user=request.user, meal_id=meal_id)
     units = Unit.objects.all()
+    if meal[0].recipe:
+        recipe_rows = len(meal[0].recipe.split('\n'))
+        print(recipe_rows)
+    else:
+        recipe_rows = 1
+
     context = {
         'meal': meal,
         'ingredients': ingredients,
-        'units': units
+        'units': units,
+        'recipe_rows': recipe_rows
     }
     return render(request, 'meals/meal_edit.html', context)
 
@@ -238,6 +245,12 @@ def add_ingredient(request, meal_id):
     new_ingredient = Ingredient(user=request.user, meal_id=meal, name=ingredient, quantity=quantity,
                                 shop=shop, unit_id=unit)
     new_ingredient.save()
+    return redirect('meals:edit_meal', meal_id=meal_id)
+
+
+def add_recipe(request, meal_id):
+    recipe = request.POST['update_recipe_textarea']
+    Meal.objects.filter(pk=meal_id).update(recipe=recipe)
     return redirect('meals:edit_meal', meal_id=meal_id)
 
 
