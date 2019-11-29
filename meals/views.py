@@ -137,7 +137,7 @@ def add_meal(request, meal_option_id):
     else:
         special = False
     if form.is_valid():
-        new_meal = Meal(name=request.POST['name'], user=request.user, meal_option=meal_option, special=special)
+        new_meal = Meal(name=request.POST['name'].lower(), user=request.user, meal_option=meal_option, special=special)
         new_meal.save()
     return redirect('meals:edit_meals')
 
