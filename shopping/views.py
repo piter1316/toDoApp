@@ -39,7 +39,7 @@ def shopping_list_index(request):
 def add_shopping_list(request):
     form = ShoppingListForm(request.POST)
     if form.is_valid():
-        new_shopping_list = ShoppingList(name=request.POST['name'], user_id=request.user)
+        new_shopping_list = ShoppingList(name=request.POST['name'].upper(), user_id=request.user)
         new_shopping_list.save()
 
     return redirect('shopping:shopping_list_index')
@@ -50,17 +50,18 @@ def delete_shopping_list(request, shopping_list_id):
 
     return redirect('shopping:shopping_list_index')
 
+
 @require_POST
 def add_product(request, shopping_list_id):
     shopping_list = get_object_or_404(ShoppingList, pk=shopping_list_id)
     form = ProductsForm(request.POST)
 
     if form.is_valid():
-        new_products = Products(shopping_list_id=shopping_list,
-                                product_name=request.POST['product_name'],
-                                quantity=request.POST['quantity'],
-                                unit_id=request.POST['prod_unit'])
-        new_products.save()
+        new_product = Products(shopping_list_id=shopping_list,
+                               product_name=request.POST['product_name'].lower(),
+                               quantity=request.POST['quantity'],
+                               unit_id=request.POST['prod_unit'])
+        new_product.save()
     return redirect('shopping:shopping_list_index')
 
 
@@ -70,7 +71,6 @@ def update_product(request, product_id):
     new_unit = request.POST['new_unit']
     Products.objects.filter(pk=product_id).update(product_name=new_name, quantity=new_quantity, unit=new_unit)
     return redirect('shopping:shopping_list_index')
-
 
 
 def bought(request, id):
