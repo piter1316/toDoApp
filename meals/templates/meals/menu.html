@@ -27,7 +27,7 @@
           <div class="modal-body">
             <div class="form-row">
               {% for option in user_meals_options %}
-                <div class="col">
+                <div class="col-6">
                   <label><input type="checkbox" value="{{option.id}}" name="mealsOptions[]" checked id="{{option}}">{{option|upper}}</label>
                 </div>
               {% endfor %}
