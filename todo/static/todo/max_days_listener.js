@@ -45,4 +45,12 @@ $('#howManyDays').attr({
     $('#new_meal_option_name').toggleClass('d-none');
   });
 
+  $('.chMeal').on('click', function(e){
+//    $('#new_meal_option_name').toggleClass('d-none');
+  var id = $(e.target).closest('span').attr('id')
+  var int_id = id.split('_')[1]
+  var form_id = 'form_'+int_id
+  $('#'+form_id).toggleClass('d-none');
+  });
+
 });
