@@ -31,7 +31,7 @@ $('#howManyDays').attr({
     $('#update_recipe_textarea').removeAttr('readonly');
     var rows = $('#update_recipe_textarea').attr('rows');
     console.log(rows)
-    if(rows >+ 1 && rows < 5){
+    if(rows >= 1 && rows < 5){
       $('#update_recipe_textarea').attr('rows', 5);
     }else{
       rows = parseInt(rows)
