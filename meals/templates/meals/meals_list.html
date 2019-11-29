@@ -9,7 +9,7 @@
     <div class="col-12 col-md-10 ">
       {% if meals_list %}
         <div class="table-responsive-sm">
-          <table class="table table-striped table-hover">
+          <table class="table table-striped table-hover ">
             <thead class="thead-dark">
             <tr class="text-center text-light">
               <th scope="col"></th>
@@ -29,10 +29,10 @@
               </th>
               {% for meal in meals %}
               <td>{%for ch_meal, all in meal.items%}
-
-<!--                <span class="chMeal" id="chMeal_{{ch_meal.id}}">-->
-<!--                  {{ch_meal}}-->
-<!--                </span>-->
+                <span class="" style="cursor:pointer;" id="dropdownMeal" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  {{ch_meal}}
+                </span>
+                <div class="dropdown-menu p-0">
                   <form id="form_{{ch_meal.id}}" action="{% url 'meals:update_meals_list' %}" method="post" class="form">{% csrf_token %}
                     <input type="hidden" name="record_id" value="{{ch_meal.id}}">
                     <input type="hidden" name="meal_option_id" value="{{ch_meal.meal_option_id}}">
@@ -44,7 +44,7 @@
                     </select>
 
                   </form>
-
+                </div>
                 {% endfor %}
               </td>
               {% endfor %}
