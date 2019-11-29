@@ -13,10 +13,9 @@
       Wyczyść jadłospis
     </a>
     {% endif %}
-
     <!-- Modal -->
     <div class="modal fade" id="newMealsListModal" tabindex="-1" role="dialog" aria-hidden="true">
-      <form action="{% url 'meals:generate_meals_list' %}" method="post" class="modal-dialog" role="document">
+      <form action="{% url 'meals:generate_meals_list' %}" method="post" class="modal-dialog modal-dialog-centered" role="document">
         {% csrf_token %}
         <div class="modal-content">
           <div class="modal-header">
@@ -26,17 +25,44 @@
             </button>
           </div>
           <div class="modal-body">
-            {% for option in user_meals_options %}
-            <label><input type="checkbox" value="{{option.id}}" name="mealsOptions[]" checked id="{{option}}">{{option|upper}}</label>
-            {% endfor %}
-            <label><input type="number" name="howManyDays" value="1" id="howManyDays" min="1" max="{{maximum_no_of_days_to_generate}}">Na ile dni</label>
-            <label><input type="checkbox" checked name="twice_the_same_meal">Jeden posiłek rzez dwa dni?</label>
-            <label>Pierwszy dzień
-            <select name="first_day" id="first_day">
-              {% for day in first_day_input_list %}
-              <option value="{{day.id}}">{{day}}</option>
+            <div class="form-row">
+              {% for option in user_meals_options %}
+                <div class="col">
+                  <label><input type="checkbox" value="{{option.id}}" name="mealsOptions[]" checked id="{{option}}">{{option|upper}}</label>
+                </div>
               {% endfor %}
-            </select></label>
+            </div>
+            <hr class="p-1 m-0">
+            <div class="form-row">
+              <div class="input-group mb-3">
+                <input class="form-control" type="number" name="howManyDays" value="1" id="howManyDays" min="1" max="{{maximum_no_of_days_to_generate}}">
+                <div class="input-group-append">
+                  <label class="input-group-text" for="howManyDays">Na ile dni</label>
+                </div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="input-group mb-3">
+                <select class="form-control" name="first_day" id="first_day">
+                  {% for day in first_day_input_list %}
+                  <option value="{{day.id}}">{{day}}</option>
+                  {% endfor %}
+                </select>
+                <div class="input-group-append">
+                  <label class="input-group-text" for="first_day">Pierwszy dzień</label>
+                </div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" checked id="twice_the_same_meal" name="twice_the_same_meal">
+                  <label class="form-check-label" for="twice_the_same_meal">
+                    Jeden posiłek rzez dwa dni?
+                  </label>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuluj</button>
