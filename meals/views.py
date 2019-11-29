@@ -279,3 +279,9 @@ def delete_meal(request, meal_id):
 def purge_meals_list(request):
     MealsList.objects.all().delete()
     return redirect('meals:index')
+
+
+def update_meal_option(request, meal_option_id):
+    new_name = request.POST['new_meal_option_name']
+    MealOption.objects.filter(pk=meal_option_id).update(meal_option=new_name)
+    return redirect('meals:edit_meals')
