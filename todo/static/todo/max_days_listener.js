@@ -27,20 +27,22 @@ $('#howManyDays').attr({
    });
 
   $('#allow_update_recipe').on('click', function(e){
-        $('#allow_update_recipe').hide('slow');
-        $('#update_recipe_textarea').removeAttr('readonly');
-        var rows = $('#update_recipe_textarea').attr('rows');
-        console.log(rows)
-        if(rows >+ 1 && rows < 5){
-          $('#update_recipe_textarea').attr('rows', 5);
-        }else{
-          rows = parseInt(rows)
-          $('#update_recipe_textarea').attr('rows', rows+=1);
-        }
+    $('#allow_update_recipe').hide('slow');
+    $('#update_recipe_textarea').removeAttr('readonly');
+    var rows = $('#update_recipe_textarea').attr('rows');
+    console.log(rows)
+    if(rows >+ 1 && rows < 5){
+      $('#update_recipe_textarea').attr('rows', 5);
+    }else{
+      rows = parseInt(rows)
+      $('#update_recipe_textarea').attr('rows', rows+=1);
+    }
+    $('#update_recipe_textarea').focus();
+    $('#update_recipe').toggleClass('d-none');
+   });
 
-
-        $('#update_recipe_textarea').focus();
-        $('#update_recipe').toggleClass('d-none');
-     });
+  $('#option_name').on('click', function(e){
+    $('#new_meal_option_name').toggleClass('d-none');
+  });
 
 });

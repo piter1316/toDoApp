@@ -192,8 +192,6 @@ def generate_meals_list(request):
                     random_meals_list.append(item)
                     option_meals_list.remove(item)
         days = days_generator(first_day, int(how_many_days))
-        print(days)
-        print(len(random_meals_list))
         for k in range(len(random_meals_list)):
             new_meals_list = MealsList(day=days[k], meal_id=random_meals_list[k].id, meal_option_id=meal_option.id,
                                        user_id=request.user.id)
@@ -203,7 +201,6 @@ def generate_meals_list(request):
 
 @require_POST
 def update_meals_list(request):
-    print(request.POST)
     record_id = request.POST['record_id']
     to_update = request.POST['to_update']
 
@@ -222,7 +219,6 @@ def edit_meal_ingredients(request, meal_id):
     units = Unit.objects.all()
     if meal[0].recipe:
         recipe_rows = len(meal[0].recipe.split('\n'))
-        print(recipe_rows)
     else:
         recipe_rows = 1
 
@@ -255,7 +251,6 @@ def add_recipe(request, meal_id):
 
 
 def update_ingredient(request, ingredient_id, meal_id):
-    print(ingredient_id)
     new_ingredient_name = request.POST['new_ingredient_name']
     new_quantity = request.POST['new_quantity']
     new_unit = request.POST['new_unit']
@@ -285,3 +280,10 @@ def update_meal_option(request, meal_option_id):
     new_name = request.POST['new_meal_option_name']
     MealOption.objects.filter(pk=meal_option_id).update(meal_option=new_name)
     return redirect('meals:edit_meals')
+
+
+def update_meal_name(request, meal_id):
+    print(meal_id)
+    new_meal_name = request.POST['new_meal_name']
+    Meal.objects.filter(pk=meal_id).update(name=new_meal_name)
+    return redirect('meals:edit_meal_ingredients', meal_id=meal_id)

@@ -11,7 +11,13 @@
         <div class="col-12 col-lg-8">
           <div class="card  p-0" style="">
             <div class="card-header text-center">
-              <p class="lead">{{meal.0.name|upper}}</p>
+              <p id="option_name" class="lead mb-0" title="Kliknj aby zmienić nazwę">{{meal.0.name|upper}}</p>
+              <form id="new_meal_option_name" class="d-none" action="{% url 'meals:update_meal_name' meal.0.id %}" method="post">{% csrf_token %}
+                <div class="input-group">
+                  <input class="form-control" name="new_meal_name" type="text" value="{{meal.0.name}}">
+                  <button class="btn btn-sm btn-success" type="submit">Zmień</button>
+                </div>
+              </form>
             </div>
             <ul class="list-group list-group-flush">
               <li class="list-group-item p-0 ml-1">
