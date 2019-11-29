@@ -216,7 +216,7 @@ def delete_meal_option(request, meal_option_id):
     return redirect('meals:edit_meals')
 
 
-def edit_meal(request, meal_id):
+def edit_meal_ingredients(request, meal_id):
     meal = Meal.objects.filter(user_id=request.user, pk=meal_id)
     ingredients = Ingredient.objects.filter(user=request.user, meal_id=meal_id)
     units = Unit.objects.all()
@@ -245,13 +245,13 @@ def add_ingredient(request, meal_id):
     new_ingredient = Ingredient(user=request.user, meal_id=meal, name=ingredient, quantity=quantity,
                                 shop=shop, unit_id=unit)
     new_ingredient.save()
-    return redirect('meals:edit_meal', meal_id=meal_id)
+    return redirect('meals:edit_meal_ingredients', meal_id=meal_id)
 
 
 def add_recipe(request, meal_id):
     recipe = request.POST['update_recipe_textarea']
     Meal.objects.filter(pk=meal_id).update(recipe=recipe)
-    return redirect('meals:edit_meal', meal_id=meal_id)
+    return redirect('meals:edit_meal_ingredients', meal_id=meal_id)
 
 
 def update_ingredient(request, ingredient_id, meal_id):
@@ -263,12 +263,12 @@ def update_ingredient(request, ingredient_id, meal_id):
 
     Ingredient.objects.filter(pk=ingredient_id).update(name=new_ingredient_name, quantity=new_quantity, unit=new_unit,
                                                        shop=new_shop)
-    return redirect('meals:edit_meal', meal_id=meal_id)
+    return redirect('meals:edit_meal_ingredients', meal_id=meal_id)
 
 
 def delete_ingredient(request, meal_id, ingredient_id):
     Ingredient.objects.filter(pk=ingredient_id).delete()
-    return redirect('meals:edit_meal', meal_id=meal_id)
+    return redirect('meals:edit_meal_ingredients', meal_id=meal_id)
 
 
 def delete_meal(request, meal_id):
