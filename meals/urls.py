@@ -8,6 +8,7 @@ urlpatterns = [
     path('mealsList/purge_meals_list', views.purge_meals_list, name='purge_meals_list'),
     path('mealsList/update', views.update_meals_list, name='update_meals_list'),
     path('mealsList/generate_meals_list', views.generate_meals_list, name='generate_meals_list'),
+    path('mealsList/generate_shopping_lists', views.generate_shopping_lists, name='generate_shopping_lists'),
     path('mealsEdit', views.edit_meals, name='edit_meals'),
     path('mealsEdit/add_meal/<meal_option_id>', views.add_meal, name='add_meal'),
     path('mealsEdit/delete_meal/<meal_id>', views.delete_meal, name='delete_meal'),

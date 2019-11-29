@@ -283,7 +283,11 @@ def update_meal_option(request, meal_option_id):
 
 
 def update_meal_name(request, meal_id):
-    print(meal_id)
     new_meal_name = request.POST['new_meal_name']
     Meal.objects.filter(pk=meal_id).update(name=new_meal_name)
     return redirect('meals:edit_meal_ingredients', meal_id=meal_id)
+
+def generate_shopping_lists(request):
+    meals = MealsList.objects.filter(user=request.user)
+    print('MEALS:', meals)
+    return redirect('shopping:shopping_list_index')
