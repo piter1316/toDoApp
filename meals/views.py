@@ -289,5 +289,15 @@ def update_meal_name(request, meal_id):
 
 def generate_shopping_lists(request):
     meals = MealsList.objects.filter(user=request.user)
-    print('MEALS:', meals)
-    return redirect('shopping:shopping_list_index')
+    shops = []
+    for meal in meals:
+        meal_instance = get_object_or_404(Meal, pk=meal.meal_id)
+
+        for ingredient in Ingredient.objects.filter(meal_id=meal_instance):
+            # print(ingredient.name,ingredient.quantity, ingredient.shop)
+            while ingredient.shop not in shops:
+                shops.append(ingredient.shop)
+    print(shops)
+
+    # return redirect('shopping:shopping_list_index')
+    return redirect('meals:index')
