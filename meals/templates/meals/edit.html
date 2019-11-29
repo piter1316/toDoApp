@@ -22,25 +22,26 @@
         <ul class="list-group list-group-flush text-center">
           <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-dark">
             {{forloop.counter}}. {{meal_option|upper}}
-            <span class="badge badge-primary badge-pill">{{qt.0}}</span>
+            <span class="badge  badge-pill" style="cursor:pointer;" id="dropdownMeal" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <i class="fas fa-cog"></i>
+            </span>
+            <div class="dropdown-menu p-2" aria-labelledby="dropdownMenuButton">
+              <form class="p-2" action="{% url 'meals:add_meal' meal_option.id %}" method="post" >
+                {% csrf_token %}
+                <div class="form-row mb-2">
+                  <div class="col">
+                    {{form.name}}
+                  </div>
+                  <label class="label ml-2 mt-2">{{form.special}}DANIE SPECJALNE</label>
+                </div>
+                <button class="btn btn-outline-success btn-block mb-2" type="submit" id="add_sn">Dodaj danie</button>
+              </form>
+              <a class="btn btn-danger btn-block mb-2" href="{% url 'meals:delete_meal_option' meal_option.id %}" id="">Usuń {{meal_option}}</a>
+            </div>
           </li>
           {% for meal in meals %}
           <a href="{% url 'meals:edit_meal' meal.id  %}" class="list-group-item list-group-item-secondary p-1">{{meal}}{% if meal.special %} ** {% endif %}</a>
           {% endfor %}
-          <li style="cursor:pointer;"  id="mealOptionSettings_{{meal_option.id}}" class="meal_option_settings list-group-item list-group-item-secondary p-1 mt-2 mb-2"><i class="fas fa-cog"></i></li>
-          <li class="list-group-item list-group-item-secondary p-1 d-none" id="settings_{{meal_option.id}}">
-            <form class="p-2" action="{% url 'meals:add_meal' meal_option.id %}" method="post" >
-              {% csrf_token %}
-              <div class="form-row mb-2">
-                <div class="col">
-                  {{form.name}}
-                </div>
-                <label class="label ml-2 mt-2">{{form.special}}DANIE SPECJALNE</label>
-              </div>
-                <button class="btn btn-outline-success btn-block mb-2" type="submit" id="add_sn">Dodaj danie</button>
-            </form>
-            <a class="btn btn-danger btn-block mb-2" href="{% url 'meals:delete_meal_option' meal_option.id %}" id="">Usuń {{meal_option}}</a>
-          </li>
         </ul>
       </div>
       {% endfor %}
