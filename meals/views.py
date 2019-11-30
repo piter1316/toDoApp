@@ -292,24 +292,30 @@ def generate_shopping_lists(request):
     meals = MealsList.objects.filter(user=request.user)
     shops = []
     ingredients_list = []
-    single_ingredients_list = []
     ingr_qt_dict = {}
+    shopping_lists = []
     for meal in meals:
         meal_instance = get_object_or_404(Meal, pk=meal.meal_id)
         for ingredient in Ingredient.objects.filter(meal_id=meal_instance):
             ingredients_list.append(ingredient)
+            while ingredient.shop not in shops:
+                shops.append(ingredient.shop)
 
+    for shop in shops:
+        for ingredient in ingredients_list:
+            # print(ingredient.shop, shop)
+            if shop == ingredient.shop:
+                if ingredient.name in ingr_qt_dict.keys():
+                    qt = ingr_qt_dict[ingredient.name]
+                    qt += ingredient.quantity
+                    ingr_qt_dict[ingredient.name] = qt
+                else:
+                    ingr_qt_dict[ingredient.name] = ingredient.quantity
 
-    for ingredient in ingredients_list:
-        # print(ingredient.name, ingredient.quantity)
-        if ingredient.name in ingr_qt_dict.keys():
-            qt = ingr_qt_dict[ingredient.name]
-            qt += ingredient.quantity
-            ingr_qt_dict[ingredient.name] = qt
-        else:
-            ingr_qt_dict[ingredient.name] = ingredient.quantity
+        shopping_lists.append({shop:ingr_qt_dict})
+        ingr_qt_dict = {}
 
+    print(shopping_lists)
 
-    print(ingr_qt_dict)
     # return redirect('shopping:shopping_list_index')
     return redirect('meals:index')
