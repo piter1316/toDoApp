@@ -326,7 +326,6 @@ def generate_shopping_lists(request):
         for shop, shoping_list_items in item.items():
             for shopping_item, qt in shoping_list_items.items():
                 unit_id = int(qt[1].id)
-                print('##############', type(qt[0]))
                 new_list_position = Products(product_name=shopping_item, quantity=qt[0],
                                              shopping_list_id_id=new_shopping_list.id,
                                              unit_id=unit_id)

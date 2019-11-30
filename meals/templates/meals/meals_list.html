@@ -30,7 +30,7 @@
               {% for meal in meals %}
               <td>{%for ch_meal, all in meal.items%}
                 <span class="" style="cursor:pointer;" id="dropdownMeal" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  {{ch_meal}}
+                  {{ch_meal}}{% for m in all %}{% if ch_meal.meal_id == m.id %} {% if m.special %} **{% endif %}{% endif %}{%endfor%}
                 </span>
                 <div class="dropdown-menu p-0">
                   <form id="form_{{ch_meal.id}}" action="{% url 'meals:update_meals_list' %}" method="post" class="form">{% csrf_token %}
