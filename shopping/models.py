@@ -17,7 +17,7 @@ class ShoppingList(models.Model):
 class Products(models.Model):
     shopping_list_id = models.ForeignKey(ShoppingList, on_delete=models.CASCADE)
     product_name = models.TextField(max_length=150)
-    quantity = models.SmallIntegerField(default=1)
+    quantity = models.FloatField(default=1)
     unit = models.ForeignKey(Unit, default=1, on_delete=models.DO_NOTHING)
     bought = models.BooleanField(default=False)
 
