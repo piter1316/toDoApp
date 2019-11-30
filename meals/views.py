@@ -8,6 +8,7 @@ from django.views.decorators.http import require_POST
 
 from meals.forms import MealForm, IngredientForm, MealOptionForm
 from meals.models import MealOption, Meal, Ingredient, MealsList, Week, Unit
+from shopping.models import ShoppingList, Products
 
 
 def days_generator(first, how_many):
@@ -294,28 +295,40 @@ def generate_shopping_lists(request):
     ingredients_list = []
     ingr_qt_dict = {}
     shopping_lists = []
+    how_many_people = request.POST['how_many_people']
+    if how_many_people == '':
+        how_many_people = 1
+    else:
+        how_many_people = int(how_many_people)
     for meal in meals:
         meal_instance = get_object_or_404(Meal, pk=meal.meal_id)
         for ingredient in Ingredient.objects.filter(meal_id=meal_instance):
             ingredients_list.append(ingredient)
             while ingredient.shop not in shops:
                 shops.append(ingredient.shop)
-
     for shop in shops:
         for ingredient in ingredients_list:
-            # print(ingredient.shop, shop)
             if shop == ingredient.shop:
                 if ingredient.name in ingr_qt_dict.keys():
-                    qt = ingr_qt_dict[ingredient.name]
+                    qt = ingr_qt_dict[ingredient.name][0]
                     qt += ingredient.quantity
-                    ingr_qt_dict[ingredient.name] = qt
+                    ingr_qt_dict[ingredient.name] = [qt, ingredient.unit]
                 else:
-                    ingr_qt_dict[ingredient.name] = ingredient.quantity
-
-        shopping_lists.append({shop:ingr_qt_dict})
+                    ingr_qt_dict[ingredient.name] = [ingredient.quantity, ingredient.unit]
+        for ingr, qt in ingr_qt_dict.items():
+            ingr_qt_dict[ingr][0] = qt[0] * how_many_people
+        shopping_lists.append({shop: ingr_qt_dict})
         ingr_qt_dict = {}
+    for item in shopping_lists:
+        shop = list(item.keys())[0]
+        new_shopping_list = ShoppingList(user_id=request.user, name=shop)
+        new_shopping_list.save()
+        for shop, shoping_list_items in item.items():
+            for shopping_item, qt in shoping_list_items.items():
+                unit_id = int(qt[1].id)
+                new_list_position = Products(product_name=shopping_item, quantity=qt[0],
+                                             shopping_list_id_id=new_shopping_list.id,
+                                             unit_id=unit_id)
+                new_list_position.save()
+    return redirect('shopping:shopping_list_index')
 
-    print(shopping_lists)
-
-    # return redirect('shopping:shopping_list_index')
-    return redirect('meals:index')
