@@ -110,7 +110,7 @@ def edit_meals(request):
     meals_options_dict = {}
     units = Unit.objects.all()
     for i in range(len(meals_options)):
-        meals_in_meals_options = Meal.objects.filter(meal_option=meals_options[i])
+        meals_in_meals_options = Meal.objects.filter(meal_option=meals_options[i]).order_by('special', 'name')
         meals = []
         for meal in meals_in_meals_options:
             meals.append(meal)
