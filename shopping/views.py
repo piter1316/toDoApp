@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 # Create your views here.
 from django.views.decorators.http import require_POST
 
-from meals.models import Unit
+from meals.models import Unit, Meal, Ingredient
 from shopping.forms import ShoppingListForm, ProductsForm
 from shopping.models import ShoppingList, Products
 
@@ -19,13 +19,20 @@ def shopping_list_index(request):
     for i in range(len(shopping_lists)):
         products_on_shopping_list = Products.objects.filter(shopping_list_id=shopping_lists[i].id)
         products = []
+
         for product in products_on_shopping_list:
-            product_quantity_bought = [product.quantity, product.bought, product.id, product.unit]
+            meals_with_product = []
+            meals_with_product_query = Ingredient.objects.filter(name__contains=product.product_name, user=request.user)
+            print('##########', product)
+            for item in meals_with_product_query:
+                meals_with_product.append(item)
+            print(meals_with_product)
+            product_quantity_bought = [product.quantity, product.bought, product.id, product.unit, meals_with_product]
             product_quantity = {product: product_quantity_bought}
             products.append(product_quantity)
 
         shopping_lists_dict[shopping_lists[i]] = products
-    print(shopping_lists_dict)
+    # print(shopping_lists_dict)
     context = {
         'shopping_lists': shopping_lists_dict,
         'form': form,

@@ -107,6 +107,20 @@
                       </div>
                     </div>
                   </form>
+                  {% if qt.4 %}
+                  <div class="dropdown-divider"></div>
+                  <small class="mb-1">Posiłki zawierające {{prod}}</small>
+                  {% endif %}
+                  <ul id="show_meals_containing_ingr_list" class="list-group m-2">
+                    {% for element in qt.4 %}
+                    <li class="list-group-item p-0">
+                      <small>
+                        <a href="{% url 'meals:edit_meals' %}">{{element.meal_id.meal_option}}</a>: {{element.meal_id}}
+                      </small>
+                    </li>
+                    {% endfor %}
+                  </ul>
+                  <br>
                 </div>
               </span>
             </span>
