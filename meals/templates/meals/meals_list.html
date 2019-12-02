@@ -29,8 +29,13 @@
               </th>
               {% for meal in meals %}
               <td>{%for ch_meal, all in meal.items%}
+
                 <span class="" style="cursor:pointer;" id="dropdownMeal" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  {% if ch_meal.meal_id %}
                   {{ch_meal}}{% for m in all %}{% if ch_meal.meal_id == m.id %} {% if m.special %} **{% endif %}{% endif %}{%endfor%}
+                  {% else %}
+                  ------
+                  {% endif %}
                 </span>
                 <div class="dropdown-menu p-0">
                   <form id="form_{{ch_meal.id}}" action="{% url 'meals:update_meals_list' %}" method="post" class="form">{% csrf_token %}
@@ -38,6 +43,7 @@
                     <input type="hidden" name="meal_option_id" value="{{ch_meal.meal_option_id}}">
                     <input type="hidden" name="meal_id" value="{{ch_meal.meal_id}}">
                     <select class="form-control" name="to_update" onChange="form.submit();">
+                      <option value="">BRAK POSIŁKU</option>
                       {% for m in all %}
                         <option {% if ch_meal.meal_id == m.id %}selected="true"{% endif %} value="{{m.id}}">{{m}}{% if m.special %} ** {% endif %} </option>
                       {% endfor %}
