@@ -5,110 +5,129 @@
   <div class="jumbotron p-2">
     <h1 class="text-center">MOJE LISTY ZAKUPÓW</h1>
     <hr class="my-2">
-    <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#addNewList">
-      Dodaj nową listę
-    </button>
+    <div class="form-row">
+      <div class=" col-12 col-md-9">
+        <button type="button" class="btn btn-primary btn-block mb-1 mb-md-0" data-toggle="modal"
+                data-target="#addNewList">
+          Dodaj nową listę
+        </button>
+      </div>
+      <div class="col-12 col-md-3">
+        <a onclick="return confirm('Usunąć wszystkie listy zakupów?')"
+           href="{% url 'shopping:delete_all_shopping_lists' %}"
+           class="btn btn-warning btn-block {% if shopping_lists %}{%else%}d-none{% endif %}">
+          Usuń wszyskie listy
+        </a>
+      </div>
+    </div>
   </div>
   {% if shopping_lists %}
-    <div class="row">
-      {% for shop, products in shopping_lists.items %}
-      <div class="col-12 col-md-4 mb-3">
-        <div class="card ">
-          <div class="card-header text-center">
-            <div class="input-group mb-1">
-              <input type="text" readonly class="form-control" value="{{shop}}">
-              <div class="input-group-append">
-                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false">Opcje
-                </button>
-                <div class="dropdown-menu">
-                  <div class="dropdown-item">
-                    <form action="{% url 'shopping:shopping_list_edit' shop.id %}" method="POST" role="form">{% csrf_token %}
-                      <input class="form-control" type="text" name="name" value="{{shop.name}}" >
-                      <button type="submit" class="btn btn-success btn-block btn-sm" id="edit-btn">Zmień nazwe</button>
-                    </form>
-                  </div>
-                  <form class="dropdown-item" action="{% url 'shopping:delete' shop.id %}">
-                    <input type="hidden" name="to_delete" value="{{shop.id}}">
-                    <button onclick="return confirm('Usunąć {{shop}} i wszystkie pozycje z listy?')" class="btn btn-danger btn-sm btn-block" type="submit">Usuń listę</button>
+  <div class="row">
+    {% for shop, products in shopping_lists.items %}
+    <div class="col-12 col-md-4 mb-3">
+      <div class="card ">
+        <div class="card-header text-center">
+          <div class="input-group mb-1">
+            <input type="text" readonly class="form-control" value="{{shop}}">
+            <div class="input-group-append">
+              <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown"
+                      aria-haspopup="true" aria-expanded="false">Opcje
+              </button>
+              <div class="dropdown-menu">
+                <div class="dropdown-item">
+                  <form action="{% url 'shopping:shopping_list_edit' shop.id %}" method="POST" role="form">{% csrf_token%}
+                    <input class="form-control" type="text" name="name" value="{{shop.name}}">
+                    <button type="submit" class="btn btn-success btn-block btn-sm" id="edit-btn">Zmień nazwe</button>
                   </form>
-                  <a class="dropdown-item" href="{% url 'shopping:delete_bought' shop.id %}">
-                    <button class="btn btn-warning btn-sm btn-block">Usuń kupione</button>
-                  </a>
-                  <a class="dropdown-item" href="{% url 'shopping:purge_list' shop.id %}">
-                    <button onclick="return confirm('Wyczyścić wszystkie pozycje z listy?')" class="btn btn-warning btn-sm btn-block">Wyczyść listę</button>
-                  </a>
-                  </a>
                 </div>
+                <form class="dropdown-item" action="{% url 'shopping:delete' shop.id %}">
+                  <input type="hidden" name="to_delete" value="{{shop.id}}">
+                  <button onclick="return confirm('Usunąć {{shop}} i wszystkie pozycje z listy?')"
+                          class="btn btn-danger btn-sm btn-block" type="submit">Usuń listę
+                  </button>
+                </form>
+                {% if products %}
+                <a class="dropdown-item" href="{% url 'shopping:delete_bought' shop.id %}">
+                  <button class="btn btn-warning btn-sm btn-block">Usuń kupione</button>
+                </a>
+                <a class="dropdown-item" href="{% url 'shopping:purge_list' shop.id %}">
+                  <button onclick="return confirm('Wyczyścić wszystkie pozycje z listy?')"
+                          class="btn btn-warning btn-sm btn-block">Wyczyść listę
+                  </button>
+                </a>
+                </a>
+                {% endif %}
               </div>
             </div>
           </div>
-          <ul class="list-group list-group-flush">
-            {% for product in products %}
-              {% for prod, qt in product.items %}
-                {% if qt.1 %}
-                  <li class="list-group-item d-flex justify-content-between todo-completed align-items-center">{{prod}}
-                    <span>
-                      <span class="badge badge-primary badge-pill todo-completed">{{qt.0}}</span>
-                      <span class="badge badge-primary badge-pill todo-completed">{{qt.3}}</span>
-                    </span>
-                  </li>
-                {% else %}
-                  <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <a class="" href=" {% url 'shopping:bought' qt.2 %}">{{prod}} </a>
-                    <span>
-                      <span class="badge badge-primary badge-pill">{{qt.0}}</span>
-                      <span class="badge badge-primary badge-pill">{{qt.3}}</span>
-                      <span class="badge badge-primary badge-pill dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <div class="dropdown-menu p-2" aria-labelledby="dropdownMenuButton">
-                          <small class="mb-1">Edycja:</small>
-                          <form class="form mt-1" action="{% url 'shopping:update_product' prod.id %}" method="post">{% csrf_token %}
-                            <div class="from-group row">
-                              <div class="col-12">
-                                <input class="form-control" type="text" name="new_product_name" value="{{prod}}">
-                              </div>
-                            </div>
-                            <div class="from-group row">
-                              <div class="col-6 pr-0">
-                                <input class="form-control" type="number" name="new_quantity" value="{{qt.0}}">
-                              </div>
-                              <div class="col-6 pl-0">
-                                <select class="form-control" name="new_unit">
-                                  <option value="{{qt.3.id}}">{{qt.3}}</option>
-                                  <option disabled>-----</option>
-                                  {% for unit in units %}
-                                    <option value="{{unit.id}}">{{unit}}</option>
-                                  {% endfor %}
-                                </select>
-                              </div>
-                            </div>
-                            <div class="form-group row mb-0">
-                              <div class="col-12">
-                                <button class="btn btn-primary btn-block" type="submit">Zmień</button>
-                              </div>
-                            </div>
-                          </form>
-                        </div>
-                      </span>
-                    </span>
-                  </li>
-                {% endif %}
-              {% endfor %}
-            {% endfor %}
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              <form class="input-group" action="{% url 'shopping:add_product' shop.id %}" method="POST" role="form">
-                {% csrf_token %}
-                {% include 'shopping/product_form.html' %}
-                <div class="input-group-append">
-                  <button class="btn btn-outline-secondary" type="submit">+</button>
-                </div>
-              </form>
-            </li>
-          </ul>
         </div>
+        <ul class="list-group list-group-flush">
+          {% for product in products %}
+          {% for prod, qt in product.items %}
+          {% if qt.1 %}
+          <li class="list-group-item d-flex justify-content-between todo-completed align-items-center">{{prod}}
+            <span>
+              <span class="badge badge-primary badge-pill todo-completed">{{qt.0}}</span>
+              <span class="badge badge-primary badge-pill todo-completed">{{qt.3}}</span>
+            </span>
+          </li>
+          {% else %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <a class="" href=" {% url 'shopping:bought' qt.2 %}">{{prod}} </a>
+            <span>
+              <span class="badge badge-primary badge-pill">{{qt.0}}</span>
+              <span class="badge badge-primary badge-pill">{{qt.3}}</span>
+              <span class="badge badge-primary badge-pill dropdown-toggle" id="dropdownMenuButton"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <div class="dropdown-menu p-2" aria-labelledby="dropdownMenuButton">
+                  <small class="mb-1">Edycja:</small>
+                  <form class="form mt-1" action="{% url 'shopping:update_product' prod.id %}" method="post">{% csrf_token %}
+                    <div class="from-group row">
+                      <div class="col-12">
+                        <input class="form-control" type="text" name="new_product_name" value="{{prod}}">
+                      </div>
+                    </div>
+                    <div class="from-group row">
+                      <div class="col-6 pr-0">
+                        <input class="form-control" type="number" name="new_quantity" value="{{qt.0}}">
+                      </div>
+                      <div class="col-6 pl-0">
+                        <select class="form-control" name="new_unit">
+                          <option value="{{qt.3.id}}">{{qt.3}}</option>
+                          <option disabled>-----</option>
+                          {% for unit in units %}
+                            <option value="{{unit.id}}">{{unit}}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-group row mb-0">
+                      <div class="col-12">
+                        <button class="btn btn-primary btn-block" type="submit">Zmień</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </span>
+            </span>
+          </li>
+          {% endif %}
+          {% endfor %}
+          {% endfor %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <form class="input-group" action="{% url 'shopping:add_product' shop.id %}" method="POST" role="form">
+              {% csrf_token %}
+              {% include 'shopping/product_form.html' %}
+              <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="submit">+</button>
+              </div>
+            </form>
+          </li>
+        </ul>
       </div>
-      {% endfor %}
     </div>
+    {% endfor %}
+  </div>
   {% else %}
   <div class="container">
     <div class="alert alert-info" role="alert">
@@ -123,33 +142,33 @@
 
 <!--MODALS-->
 <div class="modal fade" id="addNewList" tabindex="-1" role="dialog" aria-labelledby="addNewList" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Nowa lista zakupów</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form action="{% url 'shopping:add' %}" method="POST" role="form">
-            {% csrf_token %}
-            <div class="form-group">
-              <div class="input-group">
-                {{form.name}}
-                <span class="input-group-btn">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Nowa lista zakupów</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form action="{% url 'shopping:add' %}" method="POST" role="form">
+          {% csrf_token %}
+          <div class="form-group">
+            <div class="input-group">
+              {{form.name}}
+              <span class="input-group-btn">
                   <button type="submit" class="btn btn-success" id="add-btn">DODAJ</button>
                 </span>
-              </div>
             </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
-        </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
       </div>
     </div>
   </div>
+</div>
 
 
 {% endblock %}

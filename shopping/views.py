@@ -15,6 +15,7 @@ def shopping_list_index(request):
     form = ShoppingListForm(request.POST)
     form_2 = ProductsForm(request.POST)
     units = Unit.objects.all()
+
     for i in range(len(shopping_lists)):
         products_on_shopping_list = Products.objects.filter(shopping_list_id=shopping_lists[i].id)
         products = []
@@ -41,13 +42,16 @@ def add_shopping_list(request):
     if form.is_valid():
         new_shopping_list = ShoppingList(name=request.POST['name'].upper(), user_id=request.user)
         new_shopping_list.save()
-
     return redirect('shopping:shopping_list_index')
 
 
 def delete_shopping_list(request, shopping_list_id):
     ShoppingList.objects.filter(id=shopping_list_id).delete()
+    return redirect('shopping:shopping_list_index')
 
+
+def delete_all_shopping_lists(request):
+    ShoppingList.objects.filter(user_id=request.user).delete()
     return redirect('shopping:shopping_list_index')
 
 
@@ -92,6 +96,6 @@ def purge_list(request, shopping_list_id):
 
 def shopping_list_edit(request, shopping_list_id):
     list_to_edit = ShoppingList.objects.get(pk=shopping_list_id)
-    list_to_edit.name = request.POST['name']
+    list_to_edit.name = request.POST['name'].upper()
     list_to_edit.save()
     return redirect('shopping:shopping_list_index')
