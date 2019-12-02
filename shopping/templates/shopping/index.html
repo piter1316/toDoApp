@@ -1,5 +1,5 @@
 {% extends 'todo/base.html' %}
-
+{% load l10n %}
 {% block body %}
 <div class="container mt-2">
   <div class="jumbotron p-2">
@@ -89,7 +89,8 @@
                     </div>
                     <div class="from-group row">
                       <div class="col-6 pr-0">
-                        <input class="form-control" type="number" name="new_quantity" value="{{qt.0}}">
+
+                        <input class="form-control" type="number" name="new_quantity" value="{% localize off %}{{qt.0}}{% endlocalize %}">
                       </div>
                       <div class="col-6 pl-0">
                         <select class="form-control" name="new_unit">
@@ -115,7 +116,7 @@
                     {% for element in qt.4 %}
                     <li class="list-group-item p-0">
                       <small>
-                        <a href="{% url 'meals:edit_meals' %}">{{element.meal_id.meal_option}}</a>: {{element.meal_id}}
+                        <a class="text-dark" href="{% url 'meals:edit_meals' %}">{{element.meal_option}}</a>: <a class="text-dark" href="{% url 'meals:edit_meal_ingredients' element.meal.id %}">{{element.meal}}</a>
                       </small>
                     </li>
                     {% endfor %}
