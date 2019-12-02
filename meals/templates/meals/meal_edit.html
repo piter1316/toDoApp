@@ -11,12 +11,14 @@
         <div class="col-12 col-lg-8">
           <div class="card  p-0" style="">
             <div class="card-header text-center">
-              <p id="option_name" class="lead mb-0" title="Kliknj aby zmienić nazwę">{{meal.0.name|upper}}</p>
+              <p id="option_name" class="lead mb-0" title="Kliknj aby zmienić nazwę">{{meal.0.name|upper}} {%if meal.0.special%} **{% endif %}</p>
               <form id="new_meal_option_name" class="d-none" action="{% url 'meals:update_meal_name' meal.0.id %}" method="post">{% csrf_token %}
                 <div class="input-group">
                   <input class="form-control" name="new_meal_name" type="text" value="{{meal.0.name}}">
                   <button class="btn btn-sm btn-success" type="submit">Zmień</button>
                 </div>
+                <input class="" type="checkbox" name="edit_special" id="edit_special" {%if meal.0.special%}checked{% endif %}>
+                <label class="" for="edit_special">Danie specjalne</label>
               </form>
             </div>
             <ul class="list-group list-group-flush">
