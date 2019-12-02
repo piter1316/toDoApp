@@ -42,7 +42,7 @@
                 <small>Edytuj {{ meal_option }}:</small>
                 <input type="text" name="new_meal_option_name" class="form-control mb-1" value="{{meal_option}}">
                 <button type="submit" class="btn btn-info btn-block mb-1">Zmień nazwę</button>
-                <a class="btn btn-danger btn-block " href="{% url 'meals:delete_meal_option' meal_option.id %}" id="">Usuń {{meal_option}}</a>
+                <a onclick="return confirm('Usunąć {{meal_option}} i wszystkie pozycje z listy?')" class="btn btn-danger btn-block " href="{% url 'meals:delete_meal_option' meal_option.id %}" id="">Usuń {{meal_option}}</a>
               </form>
             </div>
           </li>

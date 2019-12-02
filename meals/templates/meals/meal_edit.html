@@ -102,7 +102,7 @@
                     </div>
                   </div>
                 </form>
-                <a href="{% url 'meals:delete_meal' meal.0.id  %}" class="btn btn-danger btn-block">Usuń {{meal.0.name}}</a>
+                <a  onclick="return confirm('Usunąć {{meal.0}} i wszystkie składniki?')" href="{% url 'meals:delete_meal' meal.0.id  %}" class="btn btn-danger btn-block">Usuń {{meal.0.name}}</a>
               </li>
             </ul>
           </div>

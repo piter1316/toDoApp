@@ -30,13 +30,13 @@
                   </div>
                   <form class="dropdown-item" action="{% url 'shopping:delete' shop.id %}">
                     <input type="hidden" name="to_delete" value="{{shop.id}}">
-                    <button class="btn btn-danger btn-sm btn-block" type="submit">Usuń listę</button>
+                    <button onclick="return confirm('Usunąć {{shop}} i wszystkie pozycje z listy?')" class="btn btn-danger btn-sm btn-block" type="submit">Usuń listę</button>
                   </form>
                   <a class="dropdown-item" href="{% url 'shopping:delete_bought' shop.id %}">
                     <button class="btn btn-warning btn-sm btn-block">Usuń kupione</button>
                   </a>
                   <a class="dropdown-item" href="{% url 'shopping:purge_list' shop.id %}">
-                    <button class="btn btn-warning btn-sm btn-block">Wyczyść listę</button>
+                    <button onclick="return confirm('Wyczyścić wszystkie pozycje z listy?')" class="btn btn-warning btn-sm btn-block">Wyczyść listę</button>
                   </a>
                   </a>
                 </div>
