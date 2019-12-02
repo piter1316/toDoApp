@@ -66,7 +66,7 @@ def add_product(request, shopping_list_id):
 
 
 def update_product(request, product_id):
-    new_name = request.POST['new_product_name']
+    new_name = request.POST['new_product_name'].lower()
     new_quantity = request.POST['new_quantity']
     new_unit = request.POST['new_unit']
     Products.objects.filter(pk=product_id).update(product_name=new_name, quantity=new_quantity, unit=new_unit)

@@ -252,10 +252,10 @@ def add_recipe(request, meal_id):
 
 
 def update_ingredient(request, ingredient_id, meal_id):
-    new_ingredient_name = request.POST['new_ingredient_name']
+    new_ingredient_name = request.POST['new_ingredient_name'].lower()
     new_quantity = request.POST['new_quantity']
     new_unit = request.POST['new_unit']
-    new_shop = request.POST['new_shop']
+    new_shop = request.POST['new_shop'].upper()
 
     Ingredient.objects.filter(pk=ingredient_id).update(name=new_ingredient_name, quantity=new_quantity, unit=new_unit,
                                                        shop=new_shop)
@@ -286,7 +286,6 @@ def update_meal_option(request, meal_option_id):
 def update_meal_name(request, meal_id):
     new_meal_name = request.POST['new_meal_name']
     edit_special = request.POST.get('edit_special', False)
-    print(edit_special)
     if edit_special == 'on':
         edit_special = True
     Meal.objects.filter(pk=meal_id).update(name=new_meal_name, special=edit_special)
