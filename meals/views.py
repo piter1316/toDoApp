@@ -304,11 +304,12 @@ def generate_shopping_lists(request):
     else:
         how_many_people = int(how_many_people)
     for meal in meals:
-        meal_instance = get_object_or_404(Meal, pk=meal.meal_id)
-        for ingredient in Ingredient.objects.filter(meal_id=meal_instance):
-            ingredients_list.append(ingredient)
-            while ingredient.shop not in shops:
-                shops.append(ingredient.shop)
+        if meal.meal_id:
+            meal_instance = get_object_or_404(Meal, pk=meal.meal_id)
+            for ingredient in Ingredient.objects.filter(meal_id=meal_instance):
+                ingredients_list.append(ingredient)
+                while ingredient.shop not in shops:
+                    shops.append(ingredient.shop)
     for shop in shops:
         for ingredient in ingredients_list:
             if shop == ingredient.shop:
