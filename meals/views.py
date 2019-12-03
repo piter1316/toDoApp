@@ -156,6 +156,7 @@ def generate_meals_list(request):
     user_meals_options = request.POST.getlist('mealsOptions[]')
     how_many_days = request.POST['howManyDays']
     twice_the_same_meal = request.POST.get('twice_the_same_meal', False)
+    empty_meals_list = request.POST.get('empty_meals_list', False)
     first_day = int(request.POST['first_day'])
     MealsList.objects.filter(user=request.user).delete()
     for option in user_meals_options:
@@ -193,10 +194,16 @@ def generate_meals_list(request):
                     random_meals_list.append(item)
                     option_meals_list.remove(item)
         days = days_generator(first_day, int(how_many_days))
-        for k in range(len(random_meals_list)):
-            new_meals_list = MealsList(day=days[k], meal_id=random_meals_list[k].id, meal_option_id=meal_option.id,
-                                       user_id=request.user.id)
-            new_meals_list.save()
+        if empty_meals_list:
+            for k in range(len(random_meals_list)):
+                new_meals_list = MealsList(day=days[k], meal_id=None, meal_option_id=meal_option.id,
+                                           user_id=request.user.id)
+                new_meals_list.save()
+        else:
+            for k in range(len(random_meals_list)):
+                new_meals_list = MealsList(day=days[k], meal_id=random_meals_list[k].id, meal_option_id=meal_option.id,
+                                           user_id=request.user.id)
+                new_meals_list.save()
     return redirect('meals:index')
 
 

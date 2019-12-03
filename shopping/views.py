@@ -24,22 +24,18 @@ def shopping_list_index(request):
             meals_with_product = []
             generated_meals_with_product = []
             meals_with_product_query = Ingredient.objects.filter(name__contains=product.product_name, user=request.user)
-            print('##########', product)
             for item in meals_with_product_query:
                 meals_with_product.append(item)
             for meal in meals_with_product:
                 query_set = MealsList.objects.filter(meal_id=meal.meal_id_id)
                 if len(query_set) > 0:
                     generated_meals_with_product.append(query_set[0])
-                # print(meal.meal_id_id)
-            # print(meals_with_product)
 
             product_quantity_bought = [product.quantity, product.bought, product.id, product.unit, generated_meals_with_product]
             product_quantity = {product: product_quantity_bought}
             products.append(product_quantity)
 
         shopping_lists_dict[shopping_lists[i]] = products
-    # print(shopping_lists_dict)
     context = {
         'shopping_lists': shopping_lists_dict,
         'form': form,
