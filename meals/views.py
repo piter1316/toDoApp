@@ -28,6 +28,22 @@ def days_generator(first, how_many):
     return days_list
 
 
+def appended_days_generator(request, first, how_many):
+    days = ['PN', 'WT', 'ŚR', 'CZW', 'PT', 'SB', 'ND']
+    days_list = []
+    meals_list_ids = MealsList.objects.filter(user_id=request)
+    itr = meals_list_ids.reverse()[0].id
+    space = '_'
+    for i in range(how_many):
+        days_list.append(days[first] + space + str(itr))
+        first += 1
+        if first == len(days):
+            first = 0
+            if itr == '':
+                itr = 1
+            itr += 1
+    return days_list
+
 def get_maximum_no_of_days(request):
     user_meals_options = MealOption.objects.filter(user=request.user)
     no_of_meals_in_option = []
@@ -160,9 +176,10 @@ def generate_meals_list(request):
     first_day = int(request.POST['first_day'])
     append_existing = request.POST.get('append_existing', False)
     if append_existing:
-        pass
+        days = appended_days_generator(request.user,first_day,int(how_many_days))
     else:
         MealsList.objects.filter(user=request.user).delete()
+        days = days_generator(first_day, int(how_many_days))
     for option in user_meals_options:
         option_meals_list = []
         meals_in_option = Meal.objects.filter(meal_option=option, user=request.user, special=0)
@@ -197,7 +214,7 @@ def generate_meals_list(request):
                     item = random.choice(option_meals_list)
                     random_meals_list.append(item)
                     option_meals_list.remove(item)
-        days = days_generator(first_day, int(how_many_days))
+
         if empty_meals_list:
             for k in range(len(random_meals_list)):
                 new_meals_list = MealsList(day=days[k], meal_id=None, meal_option_id=meal_option.id,
