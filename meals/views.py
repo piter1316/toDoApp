@@ -158,7 +158,11 @@ def generate_meals_list(request):
     twice_the_same_meal = request.POST.get('twice_the_same_meal', False)
     empty_meals_list = request.POST.get('empty_meals_list', False)
     first_day = int(request.POST['first_day'])
-    MealsList.objects.filter(user=request.user).delete()
+    append_existing = request.POST.get('append_existing', False)
+    if append_existing:
+        pass
+    else:
+        MealsList.objects.filter(user=request.user).delete()
     for option in user_meals_options:
         option_meals_list = []
         meals_in_option = Meal.objects.filter(meal_option=option, user=request.user, special=0)
@@ -280,7 +284,7 @@ def delete_meal(request, meal_id):
 
 
 def purge_meals_list(request):
-    MealsList.objects.all().delete()
+    MealsList.objects.filter(user=request.user).delete()
     return redirect('meals:index')
 
 

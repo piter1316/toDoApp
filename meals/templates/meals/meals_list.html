@@ -69,10 +69,12 @@
         </p>
       </div>
       {% endif %}
+      {% if meals_list %}
       <form action="{% url 'meals:generate_shopping_lists' %}" method="post">{% csrf_token %}
         <input type="number" class="form-control" name="how_many_people" placeholder="Dla ilu osób?">
         <button type="submit" class="btn btn-primary btn-block">GENERUJ LISTY ZAKUPÓW</button>
       </form>
+      {% endif %}
 
     </div>
   </div>
