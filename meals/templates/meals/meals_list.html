@@ -38,6 +38,7 @@
                   {% endif %}
                 </span>
                 <div class="dropdown-menu p-0">
+                  <small>Zmiana posiłku:</small>
                   <form id="form_{{ch_meal.id}}" action="{% url 'meals:update_meals_list' %}" method="post" class="form">{% csrf_token %}
                     <input type="hidden" name="record_id" value="{{ch_meal.id}}">
                     <input type="hidden" name="meal_option_id" value="{{ch_meal.meal_option_id}}">
@@ -48,8 +49,8 @@
                         <option {% if ch_meal.meal_id == m.id %}selected="true"{% endif %} value="{{m.id}}">{{m}}{% if m.special %} ** {% endif %} </option>
                       {% endfor %}
                     </select>
-
                   </form>
+                  <a href="{% url 'meals:edit_meal_ingredients' ch_meal.meal_id %}" class="btn btn-sm btn-block btn-primary">Edytuj {{ch_meal}}</a>
                 </div>
                 {% endfor %}
               </td>

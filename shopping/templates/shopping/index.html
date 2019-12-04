@@ -36,10 +36,11 @@
               <div class="dropdown-menu">
                 <div class="dropdown-item">
                   <form action="{% url 'shopping:shopping_list_edit' shop.id %}" method="POST" role="form">{% csrf_token%}
-                    <input class="form-control" type="text" name="name" value="{{shop.name}}">
+                    <input class="form-control mb-1" type="text" name="name" value="{{shop.name}}">
                     <button type="submit" class="btn btn-success btn-block btn-sm" id="edit-btn">Zmień nazwe</button>
                   </form>
                 </div>
+                <div class="dropdown-divider"></div>
                 <form class="dropdown-item" action="{% url 'shopping:delete' shop.id %}">
                   <input type="hidden" name="to_delete" value="{{shop.id}}">
                   <button onclick="return confirm('Usunąć {{shop}} i wszystkie pozycje z listy?')"
