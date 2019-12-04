@@ -44,6 +44,7 @@ def appended_days_generator(request, first, how_many):
             itr += 1
     return days_list
 
+
 def get_maximum_no_of_days(request):
     user_meals_options = MealOption.objects.filter(user=request.user)
     no_of_meals_in_option = []
@@ -175,17 +176,34 @@ def generate_meals_list(request):
     empty_meals_list = request.POST.get('empty_meals_list', False)
     first_day = int(request.POST['first_day'])
     append_existing = request.POST.get('append_existing', False)
+    no_repetition = request.POST.get('no_repetition', False)
+    current_meals_list = MealsList.objects.filter(user=request.user)
+    current_meals = []
+    for item in (list(current_meals_list)):
+        meal = get_object_or_404(Meal, pk=item.meal_id)
+        current_meals.append(meal)
+
     if append_existing:
-        days = appended_days_generator(request.user,first_day,int(how_many_days))
+        days = appended_days_generator(request.user, first_day, int(how_many_days))
     else:
-        MealsList.objects.filter(user=request.user).delete()
+        current_meals_list.delete()
         days = days_generator(first_day, int(how_many_days))
+
     for option in user_meals_options:
         option_meals_list = []
         meals_in_option = Meal.objects.filter(meal_option=option, user=request.user, special=0)
         meal_option = get_object_or_404(MealOption, pk=option, user=request.user)
+
         for meal in meals_in_option:
-            option_meals_list.append(meal)
+            if no_repetition:
+                if meal not in current_meals:
+                    option_meals_list.append(meal)
+            else:
+                option_meals_list.append(meal)
+        print(option, '\n')
+        for meal in option_meals_list:
+            print(meal)
+
         random_meals_list = []
         if twice_the_same_meal:
             if int(how_many_days) % 2 == 0:
