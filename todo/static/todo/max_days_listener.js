@@ -29,6 +29,31 @@ $(document).ready(function(){
       if($(this).is(':checked')) {
           console.log('ch')
           $('#meal_options_form, #meal_options_form_hr').hide(600)
+          var day_short = $('#meals_list tr:last th').text().trim()
+          console.log(day_short)
+          switch(day_short){
+          case 'PN':
+            $('#first_day').val(1);
+            break;
+          case 'WT':
+            $('#first_day').val(2);
+            break;
+          case 'ŚR':
+            $('#first_day').val(3);
+            break;
+          case 'CZW':
+            $('#first_day').val(4);
+            break;
+          case 'PT':
+            $('#first_day').val(5);
+            break;
+          case 'SB':
+            $('#first_day').val(6);
+            break;
+          case 'ND':
+            $('#first_day').val(0);
+            break;
+          }
       } else {
          $('#meal_options_form, #meal_options_form_hr').show(600)
       }

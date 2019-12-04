@@ -62,8 +62,9 @@ def get_maximum_no_of_days_no_repeat(request):
     current_meals = []
     no_of_meals_in_option = []
     for item in (list(current_meals_list)):
-        meal = get_object_or_404(Meal, pk=item.meal_id)
-        current_meals.append(meal)
+        if item.meal_id:
+            meal = get_object_or_404(Meal, pk=item.meal_id)
+            current_meals.append(meal)
     user_meals_options = MealOption.objects.filter(user=request.user)
 
     for option in user_meals_options:
@@ -209,8 +210,9 @@ def generate_meals_list(request):
     current_meals_list = MealsList.objects.filter(user=request.user)
     current_meals = []
     for item in (list(current_meals_list)):
-        meal = get_object_or_404(Meal, pk=item.meal_id)
-        current_meals.append(meal)
+        if item.meal_id:
+            meal = get_object_or_404(Meal, pk=item.meal_id)
+            current_meals.append(meal)
 
     if append_existing:
         days = appended_days_generator(request.user, first_day, int(how_many_days))
