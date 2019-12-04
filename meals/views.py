@@ -102,7 +102,7 @@ def meals(request):
 
     user_meals_options = MealOption.objects.filter(user=request.user).order_by('position')
     generated_user_meals_options = MealsList.objects.filter(user=request.user).order_by('meal_option__position').values(
-        'meal_option__meal_option').distinct()
+        'meal_option__meal_option', 'meal_option_id').distinct()
     meals_list = MealsList.objects.all().filter(user=request.user)
     days = []
 

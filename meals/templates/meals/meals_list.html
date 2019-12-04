@@ -15,7 +15,10 @@
             <tr class="text-center text-light">
               <th scope="col"></th>
               {% for meal_option in generated_user_meals_options %}
-              <th scope="col"><b>{{meal_option.meal_option__meal_option|upper}}</b></th>
+              <th scope="col">
+                <b>{{meal_option.meal_option__meal_option|upper}}</b>
+                <input type="hidden" class="generated_meal_options" value="{{meal_option.meal_option_id}}">
+              </th>
               {% endfor %}
             </tr>
             </thead>

@@ -27,7 +27,19 @@ $(document).ready(function(){
 
     $('input[name=append_existing]').change(function(){
       if($(this).is(':checked')) {
-          console.log('ch')
+          var allOptions = $('.mealsOptions')
+          allOptionsArray = []
+          generatedOptionsArray = []
+          $('.mealsOptions').each(function( index ) {
+            allOptionsArray.push($( this ).val() );
+          });
+          console.log(allOptionsArray)
+          $('.generated_meal_options').each(function( index ) {
+            generatedOptionsArray.push($( this ).val() );
+          });
+          console.log(generatedOptionsArray)
+
+
           $('#meal_options_form, #meal_options_form_hr').hide(600)
           var day_short = $('#meals_list tr:last th').text().trim()
           console.log(day_short)

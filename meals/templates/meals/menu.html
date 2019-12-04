@@ -28,7 +28,7 @@
             <div class="form-row" id="meal_options_form">
               {% for option in user_meals_options %}
                 <div class="col-6">
-                  <label><input type="checkbox" value="{{option.id}}" name="mealsOptions[]" checked id="{{option}}">{{option|upper}}</label>
+                  <label><input class="mealsOptions" type="checkbox" value="{{option.id}}" name="mealsOptions[]" checked id="{{option}}">{{option|upper}}</label>
                 </div>
               {% endfor %}
             </div>
