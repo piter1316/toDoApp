@@ -70,6 +70,7 @@ $(document).ready(function(){
          $('.mealsOptions').each(function( index ) {
               $(this).prop('checked',true)
           });
+          $('#first_day').attr('readonly', false);
       }
   });
 
