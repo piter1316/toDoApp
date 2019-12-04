@@ -23,51 +23,53 @@ $(document).ready(function(){
       }
     });
 
-
-
     $('input[name=append_existing]').change(function(){
       if($(this).is(':checked')) {
-          var allOptions = $('.mealsOptions')
-          allOptionsArray = []
-          generatedOptionsArray = []
-          $('.mealsOptions').each(function( index ) {
-            allOptionsArray.push($( this ).val() );
-          });
-          console.log(allOptionsArray)
-          $('.generated_meal_options').each(function( index ) {
-            generatedOptionsArray.push($( this ).val() );
-          });
-          console.log(generatedOptionsArray)
-
-
-          $('#meal_options_form, #meal_options_form_hr').hide(600)
-          var day_short = $('#meals_list tr:last th').text().trim()
-          console.log(day_short)
-          switch(day_short){
-          case 'PN':
-            $('#first_day').val(1);
-            break;
-          case 'WT':
-            $('#first_day').val(2);
-            break;
-          case 'ŚR':
-            $('#first_day').val(3);
-            break;
-          case 'CZW':
-            $('#first_day').val(4);
-            break;
-          case 'PT':
-            $('#first_day').val(5);
-            break;
-          case 'SB':
-            $('#first_day').val(6);
-            break;
-          case 'ND':
-            $('#first_day').val(0);
-            break;
+        var allOptions = $('.mealsOptions')
+        allOptionsArray = []
+        generatedOptionsArray = []
+        $('.generated_meal_options').each(function( index ) {
+          generatedOptionsArray.push($( this ).val() );
+        });
+        $('.mealsOptions').each(function( index ) {
+          allOptionsArray.push($( this ) );
+          console.log($(this).val())
+          if(!(generatedOptionsArray.includes($(this).val()))){
+            $(this).prop('checked',false)
           }
+        });
+        setTimeout(function(){$('#meal_options_form, #meal_options_form_hr').hide(600)}, 200);
+
+        var day_short = $('#meals_list tr:last th').text().trim()
+        $('#first_day').attr('readonly', true);
+        switch(day_short){
+        case 'PN':
+          $('#first_day').val(1);
+          break;
+        case 'WT':
+          $('#first_day').val(2);
+          break;
+        case 'ŚR':
+          $('#first_day').val(3);
+          break;
+        case 'CZW':
+          $('#first_day').val(4);
+          break;
+        case 'PT':
+          $('#first_day').val(5);
+          break;
+        case 'SB':
+          $('#first_day').val(6);
+          break;
+        case 'ND':
+          $('#first_day').val(0);
+          break;
+        }
       } else {
          $('#meal_options_form, #meal_options_form_hr').show(600)
+         $('.mealsOptions').each(function( index ) {
+              $(this).prop('checked',true)
+          });
       }
   });
 
