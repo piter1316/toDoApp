@@ -35,7 +35,8 @@
             <hr id="meal_options_form_hr" class="p-1 m-0">
             <div class="form-row">
               <div class="input-group mb-3">
-                <input class="form-control" type="number" name="howManyDays" value="1" id="howManyDays" min="1" max="{{maximum_no_of_days_to_generate}}">
+                <input class="form-control" type="number" name="howManyDays" value="1" id="howManyDays" min="1"
+                       max="{% if maximum_no_of_days_to_generate_no_repeat > 0 %}{{maximum_no_of_days_to_generate_no_repeat}}{%else%}{{maximum_no_of_days_to_generate}}{% endif%}">
                 <div class="input-group-append">
                   <label class="input-group-text" for="howManyDays">Na ile dni</label>
                 </div>
@@ -74,9 +75,11 @@
                 </div>
               </div>
             </div>
+            {% if maximum_no_of_days_to_generate_no_repeat > 0 %}
             <div class="form-row">
               <div class="form-group">
                 <div class="form-check">
+                  <input type="hidden" id="maximum_no_of_days_to_generate_no_repeat" value="{{maximum_no_of_days_to_generate_no_repeat}}">
                   <input class="form-check-input" type="checkbox" checked id="no_repetition" name="no_repetition">
                   <label class="form-check-label" for="no_repetition">
                     Nie powtarzaj posiłków z obecnego jadłospisu
@@ -84,6 +87,7 @@
                 </div>
               </div>
             </div>
+            {% endif %}
             {% endif %}
             <div class="form-row">
               <div class="form-group">

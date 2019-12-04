@@ -10,7 +10,20 @@ $(document).ready(function(){
          $('#howManyDays').attr({
          "max" : parseInt(max_days)})
       }
-  });
+    });
+    var max_days_no_repeat = $('#maximum_no_of_days_to_generate_no_repeat').val()
+    console.log(max_days_no_repeat)
+    $('input[name=no_repetition]').change(function(){
+      if($(this).is(':checked')) {
+          $('#howManyDays').attr({
+         "max" : max_days_no_repeat})
+      } else {
+         $('#howManyDays').attr({
+         "max" : parseInt(max_days)})
+      }
+    });
+
+
 
     $('input[name=append_existing]').change(function(){
       if($(this).is(':checked')) {

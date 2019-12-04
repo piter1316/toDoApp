@@ -57,6 +57,33 @@ def get_maximum_no_of_days(request):
     else:
         return 0
 
+def get_maximum_no_of_days_no_repeat(request):
+    current_meals_list = MealsList.objects.filter(user=request.user)
+    current_meals = []
+    no_of_meals_in_option = []
+    for item in (list(current_meals_list)):
+        meal = get_object_or_404(Meal, pk=item.meal_id)
+        current_meals.append(meal)
+    user_meals_options = MealOption.objects.filter(user=request.user)
+
+    for option in user_meals_options:
+        meals_in_option = Meal.objects.filter(meal_option=option, user=request.user, special=0)
+        # meal_option = get_object_or_404(MealOption, pk=option, user=request.user)
+        option_meals_list = []
+        for meal in meals_in_option:
+            if meal not in current_meals:
+                option_meals_list.append(meal)
+        no_of_meals_in_option.append(len(option_meals_list))
+    if len(no_of_meals_in_option) > 0:
+        min_no_of_meals_in_option = min(no_of_meals_in_option)
+        return min_no_of_meals_in_option
+    else:
+        return 0
+
+
+
+    # return current_meals
+
 
 @login_required(login_url='/accounts/login')
 def meals(request):
@@ -93,6 +120,7 @@ def meals(request):
         day_meal_option_meal_list.append({day: day_meals_list})
 
     maximum_no_of_days_to_generate = get_maximum_no_of_days(request)
+    maximum_no_of_days_to_generate_no_repeat = get_maximum_no_of_days_no_repeat(request)
     first_day_input_list = Week.objects.all()
     user_meals_options_select = MealsList.objects.filter(user=request.user).order_by('meal_option__position').values(
         'meal_option_id', 'meal_option_id__meal_option').distinct()
@@ -114,7 +142,8 @@ def meals(request):
         'maximum_no_of_days_to_generate': maximum_no_of_days_to_generate,
         'in_meals_list': in_meals_list,
         'first_day_input_list': first_day_input_list,
-        'option_meals_dict': option_meals_dict
+        'option_meals_dict': option_meals_dict,
+        'maximum_no_of_days_to_generate_no_repeat': maximum_no_of_days_to_generate_no_repeat
     }
     return render(request, 'meals/meals_list.html', context)
 
