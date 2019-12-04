@@ -25,14 +25,14 @@
             </button>
           </div>
           <div class="modal-body">
-            <div class="form-row">
+            <div class="form-row" id="meal_options_form">
               {% for option in user_meals_options %}
                 <div class="col-6">
                   <label><input type="checkbox" value="{{option.id}}" name="mealsOptions[]" checked id="{{option}}">{{option|upper}}</label>
                 </div>
               {% endfor %}
             </div>
-            <hr class="p-1 m-0">
+            <hr id="meal_options_form_hr" class="p-1 m-0">
             <div class="form-row">
               <div class="input-group mb-3">
                 <input class="form-control" type="number" name="howManyDays" value="1" id="howManyDays" min="1" max="{{maximum_no_of_days_to_generate}}">

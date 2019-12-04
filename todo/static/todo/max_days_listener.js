@@ -1,19 +1,25 @@
 $(document).ready(function(){
-var max_days = $('#howManyDays').attr('max')
-$('#howManyDays').attr({
-       "max" : parseInt(max_days)*2})
-  $('input[name=twice_the_same_meal]').change(function(){
-    if($(this).is(':checked')) {
+  var max_days = $('#howManyDays').attr('max')
+  $('#howManyDays').attr({
+         "max" : parseInt(max_days)*2})
+    $('input[name=twice_the_same_meal]').change(function(){
+      if($(this).is(':checked')) {
+          $('#howManyDays').attr({
+         "max" : parseInt(max_days)*2})
+      } else {
+         $('#howManyDays').attr({
+         "max" : parseInt(max_days)})
+      }
+  });
 
-        console.log('ch'+ max_days)
-        $('#howManyDays').attr({
-       "max" : parseInt(max_days)*2})
-    } else {
-       $('#howManyDays').attr({
-       "max" : parseInt(max_days)})
-        console.log('un_ch'+parseInt(max_days) )
-    }
-});
+    $('input[name=append_existing]').change(function(){
+      if($(this).is(':checked')) {
+          console.log('ch')
+          $('#meal_options_form, #meal_options_form_hr').hide(600)
+      } else {
+         $('#meal_options_form, #meal_options_form_hr').show(600)
+      }
+  });
 
   $('.dropdown-menu').click(function(e){
     e.stopPropagation();
