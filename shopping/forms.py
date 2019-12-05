@@ -7,11 +7,6 @@ class ShoppingListForm(forms.Form):
                'placeholder': 'Nazwa listy zakupów', 'aria-label': 'shoppingList',
                'aria-describedby': 'add-btn'}))
 
-    quantity = forms.FloatField(widget=forms.NumberInput(
-        attrs={
-               'class': 'form-control',
-               'style': 'max-width:75px;'}))
-
 
 class ProductsForm(forms.Form):
     product_name = forms.CharField(max_length=60, widget=forms.TextInput(

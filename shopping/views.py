@@ -52,6 +52,7 @@ def add_shopping_list(request):
     if form.is_valid():
         new_shopping_list = ShoppingList(name=request.POST['name'].upper(), user_id=request.user)
         new_shopping_list.save()
+        print('added')
     return redirect('shopping:shopping_list_index')
 
 
