@@ -6,25 +6,27 @@
     <div class="col-12 col-lg-11 mx-auto" id="">
       {% if user.is_authenticated %}
         <div class="row d-flex justify-content-center">
-          <div class="col-12 col-md-6 col-lg-3 mb-2">
+          <div class="col-12 col-lg-3 mb-2">
             <div class="card shadow" style="height:100%;">
-              <div class="card-header bg-secondary text-light text-center">
-                TO DO
+              <div class="card-header bg-secondary text-light">
+                Jadłospis
               </div>
               <div class="card-body">
                 <div class="row">
                   <div class="col-4">
-                    <img src="{% static 'todo/img/tasks-solid.svg' %}" height="75">
+                    <img src="{% static 'todo/img/utensils-solid.svg' %}" height="75" >
                   </div>
                   <div class="col-8">
                     <ul>
-                      <li>{{all_to_do_count}} zadań do zrobienia</li>
+                      <li>{{meals_list_length}} dni.</li>
+                      <li>{{meals}} różnych dań.</li>
+                      <li>{{meal_options}} posiłki dziennie.</li>
                     </ul>
                   </div>
                 </div>
               </div>
               <div class="mx-5 mb-2">
-                <a href="{% url 'todo:index' %}"  class="btn btn-secondary btn-block">Przejdź</a>
+                <a href="{% url 'meals:index' %}" class="btn btn-secondary btn-block">Przejdź</a>
               </div>
             </div>
           </div>
@@ -51,27 +53,25 @@
               </div>
             </div>
           </div>
-          <div class="col-12 col-lg-3 mb-2">
+          <div class="col-12 col-md-6 col-lg-3 mb-2">
             <div class="card shadow" style="height:100%;">
-              <div class="card-header bg-secondary text-light">
-                Jadłospis
+              <div class="card-header bg-secondary text-light text-center">
+                TO DO
               </div>
               <div class="card-body">
                 <div class="row">
                   <div class="col-4">
-                    <img src="{% static 'todo/img/utensils-solid.svg' %}" height="75" >
+                    <img src="{% static 'todo/img/tasks-solid.svg' %}" height="75">
                   </div>
                   <div class="col-8">
                     <ul>
-                      <li>{{meals_list_length}} dni.</li>
-                      <li>{{meals}} różnych dań.</li>
-                      <li>{{meal_options}} posiłki dziennie.</li>
+                      <li>{{all_to_do_count}} zadań do zrobienia</li>
                     </ul>
                   </div>
                 </div>
               </div>
               <div class="mx-5 mb-2">
-                <a href="{% url 'meals:index' %}" class="btn btn-secondary btn-block">Przejdź</a>
+                <a href="{% url 'todo:index' %}"  class="btn btn-secondary btn-block">Przejdź</a>
               </div>
             </div>
           </div>
