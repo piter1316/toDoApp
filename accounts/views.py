@@ -13,7 +13,7 @@ from accounts.forms import LoginForm
 
 def login_view(request):
     if request.method == 'POST':
-        form = AuthenticationForm(data=request.POST)
+        form = LoginForm(data=request.POST)
         if form.is_valid():
             user = form.get_user()
             login(request, user)
@@ -21,7 +21,7 @@ def login_view(request):
                 print(request.POST)
                 return redirect(request.POST.get('next'))
             else:
-                return redirect('todo:index')
+                return redirect('home')
     else:
         form = LoginForm()
     return render(request, 'accounts/login.html', {'form': form})
@@ -30,4 +30,4 @@ def login_view(request):
 def logout_view(request):
     if request.method == 'POST':
         logout(request)
-        return redirect('todo:home')
+        return redirect('home')
