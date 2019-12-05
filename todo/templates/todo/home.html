@@ -1,63 +1,77 @@
 {% extends 'todo/base.html' %}
 {% block body %}
+{% load static %}
 <div class="container-fluid" id="wrapper">
-
   <div class="row">
-    <div class="col-12 col-lg-8 mx-auto" id="content">
+    <div class="col-12 col-lg-11 mx-auto" id="">
       {% if user.is_authenticated %}
-        <div class="row row-eq-height">
-          <div class="col-12 col-md-6 col-lg-4 " >
-            <div class="card" style="height:100%;">
-              <div class="card-header bg-secondary text-light text-center">
-                Użytkownik
-              </div>
-              <div class="card-body">
-                <h5 class="card-title">{{request.user}}</h5>
-                <p class="card-text small">Data dołączenia: {{request.user.date_joined}}</p>
-              </div>
-              <form class="ml-2 mb-2" action="{% url 'accounts:logout' %}" method="post">
-                {% csrf_token %}
-                <button id="home-wyloguj" class="btn btn-danger" type="submit">Wyloguj</button>
-              </form>
-            </div>
-          </div>
-          <div class="col-12 col-md-6 col-lg-4 ">
-            <div class="card" style="height:100%;">
+        <div class="row d-flex justify-content-center">
+          <div class="col-12 col-md-6 col-lg-3 mb-2">
+            <div class="card shadow" style="height:100%;">
               <div class="card-header bg-secondary text-light text-center">
                 TO DO
               </div>
               <div class="card-body">
-                <h5 class="card-title">MASZ {{all_to_do_count}} ZADAŃ DO ZROBIENIA</h5>
-                <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                <div class="row">
+                  <div class="col-4">
+                    <img src="{% static 'todo/img/tasks-solid.svg' %}" height="75">
+                  </div>
+                  <div class="col-8">
+                    <ul>
+                      <li>{{all_to_do_count}} zadań do zrobienia</li>
+                    </ul>
+                  </div>
+                </div>
               </div>
-              <div class="ml-2 mb-2">
-                <a href="{% url 'todo:index' %}" class="btn btn-primary">Przejdź</a>
-              </div>
-            </div>
-          </div>
-          <div class="col-12 col-md-6 col-lg-4 ">
-            <div class="card">
-              <div class="card-header">
-                Featured
-              </div>
-              <div class="card-body">
-                <h5 class="card-title">Special title treatment</h5>
-                <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                <a href="#" class="btn btn-primary">Go somewhere</a>
+              <div class="mx-5 mb-2">
+                <a href="{% url 'todo:index' %}"  class="btn btn-secondary btn-block">Przejdź</a>
               </div>
             </div>
           </div>
-        </div>
-        <div class="row mt-2">
-          <div class="col-12">
-            <div class="card">
-              <div class="card-header">
-                Featured
+          <div class="col-12 col-md-6 col-lg-3 mb-2">
+            <div class="card shadow" style="height:100%;">
+              <div class="card-header bg-secondary text-light text-center">
+                Zakupy
               </div>
               <div class="card-body">
-                <h5 class="card-title">Special title treatment</h5>
-                <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                <a href="#" class="btn btn-primary">Go somewhere</a>
+                <div class="row">
+                  <div class="col-4">
+                    <img src="{% static 'todo/img/shopping-cart-solid.svg' %}" height="75">
+                  </div>
+                  <div class="col-8">
+                    <ul>
+                      <li>{{shopping_lists}} listy zakupów</li>
+                      <li>{{products_to_buy_counter}} pozycji do kupienia</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="mx-5 mb-2">
+                <a href="{% url 'shopping:shopping_list_index' %}"  class="btn btn-secondary btn-block">Przejdź</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-lg-3 mb-2">
+            <div class="card shadow" style="height:100%;">
+              <div class="card-header bg-secondary text-light">
+                Jadłospis
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-4">
+                    <img src="{% static 'todo/img/utensils-solid.svg' %}" height="75" >
+                  </div>
+                  <div class="col-8">
+                    <ul>
+                      <li>{{meals_list_length}} dni.</li>
+                      <li>{{meals}} różnych dań.</li>
+                      <li>{{meal_options}} posiłki dziennie.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="mx-5 mb-2">
+                <a href="{% url 'meals:index' %}" class="btn btn-secondary btn-block">Przejdź</a>
               </div>
             </div>
           </div>
