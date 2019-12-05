@@ -116,7 +116,7 @@ def meals(request):
 
         day_meals_list = []
         for meal in meals_on_day:
-            all_meals = Meal.objects.filter(user=request.user, meal_option_id=meal.meal_option.id)
+            all_meals = Meal.objects.filter(user=request.user, meal_option_id=meal.meal_option.id).order_by('name')
             day_meals_list.append({meal: all_meals})
         day_meal_option_meal_list.append({day: day_meals_list})
 

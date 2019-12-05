@@ -33,7 +33,6 @@
               </th>
               {% for meal in meals %}
               <td>{%for ch_meal, all in meal.items%}
-
                 <span class="" style="cursor:pointer;" id="dropdownMeal" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   {% if ch_meal.meal_id %}
                   {{ch_meal}}{% for m in all %}{% if ch_meal.meal_id == m.id %} {% if m.special %} **{% endif %}{% endif %}{%endfor%}
@@ -54,7 +53,9 @@
                       {% endfor %}
                     </select>
                   </form>
+                  {% if ch_meal.meal_id %}
                   <a href="{% url 'meals:edit_meal_ingredients' ch_meal.meal_id %}" class="btn btn-sm btn-block btn-primary">Edytuj {{ch_meal}}</a>
+                  {% endif %}
                 </div>
                 {% endfor %}
               </td>
