@@ -10,7 +10,10 @@
           {% if user.is_authenticated %}
             <form class="logout-link ml-2 form-inline w-75 mx-auto" action="{% url 'accounts:logout' %}" method="post">
               {% csrf_token %}
-              <label for="home-wyloguj" class="d-block mx-auto mb-3">Jesteś zalogowany jako {{user}}.</label>
+              <label for="home-wyloguj" class="d-block mx-auto mb-3">Jesteś zalogowany jako {{user}}.</label><BR>
+              MASZ {{all_to_do_count}} ZADAŃ DO ZROBIENIA<BR>
+              JADŁOSPIS WYGENEROWANY JEST NA {{meals_list_length}} DNI, ZAWIERA {{meals}} RÓŻNYCH DAŃ, PODZIELONYCH NA {{meal_options}} POSIŁKI<br>
+              POSIADASZ {{shopping_lists}} LIST ZAKUPÓW I {{products_to_buy_counter}} POZYCJI DO KUPIENIA.
               <button id="home-wyloguj" class="btn btn-danger btn-block" type="submit">Wyloguj</button>
             </form>
           {% else %}
