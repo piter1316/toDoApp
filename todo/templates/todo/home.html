@@ -77,7 +77,10 @@
           </div>
         </div>
       {% else %}
-      <a id="home-zaloguj" class="btn btn-success btn-block" href="{% url 'accounts:login' %}">Zaloguj</a>
+      <div class="form-inline w-75 mx-auto">
+        <label for="home-zaloguj" class="d-block mx-auto mb-3">Zaloguj aby móc tworzyć listy toDo i listy zakupowe</label>
+        <a id="home-zaloguj" class="btn btn-success btn-block" href="{% url 'accounts:login' %}">Zaloguj</a>
+      </div>
       {% endif %}
 
 <!--      <h2>HOME PAGE</h2>-->
