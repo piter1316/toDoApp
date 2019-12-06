@@ -8,7 +8,7 @@
     <button type="button" class="btn btn-outline-info btn-block mb-1" data-toggle="modal" data-target="#newMealsListModal">
       Generuj nowy jadłospis
     </button>
-    <a href="{% url 'meals:purge_meals_list' %}" class="btn btn-outline-danger btn-block mt-0">
+    <a href="{% url 'meals:purge_meals_list' %}" class="btn btn-outline-danger btn-block mt-0" onclick="return confirm('Wyczyścić jadłospis?')">
       Wyczyść jadłospis
     </a>
     {% endif %}

@@ -54,7 +54,7 @@
                     </select>
                   </form>
                   {% if ch_meal.meal_id %}
-                  <a href="{% url 'meals:edit_meal_ingredients' ch_meal.meal_id %}" class="btn btn-sm btn-block btn-primary">Edytuj {{ch_meal}}</a>
+                  <a href="{% url 'meals:edit_meal_ingredients' ch_meal.meal_id %}" class="btn btn-sm btn-block btn-primary mt-1">Edytuj {{ch_meal}}</a>
                   {% endif %}
                 </div>
                 {% endfor %}
@@ -93,8 +93,7 @@
             <div class="modal-body">
               <form class="" action="{% url 'meals:generate_shopping_lists' %}" method="post">{% csrf_token %}
                 <label><input type="checkbox" checked>Wszystkie dni</label>
-
-                <input type="number" class="form-control" required name="how_many_people" placeholder="Dla ilu osób?">
+                <input type="number" class="form-control mb-1" required name="how_many_people" placeholder="Dla ilu osób?">
                 <button type="submit" class="btn btn-primary btn-block">GENERUJ</button>
               </form>
             </div>

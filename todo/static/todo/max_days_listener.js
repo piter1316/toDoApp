@@ -78,6 +78,16 @@ $(document).ready(function(){
     e.stopPropagation();
   })
 
+  $('#new_ingredient_form_toggle').click(function(e){
+    if ($(this).text() == "Nowy Składnik") {
+          $(this).text("Zamknij formularz");
+      } else {
+          $(this).text("Nowy Składnik");
+      };
+    $('#new_ingredient_form').toggle(600);
+  })
+
+
   $('.meal_option_settings').on('click', function(e){
       var id = $(e.target).closest('li').attr('id')
       var settings_id = id.split('_')
