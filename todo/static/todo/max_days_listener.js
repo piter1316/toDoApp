@@ -99,7 +99,6 @@ $(document).ready(function(){
     $('#allow_update_recipe').hide('slow');
     $('#update_recipe_textarea').removeAttr('readonly');
     var rows = $('#update_recipe_textarea').attr('rows');
-    console.log(rows)
     if(rows >= 1 && rows < 5){
       $('#update_recipe_textarea').attr('rows', 5);
     }else{
@@ -111,7 +110,7 @@ $(document).ready(function(){
    });
 
   $('#option_name').on('click', function(e){
-    $('#new_meal_option_name').toggleClass('d-none');
+    $('#new_meal_option_name').toggle(600);
   });
 
 });
