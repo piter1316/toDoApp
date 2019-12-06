@@ -9,9 +9,9 @@
     {% include 'meals/menu.html' %}
     <div class="col-12 col-md-8 col-xl-10 ">
       {% if meals_list %}
-        <div class="table-responsive-sm shadow">
-          <table id="meals_list" class="table table-light table-striped table-hover">
-            <thead class="thead-dark">
+        <div class="table-responsive-sm shadow" id="meals_list">
+          <table  class="table table-light table-striped table-hover">
+            <thead id="meals_list_head" class="thead-dark">
             <tr class="text-center text-light">
               <th scope="col"></th>
               {% for meal_option in generated_user_meals_options %}
@@ -79,6 +79,9 @@
       <!-- Button trigger modal -->
       <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#generateShoppingListsModal">
         GENERUJ LISTY ZAKUPÓW
+      </button>
+      <button type="button" onclick="createPDF()" class="btn btn-outline-dark btn-block">
+        DRUKUJ
       </button>
       <!-- Modal -->
       <div class="modal fade" id="generateShoppingListsModal" tabindex="-1" role="dialog" aria-labelledby="generateShoppingListsModal" aria-hidden="true">
