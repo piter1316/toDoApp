@@ -2,7 +2,7 @@
 {% load l10n %}
 {% block body %}
 <div class="container mt-2">
-  <div class="jumbotron p-2">
+  <div class="jumbotron shadow p-2">
     <h1 class="text-center">MOJE LISTY ZAKUPÓW</h1>
     <hr class="my-2">
     <div class="form-row">
@@ -25,7 +25,7 @@
   <div class="row">
     {% for shop, products in shopping_lists.items %}
     <div class="col-12 col-md-4 mb-3">
-      <div class="card ">
+      <div class="card shadow">
         <div class="card-header text-center">
           <div class="input-group mb-1">
             <input type="text" readonly class="form-control" value="{{shop}}">

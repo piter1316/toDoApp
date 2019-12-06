@@ -4,13 +4,13 @@
 {% block body %}
 {% load split %}
 
-<div class="container-fluid bg-light py-2 mt-3">
+<div class="container-fluid py-2 mt-3">
   <div class="row">
     {% include 'meals/menu.html' %}
-    <div class="col-12 col-md-10 ">
+    <div class="col-12 col-md-8 col-xl-10 ">
       {% if meals_list %}
-        <div class="table-responsive-sm">
-          <table id="meals_list" class="table table-striped table-hover ">
+        <div class="table-responsive-sm shadow">
+          <table id="meals_list" class="table table-light table-striped table-hover">
             <thead class="thead-dark">
             <tr class="text-center text-light">
               <th scope="col"></th>
@@ -76,13 +76,37 @@
       </div>
       {% endif %}
       {% if meals_list %}
-      <form action="{% url 'meals:generate_shopping_lists' %}" method="post">{% csrf_token %}
-        <input type="number" class="form-control" name="how_many_people" placeholder="Dla ilu osób?">
-        <button type="submit" class="btn btn-primary btn-block">GENERUJ LISTY ZAKUPÓW</button>
-      </form>
-      {% endif %}
+      <!-- Button trigger modal -->
+      <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#generateShoppingListsModal">
+        GENERUJ LISTY ZAKUPÓW
+      </button>
+      <!-- Modal -->
+      <div class="modal fade" id="generateShoppingListsModal" tabindex="-1" role="dialog" aria-labelledby="generateShoppingListsModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Generacja list zakupów</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form class="" action="{% url 'meals:generate_shopping_lists' %}" method="post">{% csrf_token %}
+                <label><input type="checkbox" checked>Wszystkie dni</label>
 
+                <input type="number" class="form-control" required name="how_many_people" placeholder="Dla ilu osób?">
+                <button type="submit" class="btn btn-primary btn-block">GENERUJ</button>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuluj</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
     </div>
   </div>
 </div>
+
 {% endblock %}
