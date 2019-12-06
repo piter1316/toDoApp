@@ -34,6 +34,7 @@
             <hr id="meal_options_form_hr" class="p-1 m-0">
             <div class="form-row">
               <div class="input-group mb-3">
+                <input type="hidden" value="{{maximum_no_of_days_to_generate}}" id="maximum_no_of_days_to_generate">
                 <input class="form-control" type="number" name="howManyDays" value="1" id="howManyDays" min="1"
                        max="{% if maximum_no_of_days_to_generate_no_repeat > 0 %}{{maximum_no_of_days_to_generate_no_repeat}}{%else%}{{maximum_no_of_days_to_generate}}{% endif%}">
                 <div class="input-group-append">
