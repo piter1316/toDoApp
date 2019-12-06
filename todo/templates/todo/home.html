@@ -18,9 +18,13 @@
                   </div>
                   <div class="col-8">
                     <ul>
-                      <li>{{meals_list_length}} dni.</li>
-                      <li>{{meals}} różnych dań.</li>
-                      <li>{{meal_options}} posiłki dziennie.</li>
+                      {% if meals_list_length %}
+                      <li>{{meals_list_length}} {% if meals_list_length == 1 %}dzień{% else %} dni{% endif %}.</li>
+                      <li>{{meals}} {% if meals == 1 %}danie{% endif %}{% if meals > 1 and meals < 5 %} różne dania{% endif %}{% if meals >= 5 %}różnych dań{% endif %}.</li>
+                      <li>{{meal_options}} {% if meal_options == 1 %}posiłek{% endif %}{% if meal_options > 1 and meal_options < 5%}posiłki{% endif %}{% if meal_options >= 5 %}posiłków{% endif %} dziennie.</li>
+                      {% else %}
+                      <li>Jadłospis jest pusty!</li>
+                      {% endif %}
                     </ul>
                   </div>
                 </div>
@@ -42,8 +46,12 @@
                   </div>
                   <div class="col-8">
                     <ul>
-                      <li>{{shopping_lists}} listy zakupów</li>
-                      <li>{{products_to_buy_counter}} pozycji do kupienia</li>
+                      {%  if shopping_lists %}
+                      <li>{{shopping_lists}} {% if shopping_lists == 1 %}lista{% endif %}{% if shopping_lists > 1 and  shopping_lists < 5 %}listy{% endif %}{% if shopping_lists >= 5 %}list{% endif %} zakupów.</li>
+                      <li>{{products_to_buy_counter}} {% if products_to_buy_counter == 1 %}pozycja{% endif %}{% if products_to_buy_counter > 1 and  products_to_buy_counter < 5 %}pozycje{% endif %}{% if products_to_buy_counter >= 5 %}pozycji{% endif %} do kupienia</li>
+                      {% else %}
+                      <li>Brak list zakupów!</li>
+                      {% endif %}
                     </ul>
                   </div>
                 </div>
@@ -65,7 +73,12 @@
                   </div>
                   <div class="col-8">
                     <ul>
-                      <li>{{all_to_do_count}} zadań do zrobienia</li>
+                      {% if all_to_do_count %}
+<!--                      <li>{{all_to_do_count}} zadań do zrobienia</li>-->
+                      <li>{{all_to_do_count}} {% if all_to_do_count == 1 %}zadanie{% endif %}{% if all_to_do_count > 1 and  all_to_do_count < 5 %}zadania{% endif %}{% if all_to_do_count >= 5 %}zadań{% endif %} do zrobienia</li>
+                      {% else %}
+                      <li>Brak zadań do zrobienia!</li>
+                      {% endif %}
                     </ul>
                   </div>
                 </div>
