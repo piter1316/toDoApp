@@ -376,6 +376,9 @@ def generate_shopping_lists(request):
     ingr_qt_dict = {}
     shopping_lists = []
     how_many_people = request.POST['how_many_people']
+    delete_generated_shopping_lists = request.POST.get('delete_generated_shopping_lists', False)
+    if delete_generated_shopping_lists:
+        ShoppingList.objects.filter(user_id=request.user, generated=1).delete()
     if how_many_people == '':
         how_many_people = 1
     else:
@@ -402,7 +405,7 @@ def generate_shopping_lists(request):
         ingr_qt_dict = {}
     for item in shopping_lists:
         shop = list(item.keys())[0]
-        new_shopping_list = ShoppingList(user_id=request.user, name=shop)
+        new_shopping_list = ShoppingList(user_id=request.user, name=shop, generated=1)
         new_shopping_list.save()
         for shop, shoping_list_items in item.items():
             for shopping_item, qt in shoping_list_items.items():

@@ -9,6 +9,7 @@ from meals.models import Unit
 class ShoppingList(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.TextField(max_length=100)
+    generated = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
