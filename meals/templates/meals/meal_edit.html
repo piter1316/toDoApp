@@ -71,8 +71,9 @@
               </li>
               {% endfor %}
               <li class="list-group-item mt-2">
-                <button id="new_ingredient_form_toggle" type="button" class="btn btn-outline-secondary btn-sm ml-1">Nowy Składnik</button>
+                <button id="new_ingredient_form_toggle" type="button" class="btn btn-outline-secondary btn-sm ml-1">Opcje</button>
                 <form style="display:none;" class="mt-2" action="{% url 'meals:add_ingredient' meal.0.id %}" method="post" id="new_ingredient_form">{% csrf_token %}
+                  <smal>Nowy składnik:</smal>
                   {{form.name}}
                   <div class="form-row mb-2">
                     <div class="col">

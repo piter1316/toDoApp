@@ -23,30 +23,46 @@
         <ul class="list-group text-center rounded">
           <li class="list-group-item d-flex justify-content-between align-items-center bg-secondary text-light rounded">
             {{forloop.counter}}. {{meal_option|upper}}
-            <span class="badge  badge-pill" style="cursor:pointer;" id="dropdownMeal" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <i class="fas fa-cog"></i>
+            <span class="dropdownMeal badge badge-pill fas fa-cog"
+                  style="cursor:pointer;"
+                  id="dropdownMeal_{{forloop.counter}}">
             </span>
-            <div class="dropdown-menu p-2" aria-labelledby="dropdownMenuButton">
-              <small>Dodaj pozycję:</small>
-              <form class="pb-0 px-2 pt-2 mt-1" action="{% url 'meals:add_meal' meal_option.id %}" method="post" >
-                {% csrf_token %}
-                <div class="form-row mb-2">
-                  <div class="col">
-                    {{form.name}}
-                  </div>
-                  <label class="label ml-2 mt-2">{{form.special}}DANIE SPECJALNE</label>
-                </div>
-                <button class="btn btn-outline-success btn-block mb-2" type="submit" id="add_sn">Dodaj danie</button>
-              </form>
-              <hr class="m-1">
-              <form action="{% url 'meals:update_meal_option' meal_option.id %}" method="post" class="pb-0 px-2 pt-2 mt-1">{% csrf_token %}
-                <small>Edytuj {{ meal_option }}:</small>
-                <input type="text" name="new_meal_option_name" class="form-control mb-1" value="{{meal_option}}">
-                <button type="submit" class="btn btn-info btn-block mb-1">Zmień nazwę</button>
+          </li>
+          <li class="list-group-item p-0" style="display:none;" id="dropdownMealContent_{{forloop.counter}}">
+            <ul class="nav nav-tabs" id="mealOptionSettings" role="tablist">
+              <li class="nav-item">
+                <a class="nav-link active" id="addMeal-tab" data-toggle="tab" href="#addMeal_{{forloop.counter}}" role="tab" aria-controls="addMeal" aria-selected="true">Dodaj pozycję</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" id="editMealOption-tab" data-toggle="tab" href="#editMealOption_{{forloop.counter}}" role="tab" aria-controls="editMealOption" aria-selected="false">Edytuj</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" id="deteteMealOption-tab" data-toggle="tab" href="#deteteMealOption_{{forloop.counter}}" role="tab" aria-controls="deteteMealOption" aria-selected="false">Usuń</a>
+              </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+              <div class="tab-pane fade show active" id="addMeal_{{forloop.counter}}" role="tabpanel" aria-labelledby="addMeal-tab">
+                <form class="p-2 mt-1 text-center" action="{% url 'meals:add_meal' meal_option.id %}" method="post" >
+                  {% csrf_token %}
+                  <div class="form-row">{{form.name}}</div>
+                  <div class="form-row"><label class="label mx-auto">{{form.special}} DANIE SPECJALNE</label></div>
+                  <button class="btn btn-outline-success btn-block" type="submit" id="add_sn">Dodaj danie</button>
+                </form>
                 <div class="dropdown-divider"></div>
-                <a onclick="return confirm('Usunąć {{meal_option}} i wszystkie pozycje z listy?')" class="btn btn-danger btn-block " href="{% url 'meals:delete_meal_option' meal_option.id %}" id="">Usuń {{meal_option}}</a>
-              </form>
+              </div>
+              <div class="tab-pane fade" id="editMealOption_{{forloop.counter}}" role="tabpanel" aria-labelledby="editMealOption-tab">
+                <form action="{% url 'meals:update_meal_option' meal_option.id %}" method="post" class="pb-0 px-2 pt-2 mt-1">{% csrf_token %}
+                  <input type="text" name="new_meal_option_name" class="form-control mb-1" value="{{meal_option}}">
+                  <button type="submit" class="btn btn-info btn-block mb-1">Zmień nazwę</button>
+                </form>
+                <div class="dropdown-divider"></div>
+              </div>
+              <div class="tab-pane fade" id="deteteMealOption_{{forloop.counter}}" role="tabpanel" aria-labelledby="deteteMealOption-tab">
+                <a onclick="return confirm('Usunąć {{meal_option}} i wszystkie pozycje z listy?')" class="btn btn-danger btn-block mt-2" href="{% url 'meals:delete_meal_option' meal_option.id %}" id="">Usuń {{meal_option}}</a>
+                <div class="dropdown-divider"></div>
+              </div>
             </div>
+          </li>
           </li>
           {% for meal in meals %}
           <a href="{% url 'meals:edit_meal_ingredients' meal.id  %}" ><li class="list-group-item p-1">{{meal}}{% if meal.special %} ** {% endif %}</li></a>

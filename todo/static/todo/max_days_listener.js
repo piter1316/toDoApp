@@ -78,11 +78,19 @@ $(document).ready(function(){
     e.stopPropagation();
   })
 
+  $('.dropdownMeal').click(function(e){
+    var id = e.target.id
+    var num_id = id.split('_')[1]
+    console.log(num_id)
+    $('#dropdownMealContent_' + num_id).toggle(600);
+  })
+
+
   $('#new_ingredient_form_toggle').click(function(e){
-    if ($(this).text() == "Nowy Składnik") {
-          $(this).text("Zamknij formularz");
+    if ($(this).text() == "Opcje") {
+          $(this).text("Zamknij");
       } else {
-          $(this).text("Nowy Składnik");
+          $(this).text("Opcje");
       };
     $('#new_ingredient_form').toggle(600);
   })
