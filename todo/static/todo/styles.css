@@ -24,6 +24,9 @@ body {
 	text-decoration: line-through;
 	background: rgba(149, 165, 166, .3);
 }
+.edited {
+	background: rgba(149, 165, 166, .3) !important;
+}
 
 .list-group-item{
     color: black;
