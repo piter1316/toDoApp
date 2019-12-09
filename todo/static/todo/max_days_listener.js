@@ -150,5 +150,6 @@ $(document).ready(function(){
     }
 
   });
+  console.log($('input[name=bought_many]'))
 
 });
