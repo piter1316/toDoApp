@@ -139,4 +139,16 @@ $(document).ready(function(){
     $('#new_meal_option_name').toggle(600);
   });
 
+
+
+  $('input[name=bought_many]').change(function(){
+    var id_num = $(this).attr('id').split('_')[1]
+    if($(this).is(':checked')) {
+      $('#checked_'+id_num).prop('checked', true);
+    } else {
+      $('#checked_'+id_num).prop('checked', false);
+    }
+
+  });
+
 });
