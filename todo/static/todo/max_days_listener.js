@@ -81,17 +81,27 @@ $(document).ready(function(){
   $('.dropdownMeal').click(function(e){
     var id = e.target.id
     var num_id = id.split('_')[1]
-    console.log(num_id)
+
     $('#dropdownMealContent_' + num_id).toggle(600);
   })
 
   $('.dropdown_shopping_item').click(function(e){
     var id = e.target.id;
     var num_id = id.split('_')[1]
-    console.log(num_id)
+
       $('#'+num_id).toggle(600);
       $('#badge_edit_'+num_id).toggle(600);
     })
+
+    $('.shoppingListSettingsButton').click(function(e){
+    var id = e.target.id;
+    var num_id = id.split('_')[1]
+    console.log(num_id)
+      $('#shopping_list_settings_'+num_id).toggle(600);
+//      $('#badge_edit_'+num_id).toggle(600);
+    })
+
+
 
 
   $('#new_ingredient_form_toggle').click(function(e){

@@ -32,39 +32,40 @@
           <div class="input-group mb-1">
             <input type="text" readonly class="form-control" value="{{shop}}">
             <div class="input-group-append">
-              <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown"
-                      aria-haspopup="true" aria-expanded="false">Opcje
+              <button class="btn btn-outline-secondary dropdown-toggle shoppingListSettingsButton" id="shoppingListSettingsButton_{{shop.id}}" type="button">Opcje
               </button>
-              <div class="dropdown-menu">
-                <div class="dropdown-item">
-                  <form action="{% url 'shopping:shopping_list_edit' shop.id %}" method="POST" role="form">{% csrf_token%}
-                    <input class="form-control mb-1" type="text" name="name" value="{{shop.name}}">
-                    <button type="submit" class="btn btn-success btn-block btn-sm" id="edit-btn">Zmień nazwe</button>
-                  </form>
-                </div>
-                <div class="dropdown-divider"></div>
-                <form class="dropdown-item" action="{% url 'shopping:delete' shop.id %}">
-                  <input type="hidden" name="to_delete" value="{{shop.id}}">
-                  <button onclick="return confirm('Usunąć {{shop}} i wszystkie pozycje z listy?')"
-                          class="btn btn-danger btn-sm btn-block" type="submit">Usuń listę
-                  </button>
-                </form>
-                {% if products %}
-                <a class="dropdown-item" href="{% url 'shopping:delete_bought' shop.id %}">
-                  <button class="btn btn-warning btn-sm btn-block">Usuń kupione</button>
-                </a>
-                <a class="dropdown-item" href="{% url 'shopping:purge_list' shop.id %}">
-                  <button onclick="return confirm('Wyczyścić wszystkie pozycje z listy?')"
-                          class="btn btn-warning btn-sm btn-block">Wyczyść listę
-                  </button>
-                </a>
-                </a>
-                {% endif %}
-              </div>
             </div>
           </div>
         </div>
         <ul class="list-group list-group-flush">
+          <li class="list-group-item" style="display:none" id="shopping_list_settings_{{shop.id}}">
+            <div class="" >
+              <div class="dropdown-item">
+                <form action="{% url 'shopping:shopping_list_edit' shop.id %}" method="POST" role="form">{% csrf_token%}
+                  <input class="form-control mb-1" type="text" name="name" value="{{shop.name}}">
+                  <button type="submit" class="btn btn-success btn-block btn-sm" id="edit-btn">Zmień nazwe</button>
+                </form>
+              </div>
+              <div class="dropdown-divider"></div>
+              <form class="dropdown-item" action="{% url 'shopping:delete' shop.id %}">
+                <input type="hidden" name="to_delete" value="{{shop.id}}">
+                <button onclick="return confirm('Usunąć {{shop}} i wszystkie pozycje z listy?')"
+                        class="btn btn-danger btn-sm btn-block" type="submit">Usuń listę
+                </button>
+              </form>
+              {% if products %}
+              <a class="dropdown-item" href="{% url 'shopping:delete_bought' shop.id %}">
+                <button class="btn btn-warning btn-sm btn-block">Usuń kupione</button>
+              </a>
+              <a class="dropdown-item" href="{% url 'shopping:purge_list' shop.id %}">
+                <button onclick="return confirm('Wyczyścić wszystkie pozycje z listy?')"
+                        class="btn btn-warning btn-sm btn-block">Wyczyść listę
+                </button>
+              </a>
+              </a>
+              {% endif %}
+            </div>
+          </li>
           {% for product in products %}
           {% for prod, qt in product.items %}
           {% if qt.1 %}
