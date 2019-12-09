@@ -67,10 +67,10 @@
             </div>
           </li>
           <li class="list-group-item">
-            <form action>
+            <form action="{% url 'shopping:bought_many' %}" method="POST">{% csrf_token %}
               <button class="btn btn-secondary btn-block btn-small" type="submit">Kupione</button>
               {% for product in products %}
-              <input type="checkbox" name="bought_checkbox" class="bought_checkbox" id="checked_{% for prod, qt in product.items %}{{prod.id}}{% endfor %}" value="">
+              <input style="display:none" type="checkbox" name="bought_checkbox" class="bought_checkbox" id="checked_{% for prod, qt in product.items %}{{prod.id}}{% endfor %}" value="{% for prod, qt in product.items %}{{prod.id}}{% endfor %}">
               {% endfor %}
             </form>
           </li>

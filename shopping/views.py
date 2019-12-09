@@ -110,3 +110,12 @@ def shopping_list_edit(request, shopping_list_id):
     list_to_edit.name = request.POST['name'].upper()
     list_to_edit.save()
     return redirect('shopping:shopping_list_index')
+
+
+def bought_many(request):
+    shopping_items_bought = request.POST.getlist('bought_checkbox')
+    for item in shopping_items_bought:
+        shopping_product = get_object_or_404(Products, pk=int(item))
+        shopping_product.bought = True
+        shopping_product.save()
+    return redirect('shopping:shopping_list_index')
