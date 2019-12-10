@@ -12,3 +12,68 @@ function build(id) {
   document.getElementById('shop_'+id).value = ''
 
 }
+
+function printShoppingList(shop_id){
+  console.log(shop_id);
+  var sTable = document.getElementById('shop_'+shop_id).innerHTML;
+  shop = document.getElementById('shop_'+shop_id).getElementsByTagName("input")[0].value
+
+  var style = "<style>";
+  style = style + "input, button, select {display: none}";
+  style = style + "#shopping_list_settings_"+shop_id+" {display: none}";
+  style = style + "#addProdForm_"+shop_id+" {display: none}";
+  style = style + ".todo-completed {display: none}";
+  style = style + "a {text-decoration: none; color: black}";
+  style = style + ".shop_name {text-decoration: underline}";
+  style = style + "li {list-style-type: circle;}";
+  style = style + "</style>";
+
+  var win = window.open('', '', 'height=1280,width=768');
+
+  win.document.write('<html><head>');
+  win.document.write('<br>');
+  win.document.write('<title>Lista zakupów</title>');
+  win.document.write(style);
+  win.document.write('</head>');
+  win.document.write('<body>');
+  win.document.write('<span class="shop_name">' + shop + '</span>');
+  win.document.write(sTable);
+  win.document.write('</body></html>');
+
+  win.document.close();
+  win.print();
+}
+
+function printAllShoppingLists(){
+  var sTable = document.getElementsByClassName('shoppingList');
+
+  var style = "<style>";
+  style = style + "input, button, select {display: none}";
+  style = style + ".addProdForm {display: none}";
+  style = style + ".todo-completed {display: none}";
+  style = style + "a {text-decoration: none; color: black}";
+  style = style + "ul {float: left; padding: 30px}";
+  style = style + "li {list-style-type: circle;}";
+  style = style + ".shop_name {list-style-type: none; text-decoration: underline}";
+  style = style + "</style>";
+
+  var win = window.open('', '', 'height=1280,width=768');
+
+  win.document.write('<html><head>');
+  win.document.write('<br>');
+  win.document.write('<title>Listy zakupów</title>');
+  win.document.write(style);
+  win.document.write('</head>');
+  win.document.write('<body>');
+  for(var i=0;i<sTable.length;i++){
+    shop = sTable[i].getElementsByTagName("input")[0].value
+    win.document.write('<ul>');
+    win.document.write('<li class="shop_name">' + shop + '</li>');
+    win.document.write(sTable[i].innerHTML);
+    win.document.write('</ul>');
+  }
+
+  win.document.write('</body></html>');
+  win.document.close();
+  win.print();
+}

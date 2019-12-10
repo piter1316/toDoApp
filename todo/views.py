@@ -62,7 +62,6 @@ def home(request):
         for product in shopping_lists:
             for item in Products.objects.filter(shopping_list_id=product, bought=False):
                 products_to_buy_counter += 1
-        print(products_to_buy_counter)
         context = {
             'all_to_do_count': len(all_to_do_count),
             'meals_list_length': meals_list_length,
