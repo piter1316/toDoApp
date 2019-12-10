@@ -1,31 +1,44 @@
 $(document).ready(function(){
-  var max_days = $('#howManyDays').attr('max')
-  $('#howManyDays').attr({
-         "max" : parseInt(max_days)*2})
+  var max_days = $('#maximum_no_of_days_to_generate').val()
+  var max_days_no_repeat = $('#maximum_no_of_days_to_generate_no_repeat').val()
+  var double_max_days = parseInt(max_days)*2
+  $('#howManyDays').attr({"max": parseInt(max_days_no_repeat)*2})
     $('input[name=twice_the_same_meal]').change(function(){
       if($(this).is(':checked')) {
-          $('#howManyDays').attr({
-         "max" : parseInt(max_days)*2})
-      } else {
-         $('#howManyDays').attr({
-         "max" : parseInt(max_days)})
+        if ($('input[name=no_repetition]').is(':checked')){
+          $('#howManyDays').attr({"max" : parseInt(max_days_no_repeat)*2})
+        }else{
+          $('#howManyDays').attr({"max" : parseInt(max_days)*2})
+        }
+      }else{
+        if ($('input[name=no_repetition]').is(':checked')){
+          $('#howManyDays').attr({"max" : parseInt(max_days_no_repeat)})
+        }else{
+          $('#howManyDays').attr({"max" : parseInt(max_days)})
+        }
       }
     });
-    var max_days_no_repeat = $('#maximum_no_of_days_to_generate_no_repeat').val()
-    console.log(max_days_no_repeat)
+
     $('input[name=no_repetition]').change(function(){
       if($(this).is(':checked')) {
-          $('#howManyDays').attr({
-         "max" : max_days_no_repeat})
-      } else {
-         $('#howManyDays').attr({
-         "max" : parseInt(max_days)})
+        if ($('input[name=twice_the_same_meal]').is(':checked')){
+          $('#howManyDays').attr({"max" : parseInt(max_days_no_repeat)*2})
+        }else{
+          $('#howManyDays').attr({"max" : parseInt(max_days_no_repeat)})
+        }
+      }else{
+        if ($('input[name=twice_the_same_meal]').is(':checked')){
+          $('#howManyDays').attr({"max" : parseInt(max_days)*2})
+        }else{
+          $('#howManyDays').attr({"max" : parseInt(max_days)})
+        }
       }
     });
 
     $('input[name=append_existing]').change(function(){
       if($(this).is(':checked')) {
         var allOptions = $('.mealsOptions')
+
         allOptionsArray = []
         generatedOptionsArray = []
         $('.generated_meal_options').each(function( index ) {
@@ -33,13 +46,11 @@ $(document).ready(function(){
         });
         $('.mealsOptions').each(function( index ) {
           allOptionsArray.push($( this ) );
-          console.log($(this).val())
           if(!(generatedOptionsArray.includes($(this).val()))){
             $(this).prop('checked',false)
           }
         });
         setTimeout(function(){$('#meal_options_form, #meal_options_form_hr').hide(600)}, 200);
-
         var day_short = $('#meals_list tr:last th').text().trim()
         $('#first_day').attr('readonly', true);
         switch(day_short){
@@ -65,12 +76,12 @@ $(document).ready(function(){
           $('#first_day').val(0);
           break;
         }
-      } else {
-         $('#meal_options_form, #meal_options_form_hr').show(600)
-         $('.mealsOptions').each(function( index ) {
-              $(this).prop('checked',true)
-          });
-          $('#first_day').attr('readonly', false);
+      }else {
+        $('#meal_options_form, #meal_options_form_hr').show(600)
+        $('.mealsOptions').each(function( index ) {
+        $(this).prop('checked',true)
+        });
+        $('#first_day').attr('readonly', false);
       }
   });
 
@@ -96,13 +107,8 @@ $(document).ready(function(){
     $('.shoppingListSettingsButton').click(function(e){
     var id = e.target.id;
     var num_id = id.split('_')[1]
-    console.log(num_id)
       $('#shopping_list_settings_'+num_id).toggle(600);
-//      $('#badge_edit_'+num_id).toggle(600);
     })
-
-
-
 
   $('#new_ingredient_form_toggle').click(function(e){
     if ($(this).text() == "Opcje") {
@@ -112,7 +118,6 @@ $(document).ready(function(){
       };
     $('#new_ingredient_form').toggle(600);
   })
-
 
   $('.meal_option_settings').on('click', function(e){
       var id = $(e.target).closest('li').attr('id')
@@ -139,8 +144,6 @@ $(document).ready(function(){
     $('#new_meal_option_name').toggle(600);
   });
 
-
-
   $('input[name=bought_many]').change(function(){
     var id_num = $(this).attr('id').split('_')[1]
     if($(this).is(':checked')) {
@@ -150,6 +153,4 @@ $(document).ready(function(){
     }
 
   });
-  console.log($('input[name=bought_many]'))
-
 });
