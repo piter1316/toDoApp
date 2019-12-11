@@ -162,4 +162,14 @@ $(document).ready(function(){
       $('#boughtManyForm_'+ form_id).fadeOut()
     }
   });
+
+  $('input[name=day]').change(function(){
+    var atLeastOneIsChecked = $('input[name=day]').is(':checked');
+    if(atLeastOneIsChecked){
+      $('#deleteSelectedDays').fadeIn()
+    }else{
+      $('#deleteSelectedDays').fadeOut()
+    }
+  });
+
 });

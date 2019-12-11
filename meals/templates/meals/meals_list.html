@@ -26,7 +26,8 @@
             {% for item in day_meal_option_meal_list %}
             {% for day, meals in item.items %}
             <tr class="text-center">
-              <th scope="row">
+              <th scope="row" class="d-flex justify-content-between ">
+                <input type="checkbox" name="day" class="checkbox my-auto" value="{% for meal in meals %}{% for ml in meal%}{{ml.id}},{% endfor %}{% endfor %}">
                 {% with day_as_list=day|split %}
                 {{day_as_list.0}}
                 {% endwith %}
@@ -76,13 +77,16 @@
       </div>
       {% endif %}
       {% if meals_list %}
-      <!-- Button trigger modal -->
-      <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#generateShoppingListsModal">
-        GENERUJ LISTY ZAKUPÓW
-      </button>
-      <button type="button" onclick="createPDF()" class="btn btn-outline-dark btn-block">
-        DRUKUJ
-      </button>
+      <div class="btn-group btn-block">
+        <button type="button" class="btn btn-primary btn-block btn-sm" data-toggle="modal" data-target="#generateShoppingListsModal">
+          GENERUJ LISTY ZAKUPÓW
+        </button>
+        <button type="button" onclick="createPDF()" class="btn btn-outline-dark btn-block mt-0">
+          DRUKUJ
+        </button>
+      </div>
+      <button class="btn btn-danger btn-block btn-sm mt-1" id="deleteSelectedDays" style="display:none;">Usuń zaznaczone dni</button>
+
       <!-- Modal -->
       <div class="modal fade" id="generateShoppingListsModal" tabindex="-1" role="dialog" aria-labelledby="generateShoppingListsModal" aria-hidden="true">
         <div class="modal-dialog" role="document">

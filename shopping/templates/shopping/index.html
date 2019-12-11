@@ -14,7 +14,7 @@
           </button>
         </div>
         <div class="col-12 col-md-3">
-          <div class="btn-group btn-block {% if shopping_lists %}{%else%}d-none{% endif %}" role="group" aria-label="Basic example">
+          <div class="btn-group btn-block {% if shopping_lists %}{%else%}d-none{% endif %}" role="group">
             <button type="button" class="btn btn-secondary" onclick="printAllShoppingLists()"><i class="fas fa-print"></i> </button>
             <a onclick="return confirm('Usunąć wszystkie listy zakupów?')"
              href="{% url 'shopping:delete_all_shopping_lists' %}"
