@@ -151,6 +151,16 @@ $(document).ready(function(){
     } else {
       $('#checked_'+id_num).prop('checked', false);
     }
-
   });
+
+  $('input[name=bought_many]').change(function () {
+  var atLeastOneIsChecked = $('input:checkbox').is(':checked');
+
+  if(atLeastOneIsChecked){
+  $('.bought_checkbox_form').fadeIn()
+  }else{
+  $('.bought_checkbox_form').fadeOut()
+  }
+
+});
 });

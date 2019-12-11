@@ -71,10 +71,10 @@
                         class="btn btn-warning btn-sm btn-block">Wyczyść listę
                 </button>
               </a>
-              <form class="dropdown-item" action="{% url 'shopping:bought_many' %}" method="POST" id="boughtManyForm_{{forloop.counter}}">{% csrf_token %}
+              <form style="display:none" class="bought_checkbox_form dropdown-item" action="{% url 'shopping:bought_many' %}" method="POST" id="boughtManyForm_{{forloop.counter}}">{% csrf_token %}
                 <button class="btn btn-secondary btn-block btn-sm" type="submit">Zaznaczone = kupione</button>
                   {% for product in products %}
-                  <input style="display:none" type="checkbox" name="bought_checkbox" class="bought_checkbox" id="checked_{% for prod, qt in product.items %}{{prod.id}}{% endfor %}" value="{% for prod, qt in product.items %}{{prod.id}}{% endfor %}">
+                  <input style="display:none"  type="checkbox" name="bought_checkbox" class="bought_checkbox" id="checked_{% for prod, qt in product.items %}{{prod.id}}{% endfor %}" value="{% for prod, qt in product.items %}{{prod.id}}{% endfor %}">
                 {% endfor %}
               </form>
               {% endif %}
