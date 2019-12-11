@@ -85,7 +85,17 @@
           DRUKUJ
         </button>
       </div>
-      <button class="btn btn-danger btn-block btn-sm mt-1" id="deleteSelectedDays" style="display:none;">Usuń zaznaczone dni</button>
+      <form>
+        {% for item in day_meal_option_meal_list %}
+          {% for day, meals in item.items %}
+            {% for meal in meals %}
+              {% for ml in meal%}<input type="checkbox" value="{{ml.id}}" name="mealsListPosition">{% endfor %}
+            {% endfor %}
+          {% endfor %}
+        {% endfor %}
+        <button class="btn btn-danger btn-block btn-sm mt-1" id="deleteSelectedDays" >Usuń zaznaczone dni</button>
+      </form>
+
 
       <!-- Modal -->
       <div class="modal fade" id="generateShoppingListsModal" tabindex="-1" role="dialog" aria-labelledby="generateShoppingListsModal" aria-hidden="true">
