@@ -77,3 +77,4 @@ function printAllShoppingLists(){
   win.document.close();
   win.print();
 }
+
