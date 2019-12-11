@@ -146,21 +146,20 @@ $(document).ready(function(){
 
   $('input[name=bought_many]').change(function(){
     var id_num = $(this).attr('id').split('_')[1]
+    var form_id = $(this).closest('div').find('.bought_checkbox_form').attr('id').split('_')[1]
     if($(this).is(':checked')) {
       $('#checked_'+id_num).prop('checked', true);
     } else {
       $('#checked_'+id_num).prop('checked', false);
     }
+    var ul_id = $(this).closest('ul').attr('id')
+    var atLeastOneIsChecked = $('#'+ul_id+' input:checkbox').is(':checked');
+    var form_id = $(this).closest('div').find('.bought_checkbox_form').attr('id').split('_')[1]
+
+    if(atLeastOneIsChecked){
+      $('#boughtManyForm_'+ form_id).fadeIn()
+    }else{
+      $('#boughtManyForm_'+ form_id).fadeOut()
+    }
   });
-
-  $('input[name=bought_many]').change(function () {
-  var atLeastOneIsChecked = $('input:checkbox').is(':checked');
-
-  if(atLeastOneIsChecked){
-  $('.bought_checkbox_form').fadeIn()
-  }else{
-  $('.bought_checkbox_form').fadeOut()
-  }
-
-});
 });
