@@ -170,6 +170,20 @@ $(document).ready(function(){
     }else{
       $('#deleteSelectedDays').fadeOut()
     }
+
+    var CheckedMealsListItemsArray = $(this).val().split(',')
+    CheckedMealsListItemsArray.pop()
+    if($(this).is(':checked')) {
+      function check(element, index, array) {
+        $('#mealsListPosition_'+element).prop('checked', true)
+      }
+      CheckedMealsListItemsArray.forEach(check);
+    }else {
+      function uncheck(element, index, array) {
+          $('#mealsListPosition_'+element).prop('checked', false)
+       }
+       CheckedMealsListItemsArray.forEach(uncheck);
+    }
   });
 
 });

@@ -416,3 +416,9 @@ def generate_shopping_lists(request):
                 new_list_position.save()
     return redirect('shopping:shopping_list_index')
 
+
+def delete_selected_days(request):
+    meals_list_positions_to_delete_list = request.POST.getlist('mealsListPosition')
+    for item in meals_list_positions_to_delete_list:
+        MealsList.objects.filter(user=request.user, pk=item).delete()
+    return redirect('meals:index')

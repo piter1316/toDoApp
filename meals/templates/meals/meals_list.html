@@ -76,52 +76,6 @@
         </p>
       </div>
       {% endif %}
-      {% if meals_list %}
-      <div class="btn-group btn-block">
-        <button type="button" class="btn btn-primary btn-block btn-sm" data-toggle="modal" data-target="#generateShoppingListsModal">
-          GENERUJ LISTY ZAKUPÓW
-        </button>
-        <button type="button" onclick="createPDF()" class="btn btn-outline-dark btn-block mt-0">
-          DRUKUJ
-        </button>
-      </div>
-      <form>
-        {% for item in day_meal_option_meal_list %}
-          {% for day, meals in item.items %}
-            {% for meal in meals %}
-              {% for ml in meal%}<input type="checkbox" value="{{ml.id}}" name="mealsListPosition">{% endfor %}
-            {% endfor %}
-          {% endfor %}
-        {% endfor %}
-        <button class="btn btn-danger btn-block btn-sm mt-1" id="deleteSelectedDays" >Usuń zaznaczone dni</button>
-      </form>
-
-
-      <!-- Modal -->
-      <div class="modal fade" id="generateShoppingListsModal" tabindex="-1" role="dialog" aria-labelledby="generateShoppingListsModal" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">Generacja list zakupów</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <form class="" action="{% url 'meals:generate_shopping_lists' %}" method="post">{% csrf_token %}
-                <label><input type="checkbox" checked>Wszystkie dni</label><br>
-                <label><input name="delete_generated_shopping_lists" checked type="checkbox">Usunąć listy wygenerowane poprzednio?</label>
-                <input type="number" class="form-control mb-1" required name="how_many_people" placeholder="Dla ilu osób?">
-                <button type="submit" class="btn btn-primary btn-block">GENERUJ</button>
-              </form>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuluj</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      {% endif %}
     </div>
   </div>
 </div>

@@ -6,6 +6,7 @@ app_name = 'meals'
 urlpatterns = [
     path('mealsList', views.meals, name='index'),
     path('mealsList/purge_meals_list', views.purge_meals_list, name='purge_meals_list'),
+    path('mealsList/delete_selected_days', views.delete_selected_days, name='delete_selected_days'),
     path('mealsList/update', views.update_meals_list, name='update_meals_list'),
     path('mealsList/generate_meals_list', views.generate_meals_list, name='generate_meals_list'),
     path('mealsList/generate_shopping_lists', views.generate_shopping_lists, name='generate_shopping_lists'),

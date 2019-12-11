@@ -1,16 +1,59 @@
 <div class="col-12 col-md-4 col-xl-2 mb-2 ">
-  <div class="nav flex-column nav-pills bg-light p-3 rounded shadow" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+  <div class="nav flex-column nav-pills bg-light p-3 rounded shadow">
     <a class="btn btn-outline-secondary text-center mb-1" href="{% url 'meals:index' %}">JADŁOSPIS</a>
     <a class="btn btn-outline-secondary text-center mb-1" href="{% url 'meals:edit_meals' %}">POSIŁKI</a>
     <!-- Button trigger modal -->
     {% if in_meals_list %}
     <div class="dropdown-divider"></div>
-    <button type="button" class="btn btn-outline-info btn-block mb-1" data-toggle="modal" data-target="#newMealsListModal">
+    <button type="button" class="btn btn-outline-info btn-block" data-toggle="modal" data-target="#newMealsListModal">
       Generuj nowy jadłospis
     </button>
-    <a href="{% url 'meals:purge_meals_list' %}" class="btn btn-outline-danger btn-block mt-0" onclick="return confirm('Wyczyścić jadłospis?')">
-      Wyczyść jadłospis
-    </a>
+    {% if meals_list %}
+      <button type="button" class="btn btn-outline-primary btn-block" data-toggle="modal" data-target="#generateShoppingListsModal">
+        GENERUJ LISTY ZAKUPÓW
+      </button>
+      <button type="button" onclick="createPDF()" class="btn btn-outline-secondary  btn-block">
+        DRUKUJ JADŁOSPIS
+      </button>
+      <form action="{% url 'meals:delete_selected_days' %}" class="my-1" style="display:none;" id="deleteSelectedDays" method="POST">{% csrf_token %}
+        {% for item in day_meal_option_meal_list %}
+          {% for day, meals in item.items %}
+            {% for meal in meals %}
+              {% for ml in meal%}<input type="checkbox"  style="display:none;" value="{{ml.id}}" id="mealsListPosition_{{ml.id}}" name="mealsListPosition">{% endfor %}
+            {% endfor %}
+          {% endfor %}
+        {% endfor %}
+        <button type="submit" class="btn btn-outline-warning btn-block mt-1"  >Usuń zaznaczone dni</button>
+      </form>
+      <a href="{% url 'meals:purge_meals_list' %}" class="btn btn-outline-danger btn-block mt-1" onclick="return confirm('Wyczyścić jadłospis?')">
+        Wyczyść jadłospis
+      </a>
+      <!-- Modal -->
+      <div class="modal fade" id="generateShoppingListsModal" tabindex="-1" role="dialog" aria-labelledby="generateShoppingListsModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Generacja list zakupów</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form class="" action="{% url 'meals:generate_shopping_lists' %}" method="post">{% csrf_token %}
+                <label><input type="checkbox" checked>Wszystkie dni</label><br>
+                <label><input name="delete_generated_shopping_lists" checked type="checkbox">Usunąć listy wygenerowane poprzednio?</label>
+                <input type="number" class="form-control mb-1" required name="how_many_people" placeholder="Dla ilu osób?">
+                <button type="submit" class="btn btn-primary btn-block">GENERUJ</button>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuluj</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
     {% endif %}
     <!-- Modal -->
     <div class="modal fade" id="newMealsListModal" tabindex="-1" role="dialog" aria-hidden="true">
