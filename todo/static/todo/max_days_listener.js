@@ -1,88 +1,94 @@
 $(document).ready(function(){
   var max_days = $('#maximum_no_of_days_to_generate').val()
   var max_days_no_repeat = $('#maximum_no_of_days_to_generate_no_repeat').val()
+  var max_days_default = $('#maximum_no_of_days_to_generate_default').val()
+
   var double_max_days = parseInt(max_days)*2
-  $('#howManyDays').attr({"max": parseInt(max_days_no_repeat)*2})
-    $('input[name=twice_the_same_meal]').change(function(){
-      if($(this).is(':checked')) {
-        if ($('input[name=no_repetition]').is(':checked')){
-          $('#howManyDays').attr({"max" : parseInt(max_days_no_repeat)*2})
-        }else{
-          $('#howManyDays').attr({"max" : parseInt(max_days)*2})
-        }
+  if(parseInt(max_days_no_repeat) == 0){
+    $('#howManyDays').attr({"max": parseInt(max_days_default)})
+  }else{
+    $('#howManyDays').attr({"max": parseInt(max_days_no_repeat)*2})
+  }
+  $('input[name=twice_the_same_meal]').change(function(){
+    if($(this).is(':checked')) {
+      if ($('input[name=no_repetition]').is(':checked')){
+        $('#howManyDays').attr({"max" : parseInt(max_days_no_repeat)*2})
       }else{
-        if ($('input[name=no_repetition]').is(':checked')){
-          $('#howManyDays').attr({"max" : parseInt(max_days_no_repeat)})
-        }else{
-          $('#howManyDays').attr({"max" : parseInt(max_days)})
-        }
+        $('#howManyDays').attr({"max" : parseInt(max_days)*2})
       }
-    });
-
-    $('input[name=no_repetition]').change(function(){
-      if($(this).is(':checked')) {
-        if ($('input[name=twice_the_same_meal]').is(':checked')){
-          $('#howManyDays').attr({"max" : parseInt(max_days_no_repeat)*2})
-        }else{
-          $('#howManyDays').attr({"max" : parseInt(max_days_no_repeat)})
-        }
+    }else{
+      if ($('input[name=no_repetition]').is(':checked')){
+        $('#howManyDays').attr({"max" : parseInt(max_days_no_repeat)})
       }else{
-        if ($('input[name=twice_the_same_meal]').is(':checked')){
-          $('#howManyDays').attr({"max" : parseInt(max_days)*2})
-        }else{
-          $('#howManyDays').attr({"max" : parseInt(max_days)})
-        }
+        $('#howManyDays').attr({"max" : parseInt(max_days)})
       }
-    });
+    }
+  });
 
-    $('input[name=append_existing]').change(function(){
-      if($(this).is(':checked')) {
-        var allOptions = $('.mealsOptions')
-
-        allOptionsArray = []
-        generatedOptionsArray = []
-        $('.generated_meal_options').each(function( index ) {
-          generatedOptionsArray.push($( this ).val() );
-        });
-        $('.mealsOptions').each(function( index ) {
-          allOptionsArray.push($( this ) );
-          if(!(generatedOptionsArray.includes($(this).val()))){
-            $(this).prop('checked',false)
-          }
-        });
-        setTimeout(function(){$('#meal_options_form, #meal_options_form_hr').hide(600)}, 200);
-        var day_short = $('#meals_list tr:last th').text().trim()
-        $('#first_day').attr('readonly', true);
-        switch(day_short){
-        case 'PN':
-          $('#first_day').val(1);
-          break;
-        case 'WT':
-          $('#first_day').val(2);
-          break;
-        case 'ŚR':
-          $('#first_day').val(3);
-          break;
-        case 'CZW':
-          $('#first_day').val(4);
-          break;
-        case 'PT':
-          $('#first_day').val(5);
-          break;
-        case 'SB':
-          $('#first_day').val(6);
-          break;
-        case 'ND':
-          $('#first_day').val(0);
-          break;
-        }
-      }else {
-        $('#meal_options_form, #meal_options_form_hr').show(600)
-        $('.mealsOptions').each(function( index ) {
-        $(this).prop('checked',true)
-        });
-        $('#first_day').attr('readonly', false);
+  $('input[name=no_repetition]').change(function(){
+    if($(this).is(':checked')) {
+      if ($('input[name=twice_the_same_meal]').is(':checked')){
+        $('#howManyDays').attr({"max" : parseInt(max_days_no_repeat)*2})
+      }else{
+        $('#howManyDays').attr({"max" : parseInt(max_days_no_repeat)})
       }
+    }else{
+      if ($('input[name=twice_the_same_meal]').is(':checked')){
+        $('#howManyDays').attr({"max" : parseInt(max_days)*2})
+      }else{
+        $('#howManyDays').attr({"max" : parseInt(max_days)})
+      }
+    }
+  });
+
+  $('input[name=append_existing]').change(function(){
+    if($(this).is(':checked')) {
+      var allOptions = $('.mealsOptions')
+
+      allOptionsArray = []
+      generatedOptionsArray = []
+      $('.generated_meal_options').each(function( index ) {
+        generatedOptionsArray.push($( this ).val() );
+      });
+      $('.mealsOptions').each(function( index ) {
+        allOptionsArray.push($( this ) );
+        if(!(generatedOptionsArray.includes($(this).val()))){
+          $(this).prop('checked',false)
+        }
+      });
+      setTimeout(function(){$('#meal_options_form, #meal_options_form_hr').hide(600)}, 200);
+      var day_short = $('#meals_list tr:last th').text().trim()
+      $('#first_day').attr('readonly', true);
+      switch(day_short){
+      case 'PN':
+        $('#first_day').val(1);
+        break;
+      case 'WT':
+        $('#first_day').val(2);
+        break;
+      case 'ŚR':
+        $('#first_day').val(3);
+        break;
+      case 'CZW':
+        $('#first_day').val(4);
+        break;
+      case 'PT':
+        $('#first_day').val(5);
+        break;
+      case 'SB':
+        $('#first_day').val(6);
+        break;
+      case 'ND':
+        $('#first_day').val(0);
+        break;
+      }
+    }else {
+      $('#meal_options_form, #meal_options_form_hr').show(600)
+      $('.mealsOptions').each(function( index ) {
+      $(this).prop('checked',true)
+      });
+      $('#first_day').attr('readonly', false);
+    }
   });
 
   $('.dropdown-menu').click(function(e){

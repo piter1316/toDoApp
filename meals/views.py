@@ -141,6 +141,7 @@ def meals(request):
         'generated_user_meals_options': generated_user_meals_options,
         'day_meal_option_meal_list': day_meal_option_meal_list,
         'maximum_no_of_days_to_generate': maximum_no_of_days_to_generate,
+        'maximum_no_of_days_to_generate_default': maximum_no_of_days_to_generate *2,
         'in_meals_list': in_meals_list,
         'first_day_input_list': first_day_input_list,
         'option_meals_dict': option_meals_dict,
