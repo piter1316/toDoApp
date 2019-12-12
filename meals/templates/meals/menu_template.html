@@ -19,7 +19,7 @@
         {% for item in day_meal_option_meal_list %}
           {% for day, meals in item.items %}
             {% for meal in meals %}
-              {% for ml in meal%}<input type="checkbox"  style="display:none;" value="{{ml.id}}" id="mealsListPosition_{{ml.id}}" name="mealsListPosition">{% endfor %}
+              {% for ml in meal%}<input type="checkbox"  style="display:none;" value="{{ml.id}}" class="mealsListPosition_{{ml.id}}" name="mealsListPosition">{% endfor %}
             {% endfor %}
           {% endfor %}
         {% endfor %}
