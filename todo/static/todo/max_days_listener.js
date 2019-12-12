@@ -3,8 +3,7 @@ $(document).ready(function(){
   var max_days_no_repeat = $('#maximum_no_of_days_to_generate_no_repeat').val()
   var max_days_default = $('#maximum_no_of_days_to_generate_default').val()
 
-  var double_max_days = parseInt(max_days)*2
-  if(parseInt(max_days_no_repeat) == 0){
+  if(parseInt(max_days_no_repeat) == 0 || parseInt(max_days_no_repeat)==max_days ){
     $('#howManyDays').attr({"max": parseInt(max_days_default)})
   }else{
     $('#howManyDays').attr({"max": parseInt(max_days_no_repeat)*2})
@@ -172,9 +171,9 @@ $(document).ready(function(){
   $('input[name=day]').change(function(){
     var atLeastOneIsChecked = $('input[name=day]').is(':checked');
     if(atLeastOneIsChecked){
-      $('#deleteSelectedDays').fadeIn()
+      $('.deleteSelectedDays').fadeIn()
     }else{
-      $('#deleteSelectedDays').fadeOut()
+      $('.deleteSelectedDays').fadeOut()
     }
 
     var CheckedMealsListItemsArray = $(this).val().split(',')

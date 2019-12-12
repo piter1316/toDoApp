@@ -5,6 +5,8 @@
 {% load split %}
 
 <div class="container-fluid py-2 mt-3">
+<input type="hidden" id="maximum_no_of_days_to_generate_no_repeat" value="{{maximum_no_of_days_to_generate_no_repeat}}">
+        <input type="hidden" id="maximum_no_of_days_to_generate_default" value="{{maximum_no_of_days_to_generate_default}}">
   <div class="row">
     {% include 'meals/menu.html' %}
     <div class="col-12 col-md-8 col-xl-10 ">
