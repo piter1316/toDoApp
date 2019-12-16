@@ -16,7 +16,7 @@
 </div>
 
 <div class="modal fade" id="generateShoppingListsModal" tabindex="-1" role="dialog" aria-labelledby="generateShoppingListsModal" aria-hidden="true">
-  <div class="modal-dialog" role="document">
+  <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel">Generacja list zakupów</h5>
@@ -26,10 +26,10 @@
       </div>
       <div class="modal-body">
         <form class="" action="{% url 'meals:generate_shopping_lists' %}" method="post">{% csrf_token %}
-          <label><input type="checkbox" checked>Wszystkie dni</label><br>
-          <label><input name="delete_generated_shopping_lists" checked type="checkbox">Usunąć listy wygenerowane poprzednio?</label>
+<!--          <label><input type="checkbox" checked>Wszystkie dni</label><br>-->
           <input type="number" class="form-control mb-1" required name="how_many_people" placeholder="Dla ilu osób?">
           <button type="submit" class="btn btn-primary btn-block">GENERUJ</button>
+          <label><input name="delete_generated_shopping_lists" checked type="checkbox">Usunąć listy wygenerowane poprzednio?</label>
         </form>
       </div>
       <div class="modal-footer">
