@@ -90,32 +90,16 @@
           </div>
         </div>
       {% else %}
-      <div class="form-inline w-75 mx-auto">
-        <label for="home-zaloguj" class="d-block mx-auto mb-3">Zaloguj aby móc tworzyć listy toDo i listy zakupowe</label>
-        <a id="home-zaloguj" class="btn btn-success btn-block" href="{% url 'accounts:login' %}">Zaloguj</a>
-      </div>
+        <div class="container">
+          <div class="jumbotron shadow shadow-lg">
+          <h1 class="display-4">Organizer</h1>
+          <p class="lead">Zaloguj się aby móc tworzyć listy toDo i listy zakupowe</p>
+          <hr class="my-4">
+          <p>Bez logowania dostępne są tylko Narzędzia.</p>
+          <a id="home-zaloguj" class="btn btn-success" href="{% url 'accounts:login' %}">Zaloguj</a>
+        </div>
+        </div>
       {% endif %}
-
-<!--      <h2>HOME PAGE</h2>-->
-<!--      <div class="">-->
-<!--        <div class="">-->
-<!--          {% if user.is_authenticated %}-->
-<!--            <form class="logout-link ml-2 form-inline w-75 mx-auto" action="{% url 'accounts:logout' %}" method="post">-->
-<!--              {% csrf_token %}-->
-<!--              <label for="home-wyloguj" class="d-block mx-auto mb-3">Jesteś zalogowany jako {{user}}.</label><BR>-->
-<!--              MASZ {{all_to_do_count}} ZADAŃ DO ZROBIENIA<BR>-->
-<!--              JADŁOSPIS WYGENEROWANY JEST NA {{meals_list_length}} DNI, ZAWIERA {{meals}} RÓŻNYCH DAŃ, PODZIELONYCH NA {{meal_options}} POSIŁKI<br>-->
-<!--              POSIADASZ {{shopping_lists}} LIST ZAKUPÓW I {{products_to_buy_counter}} POZYCJI DO KUPIENIA.-->
-<!--              <button id="home-wyloguj" class="btn btn-danger btn-block" type="submit">Wyloguj</button>-->
-<!--            </form>-->
-<!--          {% else %}-->
-<!--          <form class="form-inline w-75 mx-auto">-->
-<!--            <label for="home-zaloguj" class="d-block mx-auto mb-3">Zaloguj aby móc tworzyć listy toDo i listy zakupowe</label>-->
-<!--            <a id="home-zaloguj" class="btn btn-success btn-block" href="{% url 'accounts:login' %}">Zaloguj</a>-->
-<!--          </form>-->
-<!--          {% endif %}-->
-<!--        </div>-->
-<!--      </div>-->
     </div>
   </div>
 </div>

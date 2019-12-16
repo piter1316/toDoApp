@@ -5,8 +5,8 @@
 {% load l10n %}
 <div class="container-fluid py-2 mt-3">
   <div class="row">
-    {% include 'meals/menu.html' %}
-    <div class="col-12 col-md-8 col-xl-10">
+
+    <div class="container">
       <form class="input-group mb-3" method="POST" action="{% url 'meals:add_meal_option' %}">
         {% csrf_token %}
         {{form_meal_option.meal_option}}
@@ -14,7 +14,7 @@
           <button class="btn btn-outline-secondary" type="submit">Dodaj</button>
         </div>
         <div class="input-group-append">
-        <button class="btn btn-secondary" type="button">Zmień kolejność</button>
+<!--        <button class="btn btn-secondary" type="button">Zmień kolejność</button>-->
       </div>
       </form>
       <div class="row">

@@ -57,6 +57,7 @@ def get_maximum_no_of_days(request):
     else:
         return 0
 
+
 def get_maximum_no_of_days_no_repeat(request):
     current_meals_list = MealsList.objects.filter(user=request.user)
     current_meals = []
@@ -80,10 +81,6 @@ def get_maximum_no_of_days_no_repeat(request):
         return min_no_of_meals_in_option
     else:
         return 0
-
-
-
-    # return current_meals
 
 
 @login_required(login_url='/accounts/login')
@@ -158,7 +155,7 @@ def edit_meals(request):
     meals_options_dict = {}
     units = Unit.objects.all()
     for i in range(len(meals_options)):
-        meals_in_meals_options = Meal.objects.filter(meal_option=meals_options[i]).order_by('special', 'name')
+        meals_in_meals_options = Meal.objects.filter(meal_option=meals_options[i]).order_by('name')
         meals = []
         for meal in meals_in_meals_options:
             meals.append(meal)
