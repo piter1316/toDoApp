@@ -1,5 +1,5 @@
 <div class="col-12 col-md-4 col-xl-2 mb-2 " style="position:relative;">
-  <button class="navbar-toggler d-md-none bg-light border shadow" type="button" onclick="openNav()" style="position:fixed; top:55px; z-index:1">
+  <button class="navbar-toggler d-md-none bg-light border shadow" type="button" onclick="openNav()" style="position:fixed; top:55px; z-index:1" >
       <i class="fas fa-bars"></i> Menu
     </button>
   <nav class="navbar navbar-expand-md navbar-light p-0">
@@ -8,8 +8,8 @@
     </div>
   </nav>
   <div id="mySidenav" class="sidenav bg-light shadow shadow-lg rounded mt-4 d-md-none">
-    <button class="navbar-toggler bg-light border shadow mb-1" type="button" onclick="closeNav()">
-      <i class="fas fa-bars"></i> Zamknij
+    <button class="navbar-toggler bg-light border shadow mb-1" type="button" onclick="closeNav()" id="closeMenu">
+      <i class="far fa-window-close"></i> Zamknij
     </button>
     {% include 'meals/menu_template.html' %}
   </div>
