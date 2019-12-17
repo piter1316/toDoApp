@@ -36,7 +36,7 @@ body {
   width: 0; /* 0 width - change this with JavaScript */
   position: fixed; /* Stay in place */
   z-index: 3; /* Stay on top */
-  top: 15px; /* Stay at the top */
+
   left: 0;
   overflow-x: hidden; /* Disable horizontal scroll */
   padding-top: 60px; /* Place content 60px from the top */
@@ -64,6 +64,3 @@ body {
   .sidenav a {font-size: 18px;}
 }
 
-.modal-backdrop{
-  z-index: 1!important;
-}

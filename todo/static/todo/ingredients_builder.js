@@ -77,26 +77,3 @@ function printAllShoppingLists(){
   win.document.close();
   win.print();
 }
-
-function openNav() {
-  document.getElementById("mySidenav").style.width = "100%";
-  document.getElementById("mySidenav").style.height = "auto";
-  document.getElementById("mySidenav").style.padding = "5%";
-  $('#mySidenav #menu_ul').css('display','block')
-   $('#closeMenu').show();
-}
-
-/* Set the width of the side navigation to 0 */
-function closeNav() {
-  document.getElementById("mySidenav").style.padding = "0";
-  $('#closeMenu').hide('slow');
-  setTimeout(function(){
-
-    $('#mySidenav #menu_ul').css('display','none')
-    setTimeout(function(){
-      document.getElementById("mySidenav").style.height = "0";
-     }, 500);
-  }, 200);
-  document.getElementById("mySidenav").style.width = "0";
-
-}
