@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
 from django.views.decorators.csrf import csrf_exempt
 
-from accounts.forms import LoginForm
+from accounts.forms import LoginForm, ChangePasswordForm
 
 
 def login_view(request):
@@ -38,7 +38,8 @@ def change_password(request):
     message = ''
     if request.method == 'POST':
 
-        form = PasswordChangeForm(request.user, request.POST)
+        form = ChangePasswordForm(request.user, request.POST)
+        form_help = PasswordChangeForm(request.user)
         if form.is_valid():
             user = form.save()
             update_session_auth_hash(request, user)  # Important!
@@ -47,8 +48,10 @@ def change_password(request):
         else:
             messages.error(request, 'Please correct the error below.')
     else:
-        form = PasswordChangeForm(request.user)
+        form = ChangePasswordForm(request.user)
+        form_help = PasswordChangeForm(request.user)
     return render(request, 'accounts/password_change.html', {
         'form': form,
-        'message': message
+        'message': message,
+        'form_help': form_help
     })
