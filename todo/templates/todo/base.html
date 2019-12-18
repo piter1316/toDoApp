@@ -29,7 +29,7 @@
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <a class="navbar-brand" href="{% url 'home' %}">ORGANIZER</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
+      <span>menu</span><span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto text-center">
@@ -46,7 +46,7 @@
           <a class="nav-link dropdown-toggle" href="#" id="narzedzia" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Narzędzia
           </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <div class="dropdown-menu mb-1" aria-labelledby="navbarDropdown">
             <a class="dropdown-item" href="{% url 'password_generator' %}">Generator haseł</a>
   <!--          <a class="dropdown-item" href="#">Kalkulator lokaty</a>-->
           </div>
@@ -71,10 +71,10 @@
   </nav>
   {% if in_meals_list %}
     <nav class="navbar d-md-none navbar-light bg-light border-top shadow">
-      <button class="navbar-toggler btn-block shadow" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span>opcje</span><span class="navbar-toggler-icon"></span>
+      <button class="navbar-toggler btn-block shadow" type="button" data-toggle="collapse" id="mealsOptionsButton" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span id="mealsOptionsButtonText">opcje</span><span class="navbar-toggler-icon" id="mealsOptionsButtonIcon"></span>
       </button>
-      <div class="collapse navbar-collapse mt-2" id="navbarNav">
+      <div class="collapse navbar-collapse mt-3" id="navbarNav">
         {% include 'meals/menu_template.html' %}
       </div>
     </nav>

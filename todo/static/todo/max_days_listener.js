@@ -171,9 +171,9 @@ $(document).ready(function(){
   $('input[name=day]').change(function(){
     var atLeastOneIsChecked = $('input[name=day]').is(':checked');
     if(atLeastOneIsChecked){
-      $('.deleteSelectedDays').fadeIn()
+      $('.deleteSelectedDaysButton').removeAttr("disabled");
     }else{
-      $('.deleteSelectedDays').fadeOut()
+      $('.deleteSelectedDaysButton').attr("disabled","true")
     }
 
     var CheckedMealsListItemsArray = $(this).val().split(',')
@@ -191,4 +191,11 @@ $(document).ready(function(){
     }
   });
 
+  $('#mealsOptionsButton').on('click', function(){
+    if ($('#mealsOptionsButtonText').text() == "opcje") {
+          $('#mealsOptionsButtonText').text('zamknij')
+      } else {
+        $('#mealsOptionsButtonText').text('opcje')
+      };
+  })
 });
