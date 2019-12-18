@@ -26,7 +26,7 @@
 </head>
 <body>
 <div class="sticky-top">
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <nav class="navbar navbar-expand-lg navbar-light bg-light text-center">
     <a class="navbar-brand" href="{% url 'home' %}">ORGANIZER</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span>menu</span><span class="navbar-toggler-icon"></span>
@@ -53,15 +53,21 @@
         </li>
       </ul>
       {% if user.is_authenticated %}
-      <form class="text-center logout-link ml-2"  action="{% url 'accounts:logout' %}" method="post">
-        {% csrf_token %}
-        <div class="input-group">
-          <div class="input-group-append mx-auto">
-            <input type="text" readonly class="form-control" value="{{user}}">
-            <button class="btn btn-danger" type="submit">Wyloguj</button>
+      <div class="btn-group dropleft ">
+        <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="fas fa-user px-3"></i>
+        </button>
+        <div class="dropdown-menu text-center p-2">
+          <div class="mb-1"><span class="font-weight-bold">{{user}}</span></div>
+          <div class="mb-1"><a class="btn btn-secondary btn-block" href="{% url 'accounts:change_password' %}"><i class="fas fa-key mr-2"></i>Zmień hasło</a></div>
+          <div>
+            <form class="text-center logout-link"  action="{% url 'accounts:logout' %}" method="post">
+            {% csrf_token %}
+            <button class="btn btn-danger btn-block" type="submit"><i class="fas fa-sign-out-alt mr-2"></i>Wyloguj</button>
+          </form>
           </div>
         </div>
-       </form>
+      </div>
       {% else %}
       <div class="text-center">
         <a class="btn btn-success btn-block" href="{% url 'accounts:login' %}">Zaloguj</a>
