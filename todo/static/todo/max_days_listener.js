@@ -60,25 +60,25 @@ $(document).ready(function(){
       $('#first_day').attr('readonly', true);
       switch(day_short){
       case 'PN':
-        $('#first_day').val(1);
-        break;
-      case 'WT':
         $('#first_day').val(2);
         break;
-      case 'ŚR':
+      case 'WT':
         $('#first_day').val(3);
         break;
-      case 'CZW':
+      case 'ŚR':
         $('#first_day').val(4);
         break;
-      case 'PT':
+      case 'CZW':
         $('#first_day').val(5);
         break;
-      case 'SB':
+      case 'PT':
         $('#first_day').val(6);
         break;
+      case 'SB':
+        $('#first_day').val(7);
+        break;
       case 'ND':
-        $('#first_day').val(0);
+        $('#first_day').val(1);
         break;
       }
     }else {
