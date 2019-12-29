@@ -202,7 +202,7 @@ def generate_meals_list(request):
     how_many_days = request.POST['howManyDays']
     twice_the_same_meal = request.POST.get('twice_the_same_meal', False)
     empty_meals_list = request.POST.get('empty_meals_list', False)
-    first_day = int(request.POST['first_day'])
+    first_day = int(request.POST['first_day']) - 1
     append_existing = request.POST.get('append_existing', False)
     no_repetition = request.POST.get('no_repetition', False)
     current_meals_list = MealsList.objects.filter(user=request.user)
