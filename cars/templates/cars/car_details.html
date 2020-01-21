@@ -1,0 +1,7 @@
+{% extends 'todo/base.html' %}
+{% block body %}
+{% load static %}
+{% for detail in car %}
+{{detail.name}}-{{detail.year}}
+{% endfor %}
+{% endblock %}
