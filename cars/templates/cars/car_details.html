@@ -1,7 +1,106 @@
 {% extends 'todo/base.html' %}
 {% block body %}
 {% load static %}
-{% for detail in car %}
-{{detail.name}}-{{detail.year}}
-{% endfor %}
+<div class="container-fluid mt-2">
+  <div class="row">
+    <div class="col-12 col-xl-3">
+      <div class="card">
+        {% for detail in car %}
+        {% if detail.image %}
+        <img class="card-img-top" style="width:100%;" src="{{detail.image.url}}" alt="{{detail}}">
+        {% else %}
+        <img class="card-img-top" style="width:100%;" src="{% static 'todo/img/car-solid.svg'%}" alt="{{detail}}">
+        {% endif %}
+        <div class="card-body">
+          <h5 class="card-title mb-0">{{detail.name}}</h5>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
+            <span>
+              <span class="text-dark">Marka:</span>
+            </span>
+            <span>
+              <h6 class="mb-0"><span class="badge badge-dark badge-pill">{{detail.make}}</span></h6>
+            </span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
+            <span>
+              <span class="text-dark">Model:</span>
+            </span>
+            <span>
+              <h6 class="mb-0"><span class="badge badge-dark badge-pill">{{detail.model}}</span></h6>
+            </span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
+            <span>
+              <span class="text-dark">Rok produkcji:</span>
+            </span>
+            <span>
+              <h6 class="mb-0"><span class="badge badge-dark badge-pill">{{detail.year}}</span></h6>
+            </span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
+            <span>
+              <span class="text-dark">Silnik:</span>
+            </span>
+            <span>
+              <h6 class="mb-0"><span class="badge badge-dark badge-pill">{{detail.engine}}</span></h6>
+            </span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
+            <span>
+              <span class="text-dark">Moc:</span>
+            </span>
+            <span>
+              <h6 class="mb-0"><span class="badge badge-dark badge-pill">{{detail.power}} KM</span></h6>
+            </span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
+            <span>
+              <span class="text-dark">Przebieg w dn zakupu:</span>
+            </span>
+            <span>
+              <h6 class="mb-0"><span class="badge badge-dark badge-pill">{{detail.milage}} KM</span></h6>
+            </span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
+            <span>
+              <span class="text-dark">Ostatni serwis/usterka:</span>
+            </span>
+            <span>
+              <h6 class="mb-0"><span class="badge badge-dark badge-pill">todo KM</span></h6>
+            </span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
+            <span>
+              <span class="text-dark">Średnie zużycie paliwa:</span>
+            </span>
+            <span>
+              <h6 class="mb-0"><span class="badge badge-dark badge-pill">todo L /1 00KM</span></h6>
+            </span>
+          </li>
+        </ul>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="col-12 col-xl-9">
+      <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item ">
+          <a class="nav-link bg-secondary text-light active" id="fuel-tab" data-toggle="tab" href="#fuel" role="tab" aria-controls="fuel" aria-selected="true">Tankowania</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link bg-secondary text-light" id="service-tab" data-toggle="tab" href="#service" role="tab" aria-controls="service" aria-selected="false">Serwis</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link bg-secondary text-light" id="contact-tab" data-toggle="tab" href="#chart" role="tab" aria-controls="chart" aria-selected="false">Zużycie paliwa</a>
+        </li>
+      </ul>
+      <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="fuel" role="tabpanel" aria-labelledby="fuel-tab">TANKOWANIA</div>
+        <div class="tab-pane fade" id="service" role="tabpanel" aria-labelledby="service-tab">SERWIS</div>
+        <div class="tab-pane fade" id="chart" role="tabpanel" aria-labelledby="chart-tab">WYKRES ZUŻYCIA</div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
