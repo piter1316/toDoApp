@@ -2,7 +2,7 @@
 <project version="4">
   <component name="DBNavigator.Project.DataEditorManager">
     <record-view-column-sorting-type value="BY_INDEX" />
-    <value-preview-text-wrapping value="true" />
+    <value-preview-text-wrapping value="false" />
     <value-preview-pinned value="false" />
   </component>
   <component name="DBNavigator.Project.DataExportManager">
@@ -26,7 +26,9 @@
     <loaded-nodes />
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
-    <open-files />
+    <open-files>
+      <object connection-id="5932e10f-b647-44cd-b1c3-e8b53bd7692c" object-ref="schemas/main/tables/meals_week" />
+    </open-files>
   </component>
   <component name="DBNavigator.Project.EditorStateManager">
     <last-used-providers />
