@@ -74,7 +74,6 @@
                   <div class="col-8">
                     <ul>
                       {% if all_to_do_count %}
-<!--                      <li>{{all_to_do_count}} zadań do zrobienia</li>-->
                       <li>{{all_to_do_count}} {% if all_to_do_count == 1 %}zadanie{% endif %}{% if all_to_do_count > 1 and  all_to_do_count < 5 %}zadania{% endif %}{% if all_to_do_count >= 5 %}zadań{% endif %} do zrobienia</li>
                       {% else %}
                       <li>Brak zadań do zrobienia!</li>
