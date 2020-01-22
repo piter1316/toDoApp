@@ -25,7 +25,7 @@
         <div class="tab-pane fade" id="chart" role="tabpanel" aria-labelledby="chart-tab">WYKRES ZUŻYCIA</div>
       </div>
     </div>
-        <div class="col-12 col-xl-3">
+    <div class="col-12 col-xl-3">
       <nav class="navbar navbar-expand-xl navbar-light bg-light">
         <button class="navbar-toggler btn-block shadow" type="button" data-toggle="collapse" data-target="#car_details"
                 aria-controls="car_details" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,7 +37,8 @@
             {% if detail.image %}
             <img class="card-img-top" style="width:100%;" src="{{detail.image.url}}" alt="{{detail}}">
             {% else %}
-            <img class="card-img-top mx-auto" style="width:100%;" src="{% static 'todo/img/car-solid.svg'%}" alt="{{detail}}">
+            <img class="card-img-top mx-auto" style="width:100%;" src="{% static 'todo/img/car-solid.svg'%}"
+                 alt="{{detail}}">
             {% endif %}
             <div class="card-body">
               <h5 class="card-title mb-0">{{detail.name}}</h5>
@@ -88,7 +89,7 @@
               <span class="text-dark">Przebieg w dn zakupu:</span>
             </span>
                 <span>
-              <h6 class="mb-0"><span class="badge badge-dark badge-pill">{{detail.milage}} KM</span></h6>
+              <h6 class="mb-0"><span class="badge badge-dark badge-pill">{{detail.mileage}} KM</span></h6>
             </span>
               </li>
               <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
@@ -106,6 +107,9 @@
                 <span>
               <h6 class="mb-0"><span class="badge badge-dark badge-pill">todo L /1 00KM</span></h6>
             </span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
+                <a class="btn btn-secondary btn-block btn-sm" href="{% url 'cars:car_edit' detail.pk %}">EDYCJA</a>
               </li>
             </ul>
             {% endfor %}

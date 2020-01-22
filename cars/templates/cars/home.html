@@ -37,57 +37,8 @@
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
-              <div class="modal-body">
-                <span>Nazwa:</span>
-                <div class="form-row">
-                  <div class="col">
-                    {{new_car_form.name}}
-                  </div>
-                </div>
-                <span>Marka i model:</span>
-                <div class="form-row">
-                  <div class="col">
-                    {{new_car_form.make}}
-                  </div>
-                  <div class="col">
-                    {{new_car_form.model}}
-                  </div>
-                </div>
-                <span>Rok produkcji:</span>
-                <div class="form-row">
-                  <div class="col">
-                    {{new_car_form.year}}
-                  </div>
-                </div>
-                <span>Silnik i moc (KM):</span>
-                <div class="form-row">
-                  <div class="col">
-                    {{new_car_form.engine}}
-                  </div>
-                  <div class="col">
-                    {{new_car_form.power}}
-                  </div>
-                </div>
-                <span>Przebieg w dniu zakupu:</span>
-                <div class="form-row">
-                  <div class="col">
-                    {{new_car_form.milage}}
-                  </div>
-                </div>
-                <div class="form-row">
-                  <div class="col">
-                    <span>Logo:</span>
-                    {{new_car_form.logo}}
-                  </div>
-                  <div class="col">
-                    <span>Zdjęcie:</span>
-                    {{new_car_form.image}}
-                  </div>
-                </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuluj</button>
-                <button type="submit" class="btn btn-primary">Zapisz</button>
-              </div>
+              {% include 'cars/car_form.html' %}
+
             </form>
           </div>
         </div>
