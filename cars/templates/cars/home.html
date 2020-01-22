@@ -5,25 +5,90 @@
   <div class="row">
     <div class="col-12 mx-auto" id="">
       <div class="container">
-        <div class="jumbotron shadow shadow-lg">
+        <div class="jumbotron mb-0 shadow shadow-lg">
           <h1 class="text-center mb-5">Moje Samochody</h1>
           <div class="row">
             {% for car in user_cars %}
-
-              <figure class="figure col-12 col-md-6 col-lg-4 mx-auto">
-                <a href="{% url 'cars:car_details' car.id %}">
+            <figure class="figure col-12 col-md-6 col-lg-4 mx-auto">
+              <a href="{% url 'cars:car_details' car.id %}">
                 {% if car.logo %}
-                {{car.logo.url}}
-                <img src="{{car.logo.url}}" class="d-block mx-auto" height="75" alt="A generic square placeholder image with rounded corners in a figure.">
+                <img src="{{car.logo.url}}" class="d-block mx-auto" height="75"
+                     alt="A generic square placeholder image with rounded corners in a figure.">
                 {% else %}
-                <img src="{% static 'todo/img/car-solid.svg' %}" class="d-block mx-auto" height="75" alt="A generic square placeholder image with rounded corners in a figure.">
+                <img src="{% static 'todo/img/car-solid.svg' %}" class="d-block mx-auto" height="75"
+                     alt="A generic square placeholder image with rounded corners in a figure.">
                 {% endif %}
-
                 <figcaption class="figure-caption text-center">{{car}}</figcaption>
-                </a>
-              </figure>
-
+              </a>
+            </figure>
             {% endfor %}
+          </div>
+        </div>
+        <button type="button" class="btn btn-secondary btn-block shadow-lg" data-toggle="modal" data-target="#add_new_car">
+          Dodaj nowy<i class="ml-3 fas fa-car-side"></i>
+        </button>
+        <div class="modal fade" id="add_new_car" tabindex="-1" role="dialog"
+             aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <form class="modal-content" action="{% url 'cars:add_new_car'%}" enctype="multipart/form-data" method="post">{%csrf_token%}
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Nowy samochód</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <span>Nazwa:</span>
+                <div class="form-row">
+                  <div class="col">
+                    {{new_car_form.name}}
+                  </div>
+                </div>
+                <span>Marka i model:</span>
+                <div class="form-row">
+                  <div class="col">
+                    {{new_car_form.make}}
+                  </div>
+                  <div class="col">
+                    {{new_car_form.model}}
+                  </div>
+                </div>
+                <span>Rok produkcji:</span>
+                <div class="form-row">
+                  <div class="col">
+                    {{new_car_form.year}}
+                  </div>
+                </div>
+                <span>Silnik i moc (KM):</span>
+                <div class="form-row">
+                  <div class="col">
+                    {{new_car_form.engine}}
+                  </div>
+                  <div class="col">
+                    {{new_car_form.power}}
+                  </div>
+                </div>
+                <span>Przebieg w dniu zakupu:</span>
+                <div class="form-row">
+                  <div class="col">
+                    {{new_car_form.milage}}
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="col">
+                    <span>Logo:</span>
+                    {{new_car_form.logo}}
+                  </div>
+                  <div class="col">
+                    <span>Zdjęcie:</span>
+                    {{new_car_form.image}}
+                  </div>
+                </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuluj</button>
+                <button type="submit" class="btn btn-primary">Zapisz</button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
