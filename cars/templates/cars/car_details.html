@@ -32,12 +32,12 @@
           <span>dane techniczne</span><span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="car_details">
-          <div class="card ">
+          <div class="card w-100 ">
             {% for detail in car %}
             {% if detail.image %}
             <img class="card-img-top" style="width:100%;" src="{{detail.image.url}}" alt="{{detail}}">
             {% else %}
-            <img class="card-img-top" style="width:100%;" src="{% static 'todo/img/car-solid.svg'%}" alt="{{detail}}">
+            <img class="card-img-top mx-auto" style="width:100%;" src="{% static 'todo/img/car-solid.svg'%}" alt="{{detail}}">
             {% endif %}
             <div class="card-body">
               <h5 class="card-title mb-0">{{detail.name}}</h5>
