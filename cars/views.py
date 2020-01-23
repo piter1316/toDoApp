@@ -5,14 +5,14 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import UpdateView
 
 from cars import forms
-from cars.forms import NewCarForm
+from cars.forms import CarForm
 from cars.models import Car
 
 
 def cars_home(request):
     user_cars = Car.objects.filter(user=request.user, sold=False)
     user_sold_cars = Car.objects.filter(user=request.user, sold=True)
-    new_car_form = NewCarForm(request.POST)
+    new_car_form = CarForm(request.POST)
     context = {
         'user_cars': user_cars,
         'form': new_car_form,
@@ -23,7 +23,7 @@ def cars_home(request):
 
 def car_details(request, car_id):
     car = Car.objects.filter(pk=car_id, user=request.user)
-    form = NewCarForm(request.POST, request.FILES, )
+    form = CarForm(request.POST, request.FILES, )
     context = {
         'car': car,
         'form': form,
@@ -33,7 +33,7 @@ def car_details(request, car_id):
 
 class CarUpdate(UpdateView):
     model = Car
-    form_class = NewCarForm
+    form_class = CarForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -81,12 +81,12 @@ class CarUpdate(UpdateView):
 
 def add_new_car(request):
     if request.method == 'POST':
-        form = NewCarForm(request.POST, request.FILES, )
+        form = CarForm(request.POST, request.FILES, )
         if form.is_valid():
             car = form.save(commit=False)
             car.user = request.user
             car.save()
             return redirect('cars:cars_home')
     else:
-        form = forms.NewCarForm()
+        form = forms.CarForm()
     return redirect('cars:cars_home')
