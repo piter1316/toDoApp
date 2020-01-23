@@ -10,11 +10,13 @@ from cars.models import Car
 
 
 def cars_home(request):
-    user_cars = Car.objects.filter(user=request.user)
+    user_cars = Car.objects.filter(user=request.user, sold=False)
+    user_sold_cars = Car.objects.filter(user=request.user, sold=True)
     new_car_form = NewCarForm(request.POST)
     context = {
         'user_cars': user_cars,
-        'form': new_car_form
+        'form': new_car_form,
+        'user_sold_cars': user_sold_cars
     }
     return render(request, 'cars/home.html', context)
 

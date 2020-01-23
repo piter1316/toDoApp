@@ -13,6 +13,7 @@ class Car(models.Model):
     mileage = models.PositiveIntegerField(null=True, blank=True, default=None)
     logo = models.FileField(null=True, blank=True, default=None)
     image = models.FileField(null=True, blank=True, default=None)
+    sold = models.BooleanField(default=False, null=False, blank=False)
 
     def __str__(self):
         return self.name

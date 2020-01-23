@@ -5,28 +5,62 @@
   <div class="row">
     <div class="col-12 mx-auto" id="">
       <div class="container">
-        <div class="jumbotron mb-0 shadow shadow-lg">
-          <h1 class="text-center mb-5">Moje Samochody</h1>
-          <div class="row">
-            {% for car in user_cars %}
-            <figure class="figure col-12 col-md-6 col-lg-4 mx-auto">
-              <a href="{% url 'cars:car_details' car.id %}">
-                {% if car.logo %}
-                <img src="{{car.logo.url}}" class="d-block mx-auto" height="75"
-                     alt="A generic square placeholder image with rounded corners in a figure.">
-                {% else %}
-                <img src="{% static 'todo/img/car-solid.svg' %}" class="d-block mx-auto" height="75"
-                     alt="A generic square placeholder image with rounded corners in a figure.">
-                {% endif %}
-                <figcaption class="figure-caption text-center">{{car}}</figcaption>
-              </a>
-            </figure>
-            {% endfor %}
+        <div class="jumbotron mb-0 shadow shadow-lg" style="min-height:430px;">
+          <div class="d-flex justify-content-between">
+            <h1 class="text-center mb-5">Moje Samochody</h1>
+          <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+            <li class="nav-item">
+              <a class="btn btn-outline-secondary active" id="pills-owned-tab" data-toggle="pill" href="#pills-owned" role="tab" aria-controls="pills-owned" aria-selected="true">Aktualnie posiadane</a>
+            </li>
+            <li class="nav-item">
+              <a class="btn btn-outline-secondary" id="pills-sold-tab" data-toggle="pill" href="#pills-sold" role="tab" aria-controls="pills-sold" aria-selected="false">Sprzedane</a>
+            </li>
+          </ul>
           </div>
+
+          <div class="tab-content" id="pills-tabContent">
+            <div class="tab-pane fade show active" id="pills-owned" role="tabpanel" aria-labelledby="pills-owned-tab">
+              <div class="row">
+                {% for car in user_cars %}
+                  <figure class="figure col-12 col-md-6 col-lg-4 mx-auto">
+                    <a href="{% url 'cars:car_details' car.id %}">
+                      {% if car.logo %}
+                      <img src="{{car.logo.url}}" class="d-block mx-auto" height="75"
+                           alt="A generic square placeholder image with rounded corners in a figure.">
+                      {% else %}
+                      <img src="{% static 'todo/img/car-solid.svg' %}" class="d-block mx-auto" height="75"
+                           alt="A generic square placeholder image with rounded corners in a figure.">
+                      {% endif %}
+                      <figcaption class="figure-caption text-center">{{car}}</figcaption>
+                    </a>
+                  </figure>
+                {% endfor %}
+              </div>
+              <button type="button" class="btn btn-secondary btn-block shadow-lg" data-toggle="modal" data-target="#add_new_car">
+                Dodaj nowy<i class="ml-3 fas fa-car-side"></i>
+              </button>
+            </div>
+            <div class="tab-pane fade" id="pills-sold" role="tabpanel" aria-labelledby="pills-sold-tab">
+              <div class="row">
+                {% for car in user_sold_cars %}
+                  <figure class="figure col-12 col-md-6 col-lg-4 mx-auto">
+                    <a href="{% url 'cars:car_details' car.id %}">
+                      {% if car.logo %}
+                      <img src="{{car.logo.url}}" class="d-block mx-auto" height="75"
+                           alt="A generic square placeholder image with rounded corners in a figure.">
+                      {% else %}
+                      <img src="{% static 'todo/img/car-solid.svg' %}" class="d-block mx-auto" height="75"
+                           alt="A generic square placeholder image with rounded corners in a figure.">
+                      {% endif %}
+                      <figcaption class="figure-caption text-center">{{car}}</figcaption>
+                    </a>
+                  </figure>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+
         </div>
-        <button type="button" class="btn btn-secondary btn-block shadow-lg" data-toggle="modal" data-target="#add_new_car">
-          Dodaj nowy<i class="ml-3 fas fa-car-side"></i>
-        </button>
         <div class="modal fade" id="add_new_car" tabindex="-1" role="dialog"
              aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered" role="document">
