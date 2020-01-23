@@ -4,7 +4,7 @@
 <div class="container mt-3">
   <div class="card p-2 shadow">
     <div class="row no-gutters">
-      <div class="col-md-4 d-flex align-items-center">
+      <div class="col-lg-4 d-flex align-items-center">
         <figure class="figure mx-auto">
           {% if car.0.image %}
           <img src="{{car.0.image.url}}" class="card-img" alt="...">
@@ -15,8 +15,8 @@
           <figcaption class="figure-caption text-right">{{car.0.make}} | {{car.0.model}} | {{car.0.engine}}</figcaption>
         </figure>
       </div>
-      <div class="col-md-8">
-        <div class="card-body">
+      <div class="col-lg-8">
+        <div class="card-body p-0 p-md-2">
           <form class="modal-content" enctype="multipart/form-data" method="post">{%csrf_token%}
             <div class="modal-header">
               <h5 class="modal-title" id="exampleModalLongTitle">Edycja</h5>
