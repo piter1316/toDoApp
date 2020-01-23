@@ -5,7 +5,7 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import UpdateView
 
 from cars import forms
-from cars.forms import NewCarForm, UpdateCar
+from cars.forms import NewCarForm
 from cars.models import Car
 
 
@@ -14,24 +14,30 @@ def cars_home(request):
     new_car_form = NewCarForm(request.POST)
     context = {
         'user_cars': user_cars,
-        'new_car_form': new_car_form
+        'form': new_car_form
     }
     return render(request, 'cars/home.html', context)
 
 
 def car_details(request, car_id):
     car = Car.objects.filter(pk=car_id, user=request.user)
-    form = UpdateCar(request.POST, request.FILES, )
+    form = NewCarForm(request.POST, request.FILES, )
     context = {
         'car': car,
-        'new_car_form': form,
+        'form': form,
     }
     return render(request, 'cars/car_details.html', context)
 
 
 class CarUpdate(UpdateView):
     model = Car
-    form_class = UpdateCar
+    form_class = NewCarForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        pk = self.object.pk
+        context['car'] = Car.objects.filter(pk=pk)
+        return context
 
     def get_success_url(self):
         pk = self.object.pk

@@ -34,10 +34,10 @@ class NewCarForm(forms.ModelForm):
         model = models.Car
         fields = ['name', 'make', 'model', 'year', 'engine', 'power', 'mileage', 'logo', 'image']
 
-
-class UpdateCar(NewCarForm):
-    class Meta:
-        model = models.Car
-        fields = ['name', 'make', 'model', 'year', 'engine', 'power', 'mileage', 'logo', 'image']
+#
+# class UpdateCar(NewCarForm):
+#     class Meta:
+#         model = models.Car
+#         fields = ['name', 'make', 'model', 'year', 'engine', 'power', 'mileage', 'logo', 'image']
 
 

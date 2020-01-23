@@ -1,4 +1,31 @@
-<form action="" method="post" enctype="multipart/form-data">{%csrf_token%}
-{{form}}
-  <button type="submit">Zapisz zmiany</button>
-</form>
+{% extends 'todo/base.html' %}
+{% block body %}
+{% load static %}
+<div class="container mt-3">
+  <div class="card p-2 shadow">
+    <div class="row no-gutters">
+      <div class="col-md-4 d-flex align-items-center">
+        <figure class="figure">
+          <img src="{{car.0.image.url}}" class="card-img" alt="...">
+          <figcaption class="figure-caption text-right">{{car.0.make}} | {{car.0.model}} | {{car.0.engine}}</figcaption>
+        </figure>
+      </div>
+      <div class="col-md-8">
+        <div class="card-body">
+          <form class="modal-content" enctype="multipart/form-data" method="post">{%csrf_token%}
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">Edycja</h5>
+            </div>
+            {% include 'cars/car_form.html' %}
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
+{{car}}
+
+{% endblock %}
