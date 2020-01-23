@@ -5,8 +5,13 @@
   <div class="card p-2 shadow">
     <div class="row no-gutters">
       <div class="col-md-4 d-flex align-items-center">
-        <figure class="figure">
+        <figure class="figure mx-auto">
+          {% if car.0.image %}
           <img src="{{car.0.image.url}}" class="card-img" alt="...">
+          {% else %}
+          <img class="card-img-top d-block" style="width:100%;" src="{% static 'todo/img/car-solid.svg'%}"
+                 alt="{{detail}}">
+            {% endif %}
           <figcaption class="figure-caption text-right">{{car.0.make}} | {{car.0.model}} | {{car.0.engine}}</figcaption>
         </figure>
       </div>
