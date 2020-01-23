@@ -64,4 +64,6 @@ body {
   .sidenav a {font-size: 18px;}
 }
 
-
+.nav-pills > .active > a, .nav-pills > .active > a:hover {
+    background-color: red !important;
+}
