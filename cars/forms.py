@@ -26,9 +26,11 @@ class NewCarForm(forms.ModelForm):
         attrs={'class': 'form-control mb-2',
                'placeholder': 'np. 184000'}))
     logo = forms.FileField(required=False,
-                           widget=forms.FileInput(attrs={'class': 'form-control-file mb-2'}))
+                            widget=forms.ClearableFileInput(attrs={'multiple': True,
+                                                                   'class': 'form-control-file mb-2'}))
     image = forms.FileField(required=False,
-                            widget=forms.FileInput(attrs={'class': 'form-control-file mb-2'}))
+                            widget=forms.ClearableFileInput(attrs={'multiple': True,
+                                                                   'class': 'form-control-file mb-2'}))
 
     class Meta:
         model = models.Car
