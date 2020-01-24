@@ -1,3 +1,6 @@
+import os
+
+from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render, redirect, get_object_or_404
 
 # Create your views here.
@@ -7,6 +10,7 @@ from django.views.generic import UpdateView
 from cars import forms
 from cars.forms import CarForm
 from cars.models import Car
+from myproject.settings import BASE_DIR
 
 
 def cars_home(request):
@@ -49,43 +53,25 @@ class CarUpdate(UpdateView):
     template_name = 'cars/car_edit.html'
     # success_url = redirect('cars:car_details', Car.pk)
 
-# def add_new_car(request):
-#     print('new car')
-#     name = request.POST['name']
-#     make = request.POST['make']
-#     model = request.POST['model']
-#     year = request.POST.get('year', False)
-#     engine = request.POST['engine']
-#     power = request.POST.get('power', False)
-#     milage = request.POST.get('milage', False)
-#     logo = request.FILES.get('logo', False)
-#     image = request.FILES.get('image', False)
-#
-#     if not year:
-#         year = None
-#     if not power:
-#         power = None
-#     if not milage:
-#         milage = None
-#     if not logo:
-#         logo = None
-#     if not image:
-#         image = None
-#
-#     new_car = Car(user=request.user, name=name, make=make,
-#                   model=model, year=year, engine=engine,
-#                   power=power, milage=milage, logo=logo,
-#                   image=image)
-#     new_car.save()
-#     return redirect('cars:cars_home')
 
 def add_new_car(request):
     if request.method == 'POST':
-        form = CarForm(request.POST, request.FILES, )
+        form = CarForm(request.POST, request.FILES)
         if form.is_valid():
             car = form.save(commit=False)
             car.user = request.user
             car.save()
+            location = os.path.join(BASE_DIR, 'media', 'user_uploads',
+                                    '{}-{}'.format(request.user.id, request.user.username),
+                                    '{}-{}'.format(car.pk, car.name), 'images')
+            fs = FileSystemStorage(location=location)
+            image = request.FILES.get('image', False)
+            logo = request.FILES.get('logo', False)
+            if image:
+                fs.save(str(car.image), image)
+            if logo:
+                fs.save(str(car.logo), logo)
+
             return redirect('cars:cars_home')
     else:
         form = forms.CarForm()
