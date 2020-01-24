@@ -50,7 +50,24 @@ class CarUpdate(UpdateView):
 
     def get_success_url(self):
         pk = self.object.pk
-        print('##############',self.object.image)
+        location = os.path.join(BASE_DIR, 'media', 'user_uploads',
+                                '{}-{}'.format(self.object.user.id, self.object.user),
+                                '{}-{}'.format(self.object.pk, self.object.name), 'images')
+        location_to_database = os.path.join('user_uploads',
+                                            '{}-{}'.format(self.object.user.id, self.object.user),
+                                            '{}-{}'.format(self.object.pk, self.object.name), 'images')
+        fs = FileSystemStorage(location=location)
+        image = self.object.image
+        logo = self.object.logo
+        if image:
+            fs.save(str(self.object.image), image)
+            self.object.image = os.path.join(location_to_database, str(self.object.image))
+            self.object.save()
+        if logo:
+            fs.save(str(self.object.logo), logo)
+            self.object.logo = os.path.join(location_to_database, str(self.object.logo))
+            self.object.save()
+
         return '{}'.format(reverse('cars:car_details', kwargs={'car_id': pk}))
 
 
