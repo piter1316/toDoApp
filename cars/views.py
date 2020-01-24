@@ -1,5 +1,7 @@
 import os
 
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render, redirect, get_object_or_404
 
@@ -35,6 +37,7 @@ def car_details(request, car_id):
     return render(request, 'cars/car_details.html', context)
 
 
+
 class CarUpdate(UpdateView):
     model = Car
     form_class = CarForm
@@ -47,6 +50,7 @@ class CarUpdate(UpdateView):
 
     def get_success_url(self):
         pk = self.object.pk
+        print('##############',self.object.image)
         return '{}'.format(reverse('cars:car_details', kwargs={'car_id': pk}))
 
 
@@ -64,13 +68,21 @@ def add_new_car(request):
             location = os.path.join(BASE_DIR, 'media', 'user_uploads',
                                     '{}-{}'.format(request.user.id, request.user.username),
                                     '{}-{}'.format(car.pk, car.name), 'images')
+            location_to_database = os.path.join('user_uploads',
+                                    '{}-{}'.format(request.user.id, request.user.username),
+                                    '{}-{}'.format(car.pk, car.name), 'images', )
             fs = FileSystemStorage(location=location)
             image = request.FILES.get('image', False)
             logo = request.FILES.get('logo', False)
             if image:
                 fs.save(str(car.image), image)
+                car.image = os.path.join(location_to_database, str(car.image))
+                car.save()
             if logo:
                 fs.save(str(car.logo), logo)
+                car.logo = os.path.join(location_to_database, str(car.logo))
+                car.save()
+
 
             return redirect('cars:cars_home')
     else:
