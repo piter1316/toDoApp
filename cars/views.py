@@ -10,9 +10,11 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import UpdateView
 
 from cars import forms
-from cars.forms import CarForm
+from cars.forms import CarForm, FuelFillForm
 from cars.models import Car, Fuel
 from myproject.settings import BASE_DIR
+
+
 
 
 def cars_home(request):
@@ -30,11 +32,13 @@ def cars_home(request):
 def car_details(request, car_id):
     car = Car.objects.filter(pk=car_id, user=request.user)
     form = CarForm(request.POST, request.FILES)
-    car_fuel_fill_list = Fuel.objects.filter(car_id=car_id).order_by('date')
+    car_fuel_fill_list = Fuel.objects.filter(car_id=car_id).order_by('-date')
+    car_fill_form = FuelFillForm()
     context = {
         'car': car,
         'form': form,
-        'car_fuel_fill_list': car_fuel_fill_list
+        'car_fuel_fill_list': car_fuel_fill_list,
+        'car_fill_form': car_fill_form
     }
     return render(request, 'cars/car_details.html', context)
 
