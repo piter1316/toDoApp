@@ -52,23 +52,23 @@ class CarForm(forms.ModelForm):
 class FuelFillForm(forms.ModelForm):
 
     date = forms.DateField(widget=forms.DateInput(
-        attrs={'class': 'form-control', 'type': 'date', 'value': get_date()}
+        attrs={'class': 'form-control p-0', 'type': 'date', 'value': get_date()}
     ))
 
     liters = forms.FloatField(widget=forms.NumberInput(
-        attrs={'class': 'form-control', 'min': 1}
+        attrs={'class': 'form-control  p-0', 'min': 1}
     ))
 
     kilometers = forms.FloatField(widget=forms.NumberInput(
-        attrs={'class': 'form-control', 'min': 1}
+        attrs={'class': 'form-control  p-0', 'min': 1}
     ))
 
     fuel_price = forms.FloatField(widget=forms.NumberInput(
-        attrs={'class': 'form-control', 'min': 1}
+        attrs={'class': 'form-control  p-0', 'min': 1}
     ))
 
     mileage = forms.IntegerField(required=False, widget=forms.NumberInput(
-        attrs={'class': 'form-control mb-2', 'min': 1}))
+        attrs={'class': 'form-control  p-0 ', 'min': 1}))
 
 
 
