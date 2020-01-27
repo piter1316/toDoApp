@@ -1,11 +1,12 @@
 {% extends 'todo/base.html' %}
 {% block body %}
 {% load static %}
+{% load average_fuel_cons %}
 {% load render_table from django_tables2 %}
 <div class="container-fluid mt-2">
   <div class="row">
     <div class="col-12 col-xl-9 ">
-      <ul class="nav nav-tabs" id="myTab" role="tablist">
+      <ul class="nav nav-tabs mb-1" id="myTab" role="tablist">
         <li class="nav-item ">
           <a class="btn btn-outline-secondary active border-right-0" id="fuel-tab" data-toggle="tab" href="#fuel" role="tab"
              aria-controls="fuel" aria-selected="true" style=" border-radius: 5px 0px 0px 5px !important;">Tankowania</a>
@@ -20,9 +21,48 @@
         </li>
       </ul>
       <div class="tab-content" id="myTabContent">
-        <div class="tab-pane fade show active" id="fuel" role="tabpanel" aria-labelledby="fuel-tab">
-          {% render_table car_fuel_fill_list %}
+        <div class="tab-pane fade show active" id="fuel" role="tabpanel" aria-labelledby="fuel-tab" >
+          <div style="overflow-y:scroll; height:80vh;">
 
+          <table class="table table-bordered bg-light table-sm table-striped ">
+            <thead class="bg-info">
+              <tr>
+                <th scope="col">Lp.</th>
+                <th scope="col">DATA</th>
+                <th scope="col">LITRY</th>
+                <th scope="col">KM</th>
+                <th scope="col">CENA/L</th>
+                <th scope="col">STAN LICZNIKA</th>
+                <th scope="col">ŚREDNIE ZUŻYCIE</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="d-none d-xl-table-row">
+                <form>
+                  <td>Dodaj...</td>
+                  <th>{{car_fill_form.date}}</th>
+                  <th>{{car_fill_form.liters}}</th>
+                  <th>{{car_fill_form.kilometers}}</th>
+                  <th>{{car_fill_form.fuel_price}}</th>
+                  <th>{{car_fill_form.mileage}}</th>
+                  <th><button class="btn border fas fa-save" type="submit"></button></th>
+                </form>
+              </tr>
+            {% for filling in car_fuel_fill_list %}
+              <tr>
+                <th>{{forloop.counter}}</th>
+                <td>{{ filling.date|date:"d M Y" }}</td>
+                <td>{{filling.liters}}</td>
+                <td>{{filling.kilometers}}</td>
+                <td>{{filling.fuel_price}}</td>
+                <td>{{filling.mileage}}</td>
+                <td>{{ filling.liters|average_fuel_cons:filling.kilometers }}</td>
+              </tr>
+            {% endfor %}
+
+            </tbody>
+          </table>
+            </div>
         </div>
         <div class="tab-pane fade" id="service" role="tabpanel" aria-labelledby="service-tab">SERWIS</div>
         <div class="tab-pane fade" id="chart" role="tabpanel" aria-labelledby="chart-tab">WYKRES ZUŻYCIA</div>

@@ -27,5 +27,4 @@ class Fuel(models.Model):
     fuel_price = models.DecimalField(null=True, blank=True, decimal_places=2, max_digits=4)
     mileage = models.PositiveIntegerField(null=True, blank=True, default=None)
 
-    def __str__(self):
-        return str(self.date)
+
