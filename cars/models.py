@@ -18,3 +18,14 @@ class Car(models.Model):
     def __str__(self):
         return self.name
 
+
+class Fuel(models.Model):
+    car_id = models.ForeignKey(Car, on_delete=models.DO_NOTHING)
+    date = models.DateField(null=False, blank=False)
+    liters = models.FloatField(null=False, blank=False)
+    kilometers = models.FloatField(null=False, blank=False)
+    fuel_price = models.DecimalField(null=True, blank=True, decimal_places=2, max_digits=4)
+    mileage = models.PositiveIntegerField(null=True, blank=True, default=None)
+
+    def __str__(self):
+        return str(self.date)
