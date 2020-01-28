@@ -63,16 +63,14 @@ class FuelFillForm(forms.ModelForm):
         attrs={'class': 'form-control  p-0', 'min': 1}
     ))
 
-    fuel_price = forms.FloatField(widget=forms.NumberInput(
-        attrs={'class': 'form-control  p-0', 'min': 1}
+    fuel_price = forms.DecimalField(widget=forms.NumberInput(
+        attrs={'class': 'form-control  p-0', 'min': 1, 'max': 99.99}
     ))
 
     mileage = forms.IntegerField(required=False, widget=forms.NumberInput(
         attrs={'class': 'form-control  p-0 ', 'min': 1}))
 
-
-
     class Meta:
         model = models.Fuel
-        fields = ['date', 'liters', 'kilometers', 'fuel_price']
+        fields = ['date', 'liters', 'kilometers', 'fuel_price', 'mileage']
 
