@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 # Create your views here.
 from django.views.decorators.http import require_POST
@@ -70,14 +71,14 @@ def delete_all_shopping_lists(request):
 def add_product(request, shopping_list_id):
     shopping_list = get_object_or_404(ShoppingList, pk=shopping_list_id)
     form = ProductsForm(request.POST)
+    print(request.POST)
 
-    if form.is_valid():
-        new_product = Products(shopping_list_id=shopping_list,
-                               product_name=request.POST['product_name'].lower(),
-                               quantity=request.POST['quantity'],
-                               unit_id=request.POST['prod_unit'])
-        new_product.save()
-    return redirect('shopping:shopping_list_index')
+    new_product = Products(shopping_list_id=shopping_list,
+                           product_name=request.POST['product_name'].lower(),
+                           quantity=request.POST['quantity'],
+                           unit_id=request.POST['prod_unit'])
+    new_product.save()
+    return HttpResponse('')
 
 
 def update_product(request, product_id):

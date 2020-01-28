@@ -1,6 +1,6 @@
 {{form_2.product_name}}
 {{form_2.quantity}}
-<select class="form-control" name="prod_unit" style="max-width:75px;">
+<select class="form-control" name="prod_unit" id="id_prod_unit" style="max-width:75px;">
   {% for unit in units %}
   <option value="{{unit.id}}">{{unit}}</option>
   {% endfor %}

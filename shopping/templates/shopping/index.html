@@ -30,7 +30,7 @@
   <div class="row d-flex justify-content-center">
     {% for shop, products in shopping_lists.items %}
     <div class="col-12 col-md-6 col-lg-4 col-xl-3 mb-3">
-      <div class="card shadow">
+      <div class="card shadow" id="{{shop}}">
         <div class="card-header text-center">
           <div class="input-group mb-1">
             <input type="text" readonly class="form-control" value="{{shop}}">
@@ -162,7 +162,7 @@
           {% endfor %}
           {% endfor %}
           <li class="list-group-item d-flex justify-content-between align-items-center addProdForm" id="addProdForm_{{shop.id}}">
-            <form class="input-group" action="{% url 'shopping:add_product' shop.id %}" method="POST" role="form">
+            <form class="input-group" action="" method="POST">
               {% csrf_token %}
               {% include 'shopping/product_form.html' %}
               <div class="input-group-append">
@@ -173,6 +173,34 @@
         </ul>
       </div>
     </div>
+    <script type="text/javascript">
+  $('#addProdForm_{{shop.id}}').on('submit', function(e){
+    e.preventDefault();
+    console.log('ajax'+ {{shop.id}});
+    $.ajax({
+      type:'POST',
+      url:'shopping/add/product/{{shop.id}}',
+      data:{
+        product_name:$('#addProdForm_{{shop.id}} #id_product_name').val(),
+        quantity:$('#addProdForm_{{shop.id}} #id_quantity').val(),
+        prod_unit:$('#addProdForm_{{shop.id}} #id_prod_unit').val(),
+        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+      },
+      success: function(json){
+        console.log('FILL ADDED !!!');
+        $('#addProdForm_{{shop.id}} #id_product_name').val('')
+        $('#addProdForm_{{shop.id}} #id_quantity').val(1)
+        $('#addProdForm_{{shop.id}} #id_prod_unit').val(1)
+
+        setTimeout (function() {
+        $('#{{shop}}').load(document.URL + ' #{{shop}}');
+        console.log('time');
+      }, 1000);
+      }
+    });
+  });
+
+</script>
     {% endfor %}
   </div>
   {% else %}
@@ -216,6 +244,7 @@
     </div>
   </div>
 </div>
+
 
 
 {% endblock %}
