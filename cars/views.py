@@ -1,8 +1,10 @@
+import json
 import os
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
+from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 
 # Create your views here.
@@ -110,3 +112,17 @@ def add_new_car(request):
     else:
         form = forms.CarForm()
     return redirect('cars:cars_home')
+
+
+def add_fuel_fill(request, pk):
+    if request.method == 'POST':
+        form = FuelFillForm(request.POST, request.FILES)
+        car = get_object_or_404(Car, pk=pk)
+        print(request.POST)
+
+        filling = form.save(commit=False)
+        filling.car_id = car
+        filling.save()
+
+
+        return HttpResponse('')

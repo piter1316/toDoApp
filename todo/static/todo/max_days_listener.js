@@ -198,4 +198,7 @@ $(document).ready(function(){
         $('#mealsOptionsButtonText').text('opcje')
       };
   })
+
+
+
 });
