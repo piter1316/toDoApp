@@ -82,39 +82,40 @@
           </li>
           {% for product in products %}
           {% for prod, qt in product.items %}
-          {% if qt.1 %}
-          <li class="list-group-item d-flex justify-content-between todo-completed align-items-center py-md-1">{{prod}}
-            <span>
-              <span class="badge badge-primary badge-pill todo-completed">{{qt.0}}</span>
-              <span class="badge badge-primary badge-pill todo-completed">{{qt.3}}</span>
-            </span>
-          </li>
-          {% else %}
-          <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light" id="prod_{{prod.id}}">
-            <span><input type="checkbox" name="bought_many" id="boughtMany_{{prod.id}}">
-              <a class="text-dark" href=" {% url 'shopping:bought' qt.2 %}">{{prod}}
+
+
+<!--          <li class="list-group-item d-flex justify-content-between todo-completed align-items-center py-md-1" id="prod_bought_{{prod.id}}">{{prod}}-->
+<!--            <span>-->
+<!--              <span class="badge badge-primary badge-pill todo-completed">{{qt.0}}</span>-->
+<!--              <span class="badge badge-primary badge-pill todo-completed">{{qt.3}}</span>-->
+<!--            </span>-->
+<!--          </li>-->
+
+          <li  class="list-group-item d-flex justify-content-between align-items-center {%if qt.1 %} todo-completed {%endif%}  py-md-1 bg-light" id="prod_{{prod.id}}">
+            <span id="span_{{prod.id}}"><input type="checkbox" name="bought_many" id="boughtMany_{{prod.id}}">
+              <a id="prod_bought_link{{prod.id}}" class="text-dark" href=" {% url 'shopping:bought' qt.2 %}">{{prod}}
                 <span id="badge_edit_{{prod.id}}" class="badge badge-info" style="display:none;">Edycja...</span>
               </a>
             </span>
             <span>
-              <span class="badge badge-dark badge-pill">{{qt.0}}</span>
-              <span class="badge badge-dark badge-pill">{{qt.3}}</span>
+              <span class="badge badge-dark badge-pill {%if qt.1 %} todo-completed {%endif%} ">{{qt.0}}</span>
+              <span class="badge badge-dark badge-pill {%if qt.1 %} todo-completed {%endif%} ">{{qt.3}}</span>
               <span class="dropdown_shopping_item badge badge-dark badge-pill fas fa-cog" id="dropdown_{{prod.id}}" style="cursor:pointer;"> </span>
             </span>
           </li>
           <li class="list-group-item p-0 border-bottom pb-2" id="{{prod.id}}" style="display:none;">
             <ul class="nav nav-tabs " id="myTab" role="tablist">
-              <li class="nav-item">
-                <a class="nav-link active" id="editPosition-tab" data-toggle="tab" href="#editPosition_{{prod.id}}" role="tab" aria-controls="home" aria-selected="true">Edycja</a>
+              <li class="nav-item {%if qt.1 %} d-none {%endif%}">
+                <a class="nav-link {%if qt.1 %}active{%endif%}" id="editPosition-tab" data-toggle="tab" href="#editPosition_{{prod.id}}" role="tab" aria-controls="home" aria-selected="true">Edycja</a>
               </li>
               {% if qt.4 %}
               <li class="nav-item">
                 <a class="nav-link" id="detailsPosition-tab" data-toggle="tab" href="#detailsPosition_{{prod.id}}" role="tab" aria-controls="profile" aria-selected="false">Szczegóły</a>
               </li>
-              {% endif %}
+
             </ul>
-            <div class="tab-content" id="myTabContent">
-              <div class="tab-pane fade show active" id="editPosition_{{prod.id}}" role="tabpanel" aria-labelledby="home-tab">
+            <div class="tab-content " id="myTabContent">
+              <div class="tab-pane fade show {%if qt.1 %} d-none {% else %} active {%endif%}" id="editPosition_{{prod.id}}" role="tabpanel" aria-labelledby="home-tab">
                 <form class="form  p-1 " action="{% url 'shopping:update_product' prod.id %}" method="post">{% csrf_token %}
                   <div class="from-group row">
                     <div class="col-12">
@@ -142,7 +143,7 @@
                   </div>
                 </form>
               </div>
-              <div class="tab-pane fade" id="detailsPosition_{{prod.id}}" role="tabpanel" aria-labelledby="profile-tab">
+              <div class="tab-pane fade {%if qt.1 %} active {%endif%}" id="detailsPosition_{{prod.id}}" role="tabpanel" aria-labelledby="profile-tab">
                 <div class="p-1">
                   <small class="mb-1">Posiłki zawierające {{prod}}</small>
                   <ul id="show_meals_containing_ingr_list" class="list-group m-2">
@@ -158,6 +159,34 @@
               </div>
             </div>
           </li>
+          <script type="text/javascript">
+            $('#prod_bought_link{{prod.id}}').on('click', function(e){
+              e.preventDefault();
+              console.log('ajax'+ {{prod.id}});
+              $.ajax({
+                type:'GET',
+                url:'shopping/bought/{{prod.id}}',
+
+                success: function(json){
+                  setTimeout (function() {
+                $.ajax({
+                    url: '/shopping#shop_{{shop.id}}',
+                    method: 'GET',
+                    data: {},
+                    success: function(data){
+                        $('#prod_{{prod.id}}').replaceWith($('#prod_{{prod.id}}',data));
+                    },
+                    error: function(error){
+                        console.log(error);
+                        console.log("error");
+                    }
+                });
+                }, 100);
+                }
+              });
+            });
+
+          </script>
           {% endif %}
           {% endfor %}
           {% endfor %}
