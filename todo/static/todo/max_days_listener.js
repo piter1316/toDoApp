@@ -101,13 +101,7 @@ $(document).ready(function(){
     $('#dropdownMealContent_' + num_id).toggle(600);
   })
 
-  $('.dropdown_shopping_item').click(function(e){
-    var id = e.target.id;
-    var num_id = id.split('_')[1]
 
-      $('#'+num_id).toggle(600);
-      $('#badge_edit_'+num_id).toggle(600);
-    })
 
     $('.shoppingListSettingsButton').click(function(e){
     var id = e.target.id;
@@ -149,24 +143,7 @@ $(document).ready(function(){
     $('#new_meal_option_name').toggle(600);
   });
 
-  $('input[name=bought_many]').change(function(){
-    var id_num = $(this).attr('id').split('_')[1]
-    var form_id = $(this).closest('div').find('.bought_checkbox_form').attr('id').split('_')[1]
-    if($(this).is(':checked')) {
-      $('#checked_'+id_num).prop('checked', true);
-    } else {
-      $('#checked_'+id_num).prop('checked', false);
-    }
-    var ul_id = $(this).closest('ul').attr('id')
-    var atLeastOneIsChecked = $('#'+ul_id+' input:checkbox').is(':checked');
-    var form_id = $(this).closest('div').find('.bought_checkbox_form').attr('id').split('_')[1]
 
-    if(atLeastOneIsChecked){
-      $('#boughtManyForm_'+ form_id).fadeIn()
-    }else{
-      $('#boughtManyForm_'+ form_id).fadeOut()
-    }
-  });
 
   $('input[name=day]').change(function(){
     var atLeastOneIsChecked = $('input[name=day]').is(':checked');
@@ -199,3 +176,31 @@ $(document).ready(function(){
       };
   })
 });
+
+$('body').on('click','.dropdown_shopping_item',function(e){
+  var id = e.target.id;
+  var num_id = id.split('_')[1]
+
+  $('#'+num_id).toggle(600);
+  $('#badge_edit_'+num_id).toggle(600);
+});
+
+$('body').on('change','input[name=bought_many]',function(e){
+var id_num = $(this).attr('id').split('_')[1]
+  var form_id = $(this).closest('div').find('.bought_checkbox_form').attr('id').split('_')[1]
+  if($(this).is(':checked')) {
+    $('#checked_'+id_num).prop('checked', true);
+  } else {
+    $('#checked_'+id_num).prop('checked', false);
+  }
+  var ul_id = $(this).closest('ul').attr('id')
+  var atLeastOneIsChecked = $('#'+ul_id+' input:checkbox').is(':checked');
+  var form_id = $(this).closest('div').find('.bought_checkbox_form').attr('id').split('_')[1]
+
+  if(atLeastOneIsChecked){
+    $('#boughtManyForm_'+ form_id).fadeIn()
+  }else{
+    $('#boughtManyForm_'+ form_id).fadeOut()
+  }
+});
+

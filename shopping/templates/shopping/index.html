@@ -39,10 +39,7 @@
               </button>
             </div>
           </div>
-        </div>
-        <ul class="list-group list-group-flush shoppingList" id="shop_{{shop.id}}">
-          <input type="hidden" value="{{shop}}">
-          <li class="list-group-item" style="display:none" id="shopping_list_settings_{{shop.id}}">
+          <div class="" style="display:none" id="shopping_list_settings_{{shop.id}}">
             <div class="" >
               <div class="dropdown-item">
                 <form action="{% url 'shopping:shopping_list_edit' shop.id %}" method="POST" role="form">{% csrf_token%}
@@ -79,7 +76,11 @@
               </form>
               {% endif %}
             </div>
-          </li>
+          </div>
+        </div>
+        <ul class="list-group list-group-flush shoppingList" id="shop_{{shop.id}}">
+          <input type="hidden" value="{{shop}}">
+
           {% for product in products %}
           {% for prod, qt in product.items %}
           {% if qt.1 %}
