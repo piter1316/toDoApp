@@ -80,12 +80,11 @@
         </div>
         <ul class="list-group list-group-flush shoppingList" id="shop_{{shop.id}}">
           <input type="hidden" value="{{shop}}">
-
           {% for product in products %}
           {% for prod, qt in product.items %}
           <li class=" {% if qt.1 %}todo-completed bg-secondary  {%else%} bg-light {%endif%}list-group-item d-flex justify-content-between align-items-center py-md-1" id="prod_{{prod.id}}">
             <span><input class="{% if qt.1 %}d-none{%endif%}" type="checkbox" name="bought_many" id="boughtMany_{{prod.id}}">
-              <a class="text-dark" href=" {% url 'shopping:bought' qt.2 %}">{{prod}}
+              <a class="shoppingBought_ text-dark" id="shoppingBought_{{qt.2}}" >{{prod}}
                 <span id="badge_edit_{{prod.id}}" class="badge badge-info" style="display:none;">{% if qt.1 %} Szczegóły {%else%} Edycja... {%endif%}</span>
               </a>
             </span>
@@ -98,7 +97,7 @@
           <li class="list-group-item p-0 border-bottom pb-2" id="{{prod.id}}" style="display:none;">
             <ul class="nav nav-tabs " id="myTab" role="tablist">
               <li class="nav-item {% if qt.1 %} d-none {%endif%}">
-                <a class="nav-link " id="editPosition-tab" data-toggle="tab" href="#editPosition_{{prod.id}}" role="tab" aria-controls="home" aria-selected="true">Edycja</a>
+                <a class="editPosition_ nav-link " id="editPosition-tab" data-toggle="tab" href="#editPosition_{{prod.id}}" role="tab" aria-controls="home" aria-selected="true">Edycja</a>
               </li>
               {% if qt.4 %}
               <li class="nav-item">
@@ -243,6 +242,31 @@
       }
     });
   });
+
+
+  $('.shoppingBought_').on('click', function(e){
+    e.preventDefault();
+
+
+    var id = e.target.id
+    var prod_id = parseInt(id.split('_')[1])
+
+    console.log('ajax '+ prod_id);
+    $.ajax({
+      type:'GET',
+      url:'shopping/bought/' + prod_id,
+      data:{
+      },
+      success: function(data){
+      $('#'+prod_id).hide();
+          $('#prod_'+prod_id).replaceWith($('#prod_' + prod_id,data));
+                    },
+    });
+  });
+
+
+
+
 
 </script>
 
