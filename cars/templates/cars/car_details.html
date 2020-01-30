@@ -26,7 +26,7 @@
             {% for detail in car %}
 
           <form method="post" action="{% url 'cars:add_fuel_fill' detail.pk  %}" id="add_fuel_fill">{% csrf_token %}
-            <table class="table table-bordered bg-light table-sm table-striped " id="filling_table">
+            <table class="table table-bordered bg-light table-sm table-striped mb-0" id="filling_table">
               <thead class="bg-secondary text-center text-light">
                 <tr>
                   <th scope="col" class="d-none d-md-table-cell">Lp.</th>
@@ -61,7 +61,7 @@
                   <td>{{filling.mileage}}</td>
                   <td class="d-flex justify-content-between align-items-center">
                     <span>{{ filling.liters|average_fuel_cons:filling.kilometers }}</span>
-                    <a id="filling_{{filling.pk}}" class="filling_ far fa-trash-alt text-dark" href="#filling_{{filling.pk}}"></a>
+                    <a onclick="return confirm('Usunąć tankowanie?')" id="filling_{{filling.pk}}" class="filling_ far fa-trash-alt text-dark" href="#filling_{{filling.pk}}"></a>
                   </td>
                 </tr>
 
