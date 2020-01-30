@@ -124,5 +124,10 @@ def add_fuel_fill(request, pk):
         filling.car_id = car
         filling.save()
 
-
         return HttpResponse('')
+
+
+def delete_fuel_fill(request, pk):
+    Fuel.objects.filter(pk=pk).delete()
+    print(pk + 'deleted')
+    return HttpResponse('')

@@ -27,37 +27,44 @@
 
           <form method="post" action="{% url 'cars:add_fuel_fill' detail.pk  %}" id="add_fuel_fill">{% csrf_token %}
             <table class="table table-bordered bg-light table-sm table-striped " id="filling_table">
-              <thead class="bg-info text-center">
+              <thead class="bg-secondary text-center text-light">
                 <tr>
                   <th scope="col" class="d-none d-md-table-cell">Lp.</th>
-                  <th scope="col">DATA</th>
-                  <th scope="col">LITRY</th>
+                  <th scope="col">Data</th>
+                  <th scope="col">Litry</th>
                   <th scope="col">KM</th>
-                  <th scope="col">CENA/L</th>
-                  <th scope="col">STAN LICZNIKA</th>
-                  <th scope="col">ŚREDNIE ZUŻYCIE</th>
+                  <th scope="col">Cena / L</th>
+                  <th scope="col">Stan Licznika</th>
+                  <th scope="col">L / 100km</th>
                 </tr>
               </thead>
               <tbody>
-                <tr class="">
+                <tr class="" style="position:relative">
                   <td class=" m-0 p-0 d-none d-md-block"></td>
-                  <th class=" m-0 p-0" style="max-width:112px;">{{car_fill_form.date}}</th>
-                  <th class=" m-0 p-0">{{car_fill_form.liters}}</th>
-                  <th class=" m-0 p-0">{{car_fill_form.kilometers}}</th>
-                  <th class=" m-0 p-0">{{car_fill_form.fuel_price}}</th>
-                  <th class=" m-0 p-0">{{car_fill_form.mileage}}</th>
-                  <th class=" m-0 p-0"><button class="btn border fas fa-save" type="submit"></button></th>
+                  <td class=" m-0 p-0" style="max-width:112px;">{{car_fill_form.date}}</td>
+                  <td class=" m-0 p-0">{{car_fill_form.liters}}</td>
+                  <td class=" m-0 p-0">{{car_fill_form.kilometers}}</td>
+                  <td class=" m-0 p-0">{{car_fill_form.fuel_price}}</td>
+                  <td class=" m-0 p-0">{{car_fill_form.mileage}}</td>
+                  <td class=" m-0 p-0">
+                    <button id="save_filling_btn" class="btn border fas fa-save" type="submit"></button>
+                  </td>
+                  <td id="save_overlay" class="alert alert-info text-center rounded shadow " style="position: absolute; left:20%; width:60%; display:none;">...Zapisywanie...</td>
                 </tr>
               {% for filling in car_fuel_fill_list %}
-                <tr>
+                <tr id="filling_row_{{filling.pk}}">
                   <th class="d-none d-md-block">{{forloop.counter}}</th>
                   <td>{{filling.date|date:"d M Y" }}</td>
                   <td>{{filling.liters}}</td>
                   <td>{{filling.kilometers}}</td>
                   <td>{{filling.fuel_price}}</td>
                   <td>{{filling.mileage}}</td>
-                  <td>{{ filling.liters|average_fuel_cons:filling.kilometers }}</td>
+                  <td class="d-flex justify-content-between align-items-center">
+                    <span>{{ filling.liters|average_fuel_cons:filling.kilometers }}</span>
+                    <a id="filling_{{filling.pk}}" class="filling_ far fa-trash-alt text-dark" href="#filling_{{filling.pk}}"></a>
+                  </td>
                 </tr>
+
               {% endfor %}
               </tbody>
             </table>
@@ -183,7 +190,7 @@
   </div>
 </div>
 <script type="text/javascript">
-  $('#add_fuel_fill').on('submit', function(e){
+  $('body').on('submit','#add_fuel_fill',function(e){
     e.preventDefault();
     console.log('ajax'+ {{detail.pk}});
     $.ajax({
@@ -198,12 +205,14 @@
         csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
       },
       success: function(json){
-        console.log('FILL ADDED !!!');
+
         $('#id_liters').val('');
         $('#id_kilometers').val('');
         fuel_price:$('#id_fuel_price').val('');
         mileage:$('#id_mileage').val('');
+        $('#save_overlay').fadeIn();
         setTimeout (function() {
+        $('#save_overlay').fadeOut();
         $('#filling_table').load(document.URL + ' #filling_table');
         console.log('time');
       }, 1000);
@@ -213,4 +222,25 @@
 
 </script>
 {% endfor %}
+<script type="text/javascript">
+  $('body').on('click','.filling_',function(e){
+    e.preventDefault();
+    console.log(e.target.id);
+    var id = e.target.id
+    var num_id = id.split('_')[1]
+    $.ajax({
+      type:'GET',
+      url:'/cars/carDetails/'+ parseInt(num_id) + '/delete_fuel_fill',
+      data:{
+
+      },
+      success: function(json){
+        setTimeout (function() {
+        $('#filling_table').load(document.URL + ' #filling_table');
+      }, 200);
+      }
+    });
+  });
+
+</script>
 {% endblock %}
