@@ -237,20 +237,9 @@
         $('#addProdForm_'+ shop_id + ' #id_prod_unit').val(1)
 
         setTimeout (function() {
-      $.ajax({
-          url: '/shopping#shop_{{shop.id}}',
-          method: 'GET',
-          data: {},
-          success: function(data){
-              $('#shop_'+ shop_id).replaceWith($('#shop_'+ shop_id,data));
-              $('#addProdForm_'+ shop_id +' #id_product_name').val('')
-          },
-          error: function(error){
-              console.log(error);
-              console.log("error");
-          }
-      });
-      }, 100);
+          $('#shop_'+ shop_id).load(document.URL + ' #shop_'+ shop_id);
+          $('#addProdForm_'+ shop_id + ' #id_product_name').val('')
+      }, 200);
       }
     });
   });
