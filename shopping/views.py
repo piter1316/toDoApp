@@ -24,9 +24,12 @@ def shopping_list_index(request):
         for product in products_on_shopping_list:
             meals_with_product = []
             generated_meals_with_product = []
-            meals_with_product_query = Ingredient.objects.filter(name__contains=product.product_name, user=request.user)
-            for item in meals_with_product_query:
-                meals_with_product.append(item)
+            if not product.bought:
+                meals_with_product_query = Ingredient.objects.filter(name__contains=product.product_name, user=request.user)
+
+                for item in meals_with_product_query:
+                    meals_with_product.append(item)
+
             for meal in meals_with_product:
                 query_set = MealsList.objects.filter(meal_id=meal.meal_id_id)
                 if len(query_set) > 0:
@@ -53,7 +56,6 @@ def add_shopping_list(request):
     if form.is_valid():
         new_shopping_list = ShoppingList(name=request.POST['name'].upper(), user_id=request.user)
         new_shopping_list.save()
-        print('added')
     return redirect('shopping:shopping_list_index')
 
 
@@ -71,7 +73,6 @@ def delete_all_shopping_lists(request):
 def add_product(request, shopping_list_id):
     shopping_list = get_object_or_404(ShoppingList, pk=shopping_list_id)
     form = ProductsForm(request.POST)
-    print(request.POST)
 
     new_product = Products(shopping_list_id=shopping_list,
                            product_name=request.POST['product_name'].lower(),

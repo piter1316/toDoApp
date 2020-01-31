@@ -229,9 +229,7 @@ def generate_meals_list(request):
                     option_meals_list.append(meal)
             else:
                 option_meals_list.append(meal)
-        print(option, '\n')
-        for meal in option_meals_list:
-            print(meal)
+
 
         random_meals_list = []
         if twice_the_same_meal:
