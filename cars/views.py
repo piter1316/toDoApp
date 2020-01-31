@@ -36,11 +36,17 @@ def car_details(request, car_id):
     form = CarForm(request.POST, request.FILES)
     car_fuel_fill_list = Fuel.objects.filter(car_id=car_id).order_by('-date')
     car_fill_form = FuelFillForm()
+    chart_dates = Fuel.objects.filter(car_id=car_id).values('date').order_by('date')
+    chart_dates_list = []
+    for date in chart_dates:
+        chart_dates_list.append(str(date['date']))
+
     context = {
         'car': car,
         'form': form,
         'car_fuel_fill_list': car_fuel_fill_list,
-        'car_fill_form': car_fill_form
+        'car_fill_form': car_fill_form,
+        'chart_dates': str(chart_dates_list).replace('[','').replace(']','')
     }
     return render(request, 'cars/car_details.html', context)
 
