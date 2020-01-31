@@ -96,10 +96,11 @@
           {{chart_dates}}
           <script>
           var ctx = document.getElementById('myChart').getContext('2d');
+          console.log('{{chart_dates|escapejs }}')
           var myChart = new Chart(ctx, {
+
               type: 'line',
               data: {
-
                   labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
                   datasets: [{
                       label: '# of Votes',
