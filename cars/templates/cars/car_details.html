@@ -93,18 +93,27 @@
         <div class="tab-pane fade" id="service" role="tabpanel" aria-labelledby="service-tab">SERWIS</div>
         <div class="tab-pane fade" id="chart" role="tabpanel" aria-labelledby="chart-tab">
           <canvas id="myChart" ></canvas>
-          {{chart_dates}}
           <script>
           var ctx = document.getElementById('myChart').getContext('2d');
-          console.log('{{chart_dates|escapejs }}')
+          var chart_data_json = JSON.parse('{{chart_dates|escapejs }}');
+          var dates_array = []
+          var consumption_array = []
+          chart_data_json.forEach(getDatesArray);
+
+          function getDatesArray(item, index){
+          dates_array.push(item['fields']['date']);
+          var l = item['fields']['liters'];
+          var km = item['fields']['kilometers'];
+          consumption_array.push((l/km*100).toFixed(2));
+          }
           var myChart = new Chart(ctx, {
 
               type: 'line',
               data: {
-                  labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                  labels: dates_array,
                   datasets: [{
                       label: '# of Votes',
-                      data: [12, 19, 3, 5, 2, 3],
+                      data: consumption_array,
                       backgroundColor: [
                           'rgba(255, 99, 132, 0.2)',
                           'rgba(54, 162, 235, 0.2)',
