@@ -98,51 +98,56 @@
           var chart_data_json = JSON.parse('{{chart_dates|escapejs }}');
           var dates_array = []
           var consumption_array = []
+          var average_array = []
+          var liters_array = []
+          var kilometers_array = []
           chart_data_json.forEach(getDatesArray);
+          chart_data_json.forEach(average);
+
+          var mixedChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+              datasets: [{
+                label: 'L/100KM',
+                data: consumption_array
+              }, {
+                label: 'Średnie: '+ average_array[0] ,
+                data: average_array,
+                backgroundColor: 'rgba(61,205,88,0.1)',
+                // Changes this dataset to become a line
+                type: 'line',
+                pointRadius: 0
+              }],
+              labels: dates_array
+            },
+          options: {
+
+            scales: {
+              yAxes: [{
+                  ticks: {
+                      beginAtZero: false,
+                      suggestedMin: 5,
+                      suggestedMax: 10
+                  }
+              }]
+            }
+        }
+        });
 
           function getDatesArray(item, index){
           dates_array.push(item['fields']['date']);
           var l = item['fields']['liters'];
           var km = item['fields']['kilometers'];
           consumption_array.push((l/km*100).toFixed(2));
+          liters_array.push(l);
+          kilometers_array.push(km)
           }
-          var myChart = new Chart(ctx, {
+          var liters_total = liters_array.reduce((a, b) => a + b, 0)
+          var kilometers_total = kilometers_array.reduce((a, b) => a + b, 0)
+          function average(){
+            average_array.push((((liters_array.reduce((a, b) => a + b, 0))/(kilometers_array.reduce((a, b) => a + b, 0)))*100).toFixed(2))
+          }
 
-              type: 'line',
-              data: {
-                  labels: dates_array,
-                  datasets: [{
-                      label: '# of Votes',
-                      data: consumption_array,
-                      backgroundColor: [
-                          'rgba(255, 255, 255, 0.2)',
-                          'rgba(54, 162, 235, 0.2)',
-                          'rgba(255, 206, 86, 0.2)',
-                          'rgba(75, 192, 192, 0.2)',
-                          'rgba(153, 102, 255, 0.2)',
-                          'rgba(255, 159, 64, 0.2)'
-                      ],
-                      borderColor: [
-                          'rgba(255, 99, 132, 1)',
-                          'rgba(54, 162, 235, 1)',
-                          'rgba(255, 206, 86, 1)',
-                          'rgba(75, 192, 192, 1)',
-                          'rgba(153, 102, 255, 1)',
-                          'rgba(255, 159, 64, 1)'
-                      ],
-                      borderWidth: 1
-                  }]
-              },
-              options: {
-                  scales: {
-                      yAxes: [{
-                          ticks: {
-                              beginAtZero: true
-                          }
-                      }]
-                  }
-              }
-          });
           </script>
         </div>
       </div>
