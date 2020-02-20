@@ -13,7 +13,7 @@ from django.views.generic import UpdateView
 
 from cars import forms
 from cars.forms import CarForm, FuelFillForm
-from cars.models import Car, Fuel
+from cars.models import Car, Fuel, Service, SparePart, Invoice
 from myproject.settings import BASE_DIR
 from django.core import serializers
 
@@ -40,6 +40,22 @@ def car_details(request, car_id):
     car_fill_form = FuelFillForm()
     json_serializer = serializers.get_serializer("json")()
     chart_dates = json_serializer.serialize(Fuel.objects.filter(car_id=car_id).order_by('date'), ensure_ascii=False)
+    service_list = Service.objects.select_related().filter(car_id=car_id)
+    service_dictionary = {}
+    for service in service_list:
+        parts_sum = 0
+        spare_parts_in_service = SparePart.objects.filter(service_id=service)
+        invoices_in_service = Invoice.objects.filter(service_id=service)
+        for part in spare_parts_in_service:
+            parts_sum += part.price
+        print(parts_sum)
+        # print(service,'\n',
+        #       SparePart.objects.filter(service_id=service), '\n',
+        #       Invoice.objects.filter(service_id=service), '\n'
+        #       )
+        service_dictionary[service] = [spare_parts_in_service, invoices_in_service, parts_sum]
+
+
 
 
     context = {
@@ -47,7 +63,8 @@ def car_details(request, car_id):
         'form': form,
         'car_fuel_fill_list': car_fuel_fill_list,
         'car_fill_form': car_fill_form,
-        'chart_dates': chart_dates
+        'chart_dates': chart_dates,
+        'service_dictionary': service_dictionary
     }
     return render(request, 'cars/car_details.html', context)
 

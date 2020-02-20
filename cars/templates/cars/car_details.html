@@ -90,7 +90,25 @@
             </div>
             </div>
         </div>
-        <div class="tab-pane fade" id="service" role="tabpanel" aria-labelledby="service-tab">SERWIS</div>
+        <div class="tab-pane fade" id="service" role="tabpanel" aria-labelledby="service-tab">
+          {% for service, lists in service_dictionary.items %}
+          ---<br>
+          {{service}} <br>
+          CZĘŚCI : <br>
+          {% for part in lists.0 %}
+          {{part}}|{{part.price}}<br>
+          {% endfor %}
+
+          PARAGONY : <br>
+          {% for invoice in lists.1 %}
+          {{invoice}}<br>
+          {% endfor %}
+
+          ROBOCIZNA:{{service.labour}} <br>
+          CZĘŚCI:{{lists.2}} <br>
+          TOTAL:{{ service.labour|add:lists.2 }} <br>
+          {% endfor %}
+        </div>
         <div class="tab-pane fade" id="chart" role="tabpanel" aria-labelledby="chart-tab">
           <canvas  class="bg-light rounded p-1" id="myChart" ></canvas>
           <script>

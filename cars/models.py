@@ -28,3 +28,29 @@ class Fuel(models.Model):
     mileage = models.PositiveIntegerField(null=True, blank=True, default=None)
 
 
+class Service(models.Model):
+    car_id = models.ForeignKey(Car, on_delete=models.DO_NOTHING)
+    date = models.DateField(null=False, blank=False)
+    mileage = models.PositiveIntegerField(null=True, blank=True, default=None)
+    labour = models.DecimalField(null=True, blank=True, decimal_places=2, max_digits=10)
+
+    def __str__(self):
+        return str(self.date) + ' ' + str(self.mileage)
+
+
+class SparePart(models.Model):
+    service_id = models.ForeignKey(Service, on_delete=models.DO_NOTHING)
+    name = models.TextField(max_length=160)
+    price = models.DecimalField(null=True, blank=True, decimal_places=2, max_digits=10)
+
+    def __str__(self):
+        return self.name
+
+
+class Invoice(models.Model):
+    service_id = models.ForeignKey(Service, on_delete=models.DO_NOTHING)
+    name = models.TextField(max_length=160)
+    file = models.FileField(null=True, blank=True, default=None)
+
+    def __str__(self):
+        return self.name
