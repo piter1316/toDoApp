@@ -175,6 +175,10 @@ $(document).ready(function(){
         $('#mealsOptionsButtonText').text('opcje')
       };
   })
+
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
 });
 
 $('body').on('click','.dropdown_shopping_item',function(e){

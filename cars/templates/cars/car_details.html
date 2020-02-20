@@ -90,24 +90,62 @@
             </div>
             </div>
         </div>
-        <div class="tab-pane fade" id="service" role="tabpanel" aria-labelledby="service-tab">
+        <div class="tab-pane fade p-2" id="service" role="tabpanel" aria-labelledby="service-tab">
+          <div class="row">
           {% for service, lists in service_dictionary.items %}
-          ---<br>
-          {{service}} <br>
-          CZĘŚCI : <br>
-          {% for part in lists.0 %}
-          {{part}}|{{part.price}}<br>
-          {% endfor %}
+            <div class="col-3">
+          <div class="card border-dark mb-3">
+            <div class="card-header bg-transparent border-dark d-flex justify-content-between">
+              <i>{{service.date}}</i> <i>{{service.mileage}} KM</i>
+            </div>
+            <div class="card-body text-secondary row no-gutters px-0 py-1">
+              <div class="col-7 pr-1 border-right">
+                <p class="text-center m-0 small">Części/koszty</p>
+                <table class="table-bordered w-100">
+                  <tbody>
+                    {% for part in lists.0 %}
+                      <tr>
+                        <td>{{part}}</td>
+                        <td class="text-right">{{part.price}}</td>
+                      </tr>
+                    {% endfor %}
+                  <tr>
+                    <td>Robocizna</td>
+                    <td class="text-right">{{service.labour}}</td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="col-5 text-center pl-1">
+                <p class="text-center m-0 small">Faktury/Paragony</p>
+                <table class="table-bordered">
+                {% for invoice in lists.1 %}
+                  <a href="{{invoice.file}}" class="text-secondary fas fa-file-invoice-dollar"> <small>{{invoice}}</small></a>
+                {% endfor %}
+                </table>
 
-          PARAGONY : <br>
-          {% for invoice in lists.1 %}
-          {{invoice}}<br>
-          {% endfor %}
 
-          ROBOCIZNA:{{service.labour}} <br>
-          CZĘŚCI:{{lists.2}} <br>
-          TOTAL:{{ service.labour|add:lists.2 }} <br>
+              </div>
+            </div>
+            <div class="card-footer bg-transparent border-dark">TOTAL: {{ service.labour|add:lists.2 }} PLN</div>
+          </div>
+            </div>
+<!--          {{service}} <br>-->
+<!--          CZĘŚCI : <br>-->
+<!--          {% for part in lists.0 %}-->
+<!--          {{part}}|{{part.price}}<br>-->
+<!--          {% endfor %}-->
+
+<!--          PARAGONY : <br>-->
+<!--          {% for invoice in lists.1 %}-->
+<!--          {{invoice}}<br>-->
+<!--          {% endfor %}-->
+
+<!--          ROBOCIZNA:{{service.labour}} <br>-->
+<!--          CZĘŚCI:{{lists.2}} <br>-->
+<!--          TOTAL:{{ service.labour|add:lists.2 }} <br>-->
           {% endfor %}
+            </div>
         </div>
         <div class="tab-pane fade" id="chart" role="tabpanel" aria-labelledby="chart-tab">
           <canvas  class="bg-light rounded p-1" id="myChart" ></canvas>

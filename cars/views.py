@@ -40,7 +40,7 @@ def car_details(request, car_id):
     car_fill_form = FuelFillForm()
     json_serializer = serializers.get_serializer("json")()
     chart_dates = json_serializer.serialize(Fuel.objects.filter(car_id=car_id).order_by('date'), ensure_ascii=False)
-    service_list = Service.objects.select_related().filter(car_id=car_id)
+    service_list = Service.objects.select_related().filter(car_id=car_id).order_by('date')
     service_dictionary = {}
     for service in service_list:
         parts_sum = 0
