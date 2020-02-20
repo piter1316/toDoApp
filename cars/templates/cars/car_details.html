@@ -92,7 +92,7 @@
         </div>
         <div class="tab-pane fade" id="service" role="tabpanel" aria-labelledby="service-tab">SERWIS</div>
         <div class="tab-pane fade" id="chart" role="tabpanel" aria-labelledby="chart-tab">
-          <canvas id="myChart" ></canvas>
+          <canvas  class="bg-light rounded p-1" id="myChart" ></canvas>
           <script>
           var ctx = document.getElementById('myChart').getContext('2d');
           var chart_data_json = JSON.parse('{{chart_dates|escapejs }}');
@@ -101,21 +101,32 @@
           var average_array = []
           var liters_array = []
           var kilometers_array = []
+          var bars_color_array = []
           chart_data_json.forEach(getDatesArray);
           chart_data_json.forEach(average);
 
+          for (var i=0; i<average_array.length; i++){
+            if(average_array[i]> consumption_array[i]){
+              bars_color_array.push('rgba(50,102,71,1)')
+            }else{
+              bars_color_array.push('rgba(255,193,7,1)')
+            }
+          }
+
           var mixedChart = new Chart(ctx, {
-            type: 'line',
+            type: 'bar',
             data: {
               datasets: [{
                 label: 'L/100KM',
-                data: consumption_array
+                data: consumption_array,
+                backgroundColor: bars_color_array
               }, {
                 label: 'Średnie: '+ average_array[0] ,
                 data: average_array,
-                backgroundColor: 'rgba(61,205,88,0.1)',
+                borderColor: 'rgba(61,205,88,1)',
                 // Changes this dataset to become a line
                 type: 'line',
+                fill: false,
                 pointRadius: 0
               }],
               labels: dates_array
@@ -147,6 +158,7 @@
           function average(){
             average_array.push((((liters_array.reduce((a, b) => a + b, 0))/(kilometers_array.reduce((a, b) => a + b, 0)))*100).toFixed(2))
           }
+
 
           </script>
         </div>
