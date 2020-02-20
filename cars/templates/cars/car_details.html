@@ -8,26 +8,31 @@
     <div class="col-12 col-xl-9 ">
       <ul class="nav nav-tabs mb-1 row no-gutters" id="myTab" role="tablist">
         <li class="nav-item col">
-          <a class="btn btn-outline-secondary active border-right-0 w-100"  id="fuel-tab" data-toggle="tab" href="#fuel" role="tab"
-             aria-controls="fuel" aria-selected="true" style=" border-radius: 5px 0px 0px 5px !important;"><i class=" px-2 fas fa-gas-pump"></i></a>
+          <a class="btn btn-outline-secondary active border-right-0 w-100" id="fuel-tab" data-toggle="tab" href="#fuel"
+             role="tab"
+             aria-controls="fuel" aria-selected="true" style=" border-radius: 5px 0px 0px 5px !important;"><i
+              class=" px-2 fas fa-gas-pump"></i></a>
         </li>
         <li class="nav-item col">
-          <a class="btn btn-outline-secondary rounded-0 w-100" id="service-tab" data-toggle="tab" href="#service" role="tab"
+          <a class="btn btn-outline-secondary rounded-0 w-100" id="service-tab" data-toggle="tab" href="#service"
+             role="tab"
              aria-controls="service" aria-selected="false"><i class=" px-2 fas fa-tools"></i></a>
         </li>
         <li class="nav-item col">
-          <a class="btn btn-outline-secondary border-left-0 w-100" id="contact-tab" data-toggle="tab" href="#chart" role="tab"
-             aria-controls="chart" aria-selected="false" style=" border-radius: 0px 5px 5px 0px !important;"><i class=" px-2 fas fa-chart-pie"></i></a>
+          <a class="btn btn-outline-secondary border-left-0 w-100" id="contact-tab" data-toggle="tab" href="#chart"
+             role="tab"
+             aria-controls="chart" aria-selected="false" style=" border-radius: 0px 5px 5px 0px !important;"><i
+              class=" px-2 fas fa-chart-pie"></i></a>
         </li>
       </ul>
       <div class="tab-content" id="myTabContent">
-        <div class="tab-pane fade show active" id="fuel" role="tabpanel" aria-labelledby="fuel-tab" >
+        <div class="tab-pane fade show active" id="fuel" role="tabpanel" aria-labelledby="fuel-tab">
           <div style="overflow-y:scroll; height:80vh;">
             {% for detail in car %}
 
-          <form method="post" action="{% url 'cars:add_fuel_fill' detail.pk  %}" id="add_fuel_fill">{% csrf_token %}
-            <table class="table table-bordered bg-light table-sm table-striped mb-0" id="filling_table">
-              <thead class="bg-secondary text-center text-light">
+            <form method="post" action="{% url 'cars:add_fuel_fill' detail.pk  %}" id="add_fuel_fill">{% csrf_token %}
+              <table class="table table-bordered bg-light table-sm table-striped mb-0" id="filling_table">
+                <thead class="bg-secondary text-center text-light">
                 <tr>
                   <th scope="col" class="d-none d-md-table-cell">Lp.</th>
                   <th scope="col">Data</th>
@@ -37,8 +42,8 @@
                   <th scope="col">Stan Licznika</th>
                   <th scope="col">L / 100km</th>
                 </tr>
-              </thead>
-              <tbody>
+                </thead>
+                <tbody>
                 <tr class="" style="position:relative">
                   <td class=" m-0 p-0 d-none d-md-block"></td>
                   <td class=" m-0 p-0" style="max-width:112px;">{{car_fill_form.date}}</td>
@@ -49,9 +54,11 @@
                   <td class=" m-0 p-0">
                     <button id="save_filling_btn" class="btn border fas fa-save" type="submit"></button>
                   </td>
-                  <td id="save_overlay" class="alert alert-info text-center rounded shadow " style="position: absolute; left:20%; width:60%; display:none;">...Zapisywanie...</td>
+                  <td id="save_overlay" class="alert alert-info text-center rounded shadow "
+                      style="position: absolute; left:20%; width:60%; display:none;">...Zapisywanie...
+                  </td>
                 </tr>
-              {% for filling in car_fuel_fill_list %}
+                {% for filling in car_fuel_fill_list %}
                 <tr id="filling_row_{{filling.pk}}">
                   <th class="d-none d-md-block">{{forloop.counter}}</th>
                   <td>{{filling.date|date:"d M Y" }}</td>
@@ -61,15 +68,17 @@
                   <td>{{filling.mileage}}</td>
                   <td class="d-flex justify-content-between align-items-center">
                     <span>{{ filling.liters|average_fuel_cons:filling.kilometers }}</span>
-                    <a onclick="return confirm('Usunąć tankowanie?')" id="filling_{{filling.pk}}" class="filling_ far fa-trash-alt text-dark" href="#filling_{{filling.pk}}"></a>
+                    <a onclick="return confirm('Usunąć tankowanie?')" id="filling_{{filling.pk}}"
+                       class="filling_ far fa-trash-alt text-dark" href="#filling_{{filling.pk}}"></a>
                   </td>
                 </tr>
-              {% endfor %}
-              </tbody>
-            </table>
+                {% endfor %}
+                </tbody>
+              </table>
             </form>
             {% endfor %}
-            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+                 aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
               <div class="modal-dialog modal-dialog-centered" role="document">
                 <form class="modal-content">
                   <div class="modal-header">
@@ -88,67 +97,52 @@
                 </form>
               </div>
             </div>
-            </div>
+          </div>
         </div>
         <div class="tab-pane fade p-2" id="service" role="tabpanel" aria-labelledby="service-tab">
           <div class="row">
-          {% for service, lists in service_dictionary.items %}
-            <div class="col-3">
-          <div class="card border-dark mb-3">
-            <div class="card-header bg-transparent border-dark d-flex justify-content-between">
-              <i>{{service.date}}</i> <i>{{service.mileage}} KM</i>
-            </div>
-            <div class="card-body text-secondary row no-gutters px-0 py-1">
-              <div class="col-7 pr-1 border-right">
-                <p class="text-center m-0 small">Części/koszty</p>
-                <table class="table-bordered w-100">
-                  <tbody>
-                    {% for part in lists.0 %}
+            {% for service, lists in service_dictionary.items %}
+            <div class="col-12 col-md-6 col-lg-4" >
+              <div class="card border-dark mb-3" style="height:100%;">
+                <div class="card-header bg-transparent border-dark d-flex justify-content-between">
+                  <i>{{service.date}}</i> <i>{{service.mileage}} KM</i>
+                </div>
+                <div class="card-body text-secondary row  no-gutters p-1">
+                  <div class="col-7 pr-1 border-right">
+                    <p class="text-center m-0 small">Części/Usługi</p>
+                    <table class="table-bordered w-100">
+                      <tbody>
+                      {% for part in lists.0 %}
                       <tr>
                         <td>{{part}}</td>
                         <td class="text-right">{{part.price}}</td>
                       </tr>
-                    {% endfor %}
-                  <tr>
-                    <td>Robocizna</td>
-                    <td class="text-right">{{service.labour}}</td>
-                  </tr>
-                  </tbody>
-                </table>
-              </div>
-              <div class="col-5 text-center pl-1">
-                <p class="text-center m-0 small">Faktury/Paragony</p>
-                <table class="table-bordered">
-                {% for invoice in lists.1 %}
-                  <a href="{{invoice.file}}" class="text-secondary fas fa-file-invoice-dollar"> <small>{{invoice}}</small></a>
-                {% endfor %}
-                </table>
-
-
+                      {% endfor %}
+                      <tr>
+                        <td>Robocizna</td>
+                        <td class="text-right">{{service.labour}}</td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="col-5  pl-1">
+                    <p class="text-center m-0 small">Faktury/Paragony</p>
+                    <table class="table-bordered">
+                      {% for invoice in lists.1 %}
+                      <a href="{{invoice.file}}" class="text-secondary fas fa-file-invoice-dollar">
+                        <small>{{invoice}}</small></a>
+                      {% endfor %}
+                    </table>
+                  </div>
+                </div>
+                <div class="card-footer bg-transparent border-dark">KOSZT CAŁKOWITY: {{ service.labour|add:lists.2 }} PLN</div>
               </div>
             </div>
-            <div class="card-footer bg-transparent border-dark">TOTAL: {{ service.labour|add:lists.2 }} PLN</div>
+            {% endfor %}
           </div>
-            </div>
-<!--          {{service}} <br>-->
-<!--          CZĘŚCI : <br>-->
-<!--          {% for part in lists.0 %}-->
-<!--          {{part}}|{{part.price}}<br>-->
-<!--          {% endfor %}-->
-
-<!--          PARAGONY : <br>-->
-<!--          {% for invoice in lists.1 %}-->
-<!--          {{invoice}}<br>-->
-<!--          {% endfor %}-->
-
-<!--          ROBOCIZNA:{{service.labour}} <br>-->
-<!--          CZĘŚCI:{{lists.2}} <br>-->
-<!--          TOTAL:{{ service.labour|add:lists.2 }} <br>-->
-          {% endfor %}
-            </div>
         </div>
         <div class="tab-pane fade" id="chart" role="tabpanel" aria-labelledby="chart-tab">
-          <canvas  class="bg-light rounded p-1" id="myChart" ></canvas>
+          <canvas class="bg-light rounded p-1" id="myChart"></canvas>
           <script>
           var ctx = document.getElementById('myChart').getContext('2d');
           var chart_data_json = JSON.parse('{{chart_dates|escapejs }}');
@@ -214,6 +208,7 @@
           function average(){
             average_array.push((((liters_array.reduce((a, b) => a + b, 0))/(kilometers_array.reduce((a, b) => a + b, 0)))*100).toFixed(2))
           }
+
 
 
           </script>
@@ -345,6 +340,7 @@
     });
   });
 
+
 </script>
 {% endfor %}
 <script type="text/javascript">
@@ -366,6 +362,7 @@
       }
     });
   });
+
 
 </script>
 {% endblock %}
