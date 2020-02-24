@@ -45,6 +45,7 @@
                 <form class="p-2 mt-1 text-center" action="{% url 'meals:add_meal' meal_option.id %}" method="post" >
                   {% csrf_token %}
                   <div class="form-row">{{form.name}}</div>
+                  <div class="form-row">{{form.calories}}</div>
                   <div class="form-row"><label class="label mx-auto">{{form.special}} DANIE SPECJALNE</label></div>
                   <button class="btn btn-outline-success btn-block" type="submit" id="add_sn">Dodaj danie</button>
                 </form>
@@ -65,7 +66,12 @@
           </li>
           </li>
           {% for meal in meals %}
-          <a href="{% url 'meals:edit_meal_ingredients' meal.id  %}" ><li class="list-group-item p-1">{{meal}}{% if meal.special %} ** {% endif %}</li></a>
+          <a href="{% url 'meals:edit_meal_ingredients' meal.id  %}" >
+            <li class="list-group-item p-1 d-flex justify-content-between">
+              <span class="text-left">{{meal}}{% if meal.special %} ** {% endif %}</span>
+              <span class="ml-1"><span class="badge badge-dark badge-pill">{{meal.calories}} <small>kcal</small></span></span>
+            </li>
+          </a>
           {% endfor %}
         </ul>
       </div>
