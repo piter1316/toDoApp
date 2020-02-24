@@ -108,7 +108,7 @@ def meals(request):
             days.append(item.day)
 
     for day in days:
-        meals_on_day = MealsList.objects.all().filter(user=request.user, day=day).order_by('meal_option__position')
+        meals_on_day = MealsList.objects.select_related('meal').filter(user=request.user, day=day).order_by('meal_option__position')
 
         day_meals_list = []
         for meal in meals_on_day:

@@ -30,6 +30,8 @@
             <tr class="text-center">
               <th scope="row" class="d-flex justify-content-between ">
                 <input type="checkbox" name="day" class="checkbox my-auto" value="{% for meal in meals %}{% for ml in meal%}{{ml.id}},{% endfor %}{% endfor %}">
+                <input type="hidden" name="kcal_sum" value="{% for meal in meals %}
+                {% for ml in meal%}{{ml.meal.calories}},{% endfor %}{% endfor %}">
                 {% with day_as_list=day|split %}
                 {{day_as_list.0}}
                 {% endwith %}
