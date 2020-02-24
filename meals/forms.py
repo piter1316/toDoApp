@@ -1,7 +1,5 @@
 from django import forms
 
-from meals.models import Ingredient
-
 
 class MealForm(forms.Form):
     name = forms.CharField(max_length=100, widget=forms.TextInput(
@@ -10,10 +8,13 @@ class MealForm(forms.Form):
                'aria-describedby': 'add-btn',
                'required': 'True'}))
     special = forms.BooleanField(required=False)
+    calories = forms.IntegerField(min_value=0, widget=forms.NumberInput(
+        attrs={'class': 'form-control mb-2',
+               'placeholder': 'Kalorie', 'aria-label': 'shoppingList',
+               'aria-describedby': 'add-btn'}))
 
 
 class IngredientForm(forms.Form):
-
     shop = forms.CharField(max_length=100, widget=forms.TextInput(
         attrs={'class': 'form-control',
                'placeholder': 'Sklep', 'aria-label': 'shoppingList',
@@ -32,4 +33,3 @@ class MealOptionForm(forms.Form):
         attrs={'class': 'form-control',
                'placeholder': 'Nowy posiłek. Np: Podwieczorek', 'aria-label': 'shoppingList',
                'aria-describedby': 'add-btn'}))
-

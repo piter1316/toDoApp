@@ -3,7 +3,6 @@ import random
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 # Create your views here.
-from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from meals.forms import MealForm, IngredientForm, MealOptionForm
@@ -138,7 +137,7 @@ def meals(request):
         'generated_user_meals_options': generated_user_meals_options,
         'day_meal_option_meal_list': day_meal_option_meal_list,
         'maximum_no_of_days_to_generate': maximum_no_of_days_to_generate,
-        'maximum_no_of_days_to_generate_default': maximum_no_of_days_to_generate *2,
+        'maximum_no_of_days_to_generate_default': maximum_no_of_days_to_generate * 2,
         'in_meals_list': in_meals_list,
         'first_day_input_list': first_day_input_list,
         'option_meals_dict': option_meals_dict,
@@ -183,7 +182,8 @@ def add_meal(request, meal_option_id):
     else:
         special = False
     if form.is_valid():
-        new_meal = Meal(name=request.POST['name'].lower(), user=request.user, meal_option=meal_option, special=special)
+        new_meal = Meal(name=request.POST['name'].lower(), user=request.user, meal_option=meal_option, special=special,
+                        calories=request.POST['calories'])
         new_meal.save()
     return redirect('meals:edit_meals')
 
@@ -229,7 +229,6 @@ def generate_meals_list(request):
                     option_meals_list.append(meal)
             else:
                 option_meals_list.append(meal)
-
 
         random_meals_list = []
         if twice_the_same_meal:
@@ -359,9 +358,10 @@ def update_meal_option(request, meal_option_id):
 def update_meal_name(request, meal_id):
     new_meal_name = request.POST['new_meal_name']
     edit_special = request.POST.get('edit_special', False)
+    edit_calories = request.POST['edit_calories']
     if edit_special == 'on':
         edit_special = True
-    Meal.objects.filter(pk=meal_id).update(name=new_meal_name, special=edit_special)
+    Meal.objects.filter(pk=meal_id).update(name=new_meal_name, special=edit_special, calories=edit_calories)
     return redirect('meals:edit_meal_ingredients', meal_id=meal_id)
 
 
