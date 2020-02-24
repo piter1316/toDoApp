@@ -6,7 +6,9 @@ function createPDF() {
   var style = "<style>";
   style = style + "table {width: 100%;font: 17px Calibri;}";
   style = style + ".dropdown-menu {display: none}";
+  style = style + ".no_print {display: none}";
   style = style + "input {display: none}";
+  style = style + ".text-left {text-align: left;}";
   style = style + "table, th, td {border: solid 1px #111; border-collapse: collapse;";
   style = style + "padding: 2px 3px;text-align: center;}";
 

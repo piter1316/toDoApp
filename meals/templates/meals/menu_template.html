@@ -14,7 +14,7 @@
       </button>
       <form action="{% url 'meals:delete_selected_days' %}" class="deleteSelectedDays my-1 w-100"  id="deleteSelectedDays" method="POST">{% csrf_token %}
         {% for item in day_meal_option_meal_list %}
-          {% for day, meals in item.items %}
+          {% for day, meals in item.0.items %}
             {% for meal in meals %}
               {% for ml in meal%}<input type="checkbox"  style="display:none;" value="{{ml.id}}" class="mealsListPosition_{{ml.id}}" name="mealsListPosition">{% endfor %}
             {% endfor %}
