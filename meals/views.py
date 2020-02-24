@@ -109,12 +109,17 @@ def meals(request):
 
     for day in days:
         meals_on_day = MealsList.objects.select_related('meal').filter(user=request.user, day=day).order_by('meal_option__position')
-
+        kcal = 0
         day_meals_list = []
         for meal in meals_on_day:
+            one_meal = Meal.objects.filter(id=meal.meal_id)
+            for i in one_meal:
+                kcal += i.calories
             all_meals = Meal.objects.filter(user=request.user, meal_option_id=meal.meal_option.id).order_by('name')
+
             day_meals_list.append({meal: all_meals})
-        day_meal_option_meal_list.append({day: day_meals_list})
+
+        day_meal_option_meal_list.append([{day: day_meals_list}, kcal])
 
     maximum_no_of_days_to_generate = get_maximum_no_of_days(request)
     maximum_no_of_days_to_generate_no_repeat = get_maximum_no_of_days_no_repeat(request)
@@ -415,6 +420,7 @@ def generate_shopping_lists(request):
 
 def delete_selected_days(request):
     meals_list_positions_to_delete_list = request.POST.getlist('mealsListPosition')
+    print(meals_list_positions_to_delete_list)
     for item in meals_list_positions_to_delete_list:
         MealsList.objects.filter(user=request.user, pk=item).delete()
     return redirect('meals:index')

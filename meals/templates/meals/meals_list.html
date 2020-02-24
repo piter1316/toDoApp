@@ -15,6 +15,7 @@
           <table  class="table table-light table-striped table-hover">
             <thead id="meals_list_head" class="thead-dark">
             <tr class="text-center text-light">
+              <th class="no_print" scope="col" style="max-width:10px;"></th>
               <th scope="col"></th>
               {% for meal_option in generated_user_meals_options %}
               <th scope="col">
@@ -26,14 +27,14 @@
             </thead>
             <tbody>
             {% for item in day_meal_option_meal_list %}
-            {% for day, meals in item.items %}
+            {% for day, meals in item.0.items %}
             <tr class="text-center">
-              <th scope="row" class="d-flex justify-content-between ">
-                <input type="checkbox" name="day" class="checkbox my-auto" value="{% for meal in meals %}{% for ml in meal%}{{ml.id}},{% endfor %}{% endfor %}">
-                <input type="hidden" name="kcal_sum" value="{% for meal in meals %}
-                {% for ml in meal%}{{ml.meal.calories}},{% endfor %}{% endfor %}">
+              <td class="no_print" style="max-width:10px;">
+                <input style="text-align: center;vertical-align: middle;" type="checkbox" name="day" class="checkbox my-auto" value="{% for meal in meals %}{% for ml in meal%}{{ml.id}},{% endfor %}{% endfor %}">
+              </td>
+              <th class="text-left">
                 {% with day_as_list=day|split %}
-                {{day_as_list.0}}
+                <span>{{day_as_list.0}} <SUP>({{item.1}})</SUP></span>
                 {% endwith %}
               </th>
               {% for meal in meals %}
