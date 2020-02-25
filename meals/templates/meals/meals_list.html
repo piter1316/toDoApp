@@ -15,10 +15,10 @@
           <table  class="table table-light table-striped table-hover">
             <thead id="meals_list_head" class="thead-dark">
             <tr class="text-center text-light">
-              <th class="no_print" scope="col" style="max-width:10px;"></th>
+              <th class="no_print px-0" scope="col" style="max-width:10px;"></th>
               <th scope="col"></th>
               {% for meal_option in generated_user_meals_options %}
-              <th scope="col">
+              <th class="px-0" scope="col">
                 <b>{{meal_option.meal_option__meal_option|upper}}</b>
                 <input type="hidden" class="generated_meal_options" value="{{meal_option.meal_option_id}}">
               </th>
@@ -29,16 +29,16 @@
             {% for item in day_meal_option_meal_list %}
             {% for day, meals in item.0.items %}
             <tr class="text-center">
-              <td class="no_print" style="max-width:10px;">
-                <input style="text-align: center;vertical-align: middle;" type="checkbox" name="day" class="checkbox my-auto" value="{% for meal in meals %}{% for ml in meal%}{{ml.id}},{% endfor %}{% endfor %}">
+              <td class="no_print px-0 " style="max-width:10px;">
+                <input style="text-align: center;vertical-align: middle;" type="checkbox" name="day" class="checkbox my-auto mr-1" value="{% for meal in meals %}{% for ml in meal%}{{ml.id}},{% endfor %}{% endfor %}">
               </td>
-              <th class="text-left">
+              <th class="text-left pl-1 pr-0">
                 {% with day_as_list=day|split %}
                 <span>{{day_as_list.0}} <SUP>({{item.1}})</SUP></span>
                 {% endwith %}
               </th>
               {% for meal in meals %}
-              <td>{%for ch_meal, all in meal.items%}
+              <td class="px-0">{%for ch_meal, all in meal.items%}
                 <span class="" style="cursor:pointer;" id="dropdownMeal" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   {% if ch_meal.meal_id %}
                   {{ch_meal}}{% for m in all %}{% if ch_meal.meal_id == m.id %} {% if m.special %} **{% endif %}{% endif %}{%endfor%}
