@@ -100,12 +100,55 @@
           </div>
         </div>
         <div class="tab-pane fade p-2" id="service" role="tabpanel" aria-labelledby="service-tab">
-          <div class="row">
+          <table class="d-none d-lg-table table table-bordered bg-light table-sm table-striped mb-0">
+            <thead class="bg-secondary text-center text-light">
+              <tr>
+                <td>Lp.</td>
+                <td>Data</td>
+                <td>Przebieg [km]</td>
+                <td>Części/Usługi - cena [PLN]</td>
+                <td>Robocizna [PLN]</td>
+                <td>Koszt całkowity [PLN]</td>
+                <td>Faktury</td>
+              </tr>
+            </thead>
+            <tbody>
             {% for service, lists in service_dictionary.items %}
-            <div class="col-12 col-md-6 col-lg-4" >
+            <tr class="text-center">
+              <td class="align-middle">{{forloop.counter}}</td>
+              <td class="align-middle">{{service.date}}</td>
+              <td class="align-middle">{{service.mileage}}</td>
+              <td class="">
+                <table class="w-100 table table-light mb-0">
+                  {% for part in lists.0 %}
+                  <tr>
+                    <td class="d-flex justify-content-between">
+                       <span>{{part}}</span><span>{{part.price}}</span>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </table>
+              </td>
+              <td class="align-middle">{{service.labour}}</td>
+              <td class="align-middle">{{ service.labour|add:lists.2 }}</td>
+              <td class="text-left align-middle">
+                {% for invoice in lists.1 %}
+                 <a href="{{invoice.file}}" class="text-secondary fas fa-file-invoice-dollar">
+                   <small>{{invoice}}</small>
+                 </a><br>
+                {% endfor %}
+              </td>
+            </tr>
+
+            {% endfor %}
+            </tbody>
+          </table>
+          <div class="row d-lg-none">
+            {% for service, lists in service_dictionary.items %}
+            <div class="col-12 mb-1" >
               <div class="card border-dark mb-3" style="height:100%;">
                 <div class="card-header bg-transparent border-dark d-flex justify-content-between">
-                  <i>{{service.date}}</i> <i>{{service.mileage}} KM</i>
+                  <i>{{forloop.counter}}. {{service.date}}</i> <i>{{service.mileage}} KM</i>
                 </div>
                 <div class="card-body text-secondary row  no-gutters p-1">
                   <div class="col-7 pr-1 border-right">
