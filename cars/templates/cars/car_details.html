@@ -106,7 +106,6 @@
                 <td>Data</td>
                 <td>Przebieg [km]</td>
                 <td>Części/Usługi - cena [PLN]</td>
-                <td>Robocizna [PLN]</td>
                 <td>Koszt całkowity [PLN]</td>
                 <td>Faktury</td>
                 <td><i class="fas fa-cog"></i></td>
@@ -129,8 +128,7 @@
                   {% endfor %}
                 </table>
               </td>
-              <td class="align-middle">{{service.labour}}</td>
-              <td class="align-middle">{{ service.labour|add:lists.2 }}</td>
+              <td class="align-middle">{{ lists.2 }}</td>
               <td class="text-left align-middle">
                 {% for invoice in lists.1 %}
                  <a href="{{invoice.file}}" class="text-secondary fas fa-file-invoice-dollar">
@@ -163,10 +161,6 @@
                         <td class="text-right">{{part.price}}</td>
                       </tr>
                       {% endfor %}
-                      <tr>
-                        <td>Robocizna</td>
-                        <td class="text-right">{{service.labour}}</td>
-                      </tr>
                       </tbody>
                     </table>
                   </div>
@@ -181,7 +175,7 @@
                   </div>
                 </div>
                 <div class="card-footer bg-transparent border-dark d-flex justify-content-between">
-                  <span>KOSZT CAŁKOWITY: {{ service.labour|add:lists.2 }} PLN</span>
+                  <span>KOSZT CAŁKOWITY: {{ lists.2 }} PLN</span>
                   <button type="button" class="fas fa-edit btn btn-secondary btn-sm" data-toggle="modal" data-target="#editService_{{service.id}}"></button>
                 </div>
               </div>

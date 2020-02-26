@@ -44,7 +44,7 @@ def car_details(request, car_id):
     service_dictionary = {}
     for service in service_list:
         parts_sum = 0
-        spare_parts_in_service = SparePart.objects.filter(service_id=service)
+        spare_parts_in_service = SparePart.objects.filter(service_id=service).order_by('service', 'price')
         invoices_in_service = Invoice.objects.filter(service_id=service)
         for part in spare_parts_in_service:
             parts_sum += part.price
