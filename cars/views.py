@@ -155,3 +155,10 @@ def delete_fuel_fill(request, pk):
     Fuel.objects.filter(pk=pk).delete()
     print(pk + 'deleted')
     return HttpResponse('')
+
+
+def add_service(request, pk):
+    car = Car.objects.filter(pk=pk)
+    print(request)
+    context = {'car': car}
+    return render(request, 'cars/addService.html', context)
