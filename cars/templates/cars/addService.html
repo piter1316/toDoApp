@@ -1,10 +1,25 @@
 {% extends 'todo/base.html' %}
 {% block body %}
-<div class="container">
-  <h1>{{car.0.name}} - Nowy serwis</h1>
-  add service
-{{car.0.pk}}
+<div class="container-fluid" id="wrapper">
+  <div class="row">
+    <div class="col-12 mx-auto" id="">
+      <div class="container">
+        <div class="jumbotron shadow shadow-lg">
+          <h1 >Nowy serwis - {{car.0.name}}</h1>
+          <form method="post">{% csrf_token %}
+            <span>Data:</span>
+            {{form.date}}
+            <span>Przebieg:</span>
+            {{form.mileage}}
+            <button class="btn btn-block btn-secondary my-1" type="submit">DODAJ</button>
+          </form>
+          <div class="alert alert-secondary">
+            <p class="text-center">Szczegóły wprowadzisz w następnym kroku </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-
 
 {% endblock %}

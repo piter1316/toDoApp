@@ -98,8 +98,8 @@
             </div>
           </div>
         </div>
-        <div class="tab-pane fade p-2" id="service" role="tabpanel" aria-labelledby="service-tab">
-          <a href="{% url 'cars:add_service' car.0.pk %}" class="btn btn-secondary btn-sm mb-1">Nowy serwis</a>
+        <div class="tab-pane fade p-2 service {% if active_tab == 'service' %} show active{% endif %}" id="service" role="tabpanel" aria-labelledby="service-tab">
+          <a href="{% url 'cars:add_service_form' car.0.pk %}" class="btn btn-secondary btn-sm mb-1">Nowy serwis</a>
           <table class="d-none d-lg-table table table-bordered bg-light table-sm table-striped mb-0" >
             <thead class="bg-secondary text-center text-light">
               <tr>
@@ -119,23 +119,11 @@
               <td class="align-middle">{{service.date}}</td>
               <td class="align-middle">{{service.mileage}}</td>
               <td class="">
-                <table class="w-100 table table-light mb-0">
-                  {% for part in lists.0 %}
-                  <tr>
-                    <td class="d-flex justify-content-between">
-                       <span>{{part}}</span><span>{{part.price}}</span>
-                    </td>
-                  </tr>
-                  {% endfor %}
-                </table>
+                {% include 'cars/parts_table.html' %}
               </td>
               <td class="align-middle">{{ lists.2 }}</td>
               <td class="text-left align-middle">
-                {% for invoice in lists.1 %}
-                 <a href="{{invoice.file}}" class="text-secondary fas fa-file-invoice-dollar">
-                   <small>{{invoice}}</small>
-                 </a><br>
-                {% endfor %}
+                {% include 'cars/invoice_list.html' %}
               </td>
               <td class="align-middle">
                 <button type="button" class="fas fa-edit btn btn-secondary btn-sm" data-toggle="modal" data-target="#editService_{{service.id}}"></button>
@@ -154,25 +142,11 @@
                 <div class="card-body text-secondary row  no-gutters p-1">
                   <div class="col-7 pr-1 border-right">
                     <p class="text-center m-0 small">Części/Usługi</p>
-                    <table class="table-bordered w-100">
-                      <tbody>
-                      {% for part in lists.0 %}
-                      <tr>
-                        <td>{{part}}</td>
-                        <td class="text-right">{{part.price}}</td>
-                      </tr>
-                      {% endfor %}
-                      </tbody>
-                    </table>
+                    {% include 'cars/parts_table.html' %}
                   </div>
-                  <div class="col-5  pl-1">
+                  <div class="col-5  pl-1 text-left align-middle">
                     <p class="text-center m-0 small">Faktury/Paragony</p>
-                    <table class="table-bordered">
-                      {% for invoice in lists.1 %}
-                      <a href="{{invoice.file}}" class="text-secondary fas fa-file-invoice-dollar">
-                        <small>{{invoice}}</small></a>
-                      {% endfor %}
-                    </table>
+                    {% include 'cars/invoice_list.html' %}
                   </div>
                 </div>
                 <div class="card-footer bg-transparent border-dark d-flex justify-content-between">

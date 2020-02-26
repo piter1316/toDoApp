@@ -1,0 +1,13 @@
+{% if lists.0 %}
+<table class="w-100 table mb-0 table-sm">
+  {% for part in lists.0 %}
+  <tr>
+    <td class="d-flex justify-content-between p-1">
+      <span>{{part}}</span><span>{{part.price}}</span>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<button class="btn btn-block btn-sm btn-secondary">Dodaj części/usługi</button>
+{% endif %}

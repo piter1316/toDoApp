@@ -177,8 +177,17 @@ $(document).ready(function(){
   })
 
   $(function () {
-  $('[data-toggle="tooltip"]').tooltip()
-})
+    $('[data-toggle="tooltip"]').tooltip()
+  })
+
+ if(window.location.href.includes('#service')){
+ $('#fuel').removeClass('show')
+ $('#fuel').removeClass('active')
+ $('#fuel-tab').removeClass('active')
+ $('#service').addClass('show');
+ $('#service').addClass('active');
+ $('#service-tab').addClass('active');
+ }
 });
 
 $('body').on('click','.dropdown_shopping_item',function(e){

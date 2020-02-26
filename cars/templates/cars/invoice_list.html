@@ -1,0 +1,9 @@
+{% if lists.1 %}
+{% for invoice in lists.1 %}
+<a href="{{invoice.file}}" class="text-secondary fas fa-file-invoice-dollar">
+  <small>{{invoice}}</small>
+</a><br>
+{% endfor %}
+{% else %}
+<button class="btn btn-block btn-sm btn-secondary">Dodaj faktury/paragony</button>
+{% endif %}

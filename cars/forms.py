@@ -74,3 +74,15 @@ class FuelFillForm(forms.ModelForm):
         model = models.Fuel
         fields = ['date', 'liters', 'kilometers', 'fuel_price', 'mileage']
 
+
+class AddServiceForm(forms.ModelForm):
+
+    date = forms.DateField(widget=forms.DateInput(
+        attrs={'class': 'form-control p-0', 'type': 'date', 'value': get_date()}
+    ))
+    mileage = forms.IntegerField(required=False, widget=forms.NumberInput(
+        attrs={'class': 'form-control  p-0 ', 'min': 1, 'placeholder': 'Podaj przebieg w dniu serwisu'}))
+
+    class Meta:
+        model = models.Service
+        fields = ['date', 'mileage']

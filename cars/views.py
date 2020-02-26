@@ -12,7 +12,7 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import UpdateView
 
 from cars import forms
-from cars.forms import CarForm, FuelFillForm
+from cars.forms import CarForm, FuelFillForm, AddServiceForm
 from cars.models import Car, Fuel, Service, SparePart, Invoice
 from myproject.settings import BASE_DIR
 from django.core import serializers
@@ -157,8 +157,24 @@ def delete_fuel_fill(request, pk):
     return HttpResponse('')
 
 
-def add_service(request, pk):
+def add_service_form(request, pk):
     car = Car.objects.filter(pk=pk)
+    car_obj = get_object_or_404(Car, pk=pk)
+    form = AddServiceForm(request.POST)
     print(request)
-    context = {'car': car}
-    return render(request, 'cars/addService.html', context)
+    context = {
+        'car': car,
+        'form': form,
+        'active_tab': 'service',
+    }
+    if request.method == 'POST':
+        if form.is_valid():
+            print(form)
+            new_service = form.save(commit=False)
+            new_service.car_id = car_obj
+            new_service.save()
+            return redirect('/cars/carDetails/{}#service'.format(pk))
+        else:
+            return render(request, 'cars/addService.html', context)
+    else:
+        return render(request, 'cars/addService.html', context)
