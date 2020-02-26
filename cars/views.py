@@ -178,3 +178,17 @@ def add_service_form(request, pk):
             return render(request, 'cars/addService.html', context)
     else:
         return render(request, 'cars/addService.html', context)
+
+
+def edit_parts_services(request, car_id, service_id):
+    context = {
+        "a": str(car_id) + str(service_id)
+    }
+    return render(request, 'cars/editPartsServices.html', context)
+
+
+def edit_invoices(request, car_id, service_id):
+    context = {
+        "a": str(car_id) + str(service_id)
+    }
+    return render(request, 'cars/editInvoices.html', context)

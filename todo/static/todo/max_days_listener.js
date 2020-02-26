@@ -188,6 +188,7 @@ $(document).ready(function(){
  $('#service').addClass('active');
  $('#service-tab').addClass('active');
  }
+
 });
 
 $('body').on('click','.dropdown_shopping_item',function(e){
@@ -197,6 +198,16 @@ $('body').on('click','.dropdown_shopping_item',function(e){
   $('#'+num_id).toggle(600);
   $('#badge_edit_'+num_id).toggle(600);
 });
+
+$('body').on('click','.editToggleLg, .editToggle',function(e){
+  var id = e.target.id;
+  var num_id = id.split('_')[1]
+  $('.serviceEditButton_' + num_id).toggle('slow')
+  $('.invoiceEditButton_' + num_id).toggle('slow')
+  console.log(num_id)
+});
+
+
 
 $('body').on('change','input[name=bought_many]',function(e){
 var id_num = $(this).attr('id').split('_')[1]

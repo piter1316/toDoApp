@@ -126,7 +126,7 @@
                 {% include 'cars/invoice_list.html' %}
               </td>
               <td class="align-middle">
-                <button type="button" class="fas fa-edit btn btn-secondary btn-sm" data-toggle="modal" data-target="#editService_{{service.id}}"></button>
+                <button type="button" class="editToggleLg fas fa-edit btn btn-secondary btn-sm" id="editToggleLg_{{service.id}}"></button>
               </td>
             </tr>
             {% endfor %}
@@ -151,7 +151,7 @@
                 </div>
                 <div class="card-footer bg-transparent border-dark d-flex justify-content-between">
                   <span>KOSZT CAŁKOWITY: {{ lists.2 }} PLN</span>
-                  <button type="button" class="fas fa-edit btn btn-secondary btn-sm" data-toggle="modal" data-target="#editService_{{service.id}}"></button>
+                  <button type="button" class="editToggle fas fa-edit btn btn-secondary btn-sm" id="editToggle_{{service.id}}"></button>
                 </div>
               </div>
             </div>
@@ -322,27 +322,6 @@
     </div>
   </div>
 </div>
-{% for service, lists in service_dictionary.items %}
-<div class="modal fade" id="editService_{{service.id}}" tabindex="-1" role="dialog" aria-labelledby="myExtraLargeModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalCenterTitle">Modal title</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        {{service.id}}
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-      </div>
-    </div>
-  </div>
-</div>
-{% endfor %}
 <script type="text/javascript">
   $('body').on('submit','#add_fuel_fill',function(e){
     e.preventDefault();

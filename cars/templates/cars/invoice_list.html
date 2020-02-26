@@ -4,6 +4,7 @@
   <small>{{invoice}}</small>
 </a><br>
 {% endfor %}
+<a class="invoiceEditButton_{{service.id}}" id="invoiceEditButton_{{service.id}}" style="display:none;" href="{% url 'cars:edit_invoices' car.0.pk service.id  %}">Edycja</a>
 {% else %}
 <button class="btn btn-block btn-sm btn-secondary">Dodaj faktury/paragony</button>
 {% endif %}
