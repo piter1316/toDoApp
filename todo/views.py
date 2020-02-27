@@ -58,11 +58,11 @@ def home(request):
         meals = MealsList.objects.select_related('meal').filter(user=request.user).distinct()
         calories_total = 0
         for meal in meals:
-            calories_total += meal.meal.calories
-        print(calories_total/len(meal_options))
+            if len(str(meal)) > 0:
+                calories_total += meal.meal.calories
         try:
             meals_list_length = int(len(all_meals) / len(meal_options))
-            average_clories_per_day = int(calories_total/len(meal_options))
+            average_clories_per_day = int(calories_total/meals_list_length)
         except ZeroDivisionError:
             meals_list_length = 0
             average_clories_per_day = 0
