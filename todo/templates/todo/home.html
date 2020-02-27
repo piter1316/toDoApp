@@ -22,6 +22,7 @@
                       <li>{{meals_list_length}} {% if meals_list_length == 1 %}dzień{% else %} dni{% endif %}.</li>
                       <li>{{meals}} {% if meals == 1 %}danie{% endif %}{% if meals > 1 and meals < 5 %} różne dania{% endif %}{% if meals >= 5 %}różnych dań{% endif %}.</li>
                       <li>{{meal_options}} {% if meal_options == 1 %}posiłek{% endif %}{% if meal_options > 1 and meal_options < 5%}posiłki{% endif %}{% if meal_options >= 5 %}posiłków{% endif %} dziennie.</li>
+                      <li>Średnio {{average_clories_per_day}} kcal dziennie.</li>
                       {% else %}
                       <li>Jadłospis jest pusty!</li>
                       {% endif %}

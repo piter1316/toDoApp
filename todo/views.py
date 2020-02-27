@@ -55,23 +55,32 @@ def home(request):
         all_to_do_count = Todo.objects.filter(user=request.user, complete=False)
         all_meals = MealsList.objects.filter(user=request.user)
         meal_options = MealsList.objects.filter(user=request.user).values('meal_option_id').distinct()
-        meals = MealsList.objects.filter(user=request.user).values('meal_id').distinct()
+        meals = MealsList.objects.select_related('meal').filter(user=request.user).distinct()
+        calories_total = 0
+        for meal in meals:
+            calories_total += meal.meal.calories
+        print(calories_total/len(meal_options))
         try:
             meals_list_length = int(len(all_meals) / len(meal_options))
+            average_clories_per_day = int(calories_total/len(meal_options))
         except ZeroDivisionError:
             meals_list_length = 0
+            average_clories_per_day = 0
         shopping_lists = ShoppingList.objects.filter(user_id=request.user)
         products_to_buy_counter = 0
         for product in shopping_lists:
             for item in Products.objects.filter(shopping_list_id=product, bought=False):
                 products_to_buy_counter += 1
+
+
         context = {
             'all_to_do_count': len(all_to_do_count),
             'meals_list_length': meals_list_length,
             'meals': len(meals),
             'meal_options': len(meal_options),
             'shopping_lists': len(shopping_lists),
-            'products_to_buy_counter': products_to_buy_counter
+            'products_to_buy_counter': products_to_buy_counter,
+            'average_clories_per_day': average_clories_per_day
         }
     else:
         context = {}
