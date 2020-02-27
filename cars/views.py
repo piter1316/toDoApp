@@ -52,7 +52,6 @@ def car_details(request, car_id):
         invoices_in_service = Invoice.objects.filter(service_id=service)
         for part in spare_parts_in_service:
             parts_sum += part.price
-        print(parts_sum)
         # print(service,'\n',
         #       SparePart.objects.filter(service_id=service), '\n',
         #       Invoice.objects.filter(service_id=service), '\n'
@@ -143,8 +142,6 @@ def add_fuel_fill(request, pk):
     if request.method == 'POST':
         form = FuelFillForm(request.POST, request.FILES)
         car = get_object_or_404(Car, pk=pk)
-        print(request.POST)
-
         filling = form.save(commit=False)
         filling.car_id = car
         filling.save()
@@ -154,7 +151,6 @@ def add_fuel_fill(request, pk):
 
 def delete_fuel_fill(request, pk):
     Fuel.objects.filter(pk=pk).delete()
-    print(pk + 'deleted')
     return HttpResponse('')
 
 
@@ -162,7 +158,6 @@ def add_service_form(request, pk):
     car = Car.objects.filter(pk=pk)
     car_obj = get_object_or_404(Car, pk=pk)
     form = AddServiceForm(request.POST)
-    print(request)
     context = {
         'car': car,
         'form': form,
@@ -170,7 +165,7 @@ def add_service_form(request, pk):
     }
     if request.method == 'POST':
         if form.is_valid():
-            print(form)
+
             new_service = form.save(commit=False)
             new_service.car_id = car_obj
             new_service.save()
@@ -186,13 +181,14 @@ def edit_parts_services(request, car_id, service_id):
     Allows a user to update their own profile.
     """
     service_instance = get_object_or_404(Service,pk=service_id)
+    car_id = car_id
       # Create the formset, specifying the form and formset we want to use.
-    LinkFormSet = formset_factory(LinkForm, formset=BaseLinkFormSet)
-
+    LinkFormSet = formset_factory(LinkForm, formset=BaseLinkFormSet, extra=0)
+    print(LinkForm)
     # Get our existing link data for this user.  This is used as initial data.
     user_links = SparePart.objects.filter(service_id=service_id)
-    print(user_links)
-    link_data = [{'anchor': l.name, 'url': l.price, 'service': l.service}
+
+    link_data = [{'part_service': l.name, 'price': l.price, 'service': l.service}
                     for l in user_links]
 
     if request.method == 'POST':
@@ -203,8 +199,8 @@ def edit_parts_services(request, car_id, service_id):
 
         for link_form in link_formset:
             if link_form.is_valid():
-                anchor = link_form.cleaned_data.get('anchor')
-                url = link_form.cleaned_data.get('url')
+                anchor = link_form.cleaned_data.get('part_service')
+                url = link_form.cleaned_data.get('price')
                 service = link_form.cleaned_data.get('service')
 
                 if anchor and url:
@@ -216,7 +212,7 @@ def edit_parts_services(request, car_id, service_id):
                 SparePart.objects.bulk_create(new_links)
 
                 # And notify our users that it worked
-                messages.success(request, 'You have updated your profile.')
+                messages.success(request, 'Zmiany zapisane')
 
         except IntegrityError: #If the transaction failed
             messages.error(request, 'There was an error saving your profile.')
@@ -229,6 +225,8 @@ def edit_parts_services(request, car_id, service_id):
     context = {
 
         'link_formset': link_formset,
+        'service_instance': service_instance,
+        'car_id': car_id
     }
 
     return render(request, 'cars/editPartsServices.html', context)

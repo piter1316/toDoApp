@@ -93,22 +93,23 @@ class LinkForm(forms.Form):
     """
     Form for individual user links
     """
-    anchor = forms.CharField(
+    part_service = forms.CharField(
                     max_length=100,
                     widget=forms.TextInput(attrs={
-                        'placeholder': 'Link Name / Anchor Text', 'required': 'true'
+                        'placeholder': 'Część/usługa', 'required': 'true', 'class': 'form-control'
                     }))
-    url = forms.CharField(required=True,
-                    widget=forms.TextInput(attrs={
-                        'placeholder': 'URL', 'required': 'true'
+    price = forms.CharField(required=True,
+                            widget=forms.TextInput(attrs={
+                        'placeholder': 'Cena', 'required': 'true', 'class': 'form-control'
                     }))
     service = forms.BooleanField(required=False)
+
 
 class BaseLinkFormSet(BaseFormSet):
     def clean(self):
         """
-        Adds validation to check that no two links have the same anchor or URL
-        and that all links have both an anchor and URL.
+        Adds validation to check that no two links have the same part_service or URL
+        and that all links have both an part_service and URL.
         """
         if any(self.errors):
             return
@@ -120,10 +121,10 @@ class BaseLinkFormSet(BaseFormSet):
 
         for form in self.forms:
             if form.cleaned_data:
-                anchor = form.cleaned_data['anchor']
-                url = form.cleaned_data['url']
+                anchor = form.cleaned_data['part_service']
+                url = form.cleaned_data['price']
 
-                # Check that no two links have the same anchor or URL
+                # Check that no two links have the same part_service or URL
                 if anchor and url:
                     if anchor in anchors:
                         duplicates = True
@@ -134,10 +135,10 @@ class BaseLinkFormSet(BaseFormSet):
                     urls.append(url)
 
 
-                # Check that all links have both an anchor and URL
+                # Check that all links have both an part_service and URL
                 if url and not anchor:
                     raise forms.ValidationError(
-                        'All links must have an anchor.',
+                        'All links must have an part_service.',
                         code='missing_anchor'
                     )
                 elif anchor and not url:
