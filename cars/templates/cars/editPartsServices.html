@@ -15,7 +15,7 @@
         </div>
       {% endif %}
 
-      <form method="post">
+      <form method="post" id="test">
         {% csrf_token %}
         {{ link_formset.management_form }}
 
@@ -38,24 +38,24 @@
                 {% endfor %}
               {% endif %}
             </div>
-            <div class="col d-flex align-items-center">
-              Usługa: {{ link_form.service }}
+            <div class="col d-flex align-items-center delete-item ">
+              {{ link_form.service }}
               {% if link_form.service.errors %}
                 {% for error in link_form.service.errors %}
                 {{ error|escape }}
                 {% endfor %}
               {% endif %}
             </div>
+            <div  class="col d-flex align-items-center"></div>
           </div>
         </div>
         {% endfor %}
-
+        <div class="addNewRow"></div>
         {% if link_formset.non_form_errors %}
         {% for error in link_formset.non_form_errors %}
         {{ error|escape }}
         {% endfor %}
         {% endif %}
-
         <button type="submit" class="btn btn-success">Zapisz zmiany</button>
         <a href="{% url 'cars:car_details' car_id %}#service" class="btn btn-secondary ">Wróć</a>
       </form>
@@ -63,18 +63,21 @@
   </div>
 </div>
 
-
-
 <!-- Include formset plugin - including jQuery dependency -->
 
 <script src="{% static 'todo/jquery.formset.js' %}"></script>
 <script>
+
     $('.link-formset').formset({
+        deleteContainerClass: 'delete-item',
+        addContainerClass: 'addNewRow',
         addText: 'Nowa część',
-        deleteText: ''
+        deleteText: 'Usuń',
+        keepFieldValues: '.delete-row'
     });
-    $('.delete-row').addClass('far fa-trash-alt text-dark');
+    $('.delete-row').addClass('far fa-trash-alt text-dark ml-2');
     $('.add-row').addClass('fas fa-plus ');
+
 
 </script>
 {% endblock %}

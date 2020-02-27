@@ -98,11 +98,16 @@ class LinkForm(forms.Form):
                     widget=forms.TextInput(attrs={
                         'placeholder': 'Część/usługa', 'required': 'true', 'class': 'form-control'
                     }))
-    price = forms.CharField(required=True,
-                            widget=forms.TextInput(attrs={
+    price = forms.DecimalField(required=True,
+                            widget=forms.NumberInput(attrs={
                         'placeholder': 'Cena', 'required': 'true', 'class': 'form-control'
                     }))
-    service = forms.BooleanField(required=False)
+    service = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={
+        'data-toggle': 'toggle', 'data-on': 'Usługa', 'data-off': 'Część', 'data-onstyle': 'dark',
+        'data-offstyle': 'dark', 'data-style': 'border', 'data-size': 'sm'
+    }))
+    # service = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class':'custom-control-input'
+    # }))
 
 
 class BaseLinkFormSet(BaseFormSet):
