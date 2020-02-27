@@ -1,18 +1,22 @@
 import json
 import os
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
+from django.db import transaction
+from django.forms import formset_factory
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 
 # Create your views here.
 from django.urls import reverse, reverse_lazy
 from django.views.generic import UpdateView
+from pymysql import IntegrityError
 
 from cars import forms
-from cars.forms import CarForm, FuelFillForm, AddServiceForm
+from cars.forms import CarForm, FuelFillForm, AddServiceForm, LinkForm, BaseLinkFormSet
 from cars.models import Car, Fuel, Service, SparePart, Invoice
 from myproject.settings import BASE_DIR
 from django.core import serializers
@@ -54,9 +58,6 @@ def car_details(request, car_id):
         #       Invoice.objects.filter(service_id=service), '\n'
         #       )
         service_dictionary[service] = [spare_parts_in_service, invoices_in_service, parts_sum]
-
-
-
 
     context = {
         'car': car,
@@ -181,9 +182,57 @@ def add_service_form(request, pk):
 
 
 def edit_parts_services(request, car_id, service_id):
+    """
+    Allows a user to update their own profile.
+    """
+    service_instance = get_object_or_404(Service,pk=service_id)
+    user = request.user
+
+    # Create the formset, specifying the form and formset we want to use.
+    LinkFormSet = formset_factory(LinkForm, formset=BaseLinkFormSet)
+
+    # Get our existing link data for this user.  This is used as initial data.
+    user_links = SparePart.objects.filter(service_id=service_id)
+    print(user_links)
+    link_data = [{'anchor': l.name, 'url': l.price, 'service': l.service}
+                    for l in user_links]
+
+    if request.method == 'POST':
+        link_formset = LinkFormSet(request.POST)
+
+        # Now save the data for each form in the formset
+        new_links = []
+
+        for link_form in link_formset:
+            if link_form.is_valid():
+                anchor = link_form.cleaned_data.get('anchor')
+                url = link_form.cleaned_data.get('url')
+                service = link_form.cleaned_data.get('service')
+
+                if anchor and url:
+                    new_links.append(SparePart(service_id=service_instance, name=anchor, price=url, service=service))
+        try:
+            with transaction.atomic():
+                #Replace the old with the new
+                SparePart.objects.filter(service_id=service_instance).delete()
+                SparePart.objects.bulk_create(new_links)
+
+                # And notify our users that it worked
+                messages.success(request, 'You have updated your profile.')
+
+        except IntegrityError: #If the transaction failed
+            messages.error(request, 'There was an error saving your profile.')
+            return redirect(reverse('profile-settings'))
+
+    else:
+
+        link_formset = LinkFormSet(initial=link_data)
+
     context = {
-        "a": str(car_id) + str(service_id)
+
+        'link_formset': link_formset,
     }
+
     return render(request, 'cars/editPartsServices.html', context)
 
 
