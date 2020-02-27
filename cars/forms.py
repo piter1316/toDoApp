@@ -96,14 +96,12 @@ class LinkForm(forms.Form):
     anchor = forms.CharField(
                     max_length=100,
                     widget=forms.TextInput(attrs={
-                        'placeholder': 'Link Name / Anchor Text',
-                    }),
-                    required=False)
-    url = forms.CharField(
+                        'placeholder': 'Link Name / Anchor Text', 'required': 'true'
+                    }))
+    url = forms.CharField(required=True,
                     widget=forms.TextInput(attrs={
-                        'placeholder': 'URL',
-                    }),
-                    required=False)
+                        'placeholder': 'URL', 'required': 'true'
+                    }))
     service = forms.BooleanField(required=False)
 
 class BaseLinkFormSet(BaseFormSet):
@@ -117,6 +115,7 @@ class BaseLinkFormSet(BaseFormSet):
 
         anchors = []
         urls = []
+
         duplicates = False
 
         for form in self.forms:
@@ -134,11 +133,6 @@ class BaseLinkFormSet(BaseFormSet):
                         duplicates = True
                     urls.append(url)
 
-                if duplicates:
-                    raise forms.ValidationError(
-                        'Links must have unique anchors and URLs.',
-                        code='duplicate_links'
-                    )
 
                 # Check that all links have both an anchor and URL
                 if url and not anchor:

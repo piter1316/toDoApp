@@ -186,9 +186,7 @@ def edit_parts_services(request, car_id, service_id):
     Allows a user to update their own profile.
     """
     service_instance = get_object_or_404(Service,pk=service_id)
-    user = request.user
-
-    # Create the formset, specifying the form and formset we want to use.
+      # Create the formset, specifying the form and formset we want to use.
     LinkFormSet = formset_factory(LinkForm, formset=BaseLinkFormSet)
 
     # Get our existing link data for this user.  This is used as initial data.
