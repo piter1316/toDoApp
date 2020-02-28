@@ -207,9 +207,7 @@ $('body').on('click','.editToggleLg, .editToggle',function(e){
   console.log(num_id)
 });
 
-$('body').on('mouseout','.add-row fas fa-plus',function(e){
- alert();
-});
+
 
 
 

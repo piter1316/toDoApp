@@ -4,21 +4,21 @@
 {% block body %}
 <div class="container mt-1">
   <div class="jumbotron shadow shadow-lg">
-    <h1 class="">{{service_instance.date}} | {{service_instance.mileage}} km</h1>
+    <h3 class="">{{service_instance.date}} | {{service_instance.mileage}} km</h3>
+    <hr>
     <div>
-      {% if messages %}
-        <div class="alert alert-info">
-          {% for message in messages %}
-            <p class="mb-0 text -center">{{ message }}</p>
-          {% endfor %}
-          <a href="{% url 'cars:car_details' car_id %}#service">Powrót do listy serwisów</a>
-        </div>
-      {% endif %}
-
       <form method="post" id="test">
+        <div class="form-row">
+          <div class="col">
+            <span class="ml-1">Część / Usługa</span>
+          </div>
+          <div class="col d-flex justify-content-between">
+            <span class="ml-1">Cena</span>
+            <span class="mr-1">Usługa</span>
+          </div>
+        </div>
         {% csrf_token %}
         {{ link_formset.management_form }}
-
         {% for link_form in link_formset %}
         <div class="link-formset mx-auto">
           <div class="form-row">
@@ -30,34 +30,45 @@
                 {% endfor %}
               {% endif %}
             </div>
-            <div class="col">
+            <div class="col d-flex align-items-center">
               {{ link_form.price }}
               {% if link_form.url.errors %}
                 {% for error in link_form.url.errors %}
                 {{ error|escape }}
                 {% endfor %}
               {% endif %}
+              <div class="col d-flex align-items-center delete-item ">
+                {{ link_form.service }}
+                {% if link_form.service.errors %}
+                  {% for error in link_form.service.errors %}
+                  {{ error|escape }}
+                  {% endfor %}
+                {% endif %}
+              </div>
             </div>
-            <div class="col d-flex align-items-center delete-item ">
-              {{ link_form.service }}
-              {% if link_form.service.errors %}
-                {% for error in link_form.service.errors %}
-                {{ error|escape }}
-                {% endfor %}
-              {% endif %}
-            </div>
-            <div  class="col d-flex align-items-center"></div>
           </div>
         </div>
         {% endfor %}
-        <div class="addNewRow"></div>
+        <div id="addButtonContainer" class="addNewRow"></div>
         {% if link_formset.non_form_errors %}
         {% for error in link_formset.non_form_errors %}
         {{ error|escape }}
         {% endfor %}
+        <div class="addButtonContainer"></div>
         {% endif %}
-        <button type="submit" class="btn btn-success">Zapisz zmiany</button>
-        <a href="{% url 'cars:car_details' car_id %}#service" class="btn btn-secondary ">Wróć</a>
+        <hr>
+        <div class="d-flex flex-row-reverse bd-highlight">
+          <a href="{% url 'cars:car_details' car_id %}#service" class="btn btn-secondary btn-sm ">Wróć</a>
+          <button type="submit" class="btn btn-success btn-sm mr-1">Zapisz zmiany</button>
+        </div>
+        {% if messages %}
+        <div class="alert alert-info text-center mt-2">
+          {% for message in messages %}
+            <p class="mb-0 text-center">{{ message }}</p>
+          {% endfor %}
+          <a href="{% url 'cars:car_details' car_id %}#service">Powrót do listy serwisów</a>
+        </div>
+      {% endif %}
       </form>
     </div>
   </div>
@@ -67,17 +78,25 @@
 
 <script src="{% static 'todo/jquery.formset.js' %}"></script>
 <script>
+function addSpecialFonts(){
+  $('.delete-row').addClass('far fa-trash-alt text-dark ml-2');
+  $('.add-row').addClass('btn btn-block btn-sm btn-secondary mt-1');
+}
 
     $('.link-formset').formset({
         deleteContainerClass: 'delete-item',
         addContainerClass: 'addNewRow',
-        addText: 'Nowa część',
-        deleteText: 'Usuń',
+        addText: 'Dodaj część/usługę',
+        deleteText: '',
         keepFieldValues: '.delete-row'
     });
-    $('.delete-row').addClass('far fa-trash-alt text-dark ml-2');
-    $('.add-row').addClass('fas fa-plus ');
+    addSpecialFonts();
 
+
+  $('body').on('mouseout mouseover','#addButtonContainer',function(e){
+    addSpecialFonts();
+
+});
 
 </script>
 {% endblock %}

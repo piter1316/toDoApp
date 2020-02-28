@@ -9,10 +9,10 @@
   {% endfor %}
   <tr class="serviceEditButton_{{service.id}}" id="serviceEditButton_{{service.id}}" style="display:none;">
     <td>
-      <a href="{% url 'cars:edit_parts_services' car.0.pk service.id  %}">Edycja</a>
+      <a href="{% url 'cars:edit_parts_services' car.0.pk service.id  %}" class="btn btn-block btn-sm btn-secondary">Edycja</a>
     </td>
   </tr>
 </table>
 {% else %}
-<button class="btn btn-block btn-sm btn-secondary">Dodaj części/usługi</button>
+<a href="{% url 'cars:edit_parts_services' car.0.pk service.id  %}" class="btn btn-block btn-sm btn-secondary">Dodaj części/usługi</a>
 {% endif %}
