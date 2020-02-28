@@ -16,7 +16,8 @@ from django.views.generic import UpdateView
 from pymysql import IntegrityError
 
 from cars import forms
-from cars.forms import CarForm, FuelFillForm, AddServiceForm, LinkForm, BaseLinkFormSet
+from cars.forms import CarForm, FuelFillForm, AddServiceForm, PartServiceForm, BasePartServiceFormSet, InvoiceForm, \
+    BaseInvoiceFormSet
 from cars.models import Car, Fuel, Service, SparePart, Invoice
 from myproject.settings import BASE_DIR
 from django.core import serializers
@@ -177,64 +178,75 @@ def add_service_form(request, pk):
 
 
 def edit_parts_services(request, car_id, service_id):
-    """
-    Allows a user to update their own profile.
-    """
-    service_instance = get_object_or_404(Service,pk=service_id)
+    service_instance = get_object_or_404(Service, pk=service_id)
     car_id = car_id
-      # Create the formset, specifying the form and formset we want to use.
-    LinkFormSet = formset_factory(LinkForm, formset=BaseLinkFormSet, extra=0, min_num=1)
-    print(LinkForm)
-    # Get our existing link data for this user.  This is used as initial data.
-    user_links = SparePart.objects.filter(service_id=service_id)
+    part_service_form_set = formset_factory(PartServiceForm, formset=BasePartServiceFormSet, extra=0, min_num=1)
+    car_services = SparePart.objects.filter(service_id=service_id)
 
-    link_data = [{'part_service': l.name, 'price': l.price, 'service': l.service}
-                    for l in user_links]
+    service_data = [{'part_service': l.name, 'price': l.price, 'service': l.service}
+                    for l in car_services]
 
     if request.method == 'POST':
-        link_formset = LinkFormSet(request.POST)
-
-        # Now save the data for each form in the formset
+        part_service_formset = part_service_form_set(request.POST)
         new_links = []
-
-        for link_form in link_formset:
+        for link_form in part_service_formset:
             if link_form.is_valid():
                 anchor = link_form.cleaned_data.get('part_service')
                 url = link_form.cleaned_data.get('price')
                 service = link_form.cleaned_data.get('service')
-
                 if anchor and url:
                     new_links.append(SparePart(service_id=service_instance, name=anchor, price=url, service=service))
         try:
             with transaction.atomic():
-                #Replace the old with the new
                 SparePart.objects.filter(service_id=service_instance).delete()
                 SparePart.objects.bulk_create(new_links)
-
-                # And notify our users that it worked
                 messages.success(request, 'Zmiany zapisane')
-
-        except IntegrityError: #If the transaction failed
+        except IntegrityError:
             messages.error(request, 'There was an error saving your profile.')
             return redirect(reverse('profile-settings'))
-
     else:
-
-        link_formset = LinkFormSet(initial=link_data)
-
+        part_service_formset = part_service_form_set(initial=service_data)
     context = {
 
-        'link_formset': link_formset,
+        'part_service_formset': part_service_formset,
         'service_instance': service_instance,
         'car_id': car_id
     }
-
     return render(request, 'cars/editPartsServices.html', context)
 
 
 def edit_invoices(request, car_id, service_id):
+    service_instance = get_object_or_404(Service, pk=service_id)
+    car_id = car_id
+    invoice_form_set = formset_factory(InvoiceForm, formset=BaseInvoiceFormSet, extra=0, min_num=1)
+    user_invoices = Invoice.objects.filter(service_id=service_id)
+    invoice_data = [{'name': l.name, 'file': l.file}
+                 for l in user_invoices]
+    if request.method == 'POST':
+        invoice_formset = invoice_form_set(request.POST, request.FILES)
+        new_invoices = []
+        for link_form in invoice_formset:
+            if link_form.is_valid():
+                name = link_form.cleaned_data.get('name')
+                file = link_form.cleaned_data.get('file')
+                if name:
+                    new_invoices.append(Invoice(service_id=service_instance, name=name, file=file))
+        try:
+            with transaction.atomic():
+                Invoice.objects.filter(service_id=service_instance).delete()
+                Invoice.objects.bulk_create(new_invoices)
+                print(new_invoices)
+                messages.success(request, 'Zmiany zapisane')
+        except IntegrityError:
+            messages.error(request, 'There was an error saving your profile.')
+            return redirect(reverse('profile-settings'))
+    else:
+        invoice_formset = invoice_form_set(initial=invoice_data)
     context = {
-        "a": str(car_id) + str(service_id)
+
+        'invoice_formset': invoice_formset,
+        'service_instance': service_instance,
+        'car_id': car_id
     }
     return render(request, 'cars/editInvoices.html', context)
 

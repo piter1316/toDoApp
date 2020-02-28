@@ -2,6 +2,91 @@
 
 
 {% block body %}
-edit invoices
-{{a}}
+<div class="container mt-1">
+  <div class="jumbotron shadow shadow-lg">
+    <h3 class="">{{service_instance.date}} | {{service_instance.mileage}} km</h3>
+    <hr>
+    <div>
+      <form method="post" id="test" enctype="multipart/form-data" action="">
+        <div class="form-row">
+          <div class="col">
+            <span class="ml-1">Nazwa</span>
+          </div>
+          <div class="col d-flex justify-content-between">
+            <span class="ml-1">Plik</span>
+          </div>
+        </div>
+        {% csrf_token %}
+        {{ invoice_formset.management_form }}
+        {% for link_form in invoice_formset %}
+        <div class="link-formset mx-auto">
+          <div class="form-row">
+            <div class="col delete-item d-flex flex-row-reverse align-items-center">
+              {{ link_form.name }}
+              {% if link_form.name.errors %}
+              {% for error in link_form.name.errors %}
+              {{ error|escape }}
+              {% endfor %}
+              {% endif %}
+            </div>
+            <div class="col">
+              {{ link_form.file }}
+              {% if link_form.file.errors %}
+              {% for error in link_form.file.errors %}
+              {{ error|escape }}
+              {% endfor %}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+        <div id="addButtonContainer" class="addNewRow"></div>
+        {% if invoice_form_set.non_form_errors %}
+        {% for error in invoice_form_set.non_form_errors %}
+        {{ error|escape }}
+        {% endfor %}
+        <div class="addButtonContainer"></div>
+        {% endif %}
+        <hr>
+        <div class="d-flex flex-row-reverse bd-highlight">
+          <a href="{% url 'cars:car_details' car_id %}#service" class="btn btn-secondary btn-sm ">Wróć</a>
+          <button type="submit" class="btn btn-success btn-sm mr-1">Zapisz zmiany</button>
+        </div>
+        {% if messages %}
+        <div class="alert alert-info text-center mt-2">
+          {% for message in messages %}
+          <p class="mb-0 text-center">{{ message }}</p>
+          {% endfor %}
+          <a href="{% url 'cars:car_details' car_id %}#service">Powrót do listy serwisów</a>
+        </div>
+        {% endif %}
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<script>
+function addSpecialFonts(){
+  $('.delete-row').addClass('far fa-trash-alt text-dark mr-2');
+  $('.add-row').addClass('btn btn-block btn-sm btn-secondary mt-1');
+}
+
+    $('.link-formset').formset({
+        deleteContainerClass: 'delete-item',
+        addContainerClass: 'addNewRow',
+        addText: 'Dodaj część/usługę',
+        deleteText: '',
+        keepFieldValues: '.delete-row'
+    });
+    addSpecialFonts();
+
+
+  $('body').on('mouseout mouseover','#addButtonContainer',function(e){
+    addSpecialFonts();
+
+});
+
+
+</script>
 {% endblock %}
