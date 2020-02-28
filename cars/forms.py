@@ -1,8 +1,9 @@
+from datetime import date
+
 from django import forms
 from django.forms.formsets import BaseFormSet
 
 from . import models
-from datetime import date
 
 
 def get_date():
@@ -51,7 +52,6 @@ class CarForm(forms.ModelForm):
 
 
 class FuelFillForm(forms.ModelForm):
-
     date = forms.DateField(widget=forms.DateInput(
         attrs={'class': 'form-control p-0', 'type': 'date', 'value': get_date()}
     ))
@@ -77,7 +77,6 @@ class FuelFillForm(forms.ModelForm):
 
 
 class AddServiceForm(forms.ModelForm):
-
     date = forms.DateField(widget=forms.DateInput(
         attrs={'class': 'form-control p-0', 'type': 'date', 'value': get_date()}
     ))
@@ -94,23 +93,19 @@ class LinkForm(forms.Form):
     Form for individual user links
     """
     part_service = forms.CharField(
-                    max_length=100,
-                    widget=forms.TextInput(attrs={
-                        'placeholder': 'Część/usługa', 'required': 'true', 'class': 'form-control'
-                    }))
+        max_length=100,
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Część/usługa', 'required': 'true', 'class': 'form-control'
+        }))
     price = forms.DecimalField(required=True,
-                            widget=forms.NumberInput(attrs={
-                        'placeholder': 'Cena', 'required': 'true', 'class': 'form-control'
-                    }))
-    service = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={
-        'data-toggle': 'toggle', 'data-on': 'Usługa', 'data-off': 'Część', 'data-onstyle': 'dark',
-        'data-offstyle': 'dark', 'data-style': 'border', 'data-size': 'sm'
-    }))
-    # service = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class':'custom-control-input'
-    # }))
+                               widget=forms.NumberInput(attrs={
+                                   'placeholder': 'Cena', 'required': 'true', 'class': 'form-control'
+                               }))
+    service = forms.BooleanField(required=False, widget=forms.CheckboxInput())
 
 
 class BaseLinkFormSet(BaseFormSet):
+
     def clean(self):
         """
         Adds validation to check that no two links have the same part_service or URL
@@ -119,35 +114,24 @@ class BaseLinkFormSet(BaseFormSet):
         if any(self.errors):
             return
 
-        anchors = []
-        urls = []
+        parts_sevices = []
+        prices = []
 
         duplicates = False
 
         for form in self.forms:
             if form.cleaned_data:
-                anchor = form.cleaned_data['part_service']
-                url = form.cleaned_data['price']
-
-                # Check that no two links have the same part_service or URL
-                if anchor and url:
-                    if anchor in anchors:
-                        duplicates = True
-                    anchors.append(anchor)
-
-                    if url in urls:
-                        duplicates = True
-                    urls.append(url)
-
+                part_service = form.cleaned_data['part_service']
+                price = form.cleaned_data['price']
 
                 # Check that all links have both an part_service and URL
-                if url and not anchor:
+                if price and not part_service:
                     raise forms.ValidationError(
-                        'All links must have an part_service.',
-                        code='missing_anchor'
+                        'Brak części/serwisu!!!.',
+                        code='missing_part_service'
                     )
-                elif anchor and not url:
+                elif part_service and not price:
                     raise forms.ValidationError(
-                        'All links must have a URL.',
-                        code='missing_URL'
+                        'Podaj cenę!',
+                        code='missing_price'
                     )
