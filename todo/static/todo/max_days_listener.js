@@ -204,6 +204,7 @@ $('body').on('click','.editToggleLg, .editToggle',function(e){
   var num_id = id.split('_')[1]
   $('.serviceEditButton_' + num_id).toggle('slow')
   $('.invoiceEditButton_' + num_id).toggle('slow')
+  $('.deleteServiceButton_' + num_id).toggle('slow')
   console.log(num_id)
 });
 

@@ -237,3 +237,8 @@ def edit_invoices(request, car_id, service_id):
         "a": str(car_id) + str(service_id)
     }
     return render(request, 'cars/editInvoices.html', context)
+
+
+def delete_service(request, car_id, service_id):
+    Service.objects.filter(id=service_id).delete()
+    return redirect('/cars/carDetails/{}#service'.format(car_id))

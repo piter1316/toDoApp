@@ -115,7 +115,14 @@
             <tbody>
             {% for service, lists in service_dictionary.items %}
             <tr class="text-center">
-              <td class="align-middle">{{forloop.counter}}</td>
+              <td class="align-middle">
+                <a onclick="return confirm('Czy napewno usunąć serwis i wszystkie dane?')"
+                   style="display:none;" class="deleteServiceButton_{{service.id}}"
+                   href="{% url 'cars:delete_service' car.0.pk service.id %}">
+                  <i title="Usuń serwis" class="far fa-trash-alt text-dark"></i>
+                </a>
+                {{forloop.counter}}.
+              </td>
               <td class="align-middle">{{service.date}}</td>
               <td class="align-middle">{{service.mileage}}</td>
               <td class="">
@@ -137,7 +144,11 @@
             <div class="col-12 mb-1" >
               <div class="card border-dark mb-3" style="height:100%;">
                 <div class="card-header bg-transparent border-dark d-flex justify-content-between">
-                  <i>{{forloop.counter}}. {{service.date}}</i> <i>{{service.mileage}} KM</i>
+                  <i><a onclick="return confirm('Czy napewno usunąć serwis i wszystkie dane?')"
+                     style="display:none;" class="deleteServiceButton_{{service.id}} mr-2"
+                     href="{% url 'cars:delete_service' car.0.pk service.id %}">
+                      <i title="Usuń serwis" class="far fa-trash-alt text-dark"></i>
+                    </a>{{forloop.counter}}. {{service.date}}</i> <i>{{service.mileage}} KM</i>
                 </div>
                 <div class="card-body text-secondary row  no-gutters p-1">
                   <div class="col-7 pr-1 border-right">
@@ -151,7 +162,10 @@
                 </div>
                 <div class="card-footer bg-transparent border-dark d-flex justify-content-between">
                   <span>KOSZT CAŁKOWITY: {{ lists.2 }} PLN</span>
-                  <button type="button" class="editToggle fas fa-edit btn btn-secondary btn-sm" id="editToggle_{{service.id}}"></button>
+                  <span>
+
+                    <button type="button" class="editToggle fas fa-edit btn btn-secondary btn-sm" id="editToggle_{{service.id}}"></button>
+                  </span>
                 </div>
               </div>
             </div>

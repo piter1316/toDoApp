@@ -38,7 +38,7 @@ class Service(models.Model):
 
 
 class SparePart(models.Model):
-    service_id = models.ForeignKey(Service, on_delete=models.DO_NOTHING)
+    service_id = models.ForeignKey(Service, on_delete=models.CASCADE)
     name = models.TextField(max_length=160)
     price = models.DecimalField(null=True, blank=True, decimal_places=2, max_digits=10)
     service = models.BooleanField(default=False, blank=True, null=True)
@@ -48,7 +48,7 @@ class SparePart(models.Model):
 
 
 class Invoice(models.Model):
-    service_id = models.ForeignKey(Service, on_delete=models.DO_NOTHING)
+    service_id = models.ForeignKey(Service, on_delete=models.CASCADE)
     name = models.TextField(max_length=160)
     file = models.FileField(null=True, blank=True, default=None)
 

@@ -22,7 +22,7 @@
         {% for link_form in link_formset %}
         <div class="link-formset mx-auto">
           <div class="form-row">
-            <div class="col">
+            <div class="col delete-item d-flex flex-row-reverse align-items-center">
               {{ link_form.part_service }}
               {% if link_form.anchor.errors %}
                 {% for error in link_form.anchor.errors %}
@@ -37,7 +37,7 @@
                 {{ error|escape }}
                 {% endfor %}
               {% endif %}
-              <div class="col d-flex align-items-center delete-item ">
+              <div class="col d-flex align-items-center">
                 {{ link_form.service }}
                 {% if link_form.service.errors %}
                   {% for error in link_form.service.errors %}
@@ -79,7 +79,7 @@
 <script src="{% static 'todo/jquery.formset.js' %}"></script>
 <script>
 function addSpecialFonts(){
-  $('.delete-row').addClass('far fa-trash-alt text-dark ml-2');
+  $('.delete-row').addClass('far fa-trash-alt text-dark mr-2');
   $('.add-row').addClass('btn btn-block btn-sm btn-secondary mt-1');
 }
 
