@@ -89,9 +89,6 @@ class AddServiceForm(forms.ModelForm):
 
 
 class LinkForm(forms.Form):
-    """
-    Form for individual user links
-    """
     part_service = forms.CharField(
         max_length=100,
         widget=forms.TextInput(attrs={
@@ -107,24 +104,14 @@ class LinkForm(forms.Form):
 class BaseLinkFormSet(BaseFormSet):
 
     def clean(self):
-        """
-        Adds validation to check that no two links have the same part_service or URL
-        and that all links have both an part_service and URL.
-        """
         if any(self.errors):
             return
-
-        parts_sevices = []
-        prices = []
-
-        duplicates = False
 
         for form in self.forms:
             if form.cleaned_data:
                 part_service = form.cleaned_data['part_service']
                 price = form.cleaned_data['price']
 
-                # Check that all links have both an part_service and URL
                 if price and not part_service:
                     raise forms.ValidationError(
                         'Brak części/serwisu!!!.',
@@ -134,4 +121,64 @@ class BaseLinkFormSet(BaseFormSet):
                     raise forms.ValidationError(
                         'Podaj cenę!',
                         code='missing_price'
+                    )
+
+
+class InvoiceForm(forms.Form):
+    name = forms.CharField(
+        max_length=100,
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Faktura/paragon', 'required': 'true', 'class': 'form-control'
+        }))
+    file = forms.FileField(required=False,
+                           widget=forms.FileInput(attrs={
+                               'class': 'form-control-file mb-2',
+                           }))
+
+
+class BaseInvoiceFormSet(BaseFormSet):
+
+    def clean(self):
+        if any(self.errors):
+            return
+
+        names = []
+        files = []
+        duplicates = False
+
+        for form in self.forms:
+            if form.cleaned_data:
+                name = form.cleaned_data['name']
+                file = form.cleaned_data['file']
+
+                # Check that no two links have the same anchor or URL
+                if name and file:
+                    if name in names:
+                        duplicates = True
+                    names.append(name)
+
+                    if file in files:
+                        duplicates = True
+                    files.append(file)
+
+                if duplicates:
+                    raise forms.ValidationError(
+                        'Faktury/Paragony muszą mieć unikatowe nazwy i pliki',
+                        code='duplicate_links'
+                    )
+
+        for form in self.forms:
+            if form.cleaned_data:
+                name = form.cleaned_data['name']
+                file = form.cleaned_data['file']
+
+                if file and not name:
+                    raise forms.ValidationError(
+                        'Brak faktury/paragonu!!!.',
+                        code='missing_invoice'
+                    )
+                elif name and not file:
+                    raise forms.ValidationError(
+                        'Brak pliku!',
+                        code='missing_file'
                     )
