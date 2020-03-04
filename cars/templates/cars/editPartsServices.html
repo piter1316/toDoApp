@@ -18,8 +18,8 @@
           </div>
         </div>
         {% csrf_token %}
-        {{ link_formset.management_form }}
-        {% for link_form in link_formset %}
+        {{ part_service_formset.management_form }}
+        {% for link_form in part_service_formset %}
         <div class="link-formset mx-auto">
           <div class="form-row">
             <div class="col delete-item d-flex flex-row-reverse align-items-center">
@@ -50,8 +50,8 @@
         </div>
         {% endfor %}
         <div id="addButtonContainer" class="addNewRow"></div>
-        {% if link_formset.non_form_errors %}
-        {% for error in link_formset.non_form_errors %}
+        {% if part_service_formset.non_form_errors %}
+        {% for error in part_service_formset.non_form_errors %}
         {{ error|escape }}
         {% endfor %}
         <div class="addButtonContainer"></div>
