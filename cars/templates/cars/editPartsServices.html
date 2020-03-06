@@ -18,8 +18,8 @@
           </div>
         </div>
         {% csrf_token %}
-        {{ part_service_formset.management_form }}
-        {% for link_form in part_service_formset %}
+        {{ link_formset.management_form }}
+        {% for link_form in link_formset %}
         <div class="link-formset mx-auto">
           <div class="form-row">
             <div class="col delete-item d-flex flex-row-reverse align-items-center">
