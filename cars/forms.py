@@ -128,11 +128,11 @@ class InvoiceForm(forms.Form):
     name = forms.CharField(
         max_length=100,
         widget=forms.TextInput(attrs={
-            'placeholder': 'Faktura/paragon', 'required': 'true', 'class': 'form-control'
+            'placeholder': 'Faktura/paragon', 'required': 'true', 'class': 'form-control my-1'
         }))
     file = forms.FileField(required=False,
                            widget=forms.FileInput(attrs={
-                               'class': 'form-control-file mb-2',
+                               'class': 'custom-file-input mb-2',
                            }))
 
 
