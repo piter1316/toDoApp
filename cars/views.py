@@ -240,11 +240,10 @@ def edit_invoices(request, car_id, service_id):
     location = os.path.join(BASE_DIR, 'media', 'user_uploads',
                             '{}-{}'.format(request.user.id, request.user.username),
                             '{}-{}'.format(car_instance.pk, car_instance.name), 'invoices')
-    location_to_database = os.path.join('user_uploads',
+    location_to_database = os.path.join('media','user_uploads',
                                         '{}-{}'.format(request.user.id, request.user.username),
                                         '{}-{}'.format(car_instance.pk, car_instance.name), 'invoices', )
 
-    fs = FileSystemStorage(location=location)
     if request.method == 'POST':
         invoice_formset = InvoiceFormSet(request.POST, request.FILES)
         new_invoices = []
@@ -259,6 +258,7 @@ def edit_invoices(request, car_id, service_id):
                     except IndexError:
                         pass
                 if name and file:
+                    fs = FileSystemStorage(location=location)
                     invoice_instance = Invoice(service_id=service_instance, name=name, file=file)
                     fs.save(str(file), invoice_instance.file)
                     invoice_instance.file = os.path.join(location_to_database, str(invoice_instance.file))
