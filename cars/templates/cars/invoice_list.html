@@ -1,10 +1,18 @@
 {% if lists.1 %}
 {% for invoice in lists.1 %}
-<a href="{{invoice.file}}" class="text-secondary fas fa-file-invoice-dollar">
-  <small>{{invoice}}</small>
-</a><br>
+<div class="d-flex justify-content-between my-2">
+  <a href="{{invoice.file}}" class="text-secondary fas fa-file-invoice-dollar">
+  <small>
+   {{invoice}}
+  </small>
+</a>
+  {% if forloop.last %}
+  <a class="invoiceEditButton_{{service.id}} small pointer text-dark " id="invoiceEditButton_{{service.id}}" href="{% url 'cars:edit_invoices' car.0.pk service.id  %}"><i class="fas fa-edit"></i></a>
+  {%endif%}
+</div>
+
 {% endfor %}
-<a class="invoiceEditButton_{{service.id}} btn  btn-sm btn-secondary" id="invoiceEditButton_{{service.id}}" style="display:none;" href="{% url 'cars:edit_invoices' car.0.pk service.id  %}">Edycja</a>
+
 {% else %}
-<button class="btn btn-block btn-sm btn-secondary">Dodaj faktury/paragony</button>
+<a href="{% url 'cars:edit_invoices' car.0.pk service.id  %}" class="btn btn-block btn-sm btn-secondary">Dodaj faktury/paragony</a>
 {% endif %}

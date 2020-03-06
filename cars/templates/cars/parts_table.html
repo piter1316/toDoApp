@@ -7,9 +7,9 @@
     </td>
   </tr>
   {% endfor %}
-  <tr class="serviceEditButton_{{service.id}}" id="serviceEditButton_{{service.id}}" style="display:none;">
-    <td>
-      <a href="{% url 'cars:edit_parts_services' car.0.pk service.id  %}" class="btn btn-sm btn-secondary">Edycja</a>
+  <tr class="serviceEditButton_{{service.id}}" id="serviceEditButton_{{service.id}}" >
+    <td class="p-0 text-center">
+      <a href="{% url 'cars:edit_parts_services' car.0.pk service.id  %}" class="text-dark pointer"><i class="fas fa-edit"></i></a>
     </td>
   </tr>
 </table>

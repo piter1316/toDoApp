@@ -22,7 +22,7 @@
               {% endif %}
             </div>
             <div class="col-12 col-lg-3 d-flex align-items-center ">
-              <input readonly value="{{ link_form.file.value }}" class="form-control my-1 mx-auto" id="current_link"/>
+              <input readonly value="{% if link_form.file.value %}{{ link_form.file.value }}{% endif %}" class="form-control my-1 mx-auto" id="current_link"/>
             </div>
             <div class="col-12 col-lg-4 d-flex align-items-center ">
               <div class="input-group">
@@ -59,8 +59,8 @@
 <script src="{% static 'todo/jquery.formset.js' %}"></script>
 <script>
 function addSpecialFonts(){
-  $('.delete-row').addClass('far fa-trash-alt text-light mr-2 btn btn-block btn-secondary my-1');
-  $('.add-row').addClass('btn btn-block btn-sm btn-secondary mt-1');
+  $('.delete-row').addClass('far fa-trash-alt text-light mr-2 btn btn-sm btn-block btn-secondary my-1');
+  $('.add-row').addClass('btn btn-block  btn-secondary mt-1');
   $('#addButtonContainer #current_link').val('');
   $('#addButtonContainer #new_file').text('Dodaj: ');
   $('#addButtonContainer input[type=file]').prop('required',true);
