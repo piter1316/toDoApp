@@ -279,3 +279,11 @@ def edit_invoices(request, car_id, service_id):
 def delete_service(request, car_id, service_id):
     Service.objects.filter(id=service_id).delete()
     return redirect('/cars/carDetails/{}#service'.format(car_id))
+
+
+def edit_service_details(request, car_id, service_id):
+    form = AddServiceForm(request.POST)
+    context = {
+        'form': form
+    }
+    return render(request, 'cars/editServiceDetails.html', context)

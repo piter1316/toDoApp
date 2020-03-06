@@ -118,8 +118,8 @@
               <td class="align-middle">
                 {{forloop.counter}}.
               </td>
-              <td class="align-middle">{{service.date}}</td>
-              <td class="align-middle">{{service.mileage}}</td>
+              <td class="align-middle"><a class="text-dark pointer" href="{% url 'cars:edit_service_details' car.0.pk service.id %}">{{service.date}}</a></td>
+              <td class="align-middle"><a class="text-dark pointer" href="{% url 'cars:edit_service_details' car.0.pk service.id %}">{{service.mileage}}</a></td>
               <td class="">
                 {% include 'cars/parts_table.html' %}
               </td>
@@ -142,9 +142,11 @@
             {% for service, lists in service_dictionary.items %}
             <div class="col-12 mb-1 p-0" >
               <div class="card border-dark mb-3" style="height:100%;">
-                <div class="card-header bg-transparent border-dark d-flex justify-content-between">
-                  <i>{{forloop.counter}}. {{service.date}}</i> <i>{{service.mileage}} KM</i>
-                </div>
+                <a class="text-dark" title="edycja" href="{% url 'cars:edit_service_details' car.0.pk service.id %}">
+                  <div class="card-header bg-transparent border-dark d-flex justify-content-between">
+                    <i>{{forloop.counter}}. {{service.date}}</i> <i>{{service.mileage}} KM</i>
+                  </div>
+                </a>
                 <div class="card-body text-secondary row  no-gutters p-1">
                   <div class="col-7 pr-1 border-right">
                     <p class="text-center m-0 small">Części/Usługi</p>
@@ -169,6 +171,7 @@
             </div>
             {% endfor %}
           </div>
+
         </div>
         <div class="tab-pane fade" id="chart" role="tabpanel" aria-labelledby="chart-tab">
           <canvas class="bg-light rounded p-1" id="myChart"></canvas>
