@@ -92,7 +92,8 @@ alert();
   });
 
   $('body').on('change ','input[type=file]',function(){
-    var fileName = $(this).val().replace('C:\\fakepath\\', " ");
+    var fileName = $(this).val().replace('C:\\fakepath\\', " ").split('\\')[0];
+    console.log(fileName)
 
     $(this).next('.custom-file-label').html(fileName);
     $('#addButtonContainer #current_link').val('fileName');

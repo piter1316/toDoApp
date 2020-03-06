@@ -178,8 +178,9 @@ def add_service_form(request, pk):
 
 def edit_parts_services(request, car_id, service_id):
 
-    service_instance = get_object_or_404(Service,pk=service_id)
+    service_instance = get_object_or_404(Service, pk=service_id)
     car_id = car_id
+
 
     LinkFormSet = formset_factory(LinkForm, formset=BaseLinkFormSet, extra=0, min_num=1)
     print(LinkForm)
@@ -192,6 +193,7 @@ def edit_parts_services(request, car_id, service_id):
     if request.method == 'POST':
         link_formset = LinkFormSet(request.POST)
         new_links = []
+
         for link_form in link_formset:
             if link_form.is_valid():
                 anchor = link_form.cleaned_data.get('part_service')
@@ -226,8 +228,7 @@ def edit_parts_services(request, car_id, service_id):
 
 def edit_invoices(request, car_id, service_id):
     service_instance = get_object_or_404(Service, pk=service_id)
-    car_id = car_id
-
+    car_instance = get_object_or_404(Car, pk=car_id)
     InvoiceFormSet = formset_factory(InvoiceForm, formset=BaseInvoiceFormSet, extra=0, min_num=1)
     print(LinkForm)
     # Get our existing link data for this user.  This is used as initial data.
@@ -236,6 +237,14 @@ def edit_invoices(request, car_id, service_id):
     invoices_data = [{'name': l.name, 'file': l.file}
                  for l in service_invoices]
 
+    location = os.path.join(BASE_DIR, 'media', 'user_uploads',
+                            '{}-{}'.format(request.user.id, request.user.username),
+                            '{}-{}'.format(car_instance.pk, car_instance.name), 'invoices')
+    location_to_database = os.path.join('user_uploads',
+                                        '{}-{}'.format(request.user.id, request.user.username),
+                                        '{}-{}'.format(car_instance.pk, car_instance.name), 'invoices', )
+
+    fs = FileSystemStorage(location=location)
     if request.method == 'POST':
         invoice_formset = InvoiceFormSet(request.POST, request.FILES)
         new_invoices = []
@@ -250,7 +259,11 @@ def edit_invoices(request, car_id, service_id):
                     except IndexError:
                         pass
                 if name and file:
-                    new_invoices.append(Invoice(service_id=service_instance, name=name, file=file))
+                    invoice_instance = Invoice(service_id=service_instance, name=name, file=file)
+                    fs.save(str(file), invoice_instance.file)
+                    invoice_instance.file = os.path.join(location_to_database, str(invoice_instance.file))
+                    invoice_instance.save()
+                    new_invoices.append(invoice_instance)
                 print(new_invoices)
         try:
             with transaction.atomic():
