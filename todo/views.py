@@ -55,7 +55,7 @@ def home(request):
         all_to_do_count = Todo.objects.filter(user=request.user, complete=False)
         all_meals = MealsList.objects.filter(user=request.user)
         meal_options = MealsList.objects.filter(user=request.user).values('meal_option_id').distinct()
-        meals = MealsList.objects.select_related('meal').filter(user=request.user).distinct()
+        meals = MealsList.objects.select_related('meal').filter(user=request.user)
         calories_total = 0
         for meal in meals:
             if len(str(meal)) > 0:
@@ -71,12 +71,15 @@ def home(request):
         for product in shopping_lists:
             for item in Products.objects.filter(shopping_list_id=product, bought=False):
                 products_to_buy_counter += 1
-
+        distinct_meals =[]
+        for meal in meals:
+            if meal.meal.name not in distinct_meals:
+                distinct_meals.append(meal.meal.name)
 
         context = {
             'all_to_do_count': len(all_to_do_count),
             'meals_list_length': meals_list_length,
-            'meals': len(meals),
+            'meals': len(distinct_meals),
             'meal_options': len(meal_options),
             'shopping_lists': len(shopping_lists),
             'products_to_buy_counter': products_to_buy_counter,
