@@ -10,13 +10,18 @@
         <div class="col-12 col-xl-8">
           <div class="card shadow  p-0" style="">
             <div class="card-header text-center">
-              <p id="option_name" class="lead mb-0" style="cursor:pointer;" title="Kliknj i edtyuj">{{meal.0.name|upper}} {%if meal.0.special%} **{% endif %} | <small>{{meal.0.calories}} kcal</small></p>
-              <form id="new_meal_option_name" style="display:none;" action="{% url 'meals:update_meal_name' meal.0.id %}" method="post">{% csrf_token %}
+              <p id="option_name" class="lead mb-0" style="cursor:pointer;" title="Kliknj i edtyuj">
+                {{meal.0.name|upper}} {%if meal.0.special%} **{% endif %} | <small>{{meal.0.calories}} kcal</small></p>
+              <form id="new_meal_option_name" style="display:none;"
+                    action="{% url 'meals:update_meal_name' meal.0.id %}" method="post">{% csrf_token %}
                 <div class="input-group">
                   <input class="form-control" name="new_meal_name" type="text" value="{{meal.0.name}}">
-                  <input class="form-control " name="edit_calories" id="edit_calories" type="number" min="0" value="{{meal.0.calories}}">
+                  <input class="form-control " name="edit_calories" id="edit_calories" type="number" min="0"
+                         value="{{meal.0.calories}}">
                 </div>
-                <label class="my-2" for="edit_special"><input class="" type="checkbox" name="edit_special" id="edit_special" {%if meal.0.special%}checked{% endif %}>Danie specjalne</label>
+                <label class="my-2" for="edit_special"><input class="" type="checkbox" name="edit_special"
+                                                              id="edit_special" {%if meal.0.special%}checked{% endif %}>Danie
+                  specjalne</label>
                 <button class="btn btn-sm btn-success btn-block" type="submit">Zmień</button>
               </form>
             </div>
@@ -28,19 +33,24 @@
               <li class="list-group-item d-flex justify-content-between align-items-center py-1">
                 {{ingredient}}
                 <span>
-                  <span class="badge badge-primary badge-pill p-2">{{ingredient.quantity}} {{ingredient.unit}}</span>
+                  <span class="badge badge-primary badge-pill p-2">{{ingredient.quantity}} g</span>
+                  <span class="badge badge-primary badge-pill p-2"> {% widthratio ingredient.quantity ingredient.ingredient_id.weight_per_unit 1 %} szt</span>
                   <span class="badge badge-primary badge-pill p-2">{{ingredient.shop}}</span>
-                  <span class="badge badge-primary badge-pill dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <span class="badge badge-primary badge-pill dropdown-toggle" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <div class="dropdown-menu p-3" aria-labelledby="dropdownMenuButton">
-                      <form class="form" action="{% url 'meals:update_ingredient' meal.0.id ingredient.id  %}" method="post">{% csrf_token %}
+                      <form class="form" action="{% url 'meals:update_ingredient' meal.0.id ingredient.id  %}"
+                            method="post">{% csrf_token %}
                         <div class="from-group row">
                           <div class="col-12">
-                            <input class="form-control" type="text" required name="new_ingredient_name" value="{{ingredient}}">
+                            <input class="form-control" type="text" required name="new_ingredient_name"
+                                   value="{{ingredient}}">
                           </div>
                         </div>
                         <div class="from-group row">
                           <div class="col-6 pr-0">
-                            <input class="form-control" type="number" min="0" step="0.01" name="new_quantity" value="{% localize off %}{{ingredient.quantity}}{% endlocalize %}">
+                            <input class="form-control" type="number" min="0" step="0.01" name="new_quantity"
+                                   value="{% localize off %}{{ingredient.quantity}}{% endlocalize %}">
                           </div>
                           <div class="col-6 pl-0">
                             <select class="form-control" name="new_unit">
@@ -60,7 +70,8 @@
                         <div class="form-group row mb-0">
                           <div class="col-12">
                             <button class="btn btn-primary btn-block" type="submit">Zmień</button>
-                            <a href="{% url 'meals:delete_ingredient' meal.0.id  ingredient.id %}" class="btn btn-danger btn-block">Usuń składnik</a>
+                            <a href="{% url 'meals:delete_ingredient' meal.0.id  ingredient.id %}"
+                               class="btn btn-danger btn-block">Usuń składnik</a>
                           </div>
                         </div>
                       </form>
@@ -70,39 +81,46 @@
               </li>
               {% endfor %}
               <li class="list-group-item mt-2">
-                <button id="new_ingredient_form_toggle" type="button" class="btn btn-outline-secondary btn-sm ml-1">Opcje</button>
-                <form style="display:none;" class="mt-2" action="{% url 'meals:add_ingredient' meal.0.id %}" method="post" id="new_ingredient_form">{% csrf_token %}
-                  <smal>Nowy składnik:</smal>
-                  {{form.name}}
+                <button id="new_ingredient_form_toggle" type="button" class="btn btn-outline-secondary btn-sm ml-1">
+                  Opcje
+                </button>
+                <form style="display:none;" class="mt-2" action="{% url 'meals:add_ingredient' meal.0.id %}"
+                      method="post" id="new_ingredient_form">{% csrf_token %}
+                  <small>Nowy składnik:</small>
                   <div class="form-row mb-2">
-                    <div class="col">
-                      <input class="form-control" type="text" required placeholder="Składnik" name="ingredient">
+                    <select class="form-control" name="ingredient">
+                      <option>DODAJ...</option>
+                      {% for ingredient in user_ingredients %}
+                      <option value="{{ingredient.id}}">{{ingredient}} | {{ingredient.calories_per_100_gram}} kcal/100g</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div class="form-row mb-2">
+                    <div class="input-group mb-3">
+                      <input class="form-control" type="number" step="0.01" min="0" placeholder="Ilość" name="quantity"
+                             value="1">
+                      <div class="input-group-append">
+                        <span class="input-group-text" id="addon-quantity">gram</span>
+                      </div>
                     </div>
                   </div>
                   <div class="form-row mb-2">
-                    <div class="col-6">
-                      <input class="form-control" type="number" step="0.01" min="0" placeholder="Ilość" name="quantity" value="1">
-                    </div>
-                    <div class="col-6">
-                      <select class="form-control" name="unit">
-                        {% for unit in units %}
-                        <option value="{{unit.id}}">{{unit}}</option>
-                        {% endfor %}
-                      </select>
-                    </div>
+                    <select class="form-control" name="shop">
+                      {% for shop in user_shops %}
+                      <option value="{{shop.id}}">{{shop}}</option>
+                      {% endfor %}
+                    </select>
                   </div>
                   <div class="form-row mb-2">
                     <div class="col">
-                      <input class="form-control" type="text" placeholder="Sklep" name="shop">
-                    </div>
-                  </div>
-                  <div class="form-row mb-2">
-                    <div class="col">
-                      <button class="btn btn-success btn-block" type="submit"><i class="fas fa-plus"></i> Składnik</button>
+                      <button class="btn btn-success btn-block" type="submit"><i class="fas fa-plus"></i> Składnik
+                      </button>
                     </div>
                   </div>
                   <div class="dropdown-divider"></div>
-                  <a  onclick="return confirm('Usunąć {{meal.0}} i wszystkie składniki?')" href="{% url 'meals:delete_meal' meal.0.id  %}" class="btn btn-danger btn-block">Usuń {{meal.0.name}}</a>
+                  <a onclick="return confirm('Usunąć {{meal.0}} i wszystkie składniki?')"
+                     href="{% url 'meals:delete_meal' meal.0.id  %}" class="btn btn-danger btn-block">Usuń
+                    {{meal.0.name}}</a>
                 </form>
               </li>
             </ul>
@@ -116,7 +134,10 @@
             <ul class="list-group list-group-flush">
               <li class="list-group-item p-0">
                 <form action="{% url 'meals:add_recipe' meal.0.id %}" method="post"> {% csrf_token %}
-                  <textarea name="update_recipe_textarea" id="update_recipe_textarea" class="form-control" placeholder="{% if not meal.0.recipe %}Wprowadź przepis...{% endif %}" rows="{{recipe_rows}}" readonly>{% if meal.0.recipe %}{{meal.0.recipe}}{% endif %}</textarea>
+                  <textarea name="update_recipe_textarea" id="update_recipe_textarea" class="form-control"
+                            placeholder="{% if not meal.0.recipe %}Wprowadź przepis...{% endif %}"
+                            rows="{{recipe_rows}}"
+                            readonly>{% if meal.0.recipe %}{{meal.0.recipe}}{% endif %}</textarea>
                   <button id="allow_update_recipe" type="button" class="btn btn-block btn-secondary">Edytuj</button>
                   <button id="update_recipe" type="submit" class="btn btn-block btn-success mt-0 d-none">Zapisz</button>
                 </form>

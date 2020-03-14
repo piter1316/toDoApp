@@ -17,7 +17,14 @@ class Meal(models.Model):
     name = models.TextField(max_length=100)
     recipe = models.TextField(null=True, blank=True)
     special = models.BooleanField(default=False)
-    calories = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return self.name
+
+
+class Shop(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+    name = models.TextField(max_length=100)
 
     def __str__(self):
         return self.name
@@ -31,15 +38,23 @@ class Unit(models.Model):
 
 
 class Ingredient(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
-    meal_id = models.ForeignKey(Meal, on_delete=models.CASCADE, default=1)
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, default=1)
     name = models.TextField(max_length=50)
-    shop = models.TextField(max_length=50)
-    quantity = models.FloatField(default=1)
-    unit = models.ForeignKey(Unit, default=1, on_delete=models.DO_NOTHING)
+    calories_per_100_gram = models.PositiveIntegerField(default=0)
+    weight_per_unit = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.name
+
+
+class MealIngredient(models.Model):
+    meal_id = models.ForeignKey(Meal, on_delete=models.CASCADE)
+    ingredient_id = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
+    quantity = models.FloatField(default=1)
+    shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.ingredient_id.name
 
 
 class MealsList(models.Model):

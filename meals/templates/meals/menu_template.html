@@ -1,6 +1,7 @@
 
   <div class="menu_ul nav" id="menu_ul">
     <a class=" nav-item btn btn-outline-secondary btn-block mb-3" href="{% url 'meals:edit_meals' %}">Posiłki</a>
+    <a class=" nav-item btn btn-outline-secondary btn-block mb-3" href="{% url 'meals:edit_ingredients' %}">Składniki</a>
     {% if in_meals_list %}
     <button type="button" class="btn btn-outline-info btn-block" data-toggle="modal" data-target="#newMealsListModal">
       Generuj nowy jadłospis

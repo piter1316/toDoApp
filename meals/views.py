@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 
 from meals.forms import MealForm, IngredientForm, MealOptionForm
-from meals.models import MealOption, Meal, Ingredient, MealsList, Week, Unit
+from meals.models import MealOption, Meal, Ingredient, MealsList, Week, Unit, MealIngredient, Shop
 from shopping.models import ShoppingList, Products
 
 
@@ -108,13 +108,13 @@ def meals(request):
             days.append(item.day)
 
     for day in days:
-        meals_on_day = MealsList.objects.select_related('meal').filter(user=request.user, day=day).order_by('meal_option__position')
+        meals_on_day = MealsList.objects.select_related('meal').filter(user=request.user, day=day).order_by(
+            'meal_option__position')
         kcal = 0
         day_meals_list = []
         for meal in meals_on_day:
             one_meal = Meal.objects.filter(id=meal.meal_id)
-            for i in one_meal:
-                kcal += i.calories
+
             all_meals = Meal.objects.filter(user=request.user, meal_option_id=meal.meal_option.id).order_by('name')
 
             day_meals_list.append({meal: all_meals})
@@ -187,8 +187,8 @@ def add_meal(request, meal_option_id):
     else:
         special = False
     if form.is_valid():
-        new_meal = Meal(name=request.POST['name'].lower(), user=request.user, meal_option=meal_option, special=special,
-                        calories=request.POST['calories'])
+        new_meal = Meal(name=request.POST['name'].lower(), user=request.user, meal_option=meal_option,
+                        special=special, )
         new_meal.save()
     return redirect('meals:edit_meals')
 
@@ -293,7 +293,9 @@ def delete_meal_option(request, meal_option_id):
 
 def edit_meal_ingredients(request, meal_id):
     meal = Meal.objects.filter(user_id=request.user, pk=meal_id)
-    ingredients = Ingredient.objects.filter(user=request.user, meal_id=meal_id)
+    ingredients = MealIngredient.objects.select_related('ingredient_id').filter(meal_id=meal_id)
+    user_ingredients = Ingredient.objects.filter(user=request.user).order_by('name')
+    user_shops = Shop.objects.filter(user=request.user)
     units = Unit.objects.all()
     if meal[0].recipe:
         recipe_rows = len(meal[0].recipe.split('\n'))
@@ -304,20 +306,23 @@ def edit_meal_ingredients(request, meal_id):
         'meal': meal,
         'ingredients': ingredients,
         'units': units,
-        'recipe_rows': recipe_rows
+        'recipe_rows': recipe_rows,
+        'user_ingredients': user_ingredients,
+        'user_shops': user_shops,
     }
     return render(request, 'meals/meal_edit.html', context)
 
 
 def add_ingredient(request, meal_id):
     meal = get_object_or_404(Meal, pk=meal_id)
-    ingredient = request.POST['ingredient'].lower()
+    ingredient = request.POST['ingredient']
     quantity = request.POST['quantity']
-    unit = request.POST['unit']
     shop = request.POST['shop'].upper()
+    shop_instance = get_object_or_404(Shop, pk=shop)
+    ingredient_instance = get_object_or_404(Ingredient, pk=ingredient)
 
-    new_ingredient = Ingredient(user=request.user, meal_id=meal, name=ingredient, quantity=quantity,
-                                shop=shop, unit_id=unit)
+    new_ingredient = MealIngredient(meal_id=meal, ingredient_id=ingredient_instance, quantity=quantity,
+                                    shop=shop_instance)
     new_ingredient.save()
     return redirect('meals:edit_meal_ingredients', meal_id=meal_id)
 
@@ -363,10 +368,9 @@ def update_meal_option(request, meal_option_id):
 def update_meal_name(request, meal_id):
     new_meal_name = request.POST['new_meal_name']
     edit_special = request.POST.get('edit_special', False)
-    edit_calories = request.POST['edit_calories']
     if edit_special == 'on':
         edit_special = True
-    Meal.objects.filter(pk=meal_id).update(name=new_meal_name, special=edit_special, calories=edit_calories)
+    Meal.objects.filter(pk=meal_id).update(name=new_meal_name, special=edit_special)
     return redirect('meals:edit_meal_ingredients', meal_id=meal_id)
 
 
@@ -424,3 +428,14 @@ def delete_selected_days(request):
     for item in meals_list_positions_to_delete_list:
         MealsList.objects.filter(user=request.user, pk=item).delete()
     return redirect('meals:index')
+
+
+def edit_ingredients(request):
+    user_ingredients = Ingredient.objects.filter(user=request.user)
+    user_shops = Shop.objects.filter(user=request.user)
+
+    context = {
+        'user_ingredients': user_ingredients,
+        'user_shops': user_shops
+    }
+    return render(request, 'meals/ingredients_edit.html', context)

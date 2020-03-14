@@ -8,10 +8,6 @@ class MealForm(forms.Form):
                'aria-describedby': 'add-btn',
                'required': 'True'}))
     special = forms.BooleanField(required=False)
-    calories = forms.IntegerField(min_value=0, widget=forms.NumberInput(
-        attrs={'class': 'form-control mb-2',
-               'placeholder': 'Kalorie', 'aria-label': 'shoppingList',
-               'aria-describedby': 'add-btn'}))
 
 
 class IngredientForm(forms.Form):

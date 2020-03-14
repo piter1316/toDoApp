@@ -57,9 +57,7 @@ def home(request):
         meal_options = MealsList.objects.filter(user=request.user).values('meal_option_id').distinct()
         meals = MealsList.objects.select_related('meal').filter(user=request.user)
         calories_total = 0
-        for meal in meals:
-            if len(str(meal)) > 0:
-                calories_total += meal.meal.calories
+
         try:
             meals_list_length = int(len(all_meals) / len(meal_options))
             average_clories_per_day = int(calories_total/meals_list_length)
