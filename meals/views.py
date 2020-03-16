@@ -382,7 +382,7 @@ def update_meal_name(request, meal_id):
 
 def generate_shopping_lists(request):
     meals = MealsList.objects.filter(user=request.user)
-    shops = []
+    shops = Shop.objects.filter(user_id=request.user)
     ingredients_list = []
     ingr_qt_dict = {}
     shopping_lists = []
@@ -397,33 +397,42 @@ def generate_shopping_lists(request):
     for meal in meals:
         if meal.meal_id:
             meal_instance = get_object_or_404(Meal, pk=meal.meal_id)
-            for ingredient in Ingredient.objects.filter(meal_id=meal_instance):
+            for ingredient in MealIngredient.objects.filter(meal_id=meal_instance):
                 ingredients_list.append(ingredient)
-                while ingredient.shop not in shops:
-                    shops.append(ingredient.shop)
+
+
+    for ingredient in ingredients_list:
+        print(ingredient.ingredient_id_id)
+        ingredient_object = get_object_or_404(Ingredient, pk=ingredient.ingredient_id_id)
+        print(ingredient_object.shop_id)
+
     for shop in shops:
         for ingredient in ingredients_list:
-            if shop == ingredient.shop:
-                if ingredient.name in ingr_qt_dict.keys():
-                    qt = ingr_qt_dict[ingredient.name][0]
+            ingredient_object = get_object_or_404(Ingredient, pk=ingredient.ingredient_id_id)
+            weight_per_unit = ingredient_object.weight_per_unit
+            shop_id = ingredient_object.shop_id
+            print(ingredient, weight_per_unit)
+            if shop.id == shop_id:
+                if ingredient in ingr_qt_dict.keys():
+                    qt = ingr_qt_dict[ingredient][0]
                     qt += ingredient.quantity
-                    ingr_qt_dict[ingredient.name] = [qt, ingredient.unit]
+                    ingr_qt_dict[ingredient] = [qt]
                 else:
-                    ingr_qt_dict[ingredient.name] = [ingredient.quantity, ingredient.unit]
+                    ingr_qt_dict[ingredient] = [ingredient.quantity]
         for ingr, qt in ingr_qt_dict.items():
             ingr_qt_dict[ingr][0] = qt[0] * how_many_people
         shopping_lists.append({shop: ingr_qt_dict})
         ingr_qt_dict = {}
+
     for item in shopping_lists:
         shop = list(item.keys())[0]
         new_shopping_list = ShoppingList(user_id=request.user, name=shop, generated=1)
         new_shopping_list.save()
         for shop, shoping_list_items in item.items():
             for shopping_item, qt in shoping_list_items.items():
-                unit_id = int(qt[1].id)
                 new_list_position = Products(product_name=shopping_item, quantity=qt[0],
                                              shopping_list_id_id=new_shopping_list.id,
-                                             unit_id=unit_id)
+                                             unit_id=2)
                 new_list_position.save()
     return redirect('shopping:shopping_list_index')
 
