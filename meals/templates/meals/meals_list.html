@@ -54,8 +54,8 @@
                     <input type="hidden" name="meal_id" value="{{ch_meal.meal_id}}">
                     <select class="form-control" name="to_update" onChange="form.submit();">
                       <option value="">BRAK POSIŁKU</option>
-                      {% for m in all %}
-                        <option {% if ch_meal.meal_id == m.id %}selected="true"{% endif %} value="{{m.id}}">{{m}} | {{m.calories}} kcal{% if m.special %} ** {% endif %} </option>
+                      {% for m in all.0 %}
+                        <option {% if ch_meal.meal_id == m.id %}selected="true"{% endif %} value="{{m.id}}">{{m}} | {{all.1}} kcal{% if m.special %} ** {% endif %} </option>
                       {% endfor %}
                     </select>
                   </form>

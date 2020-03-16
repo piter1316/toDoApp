@@ -107,19 +107,31 @@ def meals(request):
         while item.day not in days:
             days.append(item.day)
 
+    day_calories = []
     for day in days:
         meals_on_day = MealsList.objects.select_related('meal').filter(user=request.user, day=day).order_by(
             'meal_option__position')
         kcal = 0
         day_meals_list = []
+        meals = []
+        meal_ingredients = []
         for meal in meals_on_day:
-            one_meal = Meal.objects.filter(id=meal.meal_id)
-
+            one_meal = get_object_or_404(Meal, id=meal.meal_id)
             all_meals = Meal.objects.filter(user=request.user, meal_option_id=meal.meal_option.id).order_by('name')
+            ingredients = MealIngredient.objects.select_related('ingredient_id').filter(meal_id=one_meal.id)
+            calories = 0
 
-            day_meals_list.append({meal: all_meals})
+            for ingr in ingredients:
+                ingr_obj = get_object_or_404(Ingredient, pk=ingr.ingredient_id.id)
+                calories += (ingr.quantity) / 100 * int(ingr_obj.calories_per_100_gram)
+                meal_ingredients.append(calories)
 
-        day_meal_option_meal_list.append([{day: day_meals_list}, kcal])
+            meals.append(one_meal)
+            day_meals_list.append({meal: [all_meals, calories]})
+        day_calories.append({day:sum(meal_ingredients)})
+
+        day_meal_option_meal_list.append([{day: day_meals_list}, sum(meal_ingredients)])
+    print(day_calories)
 
     maximum_no_of_days_to_generate = get_maximum_no_of_days(request)
     maximum_no_of_days_to_generate_no_repeat = get_maximum_no_of_days_no_repeat(request)
@@ -132,6 +144,7 @@ def meals(request):
         meals_in_option = Meal.objects.filter(meal_option=option['meal_option_id'], user=request.user)
         meal_option = get_object_or_404(MealOption, pk=option['meal_option_id'], user=request.user)
         for meal in meals_in_option:
+
             option_meals_list.append(meal)
         option_meals_dict[meal_option] = option_meals_list
 
