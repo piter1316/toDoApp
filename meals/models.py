@@ -42,6 +42,7 @@ class Ingredient(models.Model):
     name = models.TextField(max_length=50)
     calories_per_100_gram = models.PositiveIntegerField(default=0)
     weight_per_unit = models.PositiveIntegerField(default=0)
+    shop = models.ForeignKey(Shop, on_delete=models.CASCADE, default=1)
 
     def __str__(self):
         return self.name
@@ -51,7 +52,7 @@ class MealIngredient(models.Model):
     meal_id = models.ForeignKey(Meal, on_delete=models.CASCADE)
     ingredient_id = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
     quantity = models.FloatField(default=1)
-    shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
+
 
     def __str__(self):
         return self.ingredient_id.name

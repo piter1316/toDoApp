@@ -317,12 +317,16 @@ def add_ingredient(request, meal_id):
     meal = get_object_or_404(Meal, pk=meal_id)
     ingredient = request.POST['ingredient']
     quantity = request.POST['quantity']
-    shop = request.POST['shop'].upper()
-    shop_instance = get_object_or_404(Shop, pk=shop)
+    unit = request.POST['unit']
     ingredient_instance = get_object_or_404(Ingredient, pk=ingredient)
+    quantity_per_unit = ingredient_instance.weight_per_unit
 
-    new_ingredient = MealIngredient(meal_id=meal, ingredient_id=ingredient_instance, quantity=quantity,
-                                    shop=shop_instance)
+    if unit != '2':
+        print('unit', unit, type(unit))
+        print('quantity', type(quantity))
+        quantity = int(quantity) * int(quantity_per_unit)
+
+    new_ingredient = MealIngredient(meal_id=meal, ingredient_id=ingredient_instance, quantity=quantity)
     new_ingredient.save()
     return redirect('meals:edit_meal_ingredients', meal_id=meal_id)
 
@@ -334,18 +338,20 @@ def add_recipe(request, meal_id):
 
 
 def update_ingredient(request, ingredient_id, meal_id):
-    new_ingredient_name = request.POST['new_ingredient_name'].lower()
     new_quantity = request.POST['new_quantity']
     new_unit = request.POST['new_unit']
-    new_shop = request.POST['new_shop'].upper()
+    MealIngredient_instance = get_object_or_404(MealIngredient, pk=ingredient_id)
+    ingredient_instance = get_object_or_404(Ingredient, pk=MealIngredient_instance.ingredient_id_id)
+    quantity_per_unit = ingredient_instance.weight_per_unit
+    if new_unit != '2':
+        new_quantity = int(new_quantity) * int(quantity_per_unit)
 
-    Ingredient.objects.filter(pk=ingredient_id).update(name=new_ingredient_name, quantity=new_quantity, unit=new_unit,
-                                                       shop=new_shop)
+    MealIngredient.objects.filter(pk=ingredient_id).update(quantity=new_quantity)
     return redirect('meals:edit_meal_ingredients', meal_id=meal_id)
 
 
 def delete_ingredient(request, meal_id, ingredient_id):
-    Ingredient.objects.filter(pk=ingredient_id).delete()
+    MealIngredient.objects.filter(pk=ingredient_id).delete()
     return redirect('meals:edit_meal_ingredients', meal_id=meal_id)
 
 
