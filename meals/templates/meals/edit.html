@@ -66,10 +66,10 @@
           </li>
           </li>
           {% for meal in meals %}
-          <a href="{% url 'meals:edit_meal_ingredients' meal.id  %}" >
+          <a href="{% url 'meals:edit_meal_ingredients' meal.0.id  %}" >
             <li class="list-group-item p-1 d-flex justify-content-between">
-              <span class="text-left">{{meal}}{% if meal.special %} ** {% endif %}</span>
-              <span class="ml-1"><span class="badge badge-dark badge-pill">{{meal.calories}} <small>kcal</small></span></span>
+              <span class="text-left">{{meal.0}}{% if meal.0.special %} ** {% endif %}</span>
+              <span class="ml-1"><span class="badge badge-dark badge-pill">{{meal.1}} <small>kcal</small></span></span>
             </li>
           </a>
           {% endfor %}

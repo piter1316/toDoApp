@@ -11,13 +11,11 @@
           <div class="card shadow  p-0" style="">
             <div class="card-header text-center">
               <p id="option_name" class="lead mb-0" style="cursor:pointer;" title="Kliknj i edtyuj">
-                {{meal.0.name|upper}} {%if meal.0.special%} **{% endif %} | <small>{{meal.0.calories}} kcal</small></p>
+                {{meal.0.name|upper}} {%if meal.0.special%} **{% endif %} | <small>{{calories}} kcal</small></p>
               <form id="new_meal_option_name" style="display:none;"
                     action="{% url 'meals:update_meal_name' meal.0.id %}" method="post">{% csrf_token %}
                 <div class="input-group">
                   <input class="form-control" name="new_meal_name" type="text" value="{{meal.0.name}}">
-                  <input class="form-control " name="edit_calories" id="edit_calories" type="number" min="0"
-                         value="{{meal.0.calories}}">
                 </div>
                 <label class="my-2" for="edit_special"><input class="" type="checkbox" name="edit_special"
                                                               id="edit_special" {%if meal.0.special%}checked{% endif %}>Danie
