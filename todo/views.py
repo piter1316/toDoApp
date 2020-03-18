@@ -2,10 +2,10 @@ from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 
-from meals.models import MealsList
+from meals.models import MealsList, MealIngredient, Meal, Ingredient
 from shopping.models import ShoppingList, Products
 from .forms import TodoForm
 from .models import Todo
@@ -57,6 +57,19 @@ def home(request):
         meal_options = MealsList.objects.filter(user=request.user).values('meal_option_id').distinct()
         meals = MealsList.objects.select_related('meal').filter(user=request.user)
         calories_total = 0
+        calories = 0
+        for meal in meals:
+            try:
+                one_meal = Meal.objects.get(id=meal.meal_id)
+            except Exception:
+                one_meal = None
+            ingredients = MealIngredient.objects.select_related('ingredient_id').filter(meal_id=one_meal)
+            for ingr in ingredients:
+                ingr_obj = get_object_or_404(Ingredient, pk=ingr.ingredient_id.id)
+                calories += (ingr.quantity / 100) * int(ingr_obj.calories_per_100_gram)
+                calories_total += calories
+                calories = 0
+        print('------', calories_total)
 
         try:
             meals_list_length = int(len(all_meals) / len(meal_options))
@@ -74,6 +87,7 @@ def home(request):
             if meal.meal:
                 if meal.meal.name not in distinct_meals:
                     distinct_meals.append(meal.meal.name)
+
 
         context = {
             'all_to_do_count': len(all_to_do_count),
