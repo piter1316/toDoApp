@@ -445,15 +445,20 @@ def generate_shopping_lists(request):
             weight_per_unit = ingredient_object.weight_per_unit
             shop_id = ingredient_object.shop_id
             if shop.id == shop_id:
-                print(ingredient_object, ingr_qt_dict.keys())
+
                 if ingredient_object in ingr_qt_dict.keys():
                     qt = ingr_qt_dict[ingredient_object][0]
                     qt += ingredient.quantity
-                    ingr_qt_dict[ingredient_object] = [qt]
+                    ingr_qt_dict[ingredient_object] = [qt,ingredient_object.weight_per_unit]
                 else:
-                    ingr_qt_dict[ingredient_object] = [ingredient.quantity]
+                    ingr_qt_dict[ingredient_object] = [ingredient.quantity, ingredient_object.weight_per_unit]
         for ingr, qt in ingr_qt_dict.items():
-            ingr_qt_dict[ingr][0] = qt[0] * how_many_people
+            print(ingr, ingr.weight_per_unit)
+            wpu = ingr.weight_per_unit
+            if wpu == 0:
+                wpu =1
+            ingr_qt_dict[ingr][0] = round( (qt[0]/int(wpu)) * how_many_people,2)
+
         shopping_lists.append({shop: ingr_qt_dict})
         ingr_qt_dict = {}
 
@@ -463,9 +468,13 @@ def generate_shopping_lists(request):
         new_shopping_list.save()
         for shop, shoping_list_items in item.items():
             for shopping_item, qt in shoping_list_items.items():
+                if qt[1] != 0:
+                    unit = 1
+                else:
+                    unit = 2
                 new_list_position = Products(product_name=shopping_item, quantity=qt[0],
                                              shopping_list_id_id=new_shopping_list.id,
-                                             unit_id=2)
+                                             unit_id=unit)
                 new_list_position.save()
     return redirect('shopping:shopping_list_index')
 
