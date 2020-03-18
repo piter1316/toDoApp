@@ -116,22 +116,37 @@ def meals(request):
         meals = []
         meal_ingredients = []
         for meal in meals_on_day:
-            one_meal = get_object_or_404(Meal, id=meal.meal_id)
-            all_meals = Meal.objects.filter(user=request.user, meal_option_id=meal.meal_option.id).order_by('name')
-            ingredients = MealIngredient.objects.select_related('ingredient_id').filter(meal_id=one_meal.id)
+            try:
+                one_meal = Meal.objects.get(id=meal.meal_id)
+            except Exception:
+                one_meal = None
+            all_meals = Meal.objects.select_related().filter(user=request.user,
+                                                             meal_option_id=meal.meal_option.id).order_by('name')
+            all_meals_to_select = []
+            for meal_select in all_meals:
+                ingredients = MealIngredient.objects.select_related('ingredient_id').filter(meal_id=meal_select.id)
+                calories_select = 0
+                for ingr in ingredients:
+                    ingr_obj = get_object_or_404(Ingredient, pk=ingr.ingredient_id.id)
+                    calories_select += (ingr.quantity) / 100 * int(ingr_obj.calories_per_100_gram)
+
+                meal_to_select = [meal_select, calories_select]
+                all_meals_to_select.append(meal_to_select)
             calories = 0
+            if one_meal:
+                ingredients = MealIngredient.objects.select_related('ingredient_id').filter(meal_id=one_meal.id)
 
-            for ingr in ingredients:
-                ingr_obj = get_object_or_404(Ingredient, pk=ingr.ingredient_id.id)
-                calories += (ingr.quantity) / 100 * int(ingr_obj.calories_per_100_gram)
-                meal_ingredients.append(calories)
-
+                for ingr in ingredients:
+                    ingr_obj = get_object_or_404(Ingredient, pk=ingr.ingredient_id.id)
+                    calories += (ingr.quantity / 100) * int(ingr_obj.calories_per_100_gram)
+                    meal_ingredients.append(calories)
+                    calories = 0
+            else:
+                calories = 0
             meals.append(one_meal)
-            day_meals_list.append({meal: [all_meals, calories]})
-        day_calories.append({day:sum(meal_ingredients)})
-
+            day_meals_list.append({meal: all_meals_to_select})
+        day_calories.append({day: sum(meal_ingredients)})
         day_meal_option_meal_list.append([{day: day_meals_list}, sum(meal_ingredients)])
-    print(day_calories)
 
     maximum_no_of_days_to_generate = get_maximum_no_of_days(request)
     maximum_no_of_days_to_generate_no_repeat = get_maximum_no_of_days_no_repeat(request)
@@ -144,7 +159,6 @@ def meals(request):
         meals_in_option = Meal.objects.filter(meal_option=option['meal_option_id'], user=request.user)
         meal_option = get_object_or_404(MealOption, pk=option['meal_option_id'], user=request.user)
         for meal in meals_in_option:
-
             option_meals_list.append(meal)
         option_meals_dict[meal_option] = option_meals_list
 
