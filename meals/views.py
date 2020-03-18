@@ -418,6 +418,8 @@ def update_meal_name(request, meal_id):
 def generate_shopping_lists(request):
     meals = MealsList.objects.filter(user=request.user)
     shops = Shop.objects.filter(user_id=request.user)
+    shops = list(shops)
+    shops.append(None)
     ingredients_list = []
     ingr_qt_dict = {}
     shopping_lists = []
@@ -441,29 +443,34 @@ def generate_shopping_lists(request):
     for shop in shops:
         for ingredient in ingredients_list:
             ingredient_object = get_object_or_404(Ingredient, pk=ingredient.ingredient_id_id)
-
-            weight_per_unit = ingredient_object.weight_per_unit
             shop_id = ingredient_object.shop_id
-            if shop.id == shop_id:
-
+            try:
+                id = shop.id
+            except Exception:
+                id =None
+            if id == shop_id:
                 if ingredient_object in ingr_qt_dict.keys():
                     qt = ingr_qt_dict[ingredient_object][0]
                     qt += ingredient.quantity
                     ingr_qt_dict[ingredient_object] = [qt,ingredient_object.weight_per_unit]
                 else:
                     ingr_qt_dict[ingredient_object] = [ingredient.quantity, ingredient_object.weight_per_unit]
+
         for ingr, qt in ingr_qt_dict.items():
             print(ingr, ingr.weight_per_unit)
             wpu = ingr.weight_per_unit
             if wpu == 0:
                 wpu =1
             ingr_qt_dict[ingr][0] = round( (qt[0]/int(wpu)) * how_many_people,2)
-
-        shopping_lists.append({shop: ingr_qt_dict})
+        if len(ingr_qt_dict) > 0:
+            shopping_lists.append({shop: ingr_qt_dict})
         ingr_qt_dict = {}
+
 
     for item in shopping_lists:
         shop = list(item.keys())[0]
+        if shop is None:
+            shop = 'NIEPRZYPISANY'
         new_shopping_list = ShoppingList(user_id=request.user, name=shop, generated=1)
         new_shopping_list.save()
         for shop, shoping_list_items in item.items():
@@ -487,11 +494,28 @@ def delete_selected_days(request):
 
 
 def edit_ingredients(request):
-    user_ingredients = Ingredient.objects.filter(user=request.user)
-    user_shops = Shop.objects.filter(user=request.user)
+    user_ingredients = Ingredient.objects.filter(user=request.user).order_by('name')
+    user_shops = Shop.objects.filter(user=request.user.id)
 
     context = {
         'user_ingredients': user_ingredients,
         'user_shops': user_shops
     }
     return render(request, 'meals/ingredients_edit.html', context)
+
+
+def add_shop(request):
+    print('addshop')
+    new_shop_name = request.POST['new_shop_name']
+    new_shop_name = new_shop_name.upper()
+    new_shop = Shop(name=new_shop_name, user=request.user)
+    new_shop.save()
+
+    return redirect('meals:edit_ingredients')
+
+
+def delete_shop(request, shop_id):
+    Shop.objects.filter(pk=shop_id).delete()
+
+
+    return redirect('meals:edit_ingredients')

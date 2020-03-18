@@ -76,7 +76,7 @@
                   <small>Nowy składnik:</small>
                   <div class="form-row mb-2">
                     <select class="form-control" name="ingredient">
-                      <option>DODAJ...</option>
+
                       {% for ingredient in user_ingredients %}
                       <option value="{{ingredient.id}}">{{ingredient}} | {{ingredient.calories_per_100_gram}} kcal/100g</option>
                       {% endfor %}
@@ -90,7 +90,7 @@
                         <span class="" id="addon-quantity">
                           <select class="form-control" name="unit">
                             {% for unit in units %}
-                            <option value="{{unit.id}}">{{unit}}</option>
+                            <option value="{{unit.id}}" {% if unit.id == 2%} selected {% endif %}>{{unit}}</option>
                             {% endfor %}
                           </select>
                         </span>

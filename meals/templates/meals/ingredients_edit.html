@@ -4,13 +4,75 @@
 <div class="container">
   <div class="row">
     <div class="col-12 col-md-4 col-xl-2">
-      {{user_shops}}
+      <table class="table table-light table-striped table-hover">
+        <thead class="thead-dark text-center">
+        <tr>
+          <th class="d-flex justify-content-between align-items-center">
+            <span>SKLEPY</span>
+            <button class="btn btn-sm btn-outline-light" data-toggle="modal" data-target="#addShopModal"><i class="fas fa-plus"></i></button>
+          </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for shop in user_shops %}
+        <tr>
+          <td class="d-flex justify-content-between align-items-center">
+            <span>{{shop}}</span>
+            <a onclick="return confirm('Usunąć sklep oraz i przypisanie do składników?')" href="{% url 'meals:delete_shop' shop.id %}" class="fas fa-minus-circle text-secondary"></a>
+          </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+      </table>
     </div>
     <div class="col-12 col-md-8 col-xl-10 ">
-      {{user_ingredients}}
+      <div style="overflow-y:scroll; height:80vh;">
+        <table class="table table-light table-striped table-hover table-fixed ">
+          <thead class="thead-dark text-center">
+          <tr>
+            <th>Składnik</th>
+            <th>kcal/100g</th>
+            <th>Średnia sztuka/opakowanie</th>
+            <th>Sklep</th>
+          </tr>
+          </thead>
+          <tbody class="table-sm">
+          {% for ingredient in user_ingredients %}
+          <tr>
+            <td>{{ingredient}}</td>
+            <td class="text-center">{{ingredient.calories_per_100_gram}}</td>
+            <td class="text-center">{{ingredient.weight_per_unit}}</td>
+            <td class="text-center">{{ingredient.shop}}</td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
 
+<div class="modal fade" id="addShopModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <form method="post" action="{% url 'meals:add_shop' %}">{%csrf_token%}
+        <div class="modal-header">
+          <h5 class="modal-title">Nowy Sklep</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input required type="text" name="new_shop_name" class="form-control" placeholder="Nazwa sklepu">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
+          <button type="submit" class="btn btn-primary">Dodaj</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
 {% endblock %}
