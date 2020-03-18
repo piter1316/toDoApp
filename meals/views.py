@@ -441,15 +441,17 @@ def generate_shopping_lists(request):
     for shop in shops:
         for ingredient in ingredients_list:
             ingredient_object = get_object_or_404(Ingredient, pk=ingredient.ingredient_id_id)
+
             weight_per_unit = ingredient_object.weight_per_unit
             shop_id = ingredient_object.shop_id
             if shop.id == shop_id:
-                if ingredient in ingr_qt_dict.keys():
-                    qt = ingr_qt_dict[ingredient][0]
+                print(ingredient_object, ingr_qt_dict.keys())
+                if ingredient_object in ingr_qt_dict.keys():
+                    qt = ingr_qt_dict[ingredient_object][0]
                     qt += ingredient.quantity
-                    ingr_qt_dict[ingredient] = [qt]
+                    ingr_qt_dict[ingredient_object] = [qt]
                 else:
-                    ingr_qt_dict[ingredient] = [ingredient.quantity]
+                    ingr_qt_dict[ingredient_object] = [ingredient.quantity]
         for ingr, qt in ingr_qt_dict.items():
             ingr_qt_dict[ingr][0] = qt[0] * how_many_people
         shopping_lists.append({shop: ingr_qt_dict})
