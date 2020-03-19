@@ -496,10 +496,11 @@ def delete_selected_days(request):
 def edit_ingredients(request):
     user_ingredients = Ingredient.objects.filter(user=request.user).order_by('name')
     user_shops = Shop.objects.filter(user=request.user.id)
-
+    form = IngredientForm()
     context = {
         'user_ingredients': user_ingredients,
-        'user_shops': user_shops
+        'user_shops': user_shops,
+        'form': form
     }
     return render(request, 'meals/ingredients_edit.html', context)
 
@@ -516,6 +517,57 @@ def add_shop(request):
 
 def delete_shop(request, shop_id):
     Shop.objects.filter(pk=shop_id).delete()
+    return redirect('meals:edit_ingredients')
+
+
+def new_ingredient(request):
+    new_ingredient_name = request.POST['ingr_name']
+    kcal = request.POST.get('kcal', False)
+    avg_unit = request.POST.get('avg_unit', False)
+    shop_select = request.POST.get('shop', False)
+
+    if not kcal:
+        kcal = 0
+    if not avg_unit:
+        avg_unit =0
+    if shop_select == 'None':
+        shop = None
+    else:
+        shop = Shop.objects.get(pk=shop_select)
+    new_ingredient = Ingredient(user=request.user, name=new_ingredient_name, calories_per_100_gram=kcal,
+                                weight_per_unit=avg_unit, shop=shop)
+    new_ingredient.save()
+
+    return redirect('meals:edit_ingredients')
+
+
+def delete_ingr(request, ingr_id):
+    Ingredient.objects.filter(pk=ingr_id, user_id=request.user).delete()
+    print(ingr_id)
+    return redirect('meals:edit_ingredients')
+
+
+def edit_ingredient(request, ingr_id):
+    new_ingredient_name = request.POST['ingr_name']
+    kcal = request.POST.get('kcal', False)
+    avg_unit = request.POST.get('avg_unit', False)
+    shop_select = request.POST.get('shop', False)
+
+    if not kcal:
+        kcal = 0
+    if not avg_unit:
+        avg_unit = 0
+    if shop_select == 'None':
+        shop = None
+    else:
+        shop = Shop.objects.get(pk=shop_select)
+
+    edited_ingredient = Ingredient.objects.get(pk=ingr_id)
+    edited_ingredient.name = new_ingredient_name
+    edited_ingredient.calories_per_100_gram = kcal
+    edited_ingredient.weight_per_unit = avg_unit
+    edited_ingredient.shop = shop
+    edited_ingredient.save()
 
 
     return redirect('meals:edit_ingredients')

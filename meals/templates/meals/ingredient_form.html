@@ -1,0 +1,27 @@
+<div class="form-row">
+  <div class="col">
+    <input type="text" class="form-control mb-1" name="ingr_name" required>
+  </div>
+</div>
+<div class="form-row">
+  <div class="col">
+    kcal / 100g
+    <input type="number" class="form-control" name="kcal" min="1" step="1" >
+  </div>
+  <div class="col">
+    Średnia sztuka / opakowanie :
+    <input type="number" class="form-control" name="avg_unit" placeholder="opcjonalnie">
+  </div>
+</div>
+
+<div class="form-row">
+  <div class="col">
+    Sklep:
+    <select class="form-control" name="shop">
+      <option value="None">Nieprzypisany</option>
+      {% for shop in user_shops %}
+      <option value="{{shop.id}}">{{shop}}</option>
+      {% endfor %}
+    </select>
+  </div>
+</div>

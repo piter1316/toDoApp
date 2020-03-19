@@ -1,7 +1,7 @@
 {% extends 'todo/base.html' %}
 {% block body %}
 
-<div class="container">
+<div class="container mt-2">
   <div class="row">
     <div class="col-12 col-md-4 col-xl-2">
       <table class="table table-light table-striped table-hover">
@@ -9,7 +9,8 @@
         <tr>
           <th class="d-flex justify-content-between align-items-center">
             <span>SKLEPY</span>
-            <button class="btn btn-sm btn-outline-light" data-toggle="modal" data-target="#addShopModal"><i class="fas fa-plus"></i></button>
+            <button class="btn btn-sm btn-outline-light" data-toggle="modal" data-target="#addShopModal"><i
+                class="fas fa-plus"></i></button>
           </th>
         </tr>
         </thead>
@@ -18,7 +19,8 @@
         <tr>
           <td class="d-flex justify-content-between align-items-center">
             <span>{{shop}}</span>
-            <a onclick="return confirm('Usunąć sklep oraz i przypisanie do składników?')" href="{% url 'meals:delete_shop' shop.id %}" class="fas fa-minus-circle text-secondary"></a>
+            <a onclick="return confirm('Usunąć sklep oraz i przypisanie do składników?')"
+               href="{% url 'meals:delete_shop' shop.id %}" class="fas fa-minus-circle text-secondary"></a>
           </td>
         </tr>
         {% endfor %}
@@ -30,20 +32,32 @@
         <table class="table table-light table-striped table-hover table-fixed ">
           <thead class="thead-dark text-center">
           <tr>
-            <th>Składnik</th>
-            <th>kcal/100g</th>
-            <th>Średnia sztuka/opakowanie</th>
-            <th>Sklep</th>
+            <th class="px-0">
+              <button class="btn btn-sm btn-outline-light" data-toggle="modal" data-target="#addIngredientModal"><i
+                  class="fas fa-plus"></i></button>
+            </th>
+            <th class="align-items-center px-0">
+              <span class="">Składnik</span>
+            </th>
+            <th class="px-0">kcal / 100g</th>
+            <th class="px-0">Średnia szt. / opak.</th>
+            <th class="px-0">Sklep</th>
           </tr>
           </thead>
           <tbody class="table-sm">
           {% for ingredient in user_ingredients %}
           <tr>
+            <td class="px-0 text-center">
+              <i class="fas fa-edit" data-toggle="modal" data-target="#editIngredientModal_{{ingredient.id}}"></i>
+              <a onclick="return confirm('Czy napewno usunąć składnik?')"
+                 href="{% url 'meals:delete_ingr' ingredient.id %}" class="fas fa-minus-circle text-secondary"></a>
+            </td>
             <td>{{ingredient}}</td>
-            <td class="text-center">{{ingredient.calories_per_100_gram}}</td>
-            <td class="text-center">{{ingredient.weight_per_unit}}</td>
-            <td class="text-center">{{ingredient.shop}}</td>
+            <td class="text-center px-0">{{ingredient.calories_per_100_gram}}</td>
+            <td class="text-center px-0">{{ingredient.weight_per_unit}}</td>
+            <td class="text-center px-0"><small>{{ingredient.shop}}</small></td>
           </tr>
+
           {% endfor %}
           </tbody>
         </table>
@@ -74,5 +88,79 @@
     </div>
   </div>
 </div>
+<div class="modal fade" id="addIngredientModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <form method="post" action="{% url 'meals:new_ingredient' %}">{%csrf_token%}
+        <div class="modal-header">
+          <h5 class="modal-title">Nowy Składnik</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          {% include 'meals/ingredient_form.html' %}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
+          <button type="submit" class="btn btn-primary">Dodaj</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% for ingredient in user_ingredients %}
+<div class="modal fade" id="editIngredientModal_{{ingredient.id}}" tabindex="-1" role="dialog"
+     aria-labelledby="exampleModalCenterTitle"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <form method="post" action="{% url 'meals:edit_ingredient' ingredient.id %}">{%csrf_token%}
+        <div class="modal-header">
+          <h5 class="modal-title">{{ingredient}}</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="col">
+              <input type="text" class="form-control mb-1" name="ingr_name" value="{{ingredient}}" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="col">
+              kcal / 100g
+              <input type="number" class="form-control" name="kcal" min="0" step="1" value="{{ingredient.calories_per_100_gram}}">
+            </div>
+            <div class="col">
+              Średnia sztuka / opakowanie :
+              <input type="number" class="form-control" name="avg_unit" value="{{ingredient.weight_per_100_gram}}">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="col">
+              Sklep:
+              <select class="form-control" name="shop">
+                <option value="None" {% if not ingredient.shop %} selected {% endif %}>Nieprzypisany</option>
+                {% for shop in user_shops %}
+                <option value="{{shop.id}}" {% if shop.id == ingredient.shop.id %} selected {% endif %}>
+                  {{shop}}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuluj</button>
+          <button type="submit" class="btn btn-primary">Zapisz</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endfor %}
 
 {% endblock %}
