@@ -1,6 +1,7 @@
 {% extends 'todo/base.html' %}
 
 {% load l10n %}
+{% load divide %}
 {% block body %}
 
 <div class="container-fluid py-2 mt-3">
@@ -20,7 +21,7 @@
                 <label class="my-2" for="edit_special"><input class="" type="checkbox" name="edit_special"
                                                               id="edit_special" {%if meal.0.special%}checked{% endif %}>Danie
                   specjalne</label>
-                <button class="btn btn-sm btn-success btn-block" type="submit">Zmień</button>
+                <button class="btn btn-sm btn-secondary btn-block" type="submit">Zmień</button>
               </form>
             </div>
             <ul class="list-group list-group-flush">
@@ -31,10 +32,12 @@
               <li class="list-group-item d-flex justify-content-between align-items-center py-1">
                 {{ingredient}}
                 <span>
-                  <span class="badge badge-primary badge-pill p-2">{{ingredient.quantity}} g</span>
-                  <span class="badge badge-primary badge-pill p-2"> {% widthratio ingredient.quantity ingredient.ingredient_id.weight_per_unit 1 %} szt</span>
-                  <span class="badge badge-primary badge-pill p-2">{{ingredient.ingredient_id.shop}}</span>
-                  <span class="badge badge-primary badge-pill dropdown-toggle" id="dropdownMenuButton"
+                  <span class="badge badge-secondary badge-pill p-2">{{ingredient.quantity}} g</span>
+                  {% if ingredient.quantity|divide:ingredient.ingredient_id.weight_per_unit > 0 %}
+                  <span class="badge badge-secondary badge-pill p-2"> {{ ingredient.quantity |divide:ingredient.ingredient_id.weight_per_unit }} szt</span>
+                  {% endif %}
+                  <span class="badge badge-secondary badge-pill p-2">{{ingredient.ingredient_id.shop}}</span>
+                  <span class="badge badge-secondary badge-pill dropdown-toggle" id="dropdownMenuButton"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <div class="dropdown-menu p-3" aria-labelledby="dropdownMenuButton">
                       <form class="form" action="{% url 'meals:update_ingredient' meal.0.id ingredient.id  %}"
@@ -56,7 +59,7 @@
                         </div>
                         <div class="form-group row mb-0">
                           <div class="col-12">
-                            <button class="btn btn-primary btn-block" type="submit">Zmień</button>
+                            <button class="btn btn-secondary btn-block" type="submit">Zmień</button>
                             <a href="{% url 'meals:delete_ingredient' meal.0.id  ingredient.id %}"
                                class="btn btn-danger btn-block">Usuń składnik</a>
                           </div>
@@ -99,15 +102,19 @@
                   </div>
                   <div class="form-row mb-2">
                     <div class="col">
-                      <button class="btn btn-success btn-block" type="submit"><i class="fas fa-plus"></i> Składnik
+                      <button class="btn btn-secondary btn-block" type="submit"><i class="fas fa-plus"></i> Składnik
                       </button>
                     </div>
                   </div>
+                  <a class="btn btn-outline-secondary btn-block" href="{% url 'meals:edit_ingredients' %}">Zarządzaj składnikami</a>
                   <div class="dropdown-divider"></div>
                   <a onclick="return confirm('Usunąć {{meal.0}} i wszystkie składniki?')"
                      href="{% url 'meals:delete_meal' meal.0.id  %}" class="btn btn-danger btn-block">Usuń
                     {{meal.0.name}}</a>
                 </form>
+              </li>
+              <li class="list-group-item">
+
               </li>
             </ul>
           </div>

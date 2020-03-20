@@ -130,7 +130,7 @@ def meals(request):
                     ingr_obj = get_object_or_404(Ingredient, pk=ingr.ingredient_id.id)
                     calories_select += (ingr.quantity) / 100 * int(ingr_obj.calories_per_100_gram)
 
-                meal_to_select = [meal_select, calories_select]
+                meal_to_select = [meal_select, round(calories_select, 0)]
                 all_meals_to_select.append(meal_to_select)
             calories = 0
             if one_meal:
@@ -139,14 +139,14 @@ def meals(request):
                 for ingr in ingredients:
                     ingr_obj = get_object_or_404(Ingredient, pk=ingr.ingredient_id.id)
                     calories += (ingr.quantity / 100) * int(ingr_obj.calories_per_100_gram)
-                    meal_ingredients.append(calories)
+                    meal_ingredients.append(round(calories,0))
                     calories = 0
             else:
                 calories = 0
             meals.append(one_meal)
             day_meals_list.append({meal: all_meals_to_select})
-        day_calories.append({day: sum(meal_ingredients)})
-        day_meal_option_meal_list.append([{day: day_meals_list}, sum(meal_ingredients)])
+        day_calories.append({day: round(sum(meal_ingredients), 0)})
+        day_meal_option_meal_list.append([{day: day_meals_list}, round(sum(meal_ingredients), 0)])
 
     maximum_no_of_days_to_generate = get_maximum_no_of_days(request)
     maximum_no_of_days_to_generate_no_repeat = get_maximum_no_of_days_no_repeat(request)
@@ -195,7 +195,7 @@ def edit_meals(request):
             for ingr in ingredients:
                 ingr_obj = get_object_or_404(Ingredient, pk=ingr.ingredient_id.id)
                 calories += (ingr.quantity) / 100 * int(ingr_obj.calories_per_100_gram)
-            meals.append([meal, calories])
+            meals.append([meal, round(calories)])
         meals_options_dict[meals_options[i]] = meals
 
     context = {
@@ -345,7 +345,7 @@ def edit_meal_ingredients(request, meal_id):
         'recipe_rows': recipe_rows,
         'user_ingredients': user_ingredients,
         'user_shops': user_shops,
-        'calories': round(calories, 0)
+        'calories': round(calories)
     }
     return render(request, 'meals/meal_edit.html', context)
 
@@ -359,7 +359,7 @@ def add_ingredient(request, meal_id):
     quantity_per_unit = ingredient_instance.weight_per_unit
 
     if unit != '2':
-        quantity = int(quantity) * int(quantity_per_unit)
+        quantity = float(quantity) * int(quantity_per_unit)
 
     new_ingredient = MealIngredient(meal_id=meal, ingredient_id=ingredient_instance, quantity=quantity)
     new_ingredient.save()
@@ -379,7 +379,7 @@ def update_ingredient(request, ingredient_id, meal_id):
     ingredient_instance = get_object_or_404(Ingredient, pk=MealIngredient_instance.ingredient_id_id)
     quantity_per_unit = ingredient_instance.weight_per_unit
     if new_unit != '2':
-        new_quantity = int(new_quantity) * int(quantity_per_unit)
+        new_quantity = float(new_quantity) * int(quantity_per_unit)
 
     MealIngredient.objects.filter(pk=ingredient_id).update(quantity=new_quantity)
     return redirect('meals:edit_meal_ingredients', meal_id=meal_id)
@@ -447,25 +447,23 @@ def generate_shopping_lists(request):
             try:
                 id = shop.id
             except Exception:
-                id =None
+                id = None
             if id == shop_id:
                 if ingredient_object in ingr_qt_dict.keys():
                     qt = ingr_qt_dict[ingredient_object][0]
                     qt += ingredient.quantity
-                    ingr_qt_dict[ingredient_object] = [qt,ingredient_object.weight_per_unit]
+                    ingr_qt_dict[ingredient_object] = [qt, ingredient_object.weight_per_unit]
                 else:
                     ingr_qt_dict[ingredient_object] = [ingredient.quantity, ingredient_object.weight_per_unit]
 
         for ingr, qt in ingr_qt_dict.items():
-            print(ingr, ingr.weight_per_unit)
             wpu = ingr.weight_per_unit
             if wpu == 0:
-                wpu =1
-            ingr_qt_dict[ingr][0] = round( (qt[0]/int(wpu)) * how_many_people,2)
+                wpu = 1
+            ingr_qt_dict[ingr][0] = round((qt[0] / int(wpu)) * how_many_people, 2)
         if len(ingr_qt_dict) > 0:
             shopping_lists.append({shop: ingr_qt_dict})
         ingr_qt_dict = {}
-
 
     for item in shopping_lists:
         shop = list(item.keys())[0]
@@ -506,7 +504,6 @@ def edit_ingredients(request):
 
 
 def add_shop(request):
-    print('addshop')
     new_shop_name = request.POST['new_shop_name']
     new_shop_name = new_shop_name.upper()
     new_shop = Shop(name=new_shop_name, user=request.user)
@@ -529,7 +526,7 @@ def new_ingredient(request):
     if not kcal:
         kcal = 0
     if not avg_unit:
-        avg_unit =0
+        avg_unit = 0
     if shop_select == 'None':
         shop = None
     else:
@@ -543,7 +540,6 @@ def new_ingredient(request):
 
 def delete_ingr(request, ingr_id):
     Ingredient.objects.filter(pk=ingr_id, user_id=request.user).delete()
-    print(ingr_id)
     return redirect('meals:edit_ingredients')
 
 
@@ -568,6 +564,5 @@ def edit_ingredient(request, ingr_id):
     edited_ingredient.weight_per_unit = avg_unit
     edited_ingredient.shop = shop
     edited_ingredient.save()
-
 
     return redirect('meals:edit_ingredients')

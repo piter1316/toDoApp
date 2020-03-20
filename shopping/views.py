@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 # Create your views here.
 from django.views.decorators.http import require_POST
 
-from meals.models import Unit, Meal, Ingredient, MealsList
+from meals.models import Unit, Meal, Ingredient, MealsList, MealIngredient
 from shopping.forms import ShoppingListForm, ProductsForm
 from shopping.models import ShoppingList, Products
 
@@ -24,16 +24,15 @@ def shopping_list_index(request):
         for product in products_on_shopping_list:
             meals_with_product = []
             generated_meals_with_product = []
-            # if not product.bought:
-            #     meals_with_product_query = Ingredient.objects.filter(name__contains=product.product_name, user=request.user)
-            #
-            #     for item in meals_with_product_query:
-            #         meals_with_product.append(item)
-            #
-            # for meal in meals_with_product:
-            #     query_set = MealsList.objects.filter(meal_id=meal.meal_id_id)
-            #     if len(query_set) > 0:
-            #         generated_meals_with_product.append(query_set[0])
+            if not product.bought:
+                ingredient = Ingredient.objects.get(name__contains=product, user_id=request.user)
+                meals_with_product_query = MealIngredient.objects.filter(ingredient_id=ingredient)
+                for item in meals_with_product_query:
+                    meals_with_product.append(item)
+            for meal in meals_with_product:
+                query_set = MealsList.objects.filter(meal_id=meal.meal_id_id)
+                if len(query_set) > 0:
+                    generated_meals_with_product.append(query_set[0])
 
             product_quantity_bought = [product.quantity, product.bought, product.id, product.unit, generated_meals_with_product]
             product_quantity = {product: product_quantity_bought}
