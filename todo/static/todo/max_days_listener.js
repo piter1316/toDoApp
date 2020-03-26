@@ -56,8 +56,8 @@ $(document).ready(function(){
         }
       });
       setTimeout(function(){$('#meal_options_form, #meal_options_form_hr').hide(600)}, 200);
-      var day_short = $('#meals_list tr:last th').text().trim().substring(0,2)
-      console.log(day_short);
+      var day_short = $('#meals_list tr:last th').text().trim().substr(0,2)
+
       $('#first_day').attr('readonly', true);
       switch(day_short){
       case 'PN':
