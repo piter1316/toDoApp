@@ -25,10 +25,13 @@ def shopping_list_index(request):
             meals_with_product = []
             generated_meals_with_product = []
             if not product.bought:
-                ingredient = Ingredient.objects.get(name__contains=product, user_id=request.user)
-                meals_with_product_query = MealIngredient.objects.filter(ingredient_id=ingredient)
-                for item in meals_with_product_query:
-                    meals_with_product.append(item)
+                try:
+                    ingredient = Ingredient.objects.get(name__contains=product, user_id=request.user)
+                    meals_with_product_query = MealIngredient.objects.filter(ingredient_id=ingredient)
+                    for item in meals_with_product_query:
+                        meals_with_product.append(item)
+                except Exception:
+                    pass
             for meal in meals_with_product:
                 query_set = MealsList.objects.filter(meal_id=meal.meal_id_id)
                 if len(query_set) > 0:
