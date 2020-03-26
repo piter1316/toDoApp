@@ -85,22 +85,27 @@ def get_maximum_no_of_days_no_repeat(request):
 @login_required(login_url='/accounts/login')
 def meals(request):
     in_meals_list = True
-    meals_options = MealOption.objects.filter(user=request.user)
-
-    meals_options_dict = {}
-
-    for i in range(len(meals_options)):
-        meals_in_meals_options = Meal.objects.filter(meal_option=meals_options[i])
-        meals_list = []
-        for meal in meals_in_meals_options:
-            meals_list.append(meal)
-        meals_options_dict[meals_options[i]] = meals_list
-
     user_meals_options = MealOption.objects.filter(user=request.user).order_by('position')
     generated_user_meals_options = MealsList.objects.filter(user=request.user).order_by('meal_option__position').values(
         'meal_option__meal_option', 'meal_option_id').distinct()
     meals_list = MealsList.objects.all().filter(user=request.user)
     days = []
+    all_meals_in_option_dict ={}
+    for option in generated_user_meals_options:
+        meals_in_option = Meal.objects.filter(meal_option_id=option['meal_option_id'], user=request.user).order_by('name')
+        calories = 0
+        all_meals_in_option = []
+        for meal in meals_in_option:
+            ingredients = MealIngredient.objects.select_related('ingredient_id').filter(meal_id=meal)
+            meal_ingr =[]
+
+            for ingr in ingredients:
+                ingr_obj = get_object_or_404(Ingredient, pk=ingr.ingredient_id.id)
+                calories += (ingr.quantity / 100) * int(ingr_obj.calories_per_100_gram)
+                meal_ingr.append(round(calories, 0))
+                calories = 0
+            all_meals_in_option.append([meal, sum(meal_ingr)])
+        all_meals_in_option_dict[option['meal_option_id']] = all_meals_in_option
 
     day_meal_option_meal_list = []
     for item in meals_list:
@@ -111,7 +116,6 @@ def meals(request):
     for day in days:
         meals_on_day = MealsList.objects.select_related('meal').filter(user=request.user, day=day).order_by(
             'meal_option__position')
-        kcal = 0
         day_meals_list = []
         meals = []
         meal_ingredients = []
@@ -120,18 +124,9 @@ def meals(request):
                 one_meal = Meal.objects.get(id=meal.meal_id)
             except Exception:
                 one_meal = None
-            all_meals = Meal.objects.select_related().filter(user=request.user,
-                                                             meal_option_id=meal.meal_option.id).order_by('name')
-            all_meals_to_select = []
-            for meal_select in all_meals:
-                ingredients = MealIngredient.objects.select_related('ingredient_id').filter(meal_id=meal_select.id)
-                calories_select = 0
-                for ingr in ingredients:
-                    ingr_obj = get_object_or_404(Ingredient, pk=ingr.ingredient_id.id)
-                    calories_select += (ingr.quantity) / 100 * int(ingr_obj.calories_per_100_gram)
 
-                meal_to_select = [meal_select, round(calories_select, 0)]
-                all_meals_to_select.append(meal_to_select)
+            all_meals_to_select = []
+
             calories = 0
             if one_meal:
                 ingredients = MealIngredient.objects.select_related('ingredient_id').filter(meal_id=one_meal.id)
@@ -139,12 +134,12 @@ def meals(request):
                 for ingr in ingredients:
                     ingr_obj = get_object_or_404(Ingredient, pk=ingr.ingredient_id.id)
                     calories += (ingr.quantity / 100) * int(ingr_obj.calories_per_100_gram)
-                    meal_ingredients.append(round(calories,0))
+                    meal_ingredients.append(round(calories, 0))
                     calories = 0
             else:
                 calories = 0
             meals.append(one_meal)
-            day_meals_list.append({meal: all_meals_to_select})
+            day_meals_list.append({meal: all_meals_in_option_dict.get(meal.meal_option.id)})
         day_calories.append({day: round(sum(meal_ingredients), 0)})
         day_meal_option_meal_list.append([{day: day_meals_list}, round(sum(meal_ingredients), 0)])
 
@@ -163,7 +158,6 @@ def meals(request):
         option_meals_dict[meal_option] = option_meals_list
 
     context = {
-        'meals_options_dict': meals_options_dict,
         'meals_list': meals_list,
         'user_meals_options': user_meals_options,
         'generated_user_meals_options': generated_user_meals_options,
