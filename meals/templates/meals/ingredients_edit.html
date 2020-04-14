@@ -40,6 +40,7 @@
               <span class="">Składnik</span>
             </th>
             <th class="px-0">kcal / 100g</th>
+            <th class="px-0">B/T/W</th>
             <th class="px-0">Średnia szt. / opak.</th>
             <th class="px-0">Sklep</th>
           </tr>
@@ -54,6 +55,7 @@
             </td>
             <td>{{ingredient}}</td>
             <td class="text-center px-0">{{ingredient.calories_per_100_gram}}</td>
+            <td class="text-center px-0">{{ingredient.protein_per_100_gram}} | {{ingredient.fat_per_100_gram}} | {{ingredient.carbohydrates_per_100_gram}}</td>
             <td class="text-center px-0">{{ingredient.weight_per_unit}}</td>
             <td class="text-center px-0"><small>{{ingredient.shop}}</small></td>
           </tr>
@@ -101,6 +103,7 @@
         </div>
         <div class="modal-body">
           {% include 'meals/ingredient_form.html' %}
+
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
@@ -130,10 +133,25 @@
             </div>
           </div>
           <div class="form-row">
-            <div class="col">
+            <div class="col-12 col-md-6">
               kcal / 100g
               <input type="number" class="form-control" name="kcal" min="0" step="1" value="{{ingredient.calories_per_100_gram}}">
             </div>
+            <div class="col-12 col-md-6">
+              białko / 100g
+              <input type="number" class="form-control" name="prot" min="0" step="1" value="{{ingredient.protein_per_100_gram}}">
+            </div>
+            <div class="col-12 col-md-6">
+              tłuszcz / 100g
+              <input type="number" class="form-control" name="fat" min="0" step="1" value="{{ingredient.fat_per_100_gram}}">
+            </div>
+            <div class="col-12 col-md-6">
+              węglowodany / 100g
+              <input type="number" class="form-control" name="carb" min="0" step="1" value="{{ingredient.carbohydrates_per_100_gram}}">
+            </div>
+
+          </div>
+          <div class="form-row">
             <div class="col">
               Średnia sztuka / opakowanie :
               <input type="number" class="form-control" name="avg_unit" value="{{ingredient.weight_per_unit}}">

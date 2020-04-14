@@ -514,11 +514,20 @@ def delete_shop(request, shop_id):
 def new_ingredient(request):
     new_ingredient_name = request.POST['ingr_name']
     kcal = request.POST.get('kcal', False)
+    prot = request.POST.get('prot', False)
+    fat = request.POST.get('fat', False)
+    carb = request.POST.get('carb', False)
     avg_unit = request.POST.get('avg_unit', False)
     shop_select = request.POST.get('shop', False)
 
     if not kcal:
         kcal = 0
+    if not prot:
+        prot = 0
+    if not fat:
+        fat = 0
+    if not carb:
+        carb = 0
     if not avg_unit:
         avg_unit = 0
     if shop_select == 'None':
@@ -526,6 +535,9 @@ def new_ingredient(request):
     else:
         shop = Shop.objects.get(pk=shop_select)
     new_ingredient = Ingredient(user=request.user, name=new_ingredient_name, calories_per_100_gram=kcal,
+                                protein_per_100_gram=prot,
+                                fat_per_100_gram=fat,
+                                carbohydrates_per_100_gram=carb,
                                 weight_per_unit=avg_unit, shop=shop)
     new_ingredient.save()
 
@@ -540,11 +552,20 @@ def delete_ingr(request, ingr_id):
 def edit_ingredient(request, ingr_id):
     new_ingredient_name = request.POST['ingr_name']
     kcal = request.POST.get('kcal', False)
+    prot = request.POST.get('prot', False)
+    fat = request.POST.get('fat', False)
+    carb = request.POST.get('carb', False)
     avg_unit = request.POST.get('avg_unit', False)
     shop_select = request.POST.get('shop', False)
 
     if not kcal:
         kcal = 0
+    if not prot:
+        prot = 0
+    if not fat:
+        fat = 0
+    if not carb:
+        carb = 0
     if not avg_unit:
         avg_unit = 0
     if shop_select == 'None':
@@ -555,6 +576,9 @@ def edit_ingredient(request, ingr_id):
     edited_ingredient = Ingredient.objects.get(pk=ingr_id)
     edited_ingredient.name = new_ingredient_name
     edited_ingredient.calories_per_100_gram = kcal
+    edited_ingredient.protein_per_100_gram = prot
+    edited_ingredient.fat_per_100_gram = fat
+    edited_ingredient.carbohydrates_per_100_gram = carb
     edited_ingredient.weight_per_unit = avg_unit
     edited_ingredient.shop = shop
     edited_ingredient.save()
