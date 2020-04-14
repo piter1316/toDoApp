@@ -12,14 +12,13 @@
     <div class="col-12 col-md-8 col-xl-10 ">
       {% if meals_list %}
         <div class="table-responsive-sm shadow" id="meals_list">
-          <table  class="table table-light table-striped table-hover">
+          <table  class="table table-light table-striped table-hover ">
             <thead id="meals_list_head" class="thead-dark">
             <tr class="text-center text-light">
-              <th class="no_print px-0" scope="col" style="max-width:10px;"></th>
-              <th scope="col"></th>
+              <th nowrap class=" px-0" scope="col" style=""><small class="d-none d-xl-inline"><b>k-b-t-w</b></small></th>
               {% for meal_option in generated_user_meals_options %}
               <th class="px-0" scope="col">
-                <b>{{meal_option.meal_option__meal_option|upper}}</b>
+                <small><b>{{meal_option.meal_option__meal_option|upper}}</b></small>
                 <input type="hidden" class="generated_meal_options" value="{{meal_option.meal_option_id}}">
               </th>
               {% endfor %}
@@ -28,13 +27,24 @@
             <tbody>
             {% for item in day_meal_option_meal_list %}
             {% for day, meals in item.0.items %}
-            <tr class="text-center">
-              <td class="no_print px-0 " style="max-width:10px;">
-                <input style="text-align: center;vertical-align: middle;" type="checkbox" name="day" class="checkbox my-auto mr-1" value="{% for meal in meals %}{% for ml in meal%}{{ml.id}},{% endfor %}{% endfor %}">
+             <tr class="d-xl-none no_print">
+               {% with day_as_list=day|split %}
+              <td class="text-center" colspan="6">
+                {{day_as_list.0}}:
+                {{item.1.0}}<sup>kcal</sup>|
+                {{item.1.1}}<sup>białko</sup>|
+                {{item.1.2}}<sup>tłuszcze</sup>|
+                {{item.1.3}}<sup>węglowodany</sup>
               </td>
+               {% endwith %}
+            </tr>
+
+            <tr class="text-center">
               <th class="text-left pl-1 pr-0">
                 {% with day_as_list=day|split %}
-                <span>{{day_as_list.0}} <SUP>({{item.1}})</SUP></span>
+                <input style="text-align: center;vertical-align: middle;" type="checkbox" name="day" class="checkbox my-auto mr-1" value="{% for meal in meals %}{% for ml in meal%}{{ml.id}},{% endfor %}{% endfor %}">
+                <span class="d-none d-xl-inline">{{day_as_list.0}} <SUP>{{item.1}}</SUP><br>
+                </span>
                 {% endwith %}
               </th>
               {% for meal in meals %}
@@ -67,6 +77,7 @@
               </td>
               {% endfor %}
             </tr>
+            <tr class="d-xl-none p-1 m-1 no_print"><td class="p-0" colspan="6"><hr class="m-1"></td></tr>
             {% endfor %}
             {% endfor %}
             </tbody>

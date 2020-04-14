@@ -39,8 +39,7 @@
             <th class="align-items-center px-0">
               <span class="">Składnik</span>
             </th>
-            <th class="px-0">kcal / 100g</th>
-            <th class="px-0">B/T/W</th>
+            <th class="px-0">kcal / 100g<br>btw</th>
             <th class="px-0">Średnia szt. / opak.</th>
             <th class="px-0">Sklep</th>
           </tr>
@@ -54,8 +53,9 @@
                  href="{% url 'meals:delete_ingr' ingredient.id %}" class="fas fa-minus-circle text-secondary"></a>
             </td>
             <td>{{ingredient}}</td>
-            <td class="text-center px-0">{{ingredient.calories_per_100_gram}}</td>
-            <td class="text-center px-0">{{ingredient.protein_per_100_gram}} | {{ingredient.fat_per_100_gram}} | {{ingredient.carbohydrates_per_100_gram}}</td>
+            <td nowrap="" class="text-center px-0">{{ingredient.calories_per_100_gram}}<br>
+            {{ingredient.protein_per_100_gram}}-{{ingredient.fat_per_100_gram}}-{{ingredient.carbohydrates_per_100_gram}}
+            </td>
             <td class="text-center px-0">{{ingredient.weight_per_unit}}</td>
             <td class="text-center px-0"><small>{{ingredient.shop}}</small></td>
           </tr>

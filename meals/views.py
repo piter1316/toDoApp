@@ -90,14 +90,15 @@ def meals(request):
         'meal_option__meal_option', 'meal_option_id').distinct()
     meals_list = MealsList.objects.all().filter(user=request.user)
     days = []
-    all_meals_in_option_dict ={}
+    all_meals_in_option_dict = {}
     for option in generated_user_meals_options:
-        meals_in_option = Meal.objects.filter(meal_option_id=option['meal_option_id'], user=request.user).order_by('name')
+        meals_in_option = Meal.objects.filter(meal_option_id=option['meal_option_id'], user=request.user).order_by(
+            'name')
         calories = 0
         all_meals_in_option = []
         for meal in meals_in_option:
             ingredients = MealIngredient.objects.select_related('ingredient_id').filter(meal_id=meal)
-            meal_ingr =[]
+            meal_ingr = []
 
             for ingr in ingredients:
                 ingr_obj = get_object_or_404(Ingredient, pk=ingr.ingredient_id.id)
@@ -119,6 +120,9 @@ def meals(request):
         day_meals_list = []
         meals = []
         meal_ingredients = []
+        meal_protein = []
+        meal_fat = []
+        meal_carbohydrates = []
         for meal in meals_on_day:
             try:
                 one_meal = Meal.objects.get(id=meal.meal_id)
@@ -128,20 +132,35 @@ def meals(request):
             all_meals_to_select = []
 
             calories = 0
+            protein = 0
+            fat = 0
+            carbohydrates = 0
             if one_meal:
                 ingredients = MealIngredient.objects.select_related('ingredient_id').filter(meal_id=one_meal.id)
 
                 for ingr in ingredients:
                     ingr_obj = get_object_or_404(Ingredient, pk=ingr.ingredient_id.id)
                     calories += (ingr.quantity / 100) * int(ingr_obj.calories_per_100_gram)
+                    protein += (ingr.quantity / 100) * int(ingr_obj.protein_per_100_gram)
+                    fat += (ingr.quantity / 100) * int(ingr_obj.fat_per_100_gram)
+                    carbohydrates += (ingr.quantity / 100) * int(ingr_obj.carbohydrates_per_100_gram)
                     meal_ingredients.append(round(calories, 0))
+                    meal_protein.append(round(protein, 0))
+                    meal_fat.append(round(fat, 0))
+                    meal_carbohydrates.append(round(carbohydrates, 0))
                     calories = 0
+                    protein = 0
+                    fat = 0
+                    carbohydrates = 0
             else:
                 calories = 0
             meals.append(one_meal)
             day_meals_list.append({meal: all_meals_in_option_dict.get(meal.meal_option.id)})
-        day_calories.append({day: round(sum(meal_ingredients), 0)})
-        day_meal_option_meal_list.append([{day: day_meals_list}, round(sum(meal_ingredients), 0)])
+        day_calories.append({day: [round(sum(meal_ingredients), 0)]})
+        day_meal_option_meal_list.append(
+            [{day: day_meals_list},
+             [round(sum(meal_ingredients)), round(sum(meal_protein)), round(sum(meal_fat)),
+              round(sum(meal_carbohydrates))]])
 
     maximum_no_of_days_to_generate = get_maximum_no_of_days(request)
     maximum_no_of_days_to_generate_no_repeat = get_maximum_no_of_days_no_repeat(request)
