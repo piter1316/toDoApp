@@ -1,8 +1,10 @@
 function createPDF() {
-
+  var b_t_w = document.getElementById('b-t-w')
+  b_t_w.innerText = 'B-T-W'
   var sTable = document.getElementById('meals_list').innerHTML;
 //  var sTable = document.getElementById('meals_list_head').innerHTML;
 
+  console.log(b_t_w)
   var style = "<style>";
   style = style + "table {width: 100%;font: 17px Calibri;}";
   style = style + ".dropdown-menu {display: none}";
@@ -30,4 +32,5 @@ function createPDF() {
   win.document.close(); 	// CLOSE THE CURRENT WINDOW.
 
   win.print();    // PRINT THE CONTENTS.
+  b_t_w.innerText = ''
 }

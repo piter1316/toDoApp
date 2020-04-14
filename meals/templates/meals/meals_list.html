@@ -15,7 +15,7 @@
           <table  class="table table-light table-striped table-hover ">
             <thead id="meals_list_head" class="thead-dark">
             <tr class="text-center text-light">
-              <th nowrap class=" px-0" scope="col" style=""><small class="d-none d-xl-inline"><b>k-b-t-w</b></small></th>
+              <th nowrap class=" px-0" scope="col" id="b-t-w"></th>
               {% for meal_option in generated_user_meals_options %}
               <th class="px-0" scope="col">
                 <small><b>{{meal_option.meal_option__meal_option|upper}}</b></small>
@@ -28,22 +28,28 @@
             {% for item in day_meal_option_meal_list %}
             {% for day, meals in item.0.items %}
              <tr class="d-xl-none no_print">
-               {% with day_as_list=day|split %}
-              <td class="text-center" colspan="6">
-                {{day_as_list.0}}:
-                {{item.1.0}}<sup>kcal</sup>|
-                {{item.1.1}}<sup>białko</sup>|
-                {{item.1.2}}<sup>tłuszcze</sup>|
-                {{item.1.3}}<sup>węglowodany</sup>
-              </td>
-               {% endwith %}
+                {% with day_as_list=day|split %}
+                <td class="text-center" colspan="6">
+                  <b>{{day_as_list.0}} : {{item.1.0}} kcal</b><br>
+                  <small class="">
+                    {{item.1.1}}g <sup>białko</sup>|
+                    {{item.1.2}}g <sup>tłuszcze</sup>|
+                    {{item.1.3}}g <sup>węglowodany</sup>
+                  </small>
+                </td>
+                {% endwith %}
             </tr>
-
             <tr class="text-center">
-              <th class="text-left pl-1 pr-0">
+              <th nowrap class="text-left pl-1 pr-0">
                 {% with day_as_list=day|split %}
                 <input style="text-align: center;vertical-align: middle;" type="checkbox" name="day" class="checkbox my-auto mr-1" value="{% for meal in meals %}{% for ml in meal%}{{ml.id}},{% endfor %}{% endfor %}">
-                <span class="d-none d-xl-inline">{{day_as_list.0}} <SUP>{{item.1}}</SUP><br>
+                <span class="d-none d-xl-inline">
+                  <b>{{day_as_list.0}} : {{item.1.0}} kcal</b><br>
+                  <small>
+                    {{item.1.1}}g <sup class="no_print">białko</sup>|
+                    {{item.1.2}}g <sup class="no_print">tłuszcze</sup>|
+                    {{item.1.3}}g <sup class="no_print">węglowodany</sup>
+                  </small>
                 </span>
                 {% endwith %}
               </th>
