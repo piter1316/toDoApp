@@ -29,16 +29,16 @@
   </div>
 </div>
 <div class="form-row">
-            <div class="col">
-              Sklep:
-              <select class="form-control" name="shop">
-                <option value="None" {% if not ingredient.shop %} selected {% endif %}>Nieprzypisany</option>
-                {% for shop in user_shops %}
-                <option value="{{shop.id}}" {% if shop.id == ingredient.shop.id %} selected {% endif %}>
-                  {{shop}}
-                </option>
-                {% endfor %}
-              </select>
-            </div>
-          </div>
+  <div class="col">
+    Sklep:
+    <select class="form-control" name="shop">
+      <option value="None" {% if not ingredient.shop %} selected {% endif %}>Nieprzypisany</option>
+      {% for shop in user_shops %}
+      <option value="{{shop.id}}" {% if shop.id == ingredient.shop.id %} selected {% endif %}>
+        {{shop}}
+      </option>
+      {% endfor %}
+    </select>
+  </div>
+</div>
 

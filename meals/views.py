@@ -205,10 +205,16 @@ def edit_meals(request):
         for meal in meals_in_meals_options:
             ingredients = MealIngredient.objects.select_related('ingredient_id').filter(meal_id=meal.id)
             calories = 0
+            protein = 0
+            fat = 0
+            carbohydrates = 0
             for ingr in ingredients:
                 ingr_obj = get_object_or_404(Ingredient, pk=ingr.ingredient_id.id)
                 calories += (ingr.quantity) / 100 * int(ingr_obj.calories_per_100_gram)
-            meals.append([meal, round(calories)])
+                protein += (ingr.quantity / 100) * int(ingr_obj.protein_per_100_gram)
+                fat += (ingr.quantity / 100) * int(ingr_obj.fat_per_100_gram)
+                carbohydrates += (ingr.quantity / 100) * int(ingr_obj.carbohydrates_per_100_gram)
+            meals.append([meal, [round(calories), round(protein), round(fat), round(carbohydrates)]])
         meals_options_dict[meals_options[i]] = meals
 
     context = {
@@ -348,9 +354,15 @@ def edit_meal_ingredients(request, meal_id):
     else:
         recipe_rows = 1
     calories = 0
+    protein = 0
+    fat = 0
+    carbohydrates = 0
     for ingr in ingredients:
         ingr_obj = get_object_or_404(Ingredient, pk=ingr.ingredient_id.id)
         calories += (ingr.quantity) / 100 * int(ingr_obj.calories_per_100_gram)
+        protein += (ingr.quantity) / 100 * int(ingr_obj.protein_per_100_gram)
+        fat += (ingr.quantity) / 100 * int(ingr_obj.fat_per_100_gram)
+        carbohydrates += (ingr.quantity) / 100 * int(ingr_obj.carbohydrates_per_100_gram)
     context = {
         'meal': meal,
         'ingredients': ingredients,
@@ -358,7 +370,10 @@ def edit_meal_ingredients(request, meal_id):
         'recipe_rows': recipe_rows,
         'user_ingredients': user_ingredients,
         'user_shops': user_shops,
-        'calories': round(calories)
+        'calories': round(calories),
+        'protein': round(protein),
+        'fat': round(fat),
+        'carbohydrates': round(carbohydrates)
     }
     return render(request, 'meals/meal_edit.html', context)
 

@@ -12,7 +12,12 @@
           <div class="card shadow  p-0" style="">
             <div class="card-header text-center">
               <p id="option_name" class="lead mb-0" style="cursor:pointer;" title="Kliknj i edtyuj">
-                {{meal.0.name|upper}} {%if meal.0.special%} **{% endif %} | <small>{{calories}} kcal</small></p>
+                {{meal.0.name|upper}} {%if meal.0.special%} **{% endif %}<br>
+                <small>{{calories}} <sup>kcal</sup> </small> |
+                <small>{{protein}}g <sup>białko</sup></small> |
+                <small>{{fat}}g <sup>tłuszcz</sup></small> |
+                <small>{{carbohydrates}}g <sup>węglowodany</sup></small>
+              </p>
               <form id="new_meal_option_name" style="display:none;"
                     action="{% url 'meals:update_meal_name' meal.0.id %}" method="post">{% csrf_token %}
                 <div class="input-group">
