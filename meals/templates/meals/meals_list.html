@@ -4,18 +4,33 @@
 {% block body %}
 {% load split %}
 
-<div class="container-fluid py-2 mt-3">
+<div class="container-fluid py-2 mt-2">
 <input type="hidden" id="maximum_no_of_days_to_generate_no_repeat" value="{{maximum_no_of_days_to_generate_no_repeat}}">
         <input type="hidden" id="maximum_no_of_days_to_generate_default" value="{{maximum_no_of_days_to_generate_default}}">
   <div class="row">
     {% include 'meals/menu.html' %}
     <div class="col-12 col-md-8 col-xl-10 ">
       {% if meals_list %}
+      <div class="alert alert-secondary text-center p-1 mb-1 d-xl-none">
+        <small>
+          <b>Średnio: {{average_clories_per_day}} kcal |
+          {{average_protein_per_day}}g<sup>białko</sup> |
+          {{average_fat_per_day}}g<sup>tłuszcze</sup> |
+          {{average_carb_per_day}}g<sup>węglowodany</sup></b>
+        </small>
+      </div>
         <div class="table-responsive-sm shadow" id="meals_list">
           <table  class="table table-light table-striped table-hover ">
             <thead id="meals_list_head" class="thead-dark">
             <tr class="text-center text-light">
-              <th nowrap class=" px-0" scope="col" id="b-t-w"></th>
+              <th nowrap class="px-auto py-0 text-center" scope="col" id="b-t-w">
+                <small class="d-none d-xl-table-cell">
+                Średnio: {{average_clories_per_day}} kcal<br>
+                {{average_protein_per_day}}g<sup>b<span class="no_print">iałko</span></sup> |
+                  {{average_fat_per_day}}g<sup>t<span class="no_print">łuszcze</span></sup> |
+                  {{average_carb_per_day}}g<sup>w<span class="no_print">ęglowodany</span></sup>
+                </small>
+              </th>
               {% for meal_option in generated_user_meals_options %}
               <th class="px-0" scope="col">
                 <small><b>{{meal_option.meal_option__meal_option|upper}}</b></small>

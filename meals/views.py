@@ -175,6 +175,48 @@ def meals(request):
         for meal in meals_in_option:
             option_meals_list.append(meal)
         option_meals_dict[meal_option] = option_meals_list
+    all_meals = MealsList.objects.filter(user=request.user)
+    meal_options = MealsList.objects.filter(user=request.user).values('meal_option_id').distinct()
+    meals = MealsList.objects.select_related('meal').filter(user=request.user)
+    calories_total = 0
+    protein_total = 0
+    fat_total = 0
+    carb_total = 0
+    calories = 0
+    protein = 0
+    fat = 0
+    carb = 0
+    for meal in meals:
+        try:
+            one_meal = Meal.objects.get(id=meal.meal_id)
+        except Exception:
+            one_meal = None
+        ingredients = MealIngredient.objects.select_related('ingredient_id').filter(meal_id=one_meal)
+        for ingr in ingredients:
+            ingr_obj = get_object_or_404(Ingredient, pk=ingr.ingredient_id.id)
+            calories += (ingr.quantity / 100) * int(ingr_obj.calories_per_100_gram)
+            protein += (ingr.quantity / 100) * int(ingr_obj.protein_per_100_gram)
+            fat += (ingr.quantity / 100) * int(ingr_obj.fat_per_100_gram)
+            carb += (ingr.quantity / 100) * int(ingr_obj.carbohydrates_per_100_gram)
+            calories_total += calories
+            protein_total += protein
+            fat_total += fat
+            carb_total += carb
+            calories = 0
+            protein = 0
+            fat = 0
+            carb = 0
+    print('------', calories_total)
+
+    try:
+        meals_list_length = int(len(all_meals) / len(meal_options))
+        average_clories_per_day = int(calories_total / meals_list_length)
+        average_protein_per_day = int(protein_total / meals_list_length)
+        average_fat_per_day = int(fat_total / meals_list_length)
+        average_carb_per_day = int(carb_total / meals_list_length)
+    except ZeroDivisionError:
+        meals_list_length = 0
+        average_clories_per_day = 0
 
     context = {
         'meals_list': meals_list,
@@ -186,7 +228,11 @@ def meals(request):
         'in_meals_list': in_meals_list,
         'first_day_input_list': first_day_input_list,
         'option_meals_dict': option_meals_dict,
-        'maximum_no_of_days_to_generate_no_repeat': maximum_no_of_days_to_generate_no_repeat
+        'maximum_no_of_days_to_generate_no_repeat': maximum_no_of_days_to_generate_no_repeat,
+        'average_clories_per_day': average_clories_per_day,
+        'average_protein_per_day': average_protein_per_day,
+        'average_fat_per_day': average_fat_per_day,
+        'average_carb_per_day': average_carb_per_day,
     }
     return render(request, 'meals/meals_list.html', context)
 
