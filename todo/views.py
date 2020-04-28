@@ -57,7 +57,13 @@ def home(request):
         meal_options = MealsList.objects.filter(user=request.user).values('meal_option_id').distinct()
         meals = MealsList.objects.select_related('meal').filter(user=request.user)
         calories_total = 0
+        protein_total = 0
+        fat_total = 0
+        carb_total = 0
         calories = 0
+        protein = 0
+        fat = 0
+        carb = 0
         for meal in meals:
             try:
                 one_meal = Meal.objects.get(id=meal.meal_id)
@@ -67,13 +73,25 @@ def home(request):
             for ingr in ingredients:
                 ingr_obj = get_object_or_404(Ingredient, pk=ingr.ingredient_id.id)
                 calories += (ingr.quantity / 100) * int(ingr_obj.calories_per_100_gram)
+                protein += (ingr.quantity / 100) * int(ingr_obj.protein_per_100_gram)
+                fat += (ingr.quantity / 100) * int(ingr_obj.fat_per_100_gram)
+                carb += (ingr.quantity / 100) * int(ingr_obj.carbohydrates_per_100_gram)
                 calories_total += calories
+                protein_total += protein
+                fat_total += fat
+                carb_total += carb
                 calories = 0
+                protein = 0
+                fat = 0
+                carb = 0
         print('------', calories_total)
 
         try:
             meals_list_length = int(len(all_meals) / len(meal_options))
             average_clories_per_day = int(calories_total/meals_list_length)
+            average_protein_per_day = int(protein_total/meals_list_length)
+            average_fat_per_day = int(fat_total/meals_list_length)
+            average_carb_per_day = int(carb_total/meals_list_length)
         except ZeroDivisionError:
             meals_list_length = 0
             average_clories_per_day = 0
@@ -96,7 +114,10 @@ def home(request):
             'meal_options': len(meal_options),
             'shopping_lists': len(shopping_lists),
             'products_to_buy_counter': products_to_buy_counter,
-            'average_clories_per_day': average_clories_per_day
+            'average_clories_per_day': average_clories_per_day,
+            'average_protein_per_day': average_protein_per_day,
+            'average_fat_per_day': average_fat_per_day,
+            'average_carb_per_day': average_carb_per_day,
         }
     else:
         context = {}
