@@ -136,49 +136,4 @@ class InvoiceForm(forms.Form):
                            }))
 
 
-class BaseInvoiceFormSet(BaseFormSet):
 
-    def clean(self):
-        if any(self.errors):
-            return
-
-        names = []
-        files = []
-        duplicates = False
-
-        for form in self.forms:
-            if form.cleaned_data:
-                name = form.cleaned_data['name']
-                file = form.cleaned_data['file']
-
-                # Check that no two links have the same anchor or URL
-                if name and file:
-                    if name in names:
-                        duplicates = True
-                    names.append(name)
-
-                    if file in files:
-                        duplicates = True
-                    files.append(file)
-
-                if duplicates:
-                    raise forms.ValidationError(
-                        'Faktury/Paragony muszą mieć unikatowe nazwy i pliki',
-                        code='duplicate_links'
-                    )
-
-        for form in self.forms:
-            if form.cleaned_data:
-                name = form.cleaned_data['name']
-                file = form.cleaned_data['file']
-
-                if file and not name:
-                    raise forms.ValidationError(
-                        'Brak faktury/paragonu!!!.',
-                        code='missing_invoice'
-                    )
-                elif name and not file:
-                    raise forms.ValidationError(
-                        'Brak pliku!',
-                        code='missing_file'
-                    )

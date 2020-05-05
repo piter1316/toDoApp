@@ -16,13 +16,10 @@ from django.views.generic import UpdateView
 from pymysql import IntegrityError
 
 from cars import forms
-from cars.forms import CarForm, FuelFillForm, AddServiceForm, LinkForm, BaseLinkFormSet, InvoiceForm, BaseInvoiceFormSet
+from cars.forms import CarForm, FuelFillForm, AddServiceForm, LinkForm, BaseLinkFormSet, InvoiceForm
 from cars.models import Car, Fuel, Service, SparePart, Invoice
 from myproject.settings import BASE_DIR
 from django.core import serializers
-
-
-
 
 
 def cars_home(request):
@@ -229,13 +226,9 @@ def edit_parts_services(request, car_id, service_id):
 def edit_invoices(request, car_id, service_id):
     service_instance = get_object_or_404(Service, pk=service_id)
     car_instance = get_object_or_404(Car, pk=car_id)
-    InvoiceFormSet = formset_factory(InvoiceForm, formset=BaseInvoiceFormSet, extra=0, min_num=1)
-    print(LinkForm)
     # Get our existing link data for this user.  This is used as initial data.
     service_invoices = Invoice.objects.filter(service_id=service_id)
 
-    invoices_data = [{'name': l.name, 'file': l.file}
-                 for l in service_invoices]
 
     location = os.path.join(BASE_DIR, 'media', 'user_uploads',
                             '{}-{}'.format(request.user.id, request.user.username),
@@ -244,47 +237,13 @@ def edit_invoices(request, car_id, service_id):
                                         '{}-{}'.format(request.user.id, request.user.username),
                                         '{}-{}'.format(car_instance.pk, car_instance.name), 'invoices', )
 
-    if request.method == 'POST':
-        invoice_formset = InvoiceFormSet(request.POST, request.FILES)
-        new_invoices = []
-        for invoice_form in invoice_formset:
-            if invoice_form.is_valid():
-                name = invoice_form.cleaned_data.get('name')
-                file = invoice_form.cleaned_data.get('file')
-                if not file:
-                    tmp_invoice_file = Invoice.objects.filter(name=name)
-                    try:
-                        file = tmp_invoice_file[0].file
-                    except IndexError:
-                        pass
-                if name and file:
-                    fs = FileSystemStorage(location=location)
-                    invoice_instance = Invoice(service_id=service_instance, name=name, file=file)
-                    fs.save(str(file), invoice_instance.file)
-                    invoice_instance.file = os.path.join(location_to_database, str(invoice_instance.file))
-                    invoice_instance.save()
-                    new_invoices.append(invoice_instance)
-                print(new_invoices)
-        try:
-            with transaction.atomic():
-                Invoice.objects.filter(service_id=service_instance).delete()
-                Invoice.objects.bulk_create(new_invoices)
-                messages.success(request, 'Zmiany zapisane')
 
-        except IntegrityError:
-            messages.error(request, 'There was an error saving your profile.')
-            return redirect(reverse('profile-settings'))
-        return redirect('/cars/carDetails/{}#service'.format(car_id))
-
-    else:
-
-        invoice_formset = InvoiceFormSet(initial=invoices_data)
 
     context = {
-
-        'link_formset': invoice_formset,
         'service_instance': service_instance,
-        'car_id': car_id
+        'car_id': car_id,
+        'service_invoices': service_invoices,
+        'location_to_database':location_to_database
     }
     return render(request, 'cars/editInvoices.html', context)
 
