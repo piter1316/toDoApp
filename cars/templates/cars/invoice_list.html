@@ -1,7 +1,7 @@
 {% if lists.1 %}
 {% for invoice in lists.1 %}
 <div class="d-flex justify-content-between my-2">
-  <a target="_blank" href="{% url 'home' %}media/{{invoice.file}}" class="text-secondary fas fa-file-invoice-dollar">
+  <a target="_blank" href="{% url 'home' %}{{invoice.file}}" class="text-secondary fas fa-file-invoice-dollar">
   <small>
    {{invoice}}
   </small>

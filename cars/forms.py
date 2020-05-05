@@ -4,6 +4,7 @@ from django import forms
 from django.forms.formsets import BaseFormSet
 
 from . import models
+from .models import Invoice
 
 
 def get_date():
@@ -124,16 +125,19 @@ class BaseLinkFormSet(BaseFormSet):
                     )
 
 
-class InvoiceForm(forms.Form):
+class InvoiceForm(forms.ModelForm):
     name = forms.CharField(
         max_length=100,
         widget=forms.TextInput(attrs={
             'placeholder': 'Faktura/paragon', 'required': 'true', 'class': 'form-control my-1'
         }))
-    file = forms.FileField(required=False,
+    file = forms.FileField(required=True,
                            widget=forms.FileInput(attrs={
-                               'class': 'custom-file-input mb-2',
+                               'class': 'form-control-file', 'required': 'true',
                            }))
+    class Meta:
+        model = models.Invoice
+        fields = ['name', 'file']
 
 
 

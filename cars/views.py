@@ -9,6 +9,7 @@ from django.db import transaction
 from django.forms import formset_factory
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.core.files.storage import default_storage
 
 # Create your views here.
 from django.urls import reverse, reverse_lazy
@@ -41,7 +42,7 @@ def car_details(request, car_id):
     car_fill_form = FuelFillForm()
     json_serializer = serializers.get_serializer("json")()
     chart_dates = json_serializer.serialize(Fuel.objects.filter(car_id=car_id).order_by('date'), ensure_ascii=False)
-    service_list = Service.objects.select_related().filter(car_id=car_id).order_by('date')
+    service_list = Service.objects.select_related().filter(car_id=car_id).order_by('-date')
     service_dictionary = {}
     for service in service_list:
         parts_sum = 0
@@ -127,8 +128,6 @@ def add_new_car(request):
                 fs.save(str(car.logo), logo)
                 car.logo = os.path.join(location_to_database, str(car.logo))
                 car.save()
-
-
             return redirect('cars:cars_home')
     else:
         form = forms.CarForm()
@@ -226,24 +225,31 @@ def edit_parts_services(request, car_id, service_id):
 def edit_invoices(request, car_id, service_id):
     service_instance = get_object_or_404(Service, pk=service_id)
     car_instance = get_object_or_404(Car, pk=car_id)
-    # Get our existing link data for this user.  This is used as initial data.
     service_invoices = Invoice.objects.filter(service_id=service_id)
-
 
     location = os.path.join(BASE_DIR, 'media', 'user_uploads',
                             '{}-{}'.format(request.user.id, request.user.username),
                             '{}-{}'.format(car_instance.pk, car_instance.name), 'invoices')
-    location_to_database = os.path.join('media','user_uploads',
+    location_to_database = os.path.join('media', 'user_uploads',
                                         '{}-{}'.format(request.user.id, request.user.username),
                                         '{}-{}'.format(car_instance.pk, car_instance.name), 'invoices', )
 
-
-
+    form = InvoiceForm(request.POST, request.FILES)
+    if request.method == 'POST':
+        if form.is_valid():
+            new_invoice = form.save(commit=False)
+            fs = FileSystemStorage(location=location)
+            file = request.FILES.get('file', False)
+            fs.save(str(new_invoice.file), file)
+            new_invoice.file = os.path.join(location_to_database, str(new_invoice.file))
+            new_invoice.service_id = service_instance
+            new_invoice.save()
     context = {
         'service_instance': service_instance,
         'car_id': car_id,
         'service_invoices': service_invoices,
-        'location_to_database':location_to_database
+        'location_to_database': location_to_database,
+        'form': form,
     }
     return render(request, 'cars/editInvoices.html', context)
 
@@ -259,3 +265,14 @@ def edit_service_details(request, car_id, service_id):
         'form': form
     }
     return render(request, 'cars/editServiceDetails.html', context)
+
+
+def delete_invoice(request, car_id, service_id, invoice_id):
+    print('delete', invoice_id)
+    invoice = get_object_or_404(Invoice,pk=invoice_id)
+    path = os.path.join(BASE_DIR, str(invoice.file))
+    print(path)
+    default_storage.delete(path)
+    Invoice.objects.filter(pk=invoice_id).delete()
+
+    return redirect('/cars/carDetails/{}/{}/editInvoices'.format(car_id,service_id))

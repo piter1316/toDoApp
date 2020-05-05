@@ -143,6 +143,12 @@ $(document).ready(function(){
     $('#new_meal_option_name').toggle(600);
   });
 
+  $('#add_invoice_button').on('click', function(e){
+    $('#add_invoice').toggle(600);
+  });
+
+
+
 
 
   $('input[name=day]').change(function(){
