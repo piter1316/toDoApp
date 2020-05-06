@@ -18,8 +18,9 @@
       <div class="col-lg-8">
         <div class="card-body p-0 p-md-2">
           <form class="modal-content" enctype="multipart/form-data" method="post">{%csrf_token%}
-            <div class="modal-header">
+            <div class="modal-header d-flex justify-content-between">
               <h5 class="modal-title" id="exampleModalLongTitle">Edycja</h5>
+              <a href="{{return_url}}" class="text-secondary">powrót</a>
             </div>
             {% include 'cars/car_form.html' %}
           </form>

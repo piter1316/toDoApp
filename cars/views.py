@@ -75,6 +75,7 @@ class CarUpdate(UpdateView):
         context = super().get_context_data(**kwargs)
         pk = self.object.pk
         context['car'] = Car.objects.filter(pk=pk)
+        context['return_url'] = '{}'.format(reverse('cars:car_details', kwargs={'car_id': pk}))
         return context
 
     def get_success_url(self):
