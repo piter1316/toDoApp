@@ -79,7 +79,7 @@ class FuelFillForm(forms.ModelForm):
 
 class AddServiceForm(forms.ModelForm):
     date = forms.DateField(widget=forms.DateInput(
-        attrs={'class': 'form-control p-0', 'type': 'date', 'value': get_date()}
+        attrs={'class': 'form-control p-0', 'type': 'date', 'value': get_date()},format='%Y-%m-%d'
     ))
     mileage = forms.IntegerField(required=False, widget=forms.NumberInput(
         attrs={'class': 'form-control  p-0 ', 'min': 1, 'placeholder': 'Podaj przebieg w dniu serwisu'}))

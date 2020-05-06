@@ -1,4 +1,28 @@
 {% extends 'todo/base.html' %}
 {% block body %}
-{{form}}
+<div class="container-fluid" id="wrapper">
+  <div class="row">
+    <div class="col-12 mx-auto" id="">
+      <div class="container">
+        <div class="jumbotron shadow shadow-lg">
+          <div class="d-flex justify-content-between">
+            <h3>Edycja...</h3>
+            <a class="text-secondary" href="{{ reverse_url }}">Powrót</a>
+          </div>
+          <hr>
+          <form method="post">{% csrf_token %}
+            <span>Zmień datę:</span>
+            {{form.date}}
+            <span>Zmień przebieg:</span>
+            {{form.mileage}}
+            <hr>
+            <button type="submit" class="btn btn-block btn-secondary">Zapisz zmiany</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 {% endblock %}

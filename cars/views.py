@@ -275,6 +275,23 @@ def edit_service_details(request, car_id, service_id):
     return render(request, 'cars/editServiceDetails.html', context)
 
 
+class ServiceDeailsUpdate(UpdateView):
+    model = Service
+    form_class = AddServiceForm
+    template_name = 'cars/editServiceDetails.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        car_id = self.object.car_id.pk
+        context['reverse_url'] = '{}#service'.format(reverse('cars:car_details', kwargs={'car_id': car_id}))
+        return context
+
+    def get_success_url(self):
+        car_id = self.object.car_id.pk
+        print('----------',car_id)
+        return '{}#service'.format(reverse('cars:car_details', kwargs={'car_id': car_id}))
+
+
 def delete_invoice(request, car_id, service_id, invoice_id):
     invoice = get_object_or_404(Invoice, pk=invoice_id)
     path = os.path.join(BASE_DIR, str(invoice.file))
