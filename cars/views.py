@@ -255,7 +255,15 @@ def edit_invoices(request, car_id, service_id):
 
 
 def delete_service(request, car_id, service_id):
+    invoices = Invoice.objects.filter(service_id=service_id)
+    for invoice in invoices:
+        path = os.path.join(BASE_DIR, str(invoice.file))
+        try:
+            default_storage.delete(path)
+        except Exception:
+            pass
     Service.objects.filter(id=service_id).delete()
+
     return redirect('/cars/carDetails/{}#service'.format(car_id))
 
 
@@ -268,11 +276,12 @@ def edit_service_details(request, car_id, service_id):
 
 
 def delete_invoice(request, car_id, service_id, invoice_id):
-    print('delete', invoice_id)
-    invoice = get_object_or_404(Invoice,pk=invoice_id)
+    invoice = get_object_or_404(Invoice, pk=invoice_id)
     path = os.path.join(BASE_DIR, str(invoice.file))
-    print(path)
-    default_storage.delete(path)
+    try:
+        default_storage.delete(path)
+    except Exception:
+        pass
     Invoice.objects.filter(pk=invoice_id).delete()
 
     return redirect('/cars/carDetails/{}/{}/editInvoices'.format(car_id,service_id))
