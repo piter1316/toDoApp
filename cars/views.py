@@ -43,19 +43,19 @@ def car_details(request, car_id):
     json_serializer = serializers.get_serializer("json")()
     chart_dates = json_serializer.serialize(Fuel.objects.filter(car_id=car_id).order_by('date'), ensure_ascii=False)
     service_list = Service.objects.select_related().filter(car_id=car_id).order_by('-date')
+
     total_fuel_list = []
     total_km_list = []
     for fuel in car_fuel_fill_list:
         total_fuel_list.append(fuel.liters)
         total_km_list.append(fuel.kilometers)
-
     total_fuel = sum(total_fuel_list)
     total_km = sum(total_km_list)
-    print(total_km,total_fuel)
     try:
         average_consumption = round(total_fuel/total_km * 100, 2)
     except ZeroDivisionError:
         average_consumption = 0
+
     try:
         last_service = service_list[0]
     except IndexError:
@@ -117,7 +117,7 @@ class CarUpdate(UpdateView):
             self.object.logo = os.path.join(location_to_database, str(self.object.logo))
             self.object.save()
 
-        return '{}'.format(reverse('cars:car_details', kwargs={'car_id': pk}))
+        return '{}#info'.format(reverse('cars:car_details', kwargs={'car_id': pk}))
 
 
     template_name = 'cars/car_edit.html'
@@ -197,9 +197,7 @@ def edit_parts_services(request, car_id, service_id):
     service_instance = get_object_or_404(Service, pk=service_id)
     car_id = car_id
 
-
     LinkFormSet = formset_factory(LinkForm, formset=BaseLinkFormSet, extra=0, min_num=1)
-    print(LinkForm)
     # Get our existing link data for this user.  This is used as initial data.
     user_links = SparePart.objects.filter(service_id=service_id)
 
@@ -308,7 +306,6 @@ class ServiceDeailsUpdate(UpdateView):
 
     def get_success_url(self):
         car_id = self.object.car_id.pk
-        print('----------',car_id)
         return '{}#service'.format(reverse('cars:car_details', kwargs={'car_id': car_id}))
 
 

@@ -3,7 +3,7 @@
 {% load static %}
 {% load average_fuel_cons %}
 {% load render_table from django_tables2 %}
-<div class="container-fluid mt-2">
+<div class="container-fluid mt-2 px-0 px-md-2">
   <ul class="nav nav-tabs mb-1 row no-gutters" id="myTab" role="tablist">
     <li class="nav-item col">
       <a class="btn btn-outline-secondary active border-right-0 w-100" id="fuel-tab" data-toggle="tab" href="#fuel"
@@ -148,7 +148,8 @@
         {% endfor %}
         </tbody>
       </table>
-      <div class="row d-lg-none">
+      <div class="container d-lg-none">
+      <div class="row ">
         {% for service, lists in service_dictionary.items %}
         <div class="col-12 mb-1 p-0">
           <div class="card border-dark mb-3" style="height:100%;">
@@ -181,10 +182,11 @@
         </div>
         {% endfor %}
       </div>
+      </div>
     </div>
     <div class="tab-pane fade p-2 info {% if active_tab == 'info' %} show active{% endif %}" id="info" role="tabpanel"
          aria-labelledby="info-tab">
-      <div class="card mb-3 mx-auto " style="max-width: 900px;" >
+      <div class="card mb-3 mx-auto p-1" style="max-width: 900px;" >
         <div class="row no-gutters">
           <div class="col-md-4 d-flex align-items-center">
             {% for detail in car %}
@@ -199,7 +201,7 @@
             <div class="card-body">
             <h5 class="card-title mb-0 text-center">{{detail.name}}</h5>
           </div>
-          <ul class="list-group list-group-flush p-2">
+          <ul class="list-group list-group-flush p-2 rounded border">
             <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
               <span>
                 <span class="text-dark">Marka:</span>
@@ -286,7 +288,7 @@
 
       </div>
     </div>
-    <div class="tab-pane fade" id="chart" role="tabpanel" aria-labelledby="chart-tab">
+    <div class="tab-pane fade mx-auto col-lg-10 p-0"  id="chart"  role="tabpanel" aria-labelledby="chart-tab">
       <canvas class="bg-light rounded p-1" id="myChart"></canvas>
       <script>
           var ctx = document.getElementById('myChart').getContext('2d');
