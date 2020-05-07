@@ -195,6 +195,15 @@ $(document).ready(function(){
  $('#service-tab').addClass('active');
  }
 
+ if(window.location.href.includes('#info')){
+ $('#fuel').removeClass('show')
+ $('#fuel').removeClass('active')
+ $('#fuel-tab').removeClass('active')
+ $('#info').addClass('show');
+ $('#info').addClass('active');
+ $('#info-tab').addClass('active');
+ }
+
 });
 
 $('body').on('click','.dropdown_shopping_item',function(e){

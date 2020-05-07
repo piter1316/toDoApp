@@ -4,178 +4,291 @@
 {% load average_fuel_cons %}
 {% load render_table from django_tables2 %}
 <div class="container-fluid mt-2">
-  <div class="row">
-    <div class="col-12 col-xl-9 ">
-      <ul class="nav nav-tabs mb-1 row no-gutters" id="myTab" role="tablist">
-        <li class="nav-item col">
-          <a class="btn btn-outline-secondary active border-right-0 w-100" id="fuel-tab" data-toggle="tab" href="#fuel"
-             role="tab"
-             aria-controls="fuel" aria-selected="true" style=" border-radius: 5px 0px 0px 5px !important;"><i
-              class=" px-2 fas fa-gas-pump"></i></a>
-        </li>
-        <li class="nav-item col">
-          <a class="btn btn-outline-secondary rounded-0 w-100" id="service-tab" data-toggle="tab" href="#service"
-             role="tab"
-             aria-controls="service" aria-selected="false"><i class=" px-2 fas fa-tools"></i></a>
-        </li>
-        <li class="nav-item col">
-          <a class="btn btn-outline-secondary border-left-0 w-100" id="contact-tab" data-toggle="tab" href="#chart"
-             role="tab"
-             aria-controls="chart" aria-selected="false" style=" border-radius: 0px 5px 5px 0px !important;"><i
-              class=" px-2 fas fa-chart-pie"></i></a>
-        </li>
-      </ul>
-      <div class="tab-content" id="myTabContent">
-        <div class="tab-pane fade show active" id="fuel" role="tabpanel" aria-labelledby="fuel-tab">
-          <div style="overflow-y:scroll; height:80vh;">
-            {% for detail in car %}
-            <form method="post" action="{% url 'cars:add_fuel_fill' detail.pk  %}" id="add_fuel_fill">{% csrf_token %}
-              <table class="table table-bordered bg-light table-sm table-striped mb-0" id="filling_table">
-                <thead class="bg-secondary text-center text-light">
-                <tr>
-                  <th scope="col" class="d-none d-md-table-cell">Lp.</th>
-                  <th scope="col">Data</th>
-                  <th scope="col">Litry</th>
-                  <th scope="col">KM</th>
-                  <th scope="col">Cena / L</th>
-                  <th scope="col">Stan Licznika</th>
-                  <th scope="col">L / 100km</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr class="" style="position:relative">
-                  <td class=" m-0 p-0 d-none d-md-block"></td>
-                  <td class=" m-0 p-0" style="max-width:112px;">{{car_fill_form.date}}</td>
-                  <td class=" m-0 p-0">{{car_fill_form.liters}}</td>
-                  <td class=" m-0 p-0">{{car_fill_form.kilometers}}</td>
-                  <td class=" m-0 p-0">{{car_fill_form.fuel_price}}</td>
-                  <td class=" m-0 p-0">{{car_fill_form.mileage}}</td>
-                  <td class=" m-0 p-0">
-                    <button id="save_filling_btn" class="btn border fas fa-save" type="submit"></button>
-                  </td>
-                  <td id="save_overlay" class="alert alert-info text-center rounded shadow "
-                      style="position: absolute; left:20%; width:60%; display:none;">...Zapisywanie...
-                  </td>
-                </tr>
-                {% for filling in car_fuel_fill_list %}
-                <tr id="filling_row_{{filling.pk}}">
-                  <th class="d-none d-md-block">{{forloop.counter}}</th>
-                  <td>{{filling.date|date:"d M Y" }}</td>
-                  <td>{{filling.liters}}</td>
-                  <td>{{filling.kilometers}}</td>
-                  <td>{{filling.fuel_price}}</td>
-                  <td>{{filling.mileage}}</td>
-                  <td class="d-flex justify-content-between align-items-center">
-                    <span>{{ filling.liters|average_fuel_cons:filling.kilometers }}</span>
-                    <a onclick="return confirm('Usunąć tankowanie?')" id="filling_{{filling.pk}}"
-                       class="filling_ far fa-trash-alt text-dark" href="#filling_{{filling.pk}}"></a>
-                  </td>
-                </tr>
-                {% endfor %}
-                </tbody>
-              </table>
-            </form>
-            {% endfor %}
-            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
-                 aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-              <div class="modal-dialog modal-dialog-centered" role="document">
-                <form class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-                  <div class="modal-body">
-                    ...
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Zapisz</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="tab-pane fade p-2 service {% if active_tab == 'service' %} show active{% endif %}" id="service" role="tabpanel" aria-labelledby="service-tab">
-          <a href="{% url 'cars:add_service_form' car.0.pk %}" class="btn btn-outline-secondary btn-block btn-sm mb-1">Nowy serwis</a>
-          <table class="d-none d-lg-table table table-bordered bg-light table-sm table-striped mb-0" >
+  <ul class="nav nav-tabs mb-1 row no-gutters" id="myTab" role="tablist">
+    <li class="nav-item col">
+      <a class="btn btn-outline-secondary active border-right-0 w-100" id="fuel-tab" data-toggle="tab" href="#fuel"
+         role="tab"
+         aria-controls="fuel" aria-selected="true" style=" border-radius: 5px 0px 0px 5px !important;"><i
+          class=" px-2 fas fa-gas-pump"></i></a>
+    </li>
+    <li class="nav-item col">
+      <a class="btn btn-outline-secondary rounded-0 w-100" id="service-tab" data-toggle="tab" href="#service"
+         role="tab"
+         aria-controls="service" aria-selected="false"><i class=" px-2 fas fa-tools"></i></a>
+    </li>
+    <li class="nav-item col">
+      <a class="btn btn-outline-secondary rounded-0 w-100" id="info-tab" data-toggle="tab" href="#info"
+         role="tab"
+         aria-controls="info" aria-selected="false"><i class="fas fa-info-circle"></i></a>
+    </li>
+
+    <li class="nav-item col">
+      <a class="btn btn-outline-secondary border-left-0 w-100" id="contact-tab" data-toggle="tab" href="#chart"
+         role="tab"
+         aria-controls="chart" aria-selected="false" style=" border-radius: 0px 5px 5px 0px !important;"><i
+          class=" px-2 fas fa-chart-pie"></i></a>
+    </li>
+  </ul>
+  <div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="fuel" role="tabpanel" aria-labelledby="fuel-tab">
+      <div style="overflow-y:scroll; height:80vh;">
+        {% for detail in car %}
+        <form method="post" action="{% url 'cars:add_fuel_fill' detail.pk  %}" id="add_fuel_fill">{% csrf_token %}
+          <table class="table table-bordered bg-light table-sm table-striped mb-0" id="filling_table">
             <thead class="bg-secondary text-center text-light">
-              <tr>
-                <td>Lp.</td>
-                <td>Data</td>
-                <td>Przebieg [km]</td>
-                <td>Części/Usługi - cena [PLN]</td>
-                <td>Koszt całkowity [PLN]</td>
-                <td>Faktury</td>
-                <td><i class="fas fa-cog"></i></td>
-              </tr>
+            <tr>
+              <th scope="col" class="d-none d-md-table-cell">Lp.</th>
+              <th scope="col">Data</th>
+              <th scope="col">Litry</th>
+              <th scope="col">KM</th>
+              <th scope="col">Cena / L</th>
+              <th scope="col">Stan Licznika</th>
+              <th scope="col">L / 100km</th>
+            </tr>
             </thead>
             <tbody>
-            {% for service, lists in service_dictionary.items %}
-            <tr class="text-center" style="border-bottom:  double  !important;">
-              <td class="align-middle">
-                {{forloop.counter}}.
+            <tr class="" style="position:relative">
+              <td class=" m-0 p-0 d-none d-md-block"></td>
+              <td class=" m-0 p-0" style="max-width:112px;">{{car_fill_form.date}}</td>
+              <td class=" m-0 p-0">{{car_fill_form.liters}}</td>
+              <td class=" m-0 p-0">{{car_fill_form.kilometers}}</td>
+              <td class=" m-0 p-0">{{car_fill_form.fuel_price}}</td>
+              <td class=" m-0 p-0">{{car_fill_form.mileage}}</td>
+              <td class=" m-0 p-0">
+                <button id="save_filling_btn" class="btn border fas fa-save" type="submit"></button>
               </td>
-              <td class="align-middle"><a class="text-dark pointer" href="{% url 'cars:edit_service_details' car.0.pk service.id %}">{{service.date}}</a></td>
-              <td class="align-middle"><a class="text-dark pointer" href="{% url 'cars:edit_service_details' car.0.pk service.id %}">{{service.mileage}}</a></td>
-              <td class="">
-                {% include 'cars/parts_table.html' %}
+              <td id="save_overlay" class="alert alert-info text-center rounded shadow "
+                  style="position: absolute; left:20%; width:60%; display:none;">...Zapisywanie...
               </td>
-              <td class="align-middle">{{ lists.2 }}</td>
-              <td class="text-left align-middle">
-                {% include 'cars/invoice_list.html' %}
-              </td>
-              <td class="align-middle">
-                 <a onclick="return confirm('Czy napewno usunąć serwis i wszystkie dane?')"
-                   class="deleteServiceButton_{{service.id}}"
-                   href="{% url 'cars:delete_service' car.0.pk service.id %}">
-                  <i title="Usuń serwis" class="far fa-trash-alt text-dark"></i>
-                </a>
+            </tr>
+            {% for filling in car_fuel_fill_list %}
+            <tr id="filling_row_{{filling.pk}}">
+              <th class="d-none d-md-block">{{forloop.counter}}</th>
+              <td>{{filling.date|date:"d M Y" }}</td>
+              <td>{{filling.liters}}</td>
+              <td>{{filling.kilometers}}</td>
+              <td>{{filling.fuel_price}}</td>
+              <td>{{filling.mileage}}</td>
+              <td class="d-flex justify-content-between align-items-center">
+                <span>{{ filling.liters|average_fuel_cons:filling.kilometers }}</span>
+                <a onclick="return confirm('Usunąć tankowanie?')" id="filling_{{filling.pk}}"
+                   class="filling_ far fa-trash-alt text-dark" href="#filling_{{filling.pk}}"></a>
               </td>
             </tr>
             {% endfor %}
             </tbody>
           </table>
-          <div class="row d-lg-none">
-            {% for service, lists in service_dictionary.items %}
-            <div class="col-12 mb-1 p-0" >
-              <div class="card border-dark mb-3" style="height:100%;">
-                <a class="text-dark" title="edycja" href="{% url 'cars:edit_service_details' car.0.pk service.id %}">
-                  <div class="card-header bg-transparent border-dark d-flex justify-content-between">
-                    <i>{{forloop.counter}}. {{service.date}}</i> <i>{{service.mileage}} KM</i>
-                  </div>
-                </a>
-                <div class="card-body text-secondary row  no-gutters p-1">
-                  <div class="col-7 pr-1 border-right">
-                    <p class="text-center m-0 small">Części/Usługi</p>
-                    {% include 'cars/parts_table.html' %}
-                  </div>
-                  <div class="col-5  pl-1 text-left align-middle">
-                    <p class="text-center m-0 small">Faktury/Paragony</p>
-                    {% include 'cars/invoice_list.html' %}
-                  </div>
-                </div>
-                <div class="card-footer bg-transparent border-dark d-flex justify-content-between">
-                  <span>KOSZT CAŁKOWITY: {{ lists.2 }} PLN</span>
-                  <span>
+        </form>
+        {% endfor %}
+        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+             aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <form class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                ...
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Zapisz</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-pane fade p-2 service {% if active_tab == 'service' %} show active{% endif %}" id="service"
+         role="tabpanel" aria-labelledby="service-tab">
+      <a href="{% url 'cars:add_service_form' car.0.pk %}" class="btn btn-outline-secondary btn-block btn-sm mb-1">Nowy
+        serwis</a>
+      <table class="d-none d-lg-table table table-bordered bg-light table-sm table-striped mb-0">
+        <thead class="bg-secondary text-center text-light">
+        <tr>
+          <td>Lp.</td>
+          <td>Data</td>
+          <td>Przebieg [km]</td>
+          <td>Części/Usługi - cena [PLN]</td>
+          <td>Koszt całkowity [PLN]</td>
+          <td>Faktury</td>
+          <td><i class="fas fa-cog"></i></td>
+        </tr>
+        </thead>
+        <tbody>
+        {% for service, lists in service_dictionary.items %}
+        <tr class="text-center" style="border-bottom:  double  !important;">
+          <td class="align-middle">
+            {{forloop.counter}}.
+          </td>
+          <td class="align-middle"><a class="text-dark pointer"
+                                      href="{% url 'cars:edit_service_details' car.0.pk service.id %}">{{service.date}}</a>
+          </td>
+          <td class="align-middle"><a class="text-dark pointer"
+                                      href="{% url 'cars:edit_service_details' car.0.pk service.id %}">{{service.mileage}}</a>
+          </td>
+          <td class="">
+            {% include 'cars/parts_table.html' %}
+          </td>
+          <td class="align-middle">{{ lists.2 }}</td>
+          <td class="text-left align-middle">
+            {% include 'cars/invoice_list.html' %}
+          </td>
+          <td class="align-middle">
+            <a onclick="return confirm('Czy napewno usunąć serwis i wszystkie dane?')"
+               class="deleteServiceButton_{{service.id}}"
+               href="{% url 'cars:delete_service' car.0.pk service.id %}">
+              <i title="Usuń serwis" class="far fa-trash-alt text-dark"></i>
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      <div class="row d-lg-none">
+        {% for service, lists in service_dictionary.items %}
+        <div class="col-12 mb-1 p-0">
+          <div class="card border-dark mb-3" style="height:100%;">
+            <a class="text-dark" title="edycja" href="{% url 'cars:edit_service_details' car.0.pk service.id %}">
+              <div class="card-header bg-transparent border-dark d-flex justify-content-between">
+                <i>{{forloop.counter}}. {{service.date}}</i> <i>{{service.mileage}} KM</i>
+              </div>
+            </a>
+            <div class="card-body text-secondary row  no-gutters p-1">
+              <div class="col-7 pr-1 border-right">
+                <p class="text-center m-0 small">Części/Usługi</p>
+                {% include 'cars/parts_table.html' %}
+              </div>
+              <div class="col-5  pl-1 text-left align-middle">
+                <p class="text-center m-0 small">Faktury/Paragony</p>
+                {% include 'cars/invoice_list.html' %}
+              </div>
+            </div>
+            <div class="card-footer bg-transparent border-dark d-flex justify-content-between">
+              <span>KOSZT CAŁKOWITY: {{ lists.2 }} PLN</span>
+              <span>
                     <a onclick="return confirm('Czy napewno usunąć serwis i wszystkie dane?')"
-                     class="deleteServiceButton_{{service.id}} mr-2"
-                     href="{% url 'cars:delete_service' car.0.pk service.id %}">
+                       class="deleteServiceButton_{{service.id}} mr-2"
+                       href="{% url 'cars:delete_service' car.0.pk service.id %}">
                       <i title="Usuń serwis" class="far fa-trash-alt text-dark"></i>
                     </a>
                   </span>
-                </div>
-              </div>
             </div>
-            {% endfor %}
           </div>
-
         </div>
-        <div class="tab-pane fade" id="chart" role="tabpanel" aria-labelledby="chart-tab">
-          <canvas class="bg-light rounded p-1" id="myChart"></canvas>
-          <script>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="tab-pane fade p-2 info {% if active_tab == 'info' %} show active{% endif %}" id="info" role="tabpanel"
+         aria-labelledby="info-tab">
+      <div class="card mb-3 mx-auto " style="max-width: 900px;" >
+        <div class="row no-gutters">
+          <div class="col-md-4 d-flex align-items-center">
+            {% for detail in car %}
+              {% if detail.image %}
+              <img class="card-img-top" style="width:100%;" src="{{detail.image.url}}" alt="{{detail}}">
+              {% else %}
+              <img class="card-img-top mx-auto" style="width:100%;" src="{% static 'todo/img/car-solid.svg'%}"
+                   alt="{{detail}}">
+              {% endif %}
+          </div>
+          <div class="col-md-8">
+            <div class="card-body">
+            <h5 class="card-title mb-0 text-center">{{detail.name}}</h5>
+          </div>
+          <ul class="list-group list-group-flush p-2">
+            <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
+              <span>
+                <span class="text-dark">Marka:</span>
+              </span>
+              <span>
+                <h6 class="mb-0"><span class="badge badge-dark badge-pill">{{detail.make}}</span></h6>
+              </span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
+              <span>
+                <span class="text-dark">Model:</span>
+              </span>
+              <span>
+                <h6 class="mb-0"><span class="badge badge-dark badge-pill">{{detail.model}}</span></h6>
+              </span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
+              <span>
+                <span class="text-dark">Rok produkcji:</span>
+              </span>
+              <span>
+                <h6 class="mb-0"><span class="badge badge-dark badge-pill">{{detail.year}}</span></h6>
+              </span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
+              <span>
+                <span class="text-dark">Silnik:</span>
+              </span>
+              <span>
+                <h6 class="mb-0"><span class="badge badge-dark badge-pill">{{detail.engine}}</span></h6>
+              </span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
+              <span>
+                <span class="text-dark">Moc:</span>
+              </span>
+              <span>
+                <h6 class="mb-0"><span class="badge badge-dark badge-pill">{{detail.power}} KM</span></h6>
+              </span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
+              <span>
+                <span class="text-dark">Przebieg w dn zakupu:</span>
+              </span>
+              <span>
+                <h6 class="mb-0"><span class="badge badge-dark badge-pill">{{detail.mileage}} KM</span></h6>
+              </span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
+              <span>
+                <span class="text-dark">Ostatni serwis:</span>
+              </span>
+              <span>
+                <h6 class="mb-0">
+                  <span class="badge badge-dark badge-pill">
+                    {% if last_service %}
+                      {{last_service.date}} | {{last_service.mileage}} km
+                    {% else%}
+                      B/D
+                    {% endif %}
+                  </span>
+                </h6>
+              </span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
+              <span>
+                <span class="text-dark">Średnie zużycie paliwa:</span>
+              </span>
+              <span>
+                <h6 class="mb-0"><span class="badge badge-dark badge-pill">{{average_consumption}} l/100km</span></h6>
+              </span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
+              <a class="btn btn-secondary btn-block btn-sm" href="{% url 'cars:car_edit' detail.pk %}">EDYCJA</a>
+            </li>
+          </ul>
+        </div>
+          </div>
+        </div>
+      </div>
+      <div class="container">
+        <div class="card" style="width: 18rem;">
+
+
+      </div>
+    </div>
+    <div class="tab-pane fade" id="chart" role="tabpanel" aria-labelledby="chart-tab">
+      <canvas class="bg-light rounded p-1" id="myChart"></canvas>
+      <script>
           var ctx = document.getElementById('myChart').getContext('2d');
           var chart_data_json = JSON.parse('{{chart_dates|escapejs }}');
           var dates_array = []
@@ -240,100 +353,8 @@
           function average(){
             average_array.push((((liters_array.reduce((a, b) => a + b, 0))/(kilometers_array.reduce((a, b) => a + b, 0)))*100).toFixed(2))
           }
-          </script>
-        </div>
-      </div>
-    </div>
-    <div class="col-12 col-xl-3">
-      <nav class="navbar navbar-expand-xl navbar-light bg-light">
-        <button class="navbar-toggler btn-block shadow" type="button" data-toggle="collapse" data-target="#car_details"
-                aria-controls="car_details" aria-expanded="false" aria-label="Toggle navigation">
-          <span>dane techniczne</span><span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="car_details">
-          <div class="card w-100 ">
-            {% for detail in car %}
-            {% if detail.image %}
-            <img class="card-img-top" style="width:100%;" src="{{detail.image.url}}" alt="{{detail}}">
-            {% else %}
-            <img class="card-img-top mx-auto" style="width:100%;" src="{% static 'todo/img/car-solid.svg'%}"
-                 alt="{{detail}}">
-            {% endif %}
-            <div class="card-body">
-              <h5 class="card-title mb-0">{{detail.name}}</h5>
-            </div>
-            <ul class="list-group list-group-flush">
-              <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
-            <span>
-              <span class="text-dark">Marka:</span>
-            </span>
-                <span>
-              <h6 class="mb-0"><span class="badge badge-dark badge-pill">{{detail.make}}</span></h6>
-            </span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
-            <span>
-              <span class="text-dark">Model:</span>
-            </span>
-                <span>
-              <h6 class="mb-0"><span class="badge badge-dark badge-pill">{{detail.model}}</span></h6>
-            </span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
-            <span>
-              <span class="text-dark">Rok produkcji:</span>
-            </span>
-                <span>
-              <h6 class="mb-0"><span class="badge badge-dark badge-pill">{{detail.year}}</span></h6>
-            </span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
-            <span>
-              <span class="text-dark">Silnik:</span>
-            </span>
-                <span>
-              <h6 class="mb-0"><span class="badge badge-dark badge-pill">{{detail.engine}}</span></h6>
-            </span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
-            <span>
-              <span class="text-dark">Moc:</span>
-            </span>
-                <span>
-              <h6 class="mb-0"><span class="badge badge-dark badge-pill">{{detail.power}} KM</span></h6>
-            </span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
-            <span>
-              <span class="text-dark">Przebieg w dn zakupu:</span>
-            </span>
-                <span>
-              <h6 class="mb-0"><span class="badge badge-dark badge-pill">{{detail.mileage}} KM</span></h6>
-            </span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
-            <span>
-              <span class="text-dark">Ostatni serwis/usterka:</span>
-            </span>
-                <span>
-              <h6 class="mb-0"><span class="badge badge-dark badge-pill">todo KM</span></h6>
-            </span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
-            <span>
-              <span class="text-dark">Średnie zużycie paliwa:</span>
-            </span>
-                <span>
-              <h6 class="mb-0"><span class="badge badge-dark badge-pill">todo L /1 00KM</span></h6>
-            </span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
-                <a class="btn btn-secondary btn-block btn-sm" href="{% url 'cars:car_edit' detail.pk %}">EDYCJA</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </nav>
+
+      </script>
     </div>
   </div>
 </div>
@@ -369,6 +390,7 @@
   });
 
 
+
 </script>
 {% endfor %}
 <script type="text/javascript">
@@ -390,6 +412,7 @@
       }
     });
   });
+
 
 
 </script>

@@ -43,6 +43,23 @@ def car_details(request, car_id):
     json_serializer = serializers.get_serializer("json")()
     chart_dates = json_serializer.serialize(Fuel.objects.filter(car_id=car_id).order_by('date'), ensure_ascii=False)
     service_list = Service.objects.select_related().filter(car_id=car_id).order_by('-date')
+    total_fuel_list = []
+    total_km_list = []
+    for fuel in car_fuel_fill_list:
+        total_fuel_list.append(fuel.liters)
+        total_km_list.append(fuel.kilometers)
+
+    total_fuel = sum(total_fuel_list)
+    total_km = sum(total_km_list)
+    print(total_km,total_fuel)
+    try:
+        average_consumption = round(total_fuel/total_km * 100, 2)
+    except ZeroDivisionError:
+        average_consumption = 0
+    try:
+        last_service = service_list[0]
+    except IndexError:
+        last_service = ''
     service_dictionary = {}
     for service in service_list:
         parts_sum = 0
@@ -62,7 +79,9 @@ def car_details(request, car_id):
         'car_fuel_fill_list': car_fuel_fill_list,
         'car_fill_form': car_fill_form,
         'chart_dates': chart_dates,
-        'service_dictionary': service_dictionary
+        'service_dictionary': service_dictionary,
+        'last_service': last_service,
+        'average_consumption': average_consumption,
     }
     return render(request, 'cars/car_details.html', context)
 
@@ -75,7 +94,7 @@ class CarUpdate(UpdateView):
         context = super().get_context_data(**kwargs)
         pk = self.object.pk
         context['car'] = Car.objects.filter(pk=pk)
-        context['return_url'] = '{}'.format(reverse('cars:car_details', kwargs={'car_id': pk}))
+        context['return_url'] = '{}#info'.format(reverse('cars:car_details', kwargs={'car_id': pk}))
         return context
 
     def get_success_url(self):
