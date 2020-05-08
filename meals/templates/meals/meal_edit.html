@@ -47,15 +47,15 @@
                 </span>
               </li>
               <li class="list-group-item  update_ingredient_ px-1" id="update_ingredient_{{ingredient.id }}" style="display:none;">
-                <form class="form" action="{% url 'meals:update_ingredient' meal.0.id ingredient.id  %}"
-                      method="post" id="">{% csrf_token %}
+                <form class="updateIngredient_ form" action="{% url 'meals:update_ingredient' meal.0.id ingredient.id  %}"
+                      method="post" id="updateIngredient_{{ingredient.id }}">{% csrf_token %}
                   <div class="form-row mx-auto">
                     <div class="col-6 pr-0">
-                      <input class="form-control" type="number" min="0" step="0.01" name="new_quantity"
+                      <input class="form-control" type="number" min="0" step="0.01" name="new_quantity" id="newQuantity_{{ingredient.id }}"
                              value="{% localize off %}{{ingredient.quantity}}{% endlocalize %}">
                     </div>
                     <div class="col-6 pl-0">
-                      <select class="form-control" name="new_unit">
+                      <select class="form-control" name="new_unit" id="newUnit_{{ingredient.id }}">
                         <option value="2">g</option>
                         <option disabled>-----</option>
                         {% for unit in units %}
@@ -173,7 +173,25 @@
       }, 1000);
       }
     });
-
+  });
+  $('body').on('submit','.updateIngredient_',function(e){
+    e.preventDefault();
+    var id = e.target.id
+    var ingr_id = parseInt(id.split('_')[1])
+    $.ajax({
+      type:'POST',
+      url:'/mealsEdit/update_ingredient/' + {{meal.0.id}} + '/' + ingr_id,
+      data:{
+        new_quantity:$('#newQuantity_'+ ingr_id).val(),
+        new_unit:$('#newUnit_' + ingr_id).val(),
+        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+      },
+      success: function(json){
+        setTimeout (function() {
+          $('#ingredients_list').load(document.URL + ' #ingredients_list');
+      }, 1000);
+      }
+    });
   });
 
   $('body').on('click','.delete_ingr_',function(e){
