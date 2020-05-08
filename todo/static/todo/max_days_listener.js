@@ -111,13 +111,16 @@ $(document).ready(function(){
     })
 
   $('#new_ingredient_form_toggle').click(function(e){
-    if ($(this).text() == "Opcje") {
+  console.log($(this).text());
+    if ($(this).text().trim() == "Opcje") {
           $(this).text("Zamknij");
       } else {
           $(this).text("Opcje");
       };
     $('#new_ingredient_form').toggle(600);
   })
+
+
 
   $('.meal_option_settings').on('click', function(e){
       var id = $(e.target).closest('li').attr('id')
@@ -185,6 +188,13 @@ $('body').on('click','.dropdown_shopping_item',function(e){
   $('#'+num_id).toggle(600);
   $('#badge_edit_'+num_id).toggle(600);
 });
+
+$('body').on('click','.dropdownMenuButton_',function(e){
+  var id = e.target.id;
+    var num_id = id.split('_')[1]
+  $('#update_ingredient_'+num_id).toggle(600)
+});
+
 
 $('body').on('change','input[name=bought_many]',function(e){
 var id_num = $(this).attr('id').split('_')[1]

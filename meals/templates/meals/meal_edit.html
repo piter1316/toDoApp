@@ -29,7 +29,7 @@
                 <button class="btn btn-sm btn-secondary btn-block" type="submit">Zmień</button>
               </form>
             </div>
-            <ul class="list-group list-group-flush">
+            <ul class="list-group list-group-flush" id="ingredients_list">
               <li class="list-group-item p-0 ml-1">
                 <small>Składniki:</small>
               </li>
@@ -42,49 +42,55 @@
                   <span class="badge badge-secondary badge-pill p-2"> {{ ingredient.quantity |divide:ingredient.ingredient_id.weight_per_unit }} szt</span>
                   {% endif %}
                   <span class="badge badge-secondary badge-pill p-2">{{ingredient.ingredient_id.shop}}</span>
-                  <span class="badge badge-secondary badge-pill dropdown-toggle" id="dropdownMenuButton"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <div class="dropdown-menu p-3" aria-labelledby="dropdownMenuButton">
-                      <form class="form" action="{% url 'meals:update_ingredient' meal.0.id ingredient.id  %}"
-                            method="post">{% csrf_token %}
-                        <div class="from-group row">
-                          <div class="col-6 pr-0">
-                            <input class="form-control" type="number" min="0" step="0.01" name="new_quantity"
-                                   value="{% localize off %}{{ingredient.quantity}}{% endlocalize %}">
-                          </div>
-                          <div class="col-6 pl-0">
-                            <select class="form-control" name="new_unit">
-                              <option value="2">g</option>
-                              <option disabled>-----</option>
-                              {% for unit in units %}
-                                <option value="{{unit.id}}">{{unit}}</option>
-                              {% endfor %}
-                            </select>
-                          </div>
-                        </div>
-                        <div class="form-group row mb-0">
-                          <div class="col-12">
-                            <button class="btn btn-secondary btn-block" type="submit">Zmień</button>
-                            <a href="{% url 'meals:delete_ingredient' meal.0.id  ingredient.id %}"
-                               class="btn btn-danger btn-block">Usuń składnik</a>
-                          </div>
-                        </div>
-                      </form>
-                    </div>
+                  <span class="badge badge-secondary badge-pill dropdown-toggle dropdownMenuButton_" style="cursor:pointer;" id="dropdownMenuButton_{{ingredient.id }}">
                   </span>
                 </span>
               </li>
+              <li class="list-group-item  update_ingredient_ px-1" id="update_ingredient_{{ingredient.id }}" style="display:none;">
+                <form class="form" action="{% url 'meals:update_ingredient' meal.0.id ingredient.id  %}"
+                      method="post" id="">{% csrf_token %}
+                  <div class="form-row mx-auto">
+                    <div class="col-6 pr-0">
+                      <input class="form-control" type="number" min="0" step="0.01" name="new_quantity"
+                             value="{% localize off %}{{ingredient.quantity}}{% endlocalize %}">
+                    </div>
+                    <div class="col-6 pl-0">
+                      <select class="form-control" name="new_unit">
+                        <option value="2">g</option>
+                        <option disabled>-----</option>
+                        {% for unit in units %}
+                          <option value="{{unit.id}}">{{unit}}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    <div class="col-12">
+                      <div class="btn-group btn-block">
+                      <button class="btn btn-secondary" type="submit">Zmień</button>
+                      <a href="{% url 'meals:delete_ingredient' meal.0.id  ingredient.id %}"
+                         class="btn btn-danger"><i class="far fa-trash-alt"></i></a>
+                    </div>
+                  </div>
+                  <div class="form-group row mb-0">
+
+                  </div>
+                </form>
+              </li>
               {% endfor %}
+            </ul>
+            <ul class="list-group list-group-flush">
               <li class="list-group-item mt-2">
-                <button id="new_ingredient_form_toggle" type="button" class="btn btn-outline-secondary btn-sm ml-1">
-                  Opcje
-                </button>
+                <div class="btn-group mr-2" role="group" aria-label="First group">
+                  <button id="new_ingredient_form_toggle" type="button" class="btn btn-outline-secondary btn-sm ml-1">
+                    Opcje
+                  </button>
+                  <button class="btn btn-block btn-outline-info btn-block" id="addding_ingr_info" style="display:none">Zapisywanie...</button>
+                </div>
                 <form style="display:none;" class="mt-2" action="{% url 'meals:add_ingredient' meal.0.id %}"
                       method="post" id="new_ingredient_form">{% csrf_token %}
+
                   <small>Nowy składnik:</small>
                   <div class="form-row mb-2">
-                    <select class="form-control" name="ingredient">
-
+                    <select class="form-control" name="ingredient" id="select_ingredient">
                       {% for ingredient in user_ingredients %}
                       <option value="{{ingredient.id}}">{{ingredient}} | {{ingredient.calories_per_100_gram}} kcal/100g</option>
                       {% endfor %}
@@ -93,10 +99,10 @@
                   <div class="form-row mb-2">
                     <div class="input-group mb-3">
                       <input class="form-control" type="number" step="0.01" min="0" placeholder="Ilość" name="quantity"
-                             value="1">
+                             value="1" id="quantity">
                       <div class="input-group-append">
                         <span class="" id="addon-quantity">
-                          <select class="form-control" name="unit">
+                          <select class="form-control" name="unit" id="unit">
                             {% for unit in units %}
                             <option value="{{unit.id}}" {% if unit.id == 2%} selected {% endif %}>{{unit}}</option>
                             {% endfor %}
@@ -147,6 +153,27 @@
 
     </div>
   </div>
+  <script type="text/javascript">
+  $('#new_ingredient_form').on('submit', function(e){
+    e.preventDefault();
+    $.ajax({
+      type:'POST',
+      url:'/mealsEdit/add_ingredient/' + {{meal.0.id}},
+      data:{
+        ingredient:$('#select_ingredient').val(),
+        quantity:$('#quantity').val(),
+        unit:$('#unit').val(),
+        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+      },
+      success: function(json){
+        $('#addding_ingr_info').show('slow')
+        setTimeout (function() {
+        $('#addding_ingr_info').hide('slow')
+          $('#ingredients_list').load(document.URL + ' #ingredients_list');
+      }, 1000);
+      }
+    });
 
-
+  });
+  </script>
   {% endblock %}
