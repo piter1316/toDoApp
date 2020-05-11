@@ -111,13 +111,13 @@ $(document).ready(function(){
     })
 
   $('#new_ingredient_form_toggle').click(function(e){
-  console.log($(this).text());
     if ($(this).text().trim() == "Opcje") {
           $(this).text("Zamknij");
       } else {
           $(this).text("Opcje");
       };
     $('#new_ingredient_form').toggle(600);
+
   })
 
 

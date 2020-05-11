@@ -10,7 +10,7 @@
       <div class="row">
         <div class="col-12 col-xl-8">
           <div class="card shadow  p-0" style="">
-            <div class="card-header text-center">
+            <div class="card-header text-center" id="card-header">
               <p id="option_name" class="lead mb-0" style="cursor:pointer;" title="Kliknj i edtyuj">
                 {{meal.0.name|upper}} {%if meal.0.special%} **{% endif %}<br>
                 <small>{{calories}} <sup>kcal</sup> </small> |
@@ -30,7 +30,7 @@
               </form>
             </div>
             <ul class="list-group list-group-flush" id="ingredients_list">
-              <li class="list-group-item p-0 ml-1">
+              <li class="list-group-item p-0 ml-1" id="ingr">
                 <small>Składniki:</small>
               </li>
               {% for ingredient in ingredients %}
@@ -39,9 +39,9 @@
                 <span>
                   <span class="badge badge-secondary badge-pill p-2">{{ingredient.quantity}} g</span>
                   {% if ingredient.quantity|divide:ingredient.ingredient_id.weight_per_unit > 0 %}
-                  <span class="badge badge-secondary badge-pill p-2"> {{ ingredient.quantity |divide:ingredient.ingredient_id.weight_per_unit }} szt</span>
+                  <span class="badge badge-secondary badge-pill p-2 no_print"> {{ ingredient.quantity |divide:ingredient.ingredient_id.weight_per_unit }} szt</span>
                   {% endif %}
-                  <span class="badge badge-secondary badge-pill p-2">{{ingredient.ingredient_id.shop}}</span>
+                  <span class="badge badge-secondary badge-pill p-2 no_print">{{ingredient.ingredient_id.shop}}</span>
                   <span class="badge badge-secondary badge-pill dropdown-toggle dropdownMenuButton_" style="cursor:pointer;" id="dropdownMenuButton_{{ingredient.id }}">
                   </span>
                 </span>
@@ -82,6 +82,9 @@
                 <div class="btn-group mr-2" role="group" aria-label="First group">
                   <button id="new_ingredient_form_toggle" type="button" class="btn btn-outline-secondary btn-sm ml-1">
                     Opcje
+                  </button>
+                  <button id="print_meal_recipe" onclick="createPDFRecipe()" type="button" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-print"></i>
                   </button>
                   <button class="btn btn-block btn-outline-info btn-block btn-sm" id="addding_ingr_info" style="display:none">Zapisywanie...</button>
                 </div>

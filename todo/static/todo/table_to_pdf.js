@@ -29,5 +29,39 @@ function createPDF() {
   win.document.close(); 	// CLOSE THE CURRENT WINDOW.
 
   win.print();    // PRINT THE CONTENTS.
-  b_t_w.innerText = ''
+}
+
+function createPDFRecipe() {
+
+var style = "<style>";
+  style = style + "p {text-align:center;}";
+  style = style + "#ingr {list-style-type:none;}";
+  style = style + "form {dispaly: none;}";
+    style = style + ".no_print {display: none}";
+
+
+  style = style + "</style>";
+
+var name = document.getElementById('option_name').innerHTML;
+var list = document.getElementById('ingredients_list').innerHTML;
+var recipe = document.getElementById('update_recipe_textarea').value;
+
+var win = window.open('', '', 'height=1280,width=768');
+
+  win.document.write('<html><head>');
+  win.document.write('<br>');
+  win.document.write('<title>Profile</title>');   // <title> FOR PDF HEADER.
+  win.document.write(style);          // ADD STYLE INSIDE THE HEAD TAG.
+  win.document.write('</head>');
+  win.document.write('<body>');
+  win.document.write(name);         // THE TABLE CONTENTS INSIDE THE BODY TAG.
+  win.document.write('<hr>');         // THE TABLE CONTENTS INSIDE THE BODY TAG.
+  win.document.write(list);         // THE TABLE CONTENTS INSIDE THE BODY TAG.
+  win.document.write('<hr>');
+  win.document.write(recipe);         // THE TABLE CONTENTS INSIDE THE BODY TAG.
+  win.document.write('</body></html>');
+
+  win.document.close(); 	// CLOSE THE CURRENT WINDOW.
+
+  win.print();    // PRINT THE CONTENTS
 }
