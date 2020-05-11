@@ -83,7 +83,7 @@
                   <button id="new_ingredient_form_toggle" type="button" class="btn btn-outline-secondary btn-sm ml-1">
                     Opcje
                   </button>
-                  <button class="btn btn-block btn-outline-info btn-block" id="addding_ingr_info" style="display:none">Zapisywanie...</button>
+                  <button class="btn btn-block btn-outline-info btn-block btn-sm" id="addding_ingr_info" style="display:none">Zapisywanie...</button>
                 </div>
                 <form style="display:none;" class="mt-2" action="{% url 'meals:add_ingredient' meal.0.id %}"
                       method="post" id="new_ingredient_form">{% csrf_token %}
@@ -131,13 +131,13 @@
           </div>
         </div>
         <div class="col-12 col-xl-4">
-          <div class="card shadow p-0" style="">
+          <div class="card shadow p-0" style="" id="update_recipe_container">
             <div class="card-header text-center">
               <p class="lead">Przepis</p>
             </div>
             <ul class="list-group list-group-flush">
               <li class="list-group-item p-0">
-                <form action="{% url 'meals:add_recipe' meal.0.id %}" method="post"> {% csrf_token %}
+                <form action="{% url 'meals:add_recipe' meal.0.id %}" method="post" id="recipe_update"> {% csrf_token %}
                   <textarea name="update_recipe_textarea" id="update_recipe_textarea" class="form-control"
                             placeholder="{% if not meal.0.recipe %}Wprowadź przepis...{% endif %}"
                             rows="{{recipe_rows}}"
@@ -189,6 +189,23 @@
       success: function(json){
         setTimeout (function() {
           $('#ingredients_list').load(document.URL + ' #ingredients_list');
+      }, 1000);
+      }
+    });
+  });
+
+  $('body').on('submit','#recipe_update',function(e){
+    e.preventDefault();
+    $.ajax({
+      type:'POST',
+      url:'/mealsEdit/add_recipe/' + {{meal.0.id}},
+      data:{
+        update_recipe_textarea:$('#update_recipe_textarea').val(),
+        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+      },
+      success: function(json){
+        setTimeout (function() {
+          $('#update_recipe_container').load(document.URL + ' #update_recipe_container');
       }, 1000);
       }
     });

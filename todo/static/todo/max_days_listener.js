@@ -128,8 +128,7 @@ $(document).ready(function(){
       var s_id = parseInt(settings_id[1])
       $('#settings_'+(s_id)).toggleClass('d-none');
    });
-
-  $('#allow_update_recipe').on('click', function(e){
+  $('body').on('click','#allow_update_recipe',function(e){
     $('#allow_update_recipe').hide('slow');
     $('#update_recipe_textarea').removeAttr('readonly');
     var rows = $('#update_recipe_textarea').attr('rows');
@@ -140,7 +139,8 @@ $(document).ready(function(){
       $('#update_recipe_textarea').attr('rows', rows+=1);
     }
     $('#update_recipe_textarea').focus();
-    $('#update_recipe').toggleClass('d-none');
+    setTimeout(function(){$('#update_recipe').toggleClass('d-none');}, 600);
+
    });
 
   $('#option_name').on('click', function(e){
