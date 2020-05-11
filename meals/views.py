@@ -483,8 +483,11 @@ def update_meal_option(request, meal_option_id):
 def update_meal_name(request, meal_id):
     new_meal_name = request.POST['new_meal_name']
     edit_special = request.POST.get('edit_special', False)
-    if edit_special == 'on':
+    print(edit_special)
+    if edit_special == 'true':
         edit_special = True
+    else:
+        edit_special = False
     Meal.objects.filter(pk=meal_id).update(name=new_meal_name, special=edit_special)
     return redirect('meals:edit_meal_ingredients', meal_id=meal_id)
 

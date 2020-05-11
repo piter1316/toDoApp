@@ -9,25 +9,27 @@
     <div class="container">
       <div class="row">
         <div class="col-12 col-xl-8">
-          <div class="card shadow  p-0" style="">
+          <div class="card shadow  p-0" style="" id="card">
             <div class="card-header text-center" id="card-header">
-              <p id="option_name" class="lead mb-0" style="cursor:pointer;" title="Kliknj i edtyuj">
-                {{meal.0.name|upper}} {%if meal.0.special%} **{% endif %}<br>
-                <small>{{calories}} <sup>kcal</sup> </small> |
-                <small>{{protein}}g <sup>białko</sup></small> |
-                <small>{{fat}}g <sup>tłuszcz</sup></small> |
-                <small>{{carbohydrates}}g <sup>węglowodany</sup></small>
-              </p>
-              <form id="new_meal_option_name" style="display:none;"
-                    action="{% url 'meals:update_meal_name' meal.0.id %}" method="post">{% csrf_token %}
-                <div class="input-group">
-                  <input class="form-control" name="new_meal_name" type="text" value="{{meal.0.name}}">
-                </div>
-                <label class="my-2" for="edit_special"><input class="" type="checkbox" name="edit_special"
-                                                              id="edit_special" {%if meal.0.special%}checked{% endif %}>Danie
-                  specjalne</label>
-                <button class="btn btn-sm btn-secondary btn-block" type="submit">Zmień</button>
-              </form>
+              <div id="edit_panel">
+                <p id="option_name" class="lead mb-0" style="cursor:pointer;" title="Kliknj i edtyuj">
+                  {{meal.0.name|upper}} {%if meal.0.special%} **{% endif %}<br>
+                  <small>{{calories}} <sup>kcal</sup> </small> |
+                  <small>{{protein}}g <sup>białko</sup></small> |
+                  <small>{{fat}}g <sup>tłuszcz</sup></small> |
+                  <small>{{carbohydrates}}g <sup>węglowodany</sup></small>
+                </p>
+                <form id="new_meal_option_name" style="display:none;"
+                      action="{% url 'meals:update_meal_name' meal.0.id %}" method="post">{% csrf_token %}
+                  <div class="input-group">
+                    <input class="form-control" name="new_meal_name" id="new_meal_name" type="text" value="{{meal.0.name}}">
+                  </div>
+                  <label class="my-2" for="edit_special"><input class="" type="checkbox" name="edit_special"
+                                                                id="edit_special" {%if meal.0.special%}checked{% endif %}>Danie
+                    specjalne</label>
+                  <button class="btn btn-sm btn-secondary btn-block" type="submit">Zmień</button>
+                </form>
+              </div>
             </div>
             <ul class="list-group list-group-flush" id="ingredients_list">
               <li class="list-group-item p-0 ml-1" id="ingr">
@@ -157,6 +159,12 @@
     </div>
   </div>
   <script type="text/javascript">
+
+  function reloadData() {
+    $('#ingredients_list').load(document.URL + ' #ingredients_list');
+    $('#card-header').load(document.URL + ' #edit_panel');
+  }
+
   $('#new_ingredient_form').on('submit', function(e){
     e.preventDefault();
     $.ajax({
@@ -172,7 +180,7 @@
         $('#addding_ingr_info').show('slow')
         setTimeout (function() {
         $('#addding_ingr_info').hide('slow')
-          $('#ingredients_list').load(document.URL + ' #ingredients_list');
+         reloadData();
       }, 1000);
       }
     });
@@ -191,7 +199,7 @@
       },
       success: function(json){
         setTimeout (function() {
-          $('#ingredients_list').load(document.URL + ' #ingredients_list');
+          reloadData();
       }, 1000);
       }
     });
@@ -214,6 +222,24 @@
     });
   });
 
+  $('body').on('submit','#new_meal_option_name',function(e){
+    e.preventDefault();
+    $.ajax({
+      type:'POST',
+      url:'/mealsEdit/update_meal_name/' + {{meal.0.id}},
+      data:{
+        new_meal_name:$('#new_meal_name').val(),
+        edit_special:$('#edit_special').prop('checked'),
+        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+      },
+      success: function(json){
+        setTimeout (function() {
+          $('#card-header').load(document.URL + ' #edit_panel');
+      }, 1000);
+      }
+    });
+  });
+
   $('body').on('click','.delete_ingr_',function(e){
     e.preventDefault();
     var id = e.target.id
@@ -224,7 +250,7 @@
       data:{
       },
       success: function(data){
-        $('#ingredients_list').load(document.URL + ' #ingredients_list');
+        reloadData();
       },
     });
   });

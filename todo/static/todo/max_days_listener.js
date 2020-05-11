@@ -143,7 +143,7 @@ $(document).ready(function(){
 
    });
 
-  $('#option_name').on('click', function(e){
+   $('body').on('click','#option_name',function(e){
     $('#new_meal_option_name').toggle(600);
   });
 
