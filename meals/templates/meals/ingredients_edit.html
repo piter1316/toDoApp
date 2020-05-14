@@ -2,9 +2,29 @@
 {% block body %}
 
 <div class="container mt-2">
-  <div class="row">
-    <div class="col-12 col-md-4 col-xl-2">
-      <table class="table table-light table-striped table-hover">
+  <ul class="nav nav-tabs mb-1 row no-gutters" id="myShopMacrosTab" role="tablist">
+    <li class="nav-item col">
+      <a class="btn btn-outline-secondary  w-100 active" id="macro-tab" data-toggle="tab" href="#macro"
+         role="tab"
+         aria-controls="chart" aria-selected="false" style=" border-radius: 5px 0px 0px 5px !important;">
+        <i class="fas fa-egg"></i>
+        <i class="fas fa-bacon"></i>
+        <i class="fas fa-drumstick-bite"></i>
+        <i class="fas fa-pepper-hot"></i>
+        <i class="fas fa-ice-cream"></i>
+      </a>
+    </li>
+    <li class="nav-item col">
+    <a class="btn btn-outline-secondary   w-100" id="shop-tab" data-toggle="tab" href="#shop"
+       role="tab"
+       aria-controls="fuel" aria-selected="true" style=" border-radius: 0px 5px 5px 0px !important;">
+      <i class="fas fa-shopping-cart"></i>
+    </a>
+  </li>
+  </ul>
+  <div class="tab-content" id="shops_macros_tabs">
+    <div class="tab-pane fade" id="shop" role="tabpanel" aria-labelledby="shop-tab">
+      <table class="table table-light table-striped table-hover" id="shops_tab">
         <thead class="thead-dark text-center">
         <tr>
           <th class="d-flex justify-content-between align-items-center">
@@ -17,37 +37,38 @@
         <tbody>
         {% for shop in user_shops %}
         <tr>
-          <td class="d-flex justify-content-between align-items-center">
-            <span>{{shop}}</span>
+          <td  class=" d-flex justify-content-between align-items-center" id="tdShop_{{shop.id}}">
+            <span class="shop_" contenteditable="true" id="shop_{{shop.id}}">{{shop}}</span>
             <a onclick="return confirm('Usunąć sklep oraz i przypisanie do składników?')"
-               href="{% url 'meals:delete_shop' shop.id %}" class="fas fa-minus-circle text-secondary"></a>
+               href="{% url 'meals:delete_shop' shop.id %}" class="deleteShop_ fas fa-minus-circle text-secondary"
+                id="deleteShop_{{shop.id}}"></a>
           </td>
         </tr>
         {% endfor %}
         </tbody>
       </table>
     </div>
-    <div class="col-12 col-md-8 col-xl-10 ">
+    <div class="tab-pane fade service show active" id="macro">
       <div style="overflow-y:scroll; height:80vh;">
         <table class="table table-light table-striped table-hover table-fixed ">
           <thead class="thead-dark text-center">
           <tr>
             <th class="px-0">
-              <button class="btn btn-sm btn-outline-light" data-toggle="modal" data-target="#addIngredientModal"><i
+              <button class="btn btn-sm btn-outline-light p-1 p-md-2" data-toggle="modal" data-target="#addIngredientModal"><i
                   class="fas fa-plus"></i></button>
             </th>
             <th class="align-items-center px-0">
               <span class="">Składnik</span>
             </th>
-            <th class="px-0">kcal / 100g<br>btw</th>
-            <th class="px-0">Średnia szt. / opak.</th>
-            <th class="px-0">Sklep</th>
+            <th class="p-0">kcal/100g<br>btw</th>
+            <th class="p-0">szt./opak.</th>
+            <th class="p-0">Sklep</th>
           </tr>
           </thead>
           <tbody class="table-sm">
           {% for ingredient in user_ingredients %}
           <tr>
-            <td class="px-0 text-center">
+            <td class="p-0 text-center">
               <i class="fas fa-edit" data-toggle="modal" data-target="#editIngredientModal_{{ingredient.id}}"></i>
               <a onclick="return confirm('Czy napewno usunąć składnik?')"
                  href="{% url 'meals:delete_ingr' ingredient.id %}" class="fas fa-minus-circle text-secondary"></a>
@@ -65,6 +86,14 @@
         </table>
       </div>
     </div>
+    </div>
+  <div class="row">
+    <div class="col-12 col-md-4 col-xl-2">
+
+    </div>
+    <div class="col-12 col-md-8 col-xl-10 ">
+
+    </div>
   </div>
 </div>
 
@@ -72,15 +101,15 @@
      aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
-      <form method="post" action="{% url 'meals:add_shop' %}">{%csrf_token%}
+      <form method="post" action="{% url 'meals:add_shop' %}" id="add_shop">{%csrf_token%}
         <div class="modal-header">
           <h5 class="modal-title">Nowy Sklep</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="addShopModalCloseButton">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
-          <input required type="text" name="new_shop_name" class="form-control" placeholder="Nazwa sklepu">
+          <input required type="text" name="new_shop_name" id="new_shop_name" class="form-control" placeholder="Nazwa sklepu">
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
@@ -180,5 +209,60 @@
   </div>
 </div>
 {% endfor %}
+<script>
+   $('body').on('focusout','.shop_',function(e){
+    e.preventDefault();
+    var id = e.target.id
+    var shop_id = parseInt(id.split('_')[1])
+    $.ajax({
+      type:'POST',
+      url:'/ingredientsEdit/editShop',
+      data:{
+        new_name:$('#shop_'+ shop_id).text(),
+        shop_id: shop_id,
+        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+      },
+      success: function(json){
+        setTimeout (function() {
+          $('#shop').load(document.URL + ' #shops_tab');
+      }, 200);
+      }
+    });
+  });
 
+  $('body').on('click','.deleteShop_',function(e){
+    e.preventDefault();
+    var id = e.target.id
+    var shop_id = parseInt(id.split('_')[1])
+    $.ajax({
+      type:'GET',
+      url:'/ingredientsEdit/deleteShop/' + shop_id,
+      data:{
+      },
+      success: function(data){
+        setTimeout (function() {
+          $('#shop').load(document.URL + ' #shops_tab');
+      }, 200);
+      },
+    });
+  });
+
+  $('body').on('submit','#add_shop',function(e){
+    e.preventDefault();
+    $.ajax({
+      type:'POST',
+      url:'ingredientsEdit/addShop',
+      data:{
+        new_shop_name:$('#new_shop_name').val(),
+        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+      },
+      success: function(json){
+        setTimeout (function() {
+          $('#addShopModalCloseButton').click();
+          $('#shop').load(document.URL + ' #shops_tab');
+      }, 200);
+      }
+    });
+  });
+</script>
 {% endblock %}

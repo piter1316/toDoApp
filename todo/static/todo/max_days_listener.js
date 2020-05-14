@@ -215,3 +215,12 @@ var id_num = $(this).attr('id').split('_')[1]
   }
 });
 
+if(window.location.href.includes('#shop')){
+ $('#macro').removeClass('show')
+ $('#macro').removeClass('active')
+ $('#macro-tab').removeClass('active')
+ $('#shop').addClass('show');
+ $('#shop').addClass('active');
+ $('#shop-tab').addClass('active');
+ }
+

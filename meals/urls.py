@@ -14,6 +14,7 @@ urlpatterns = [
     path('ingredientsEdit', views.edit_ingredients, name='edit_ingredients'),
     path('ingredientsEdit/addShop', views.add_shop, name='add_shop'),
     path('ingredientsEdit/deleteShop/<shop_id>', views.delete_shop, name='delete_shop'),
+    path('ingredientsEdit/editShop', views.edit_shop, name='edit_shop'),
     path('ingredientsEdit/newIngredient', views.new_ingredient, name='new_ingredient'),
     path('ingredientsEdit/deleteIngredient/<ingr_id>', views.delete_ingr, name='delete_ingr'),
     path('ingredientsEdit/editIngredient/<ingr_id>', views.edit_ingredient, name='edit_ingredient'),

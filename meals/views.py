@@ -575,7 +575,8 @@ def edit_ingredients(request):
     context = {
         'user_ingredients': user_ingredients,
         'user_shops': user_shops,
-        'form': form
+        'form': form,
+        'active_tab': 'shop',
     }
     return render(request, 'meals/ingredients_edit.html', context)
 
@@ -585,13 +586,25 @@ def add_shop(request):
     new_shop_name = new_shop_name.upper()
     new_shop = Shop(name=new_shop_name, user=request.user)
     new_shop.save()
+    return redirect('/ingredientsEdit#shops')
 
-    return redirect('meals:edit_ingredients')
+
+def edit_shop(request):
+    print(request.POST)
+    new_name = request.POST['new_name']
+    shop_id = request.POST['shop_id']
+    shop_to_edit = get_object_or_404(Shop, pk=int(shop_id))
+    shop_to_edit.name = new_name.upper().strip()
+    shop_to_edit.save()
+
+    return redirect('/ingredientsEdit#shops')
+
+
 
 
 def delete_shop(request, shop_id):
     Shop.objects.filter(pk=shop_id).delete()
-    return redirect('meals:edit_ingredients')
+    return redirect('/ingredientsEdit#shops')
 
 
 def new_ingredient(request):
