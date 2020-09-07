@@ -95,6 +95,10 @@ def home(request):
         except ZeroDivisionError:
             meals_list_length = 0
             average_clories_per_day = 0
+            average_protein_per_day = 0
+            average_fat_per_day = 0
+            average_carb_per_day = 0
+
         shopping_lists = ShoppingList.objects.filter(user_id=request.user)
         products_to_buy_counter = 0
         for product in shopping_lists:
