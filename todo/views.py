@@ -2,10 +2,10 @@ from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 
-from meals.models import MealsList
+from meals.models import MealsList, MealIngredient, Meal, Ingredient
 from shopping.models import ShoppingList, Products
 from .forms import TodoForm
 from .models import Todo
@@ -55,32 +55,73 @@ def home(request):
         all_to_do_count = Todo.objects.filter(user=request.user, complete=False)
         all_meals = MealsList.objects.filter(user=request.user)
         meal_options = MealsList.objects.filter(user=request.user).values('meal_option_id').distinct()
-        meals = MealsList.objects.select_related('meal').filter(user=request.user).distinct()
+        meals = MealsList.objects.select_related('meal').filter(user=request.user)
         calories_total = 0
+        protein_total = 0
+        fat_total = 0
+        carb_total = 0
+        calories = 0
+        protein = 0
+        fat = 0
+        carb = 0
         for meal in meals:
-            if len(str(meal)) > 0:
-                calories_total += meal.meal.calories
+            try:
+                one_meal = Meal.objects.get(id=meal.meal_id)
+            except Exception:
+                one_meal = None
+            ingredients = MealIngredient.objects.select_related('ingredient_id').filter(meal_id=one_meal)
+            for ingr in ingredients:
+                ingr_obj = get_object_or_404(Ingredient, pk=ingr.ingredient_id.id)
+                calories += (ingr.quantity / 100) * int(ingr_obj.calories_per_100_gram)
+                protein += (ingr.quantity / 100) * int(ingr_obj.protein_per_100_gram)
+                fat += (ingr.quantity / 100) * int(ingr_obj.fat_per_100_gram)
+                carb += (ingr.quantity / 100) * int(ingr_obj.carbohydrates_per_100_gram)
+                calories_total += calories
+                protein_total += protein
+                fat_total += fat
+                carb_total += carb
+                calories = 0
+                protein = 0
+                fat = 0
+                carb = 0
+        print('------', calories_total)
+
         try:
             meals_list_length = int(len(all_meals) / len(meal_options))
             average_clories_per_day = int(calories_total/meals_list_length)
+            average_protein_per_day = int(protein_total/meals_list_length)
+            average_fat_per_day = int(fat_total/meals_list_length)
+            average_carb_per_day = int(carb_total/meals_list_length)
         except ZeroDivisionError:
             meals_list_length = 0
             average_clories_per_day = 0
+            average_protein_per_day = 0
+            average_fat_per_day = 0
+            average_carb_per_day = 0
+
         shopping_lists = ShoppingList.objects.filter(user_id=request.user)
         products_to_buy_counter = 0
         for product in shopping_lists:
             for item in Products.objects.filter(shopping_list_id=product, bought=False):
                 products_to_buy_counter += 1
+        distinct_meals =[]
+        for meal in meals:
+            if meal.meal:
+                if meal.meal.name not in distinct_meals:
+                    distinct_meals.append(meal.meal.name)
 
 
         context = {
             'all_to_do_count': len(all_to_do_count),
             'meals_list_length': meals_list_length,
-            'meals': len(meals),
+            'meals': len(distinct_meals),
             'meal_options': len(meal_options),
             'shopping_lists': len(shopping_lists),
             'products_to_buy_counter': products_to_buy_counter,
-            'average_clories_per_day': average_clories_per_day
+            'average_clories_per_day': average_clories_per_day,
+            'average_protein_per_day': average_protein_per_day,
+            'average_fat_per_day': average_fat_per_day,
+            'average_carb_per_day': average_carb_per_day,
         }
     else:
         context = {}

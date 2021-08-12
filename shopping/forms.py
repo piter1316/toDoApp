@@ -18,6 +18,3 @@ class ProductsForm(forms.Form):
         attrs={'value': 1,
                'class': 'form-control',
                'style': 'max-width:75px;'}))
-
-
-

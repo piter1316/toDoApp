@@ -49,11 +49,20 @@
         <li class="nav-item">
           <a class="nav-link" href="{% url 'todo:index' %}">To do</a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item dropdown">
           <a class="nav-link" href="{% url 'meals:index' %}">Jadłospis</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{% url 'cars:cars_home' %}">Garaż</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle pl-0" style="cursor:pointer;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span class="sr-only">Toggle Dropdown</span>
+          </a>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="{% url 'meals:edit_meals' %}">Posiłki</a></a>
+            <a class="dropdown-item" href="{% url 'meals:edit_ingredients' %}">Składniki/Sklepy</a>
+          </div>
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="narzedzia" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
