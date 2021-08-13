@@ -83,7 +83,7 @@
                     <input type="hidden" name="record_id" value="{{ch_meal.id}}">
                     <input type="hidden" name="meal_option_id" value="{{ch_meal.meal_option_id}}">
                     <input type="hidden" name="meal_id" value="{{ch_meal.meal_id}}">
-                    <select class="form-control" name="to_update" onChange="form.submit();">
+                    <select class="form-control" name="to_update" id="toUpdate_{{ch_meal.id}}">
                       <option value="">BRAK POSIŁKU</option>
                       {% for m in all %}
                         <option {% if ch_meal.meal_id == m.0.id %}selected="true"{% endif %} value="{{m.0.id}}">{{m.0}} | {{m.1}} kcal{% if m.0.special %} ** {% endif %} </option>
@@ -116,5 +116,26 @@
     </div>
   </div>
 </div>
+<script>
+    $('select[name="to_update"]').on('change', function(e){
+      e.preventDefault();
+      var id = e.target.id
+      var form_id = id.split('_')[1]
+      console.log(form_id)
+      $.ajax({
+      type:'POST',
+      url:'mealsList/update',
+      data:{
+        record_id:$('#form_'+ form_id + ' input[name="record_id"]').val(),
+        to_update:$('#form_'+ form_id + ' #toUpdate_' + form_id).val(),
+        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+      },
+      success: function(json){
+      console.log('post success');
+      }
+    });
+    });
+
+</script>
 
 {% endblock %}
