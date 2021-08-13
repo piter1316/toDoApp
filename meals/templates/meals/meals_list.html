@@ -22,9 +22,9 @@
         <div class="table-responsive-sm shadow" id="meals_list">
           <table  class="table table-light table-striped table-hover ">
             <thead id="meals_list_head" class="thead-dark">
-            <tr class="text-center text-light">
+            <tr class="text-center text-light" ">
               <th nowrap class="px-auto py-0 text-center" scope="col" id="b-t-w">
-                <small class="d-none d-xl-table-cell">
+                <small class="d-none d-xl-table-cell" id="b-t-w-small">
                 Średnio: {{average_clories_per_day}} kcal<br>
                 {{average_protein_per_day}}g<sup>b<span class="no_print">iałko</span></sup> |
                   {{average_fat_per_day}}g<sup>t<span class="no_print">łuszcze</span></sup> |
@@ -69,15 +69,15 @@
                 {% endwith %}
               </th>
               {% for meal in meals %}
-              <td class="px-0">{%for ch_meal, all in meal.items%}
-                <span class="" style="cursor:pointer;" id="dropdownMeal" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <td class="px-0" >{%for ch_meal, all in meal.items%}
+                <span class="" style="cursor:pointer;" id="dropdownMeal_{{ch_meal.id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   {% if ch_meal.meal_id %}
                   {{ch_meal}}{% for m in all %}{% if ch_meal.meal_id == m.id %} {% if m.special %} **{% endif %}{% endif %}{%endfor%}
                   {% else %}
                   ------
                   {% endif %}
                 </span>
-                <div class="dropdown-menu p-0">
+                <div class="dropdown-menu p-0" id="dropdownMenu_{{ch_meal.id}}">
                   <small>Zmiana posiłku:</small>
                   <form id="form_{{ch_meal.id}}" action="{% url 'meals:update_meals_list' %}" method="post" class="form">{% csrf_token %}
                     <input type="hidden" name="record_id" value="{{ch_meal.id}}">
@@ -117,11 +117,30 @@
   </div>
 </div>
 <script>
-    $('select[name="to_update"]').on('change', function(e){
+    $('body').on('change','select[name="to_update"]',function(e){
       e.preventDefault();
       var id = e.target.id
       var form_id = id.split('_')[1]
-      console.log(form_id)
+      var newMealOptionId = $('#form_'+ form_id + ' #toUpdate_' + form_id).val();
+      var newMealOptionText = $('#toUpdate_' + form_id + ' option[value="' + newMealOptionId +'"]').text();
+      if(newMealOptionText.includes('|')){
+        var newMealOptionName = newMealOptionText.split('|')[0]
+      } else{
+        var newMealOptionName = '-----------'
+      }
+      $('#dropdownMeal_'+form_id).text(newMealOptionName);
+      var rows = $('input[name=day]');
+      for (let i = 0; i < rows.length; i++) {
+        var row = rows[i]
+        if (row.value.includes(form_id)){
+          console.log(row.value);
+          var thToRefresh = row
+          console.log(thToRefresh)
+          }
+}
+
+
+
       $.ajax({
       type:'POST',
       url:'mealsList/update',
@@ -130,8 +149,13 @@
         to_update:$('#form_'+ form_id + ' #toUpdate_' + form_id).val(),
         csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
       },
-      success: function(json){
-      console.log('post success');
+      success: function(data){
+      setTimeout (function() {
+          $('#dropdownMeal_'+form_id).replaceWith($('#dropdownMeal_' + form_id,data));
+          $('#dropdownMenu_'+form_id).removeClass('show');
+          $('#b-t-w').load(document.URL + ' #b-t-w-small');
+      }, 200);
+
       }
     });
     });
