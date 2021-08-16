@@ -11,8 +11,8 @@
     {% include 'meals/menu.html' %}
     <div class="col-12 col-md-8 col-xl-10 ">
       {% if meals_list %}
-      <div class="alert alert-secondary text-center p-1 mb-1 d-xl-none">
-        <small>
+      <div class="alert alert-secondary text-center p-1 mb-1 d-xl-none" id="mobileAverageContainer">
+        <small id="mobileAverage">
           <b>Średnio: {{average_clories_per_day}} kcal |
           {{average_protein_per_day}}g<sup>białko</sup> |
           {{average_fat_per_day}}g<sup>tłuszcze</sup> |
@@ -22,7 +22,7 @@
         <div class="table-responsive-sm shadow" id="meals_list">
           <table  class="table table-light table-striped table-hover ">
             <thead id="meals_list_head" class="thead-dark">
-            <tr class="text-center text-light" ">
+            <tr class="text-center text-light">
               <th nowrap class="px-auto py-0 text-center" scope="col" id="b-t-w">
                 <small class="d-none d-xl-table-cell" id="b-t-w-small">
                 Średnio: {{average_clories_per_day}} kcal<br>
@@ -42,9 +42,9 @@
             <tbody>
             {% for item in day_meal_option_meal_list %}
             {% for day, meals in item.0.items %}
-             <tr class="d-xl-none no_print">
+             <tr class="d-xl-none no_print" id="tr_{{day}}">
                 {% with day_as_list=day|split %}
-                <td class="text-center" colspan="6">
+                <td class="text-center" colspan="6" id="div_td_{{day}}">
                   <b>{{day_as_list.0}} : {{item.1.0}} kcal</b><br>
                   <small class="">
                     {{item.1.1}}g <sup>białko</sup>|
@@ -55,21 +55,23 @@
                 {% endwith %}
             </tr>
             <tr class="text-center">
-              <th nowrap class="text-left pl-1 pr-0">
+              <th nowrap class="text-left pl-1 pr-0" id="th_{{day}}">
                 {% with day_as_list=day|split %}
-                <input style="text-align: center;vertical-align: middle;" type="checkbox" name="day" class="checkbox my-auto mr-1" value="{% for meal in meals %}{% for ml in meal%}{{ml.id}},{% endfor %}{% endfor %}">
-                <span class="d-none d-xl-inline">
-                  <b>{{day_as_list.0}} : {{item.1.0}} kcal</b><br>
-                  <small>
-                    {{item.1.1}}g <sup class="no_print">białko</sup>|
-                    {{item.1.2}}g <sup class="no_print">tłuszcze</sup>|
-                    {{item.1.3}}g <sup class="no_print">węglowodany</sup>
-                  </small>
-                </span>
+                <div id="div_th_{{day}}">
+                  <input style="text-align: center;vertical-align: middle;" type="checkbox" name="day" class="checkbox my-auto mr-1" value="{% for meal in meals %}{% for ml in meal%}{{ml.id}},{% endfor %}{% endfor %}">
+                  <span class="d-none d-xl-inline">
+                    <b>{{day_as_list.0}} : {{item.1.0}} kcal</b><br>
+                    <small>
+                      {{item.1.1}}g <sup class="no_print">białko</sup>|
+                      {{item.1.2}}g <sup class="no_print">tłuszcze</sup>|
+                      {{item.1.3}}g <sup class="no_print">węglowodany</sup>
+                    </small>
+                  </span>
+                </div>
                 {% endwith %}
               </th>
               {% for meal in meals %}
-              <td class="px-0" >{%for ch_meal, all in meal.items%}
+              <td class="px-0"{%for ch_meal, all in meal.items%} id="td_{{ch_meal.id}}" {% endfor %}  >{%for ch_meal, all in meal.items%}
                 <span class="" style="cursor:pointer;" id="dropdownMeal_{{ch_meal.id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   {% if ch_meal.meal_id %}
                   {{ch_meal}}{% for m in all %}{% if ch_meal.meal_id == m.id %} {% if m.special %} **{% endif %}{% endif %}{%endfor%}
@@ -90,9 +92,11 @@
                       {% endfor %}
                     </select>
                   </form>
+                  <span id="span_{{ch_meal.id}}">
                   {% if ch_meal.meal_id %}
-                  <a href="{% url 'meals:edit_meal_ingredients' ch_meal.meal_id %}" class="btn btn-sm btn-block btn-primary mt-1">Edytuj {{ch_meal}}</a>
+                    <a href="{% url 'meals:edit_meal_ingredients' ch_meal.meal_id %}" id="a_{{ch_meal.id}}" class="btn btn-sm btn-block btn-primary mt-1">Edytuj {{ch_meal}}</a>
                   {% endif %}
+                  </span>
                 </div>
                 {% endfor %}
               </td>
@@ -126,21 +130,16 @@
       if(newMealOptionText.includes('|')){
         var newMealOptionName = newMealOptionText.split('|')[0]
       } else{
-        var newMealOptionName = '-----------'
+        var newMealOptionName = '------'
       }
       $('#dropdownMeal_'+form_id).text(newMealOptionName);
       var rows = $('input[name=day]');
       for (let i = 0; i < rows.length; i++) {
         var row = rows[i]
         if (row.value.includes(form_id)){
-          console.log(row.value);
-          var thToRefresh = row
-          console.log(thToRefresh)
+          var thToRefresh = row.parentNode
           }
-}
-
-
-
+      }
       $.ajax({
       type:'POST',
       url:'mealsList/update',
@@ -153,13 +152,18 @@
       setTimeout (function() {
           $('#dropdownMeal_'+form_id).replaceWith($('#dropdownMeal_' + form_id,data));
           $('#dropdownMenu_'+form_id).removeClass('show');
+          $('#span_'+form_id).load(document.URL +' #a_' + form_id,data);
           $('#b-t-w').load(document.URL + ' #b-t-w-small');
+          $('#mobileAverageContainer').load(document.URL + ' #mobileAverage');
+          $('#tr_'+form_id).load(document.URL + ' #td_' + form_id);
+          $(thToRefresh).load(document.URL + ' #' + thToRefresh.id);
+          var tdToRefresh = thToRefresh.id.replace('th', 'td')
+          var trToRefresh = thToRefresh.id.replace('th', 'tr').replace('div_', '')
+          $('#' + trToRefresh).load(document.URL + ' #' + tdToRefresh);
       }, 200);
-
-      }
+        }
+      });
     });
-    });
-
 </script>
 
 {% endblock %}
