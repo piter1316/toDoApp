@@ -318,4 +318,4 @@ def delete_invoice(request, car_id, service_id, invoice_id):
         pass
     Invoice.objects.filter(pk=invoice_id).delete()
 
-    return redirect('/cars/carDetails/{}/{}/editInvoices'.format(car_id,service_id))
+    return redirect('/cars/carDetails/{}/{}/editInvoices'.format(car_id, service_id))
