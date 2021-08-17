@@ -206,7 +206,6 @@ def meals(request):
             protein = 0
             fat = 0
             carb = 0
-    print('------', calories_total)
 
     try:
         meals_list_length = int(len(all_meals) / len(meal_options))
@@ -486,7 +485,6 @@ def update_meal_option(request, meal_option_id):
 def update_meal_name(request, meal_id):
     new_meal_name = request.POST['new_meal_name']
     edit_special = request.POST.get('edit_special', False)
-    print(edit_special)
     if edit_special == 'true':
         edit_special = True
     else:
@@ -593,7 +591,6 @@ def add_shop(request):
 
 
 def edit_shop(request):
-    print(request.POST)
     new_name = request.POST['new_name']
     shop_id = request.POST['shop_id']
     shop_to_edit = get_object_or_404(Shop, pk=int(shop_id))

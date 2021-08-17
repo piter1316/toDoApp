@@ -35,14 +35,12 @@ INSTALLED_APPS = [
     'accounts',
     'shopping',
     'meals',
-    'cars',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_tables2'
 ]
 
 MIDDLEWARE = [
@@ -86,13 +84,24 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 #     }
 # }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'mukJKAQGyj',
+#         'USER': 'mukJKAQGyj',
+#         'PASSWORD': '9KD15Mi0uc',
+#         'HOST': 'remotemysql.com',   # Or an IP Address that your DB is hosted on
+#         'PORT': '3306',
+#     }
+# }
+#
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'ilDKCpjM48',
-        'USER': 'ilDKCpjM48',
-        'PASSWORD': 'RmnQAxrmtw',
-        'HOST': 'remotemysql.com',   # Or an IP Address that your DB is hosted on
+        'NAME': 'todoapp',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': '',   # Or an IP Address that your DB is hosted on
         'PORT': '3306',
     }
 }
@@ -133,8 +142,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
+
 STATIC_URL = '/static/'
 
 STATIC_ROOT = '/home/piter1316/toDoApp/todo/static'
