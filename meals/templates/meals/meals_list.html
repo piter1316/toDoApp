@@ -20,7 +20,7 @@
         </small>
       </div>
         <div class="table-responsive-sm shadow" id="meals_list">
-          <table  class="table table-light table-striped table-hover ">
+          <table  class="table table-light table-striped table-hover " id="table">
             <thead id="meals_list_head" class="thead-dark">
             <tr class="text-center text-light">
               <th nowrap class="px-auto py-0 text-center" scope="col" id="b-t-w">
@@ -152,15 +152,16 @@
       setTimeout (function() {
           $('#dropdownMeal_'+form_id).replaceWith($('#dropdownMeal_' + form_id,data));
           $('#dropdownMenu_'+form_id).removeClass('show');
-          $('#span_'+form_id).load(document.URL +' #a_' + form_id,data);
-          $('#b-t-w').load(document.URL + ' #b-t-w-small');
-          $('#mobileAverageContainer').load(document.URL + ' #mobileAverage');
-          $('#tr_'+form_id).load(document.URL + ' #td_' + form_id);
-          $(thToRefresh).load(document.URL + ' #' + thToRefresh.id);
+          $('#span_'+form_id).replaceWith($('#span_' + form_id,data));
+          $('#b-t-w').replaceWith($('#b-t-w',data));
+          $('#mobileAverageContainer').replaceWith($('#mobileAverageContainer',data));
+          $('#tr_'+form_id).replaceWith($('#tr_'+form_id,data));
+          $('#' + thToRefresh.id).replaceWith($('#' + thToRefresh.id, data));
           var tdToRefresh = thToRefresh.id.replace('th', 'td')
           var trToRefresh = thToRefresh.id.replace('th', 'tr').replace('div_', '')
-          $('#' + trToRefresh).load(document.URL + ' #' + tdToRefresh);
+          $('#' + trToRefresh).replaceWith($('#' + trToRefresh,data));
       }, 200);
+
         }
       });
     });

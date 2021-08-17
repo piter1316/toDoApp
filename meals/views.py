@@ -84,6 +84,7 @@ def get_maximum_no_of_days_no_repeat(request):
 
 @login_required(login_url='/accounts/login')
 def meals(request):
+    print('>>>in')
     in_meals_list = True
     user_meals_options = MealOption.objects.filter(user=request.user).order_by('position')
     generated_user_meals_options = MealsList.objects.filter(user=request.user).order_by('meal_option__position').values(
@@ -206,7 +207,6 @@ def meals(request):
             protein = 0
             fat = 0
             carb = 0
-    print('------', calories_total)
 
     try:
         meals_list_length = int(len(all_meals) / len(meal_options))
