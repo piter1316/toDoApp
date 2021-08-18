@@ -17,6 +17,7 @@ class Meal(models.Model):
     name = models.TextField(max_length=100)
     recipe = models.TextField(null=True, blank=True)
     special = models.BooleanField(default=False)
+    calories = models.IntegerField(default=0)
 
     def __str__(self):
         return self.name
