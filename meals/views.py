@@ -85,7 +85,6 @@ def get_maximum_no_of_days_no_repeat(request):
 
 @login_required(login_url='/accounts/login')
 def meals(request):
-    start = time.time()
     in_meals_list = True
     user_meals_options = MealOption.objects.filter(user=request.user).order_by('position')
     generated_user_meals_options = MealsList.objects.filter(user=request.user).order_by('meal_option__position').values(
@@ -93,29 +92,46 @@ def meals(request):
     meals_list = MealsList.objects.all().filter(user=request.user)
     days = []
     all_meals_in_option_dict = {}
+    all_meals = []
     for option in generated_user_meals_options:
         meals_in_option = Meal.objects.filter(meal_option_id=option['meal_option_id'], user=request.user).order_by(
             'name')
         calories = 0
         all_meals_in_option = []
         for meal in meals_in_option:
-            sql = """
-            SELECT
-            meals_mealingredient.id,
-                sum(`meals_ingredient`.`calories_per_100_gram` * `meals_mealingredient`.`quantity` /100) as sum
-            FROM
-                `meals_mealingredient`
-            INNER JOIN `meals_ingredient` ON (
-                `meals_mealingredient`.`ingredient_id_id` = `meals_ingredient`.`id`
-            )
-            WHERE
-                `meals_mealingredient`.`meal_id_id` = {}
-            """.format(meal.id)
-            meal_calories = MealIngredient.objects.raw(sql)
-            calories_sum = round(meal_calories[0].sum)
+            all_meals.append(meal.id)
+            calories_sum = 0
             all_meals_in_option.append([meal, calories_sum])
         all_meals_in_option_dict[option['meal_option_id']] = all_meals_in_option
+    sql = """
+    SELECT
+        *
+    FROM
+        `meals_mealingredient`
+    INNER JOIN `meals_ingredient` ON (
+        `meals_mealingredient`.`ingredient_id_id` = `meals_ingredient`.`id`
+    )
+    WHERE
+        `meal_id_id` IN {}
+        """.format(str(all_meals).replace('[','(').replace(']',')'))
+    all_ingredients = MealIngredient.objects.raw(sql)
+    meal_ingredients_dict = {}
+    for meal in all_meals:
+        ingredients_for_meal =[]
+        for ingredient in all_ingredients:
+            if meal == ingredient.meal_id_id:
+                ingredients_for_meal.append(ingredient)
 
+        meal_ingredients_dict[meal] = ingredients_for_meal
+    for meal, ingredients in meal_ingredients_dict.items():
+        kcal = []
+        for ingredient in ingredients:
+            kcal.append((ingredient.calories_per_100_gram * ingredient.quantity/100))
+        for option, meals_in_option in all_meals_in_option_dict.items():
+
+            for m in meals_in_option:
+                if m[0].id == meal:
+                    m[1] = round(sum(kcal))
     day_meal_option_meal_list = []
     for item in meals_list:
         while item.day not in days:
@@ -245,8 +261,6 @@ def meals(request):
         'average_fat_per_day': average_fat_per_day,
         'average_carb_per_day': average_carb_per_day,
     }
-    end = time.time()
-    print('>>>>>>>>>>>>>>', end - start)
     return render(request, 'meals/meals_list.html', context)
 
 
