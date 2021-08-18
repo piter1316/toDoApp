@@ -1,4 +1,5 @@
 import random
+import time
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
@@ -84,6 +85,7 @@ def get_maximum_no_of_days_no_repeat(request):
 
 @login_required(login_url='/accounts/login')
 def meals(request):
+    start = time.time()
     in_meals_list = True
     user_meals_options = MealOption.objects.filter(user=request.user).order_by('position')
     generated_user_meals_options = MealsList.objects.filter(user=request.user).order_by('meal_option__position').values(
@@ -97,15 +99,21 @@ def meals(request):
         calories = 0
         all_meals_in_option = []
         for meal in meals_in_option:
-            ingredients = MealIngredient.objects.select_related('ingredient_id').filter(meal_id=meal)
-            meal_ingr = []
-
-            for ingr in ingredients:
-                ingr_obj = get_object_or_404(Ingredient, pk=ingr.ingredient_id.id)
-                calories += (ingr.quantity / 100) * int(ingr_obj.calories_per_100_gram)
-                meal_ingr.append(round(calories, 0))
-                calories = 0
-            all_meals_in_option.append([meal, sum(meal_ingr)])
+            sql = """
+            SELECT
+            meals_mealingredient.id,
+                sum(`meals_ingredient`.`calories_per_100_gram` * `meals_mealingredient`.`quantity` /100) as sum
+            FROM
+                `meals_mealingredient`
+            INNER JOIN `meals_ingredient` ON (
+                `meals_mealingredient`.`ingredient_id_id` = `meals_ingredient`.`id`
+            )
+            WHERE
+                `meals_mealingredient`.`meal_id_id` = {}
+            """.format(meal.id)
+            meal_calories = MealIngredient.objects.raw(sql)
+            calories_sum = round(meal_calories[0].sum)
+            all_meals_in_option.append([meal, calories_sum])
         all_meals_in_option_dict[option['meal_option_id']] = all_meals_in_option
 
     day_meal_option_meal_list = []
@@ -165,9 +173,10 @@ def meals(request):
     maximum_no_of_days_to_generate = get_maximum_no_of_days(request)
     maximum_no_of_days_to_generate_no_repeat = get_maximum_no_of_days_no_repeat(request)
     first_day_input_list = Week.objects.all()
-    user_meals_options_select = MealsList.objects.filter(user=request.user).order_by('meal_option__position').values(
-        'meal_option_id', 'meal_option_id__meal_option').distinct()
+    # user_meals_options_select = MealsList.objects.filter(user=request.user).order_by('meal_option__position').values(
+    #     'meal_option_id', 'meal_option_id__meal_option').distinct()
     option_meals_dict = {}
+    user_meals_options_select = []
     for option in user_meals_options_select:
         option_meals_list = []
         meals_in_option = Meal.objects.filter(meal_option=option['meal_option_id'], user=request.user)
@@ -216,7 +225,7 @@ def meals(request):
     except ZeroDivisionError:
         meals_list_length = 0
         average_clories_per_day = 0
-        average_protein_per_day =0
+        average_protein_per_day = 0
         average_carb_per_day = 0
         average_fat_per_day = 0
 
@@ -236,6 +245,8 @@ def meals(request):
         'average_fat_per_day': average_fat_per_day,
         'average_carb_per_day': average_carb_per_day,
     }
+    end = time.time()
+    print('>>>>>>>>>>>>>>', end - start)
     return render(request, 'meals/meals_list.html', context)
 
 
@@ -598,8 +609,6 @@ def edit_shop(request):
     shop_to_edit.save()
 
     return redirect('/ingredientsEdit#shops')
-
-
 
 
 def delete_shop(request, shop_id):

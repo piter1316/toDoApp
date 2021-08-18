@@ -84,7 +84,6 @@ def home(request):
                 protein = 0
                 fat = 0
                 carb = 0
-        print('------', calories_total)
 
         try:
             meals_list_length = int(len(all_meals) / len(meal_options))
