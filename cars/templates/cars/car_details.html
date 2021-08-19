@@ -271,7 +271,7 @@
                 <span class="text-dark">Średnie zużycie paliwa:</span>
               </span>
               <span>
-                <h6 class="mb-0"><span class="badge badge-dark badge-pill">{{average_consumption}} l/100km</span></h6>
+                <h6 class="mb-0"><span class="badge badge-dark badge-pill" id="averageFuelConsumption">{{average_consumption}} l/100km</span></h6>
               </span>
             </li>
             <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
@@ -385,6 +385,7 @@
         $('#save_overlay').fadeOut();
         //$('#filling_table').load(document.URL + ' #filling_table');
         $('#filling_table').replaceWith($('#filling_table', json));
+        $('#averageFuelConsumption').replaceWith($('#averageFuelConsumption', json));
         console.log('time');
       }, 1000);
       $('#chart').replaceWith($('#chart', json));
@@ -412,6 +413,7 @@
         setTimeout (function() {
         $('#filling_table').replaceWith($('#filling_table', json));
         $('#chart').replaceWith($('#chart', json));
+        $('#averageFuelConsumption').replaceWith($('#averageFuelConsumption', json));
       }, 200);
       }
     });
