@@ -41,15 +41,17 @@ class CarForm(forms.ModelForm):
         attrs={'class': 'form-control mb-2',
                'placeholder': 'np. 184000'}))
     logo = forms.FileField(required=False,
-                           widget=forms.ClearableFileInput(attrs={'multiple': True,
+                           widget=forms.FileInput(attrs={'multiple': True,
                                                                   'class': 'form-control-file mb-2'}))
     image = forms.FileField(required=False,
-                            widget=forms.ClearableFileInput(attrs={'multiple': True,
+                            widget=forms.FileInput(attrs={'multiple': True,
                                                                    'class': 'form-control-file mb-2'}))
+
+    sold = forms.CheckboxInput()
 
     class Meta:
         model = models.Car
-        fields = ['name', 'make', 'model', 'year', 'engine', 'power', 'mileage', 'logo', 'image']
+        fields = ['name', 'make', 'model', 'year', 'engine', 'power', 'mileage', 'logo', 'image', 'sold']
 
 
 class FuelFillForm(forms.ModelForm):
