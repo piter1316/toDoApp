@@ -161,13 +161,16 @@ def add_fuel_fill(request, pk):
         filling = form.save(commit=False)
         filling.car_id = car
         filling.save()
+        context = {}
 
-        return HttpResponse('')
+        return redirect('/cars/carDetails/{}#service'.format(pk))
 
 
 def delete_fuel_fill(request, pk):
+    fuel = Fuel.objects.filter(pk=pk)
+    car_id = fuel[0].car_id_id
     Fuel.objects.filter(pk=pk).delete()
-    return HttpResponse('')
+    return redirect('/cars/carDetails/{}#service'.format(car_id))
 
 
 def add_service_form(request, pk):

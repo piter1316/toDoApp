@@ -376,7 +376,6 @@
         csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
       },
       success: function(json){
-
         $('#id_liters').val('');
         $('#id_kilometers').val('');
         fuel_price:$('#id_fuel_price').val('');
@@ -384,9 +383,11 @@
         $('#save_overlay').fadeIn();
         setTimeout (function() {
         $('#save_overlay').fadeOut();
-        $('#filling_table').load(document.URL + ' #filling_table');
+        //$('#filling_table').load(document.URL + ' #filling_table');
+        $('#filling_table').replaceWith($('#filling_table', json));
         console.log('time');
       }, 1000);
+      $('#chart').replaceWith($('#chart', json));
       }
     });
   });
@@ -409,7 +410,8 @@
       },
       success: function(json){
         setTimeout (function() {
-        $('#filling_table').load(document.URL + ' #filling_table');
+        $('#filling_table').replaceWith($('#filling_table', json));
+        $('#chart').replaceWith($('#chart', json));
       }, 200);
       }
     });
