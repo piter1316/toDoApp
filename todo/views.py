@@ -5,6 +5,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 
+from cars.models import Car
 from meals.models import MealsList, MealIngredient, Meal, Ingredient
 from shopping.models import ShoppingList, Products
 from .forms import TodoForm
@@ -56,6 +57,7 @@ def home(request):
         all_meals = MealsList.objects.filter(user=request.user)
         meal_options = MealsList.objects.filter(user=request.user).values('meal_option_id').distinct()
         meals = MealsList.objects.select_related('meal').filter(user=request.user)
+        cars = Car.objects.filter(user=request.user)
         calories_total = 0
         protein_total = 0
         fat_total = 0
@@ -116,6 +118,7 @@ def home(request):
             'meals': len(distinct_meals),
             'meal_options': len(meal_options),
             'shopping_lists': len(shopping_lists),
+            'cars': cars,
             'products_to_buy_counter': products_to_buy_counter,
             'average_clories_per_day': average_clories_per_day,
             'average_protein_per_day': average_protein_per_day,

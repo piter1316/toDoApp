@@ -6,7 +6,7 @@
     <div class="col-12 mx-auto" id="">
       {% if user.is_authenticated %}
         <div class="row d-flex justify-content-center">
-          <div class="col-12 col-xl-3 mb-2">
+          <div class="ccol-12 col-md-6 col-xl-3 mb-2">
             <div class="card shadow" style="height:100%;">
               <div class="card-header bg-secondary text-light">
                 Jadłospis
@@ -88,6 +88,34 @@
               </div>
               <div class="mx-5 mb-2">
                 <a href="{% url 'todo:index' %}"  class="btn btn-secondary btn-block">Przejdź</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-xl-3 mb-2">
+            <div class="card shadow" style="height:100%;">
+              <div class="card-header bg-secondary text-light text-center">
+                GARAŻ
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-4">
+                    <img src="{% static 'todo/img/car-solid.svg' %}" height="75">
+                  </div>
+                  <div class="col-8">
+                    <ul>
+                      {% if cars %}
+                        {% for car in cars %}
+                          {% if not car.sold %}
+                          <a href="{% url 'cars:car_details' car.id %} " class="text-dark"><li>{{car}}</li></a>
+                          {% endif %}
+                        {% endfor %}
+                      {% endif %}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="mx-5 mb-2">
+                <a href="{% url 'cars:cars_home' %}"  class="btn btn-secondary btn-block">Przejdź</a>
               </div>
             </div>
           </div>

@@ -35,12 +35,14 @@ INSTALLED_APPS = [
     'accounts',
     'shopping',
     'meals',
+    'cars',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_tables2',
 ]
 
 MIDDLEWARE = [
@@ -87,9 +89,9 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'mukJKAQGyj',
-#         'USER': 'mukJKAQGyj',
-#         'PASSWORD': '9KD15Mi0uc',
+#         'NAME': 'ilDKCpjM48',
+#         'USER': 'ilDKCpjM48',
+#         'PASSWORD': 'RmnQAxrmtw',
 #         'HOST': 'remotemysql.com',   # Or an IP Address that your DB is hosted on
 #         'PORT': '3306',
 #     }
