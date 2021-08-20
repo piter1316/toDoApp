@@ -22,7 +22,7 @@ from cars.models import Car, Fuel, Service, SparePart, Invoice
 from myproject.settings import BASE_DIR
 from django.core import serializers
 
-
+@login_required(login_url='/accounts/login')
 def cars_home(request):
     user_cars = Car.objects.filter(user=request.user, sold=False)
     user_sold_cars = Car.objects.filter(user=request.user, sold=True)
@@ -34,7 +34,7 @@ def cars_home(request):
     }
     return render(request, 'cars/home.html', context)
 
-
+@login_required(login_url='/accounts/login')
 def car_details(request, car_id):
     car = Car.objects.filter(pk=car_id, user=request.user)
     form = CarForm(request.POST, request.FILES)

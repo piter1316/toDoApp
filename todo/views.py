@@ -50,7 +50,7 @@ def deleteAll(request):
     Todo.objects.filter(user=request.user).delete()
     return redirect('todo:index')
 
-
+@login_required(login_url='/accounts/login')
 def home(request):
     if request.user.is_authenticated:
         all_to_do_count = Todo.objects.filter(user=request.user, complete=False)
