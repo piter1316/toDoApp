@@ -264,7 +264,7 @@ def meals(request):
     }
     return render(request, 'meals/meals_list.html', context)
 
-
+@login_required(login_url='/accounts/login')
 def edit_meals(request):
     form = MealForm(request.POST)
     form_ingredient = IngredientForm(request.POST)
@@ -416,7 +416,7 @@ def delete_meal_option(request, meal_option_id):
     MealOption.objects.filter(pk=meal_option_id).delete()
     return redirect('meals:edit_meals')
 
-
+@login_required(login_url='/accounts/login')
 def edit_meal_ingredients(request, meal_id):
     meal = Meal.objects.filter(user_id=request.user, pk=meal_id)
     ingredients = MealIngredient.objects.select_related('ingredient_id').filter(meal_id=meal_id)
@@ -451,7 +451,7 @@ def edit_meal_ingredients(request, meal_id):
     }
     return render(request, 'meals/meal_edit.html', context)
 
-
+@login_required(login_url='/accounts/login')
 def add_ingredient(request, meal_id):
     meal = get_object_or_404(Meal, pk=meal_id)
     ingredient = request.POST['ingredient']
@@ -467,13 +467,13 @@ def add_ingredient(request, meal_id):
     new_ingredient.save()
     return redirect('meals:edit_meal_ingredients', meal_id=meal_id)
 
-
+@login_required(login_url='/accounts/login')
 def add_recipe(request, meal_id):
     recipe = request.POST['update_recipe_textarea']
     Meal.objects.filter(pk=meal_id).update(recipe=recipe)
     return redirect('meals:edit_meal_ingredients', meal_id=meal_id)
 
-
+@login_required(login_url='/accounts/login')
 def update_ingredient(request, ingredient_id, meal_id):
     new_quantity = request.POST['new_quantity']
     new_unit = request.POST['new_unit']
