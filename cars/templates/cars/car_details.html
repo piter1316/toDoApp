@@ -299,12 +299,14 @@
           var chart_data_json = JSON.parse('{{chart_dates|escapejs }}');
           var dates_array = []
           var consumption_array = []
-          var average_array = [0]
+          var average_array = []
           var liters_array = []
           var kilometers_array = []
           var bars_color_array = []
           chart_data_json.forEach(getDatesArray);
-          chart_data_json.forEach(average);
+          if (chart_data_json.length > 0){
+            chart_data_json.forEach(average);
+          }else{average_array.push(0)}
 
           for (var i=0; i<average_array.length; i++){
             if(average_array[i]> consumption_array[i]){
@@ -357,8 +359,8 @@
           var liters_total = liters_array.reduce((a, b) => a + b, 0)
           var kilometers_total = kilometers_array.reduce((a, b) => a + b, 0)
           function average(){
-            average_array = []
-            average_array.push((((liters_array.reduce((a, b) => a + b, 0))/(kilometers_array.reduce((a, b) => a + b, 0)))*100).toFixed(2))
+            let avg = (((liters_array.reduce((a, b) => a + b, 0))/(kilometers_array.reduce((a, b) => a + b, 0)))*100).toFixed(2)
+            average_array.push(avg)
           }
 
       </script>
@@ -368,7 +370,6 @@
 <script type="text/javascript">
   $('body').on('submit','#add_fuel_fill',function(e){
     e.preventDefault();
-    console.log('ajax'+ {{detail.pk}});
     $.ajax({
       type:'POST',
       url:'/cars/carDetails/{{detail.pk}}/add_fuel_fill',
@@ -391,7 +392,6 @@
         //$('#filling_table').load(document.URL + ' #filling_table');
         $('#filling_table').replaceWith($('#filling_table', json));
         $('#averageFuelConsumption').replaceWith($('#averageFuelConsumption', json));
-        console.log('time');
       }, 1000);
       $('#chart').replaceWith($('#chart', json));
       }
@@ -405,7 +405,6 @@
 <script type="text/javascript">
   $('body').on('click','.filling_',function(e){
     e.preventDefault();
-    console.log(e.target.id);
     var id = e.target.id
     var num_id = id.split('_')[1]
     $.ajax({
