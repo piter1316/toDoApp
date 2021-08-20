@@ -57,7 +57,8 @@ def home(request):
         all_meals = MealsList.objects.filter(user=request.user)
         meal_options = MealsList.objects.filter(user=request.user).values('meal_option_id').distinct()
         meals = MealsList.objects.select_related('meal').filter(user=request.user)
-        cars = Car.objects.filter(user=request.user)
+        cars_owned = Car.objects.filter(user=request.user, sold=0)
+        cars_sold = Car.objects.filter(user=request.user, sold=1)
         calories_total = 0
         protein_total = 0
         fat_total = 0
@@ -118,7 +119,8 @@ def home(request):
             'meals': len(distinct_meals),
             'meal_options': len(meal_options),
             'shopping_lists': len(shopping_lists),
-            'cars': cars,
+            'cars_owned': cars_owned,
+            'cars_sold': cars_sold,
             'products_to_buy_counter': products_to_buy_counter,
             'average_clories_per_day': average_clories_per_day,
             'average_protein_per_day': average_protein_per_day,

@@ -102,18 +102,38 @@
                     <img src="{% static 'todo/img/car-solid.svg' %}" height="75">
                   </div>
                   <div class="col-8">
-                    <ul>
-                      {% if cars %}
-                        {% for car in cars %}
-                          {% if not car.sold %}
-                          <a href="{% url 'cars:car_details' car.id %} " class="text-dark"><li>{{car}}</li></a>
+                    <div class="row">
+                      {% if cars_owned or cars_sold %}
+                      <div class="col-6">
+                        <small>Posiadane</small>
+                        <ul>
+                          {% if cars_owned %}
+                            {% for car in cars_owned %}
+                            <li><a class="text-dark" href="{% url 'cars:car_details' car.id %}">{{car}}</a></li>
+                            {% endfor %}
                           {% else %}
-                            <li>Garaż jest pusty</li>
+                            <li>BRAK !</li>
                           {% endif %}
-                        {% endfor %}
-
+                        </ul>
+                      </div>
+                      <div class="col-6">
+                        <small>Sprzedane</small>
+                        <ul>
+                          {% if cars_sold %}
+                            {% for car in cars_sold %}
+                            <li><a class="text-dark" href="{% url 'cars:car_details' car.id %}">{{car}}</a></li>
+                            {% endfor %}
+                          {% else %}
+                            <li>BRAK !</li>
+                          {% endif %}
+                        </ul>
+                      </div>
+                      {% else %}
+                      <div class="col-12">
+                        <li>Garaż jest pusty!</li>
+                      </div>
                       {% endif %}
-                    </ul>
+                    </div>
                   </div>
                 </div>
               </div>
