@@ -154,6 +154,7 @@
       </table>
       <div class="container d-lg-none">
       <div class="row ">
+        {% if service_dictionary.items %}
         {% for service, lists in service_dictionary.items %}
         <div class="col-12 mb-1 p-0">
           <div class="card border-dark mb-3" style="height:100%;">
@@ -185,6 +186,9 @@
           </div>
         </div>
         {% endfor %}
+        {% else %}
+        <div class="col-12 alert alert-info text-center">Brak histori serwisowej!</spa></div>
+        {% endif %}
       </div>
       </div>
     </div>
