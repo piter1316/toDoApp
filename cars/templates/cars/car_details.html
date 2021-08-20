@@ -119,33 +119,37 @@
         </tr>
         </thead>
         <tbody>
-        {% for service, lists in service_dictionary.items %}
-        <tr class="text-center" style="border-bottom:  double  !important;">
-          <td class="align-middle">
-            {{forloop.counter}}.
-          </td>
-          <td class="align-middle"><a class="text-dark pointer"
-                                      href="{% url 'cars:edit_service_details' car.0.pk service.id %}">{{service.date}}</a>
-          </td>
-          <td class="align-middle"><a class="text-dark pointer"
-                                      href="{% url 'cars:edit_service_details' car.0.pk service.id %}">{{service.mileage}}</a>
-          </td>
-          <td class="">
-            {% include 'cars/parts_table.html' %}
-          </td>
-          <td class="align-middle">{{ lists.2 }}</td>
-          <td class="text-left align-middle">
-            {% include 'cars/invoice_list.html' %}
-          </td>
-          <td class="align-middle">
-            <a onclick="return confirm('Czy napewno usunąć serwis i wszystkie dane?')"
-               class="deleteServiceButton_{{service.id}}"
-               href="{% url 'cars:delete_service' car.0.pk service.id %}">
-              <i title="Usuń serwis" class="far fa-trash-alt text-dark"></i>
-            </a>
-          </td>
-        </tr>
-        {% endfor %}
+        {% if service_dictionary.items %}
+          {% for service, lists in service_dictionary.items %}
+          <tr class="text-center" style="border-bottom:  double  !important;">
+            <td class="align-middle">
+              {{forloop.counter}}.
+            </td>
+            <td class="align-middle"><a class="text-dark pointer"
+                                        href="{% url 'cars:edit_service_details' car.0.pk service.id %}">{{service.date}}</a>
+            </td>
+            <td class="align-middle"><a class="text-dark pointer"
+                                        href="{% url 'cars:edit_service_details' car.0.pk service.id %}">{{service.mileage}}</a>
+            </td>
+            <td class="">
+              {% include 'cars/parts_table.html' %}
+            </td>
+            <td class="align-middle">{{ lists.2 }}</td>
+            <td class="text-left align-middle">
+              {% include 'cars/invoice_list.html' %}
+            </td>
+            <td class="align-middle">
+              <a onclick="return confirm('Czy napewno usunąć serwis i wszystkie dane?')"
+                 class="deleteServiceButton_{{service.id}}"
+                 href="{% url 'cars:delete_service' car.0.pk service.id %}">
+                <i title="Usuń serwis" class="far fa-trash-alt text-dark"></i>
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+        <td class="alert alert-info text-center" colspan=7>Brak histori serwisowej!</spa></td>
+        {% endif %}
         </tbody>
       </table>
       <div class="container d-lg-none">
@@ -295,7 +299,7 @@
           var chart_data_json = JSON.parse('{{chart_dates|escapejs }}');
           var dates_array = []
           var consumption_array = []
-          var average_array = []
+          var average_array = [0]
           var liters_array = []
           var kilometers_array = []
           var bars_color_array = []
@@ -353,6 +357,7 @@
           var liters_total = liters_array.reduce((a, b) => a + b, 0)
           var kilometers_total = kilometers_array.reduce((a, b) => a + b, 0)
           function average(){
+            average_array = []
             average_array.push((((liters_array.reduce((a, b) => a + b, 0))/(kilometers_array.reduce((a, b) => a + b, 0)))*100).toFixed(2))
           }
 

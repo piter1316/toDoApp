@@ -107,8 +107,11 @@
                         {% for car in cars %}
                           {% if not car.sold %}
                           <a href="{% url 'cars:car_details' car.id %} " class="text-dark"><li>{{car}}</li></a>
+                          {% else %}
+                            <li>Garaż jest pusty</li>
                           {% endif %}
                         {% endfor %}
+
                       {% endif %}
                     </ul>
                   </div>
