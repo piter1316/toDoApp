@@ -37,7 +37,11 @@
               </li>
               {% for ingredient in ingredients %}
               <li class="list-group-item d-flex justify-content-between align-items-center py-1">
-                {{ingredient}}
+                <span>{{ingredient}}
+                  {% if ingredient.ingredient_id.short_expiry %}
+                    <i class="fas fa-hourglass-start" ></i>
+                  {% endif %}
+                </span>
                 <span>
                   <span class="badge badge-secondary badge-pill p-2">{{ingredient.quantity}} g</span>
                   {% if ingredient.quantity|divide:ingredient.ingredient_id.weight_per_unit > 0 %}

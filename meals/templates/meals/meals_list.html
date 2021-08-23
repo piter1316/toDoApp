@@ -74,7 +74,9 @@
               <td class="px-0"{%for ch_meal, all in meal.items%} id="td_{{ch_meal.id}}" {% endfor %}  >{%for ch_meal, all in meal.items%}
                 <span class="" style="cursor:pointer;" id="dropdownMeal_{{ch_meal.id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   {% if ch_meal.meal_id %}
-                  {{ch_meal}}{% for m in all %}{% if ch_meal.meal_id == m.id %} {% if m.special %} **{% endif %}{% endif %}{%endfor%}
+
+                  {{ch_meal}}{% for m in all %}{% if ch_meal.meal_id == m.0.id %} {% if m.0.special %} **{% endif %}{% endif %}{%endfor%}
+
                   {% else %}
                   ------
                   {% endif %}
