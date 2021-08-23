@@ -364,25 +364,21 @@ def generate_meals_list(request):
         random_meals_list = []
         if twice_the_same_meal:
             if int(how_many_days) % 2 == 0:
-                number_of_different_meals = int(int(how_many_days) / 2)
-                for k in range(number_of_different_meals):
-                    while len(random_meals_list) < int(how_many_days):
-                        item = random.choice(option_meals_list)
+                while len(random_meals_list) < int(how_many_days):
+                    item = random.choice(option_meals_list)
+                    random_meals_list.append(item)
+                    random_meals_list.append(item)
+                    option_meals_list.remove(item)
+            else:
+                while len(random_meals_list) < int(how_many_days):
+                    item = random.choice(option_meals_list)
+                    if len(random_meals_list) == int(how_many_days) - 1:
+                        random_meals_list.append(item)
+                        break
+                    else:
                         random_meals_list.append(item)
                         random_meals_list.append(item)
                         option_meals_list.remove(item)
-            else:
-                number_of_different_meals = int((int(how_many_days) / 2)) + 1
-                for j in range(number_of_different_meals):
-                    while len(random_meals_list) < int(how_many_days):
-                        item = random.choice(option_meals_list)
-                        if len(random_meals_list) == int(how_many_days) - 1:
-                            random_meals_list.append(item)
-                            break
-                        else:
-                            random_meals_list.append(item)
-                            random_meals_list.append(item)
-                            option_meals_list.remove(item)
         else:
             for i in range(int(how_many_days)):
                 while len(random_meals_list) < int(how_many_days):
