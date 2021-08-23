@@ -605,6 +605,7 @@ def edit_ingredients(request):
         'form': form,
         'active_tab': 'shop',
     }
+    print(form)
     return render(request, 'meals/ingredients_edit.html', context)
 
 
@@ -639,6 +640,9 @@ def new_ingredient(request):
     carb = request.POST.get('carb', False)
     avg_unit = request.POST.get('avg_unit', False)
     shop_select = request.POST.get('shop', False)
+    short_expiry = request.POST.get('short_expiry', False)
+    if short_expiry:
+        short_expiry = True
 
     if not kcal:
         kcal = 0
@@ -658,9 +662,9 @@ def new_ingredient(request):
                                 protein_per_100_gram=prot,
                                 fat_per_100_gram=fat,
                                 carbohydrates_per_100_gram=carb,
-                                weight_per_unit=avg_unit, shop=shop)
+                                weight_per_unit=avg_unit, shop=shop, short_expiry=short_expiry)
     new_ingredient.save()
-
+    print(request.POST)
     return redirect('meals:edit_ingredients')
 
 
@@ -677,6 +681,9 @@ def edit_ingredient(request, ingr_id):
     carb = request.POST.get('carb', False)
     avg_unit = request.POST.get('avg_unit', False)
     shop_select = request.POST.get('shop', False)
+    short_expiry = request.POST.get('short_expiry', False)
+    if short_expiry:
+        short_expiry = True
 
     if not kcal:
         kcal = 0
@@ -701,6 +708,7 @@ def edit_ingredient(request, ingr_id):
     edited_ingredient.carbohydrates_per_100_gram = carb
     edited_ingredient.weight_per_unit = avg_unit
     edited_ingredient.shop = shop
+    edited_ingredient.short_expiry = short_expiry
     edited_ingredient.save()
 
     return redirect('meals:edit_ingredients')

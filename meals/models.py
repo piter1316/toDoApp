@@ -47,6 +47,7 @@ class Ingredient(models.Model):
     carbohydrates_per_100_gram = models.PositiveIntegerField(default=0)
     weight_per_unit = models.PositiveIntegerField(default=0)
     shop = models.ForeignKey(Shop, on_delete=models.SET_NULL, default=1, null=True)
+    short_expiry = models.BooleanField(default=False, null=True)
 
     def __str__(self):
         return self.name
