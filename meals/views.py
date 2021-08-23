@@ -605,7 +605,6 @@ def edit_ingredients(request):
         'form': form,
         'active_tab': 'shop',
     }
-    print(form)
     return render(request, 'meals/ingredients_edit.html', context)
 
 
@@ -664,7 +663,6 @@ def new_ingredient(request):
                                 carbohydrates_per_100_gram=carb,
                                 weight_per_unit=avg_unit, shop=shop, short_expiry=short_expiry)
     new_ingredient.save()
-    print(request.POST)
     return redirect('meals:edit_ingredients')
 
 

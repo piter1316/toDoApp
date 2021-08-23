@@ -73,14 +73,19 @@
               <a onclick="return confirm('Czy napewno usunąć składnik?')"
                  href="{% url 'meals:delete_ingr' ingredient.id %}" class="fas fa-minus-circle text-secondary"></a>
             </td>
-            <td>{{ingredient}}</td>
-            <td nowrap="" class="text-center px-0">{{ingredient.calories_per_100_gram}}<br>
+            <td>
+              {{ingredient}}
+            </td>
+            <td nowrap="" class="text-center px-0">{{ingredient.calories_per_100_gram}}
+            {% if ingredient.short_expiry %}
+                <i class="fas fa-hourglass-start" ></i>
+            {% endif %}
+            <br>
             {{ingredient.protein_per_100_gram}}-{{ingredient.fat_per_100_gram}}-{{ingredient.carbohydrates_per_100_gram}}
             </td>
             <td class="text-center px-0">{{ingredient.weight_per_unit}}</td>
             <td class="text-center px-0"><small>{{ingredient.shop}}</small></td>
           </tr>
-
           {% endfor %}
           </tbody>
         </table>
@@ -201,7 +206,7 @@
           </div>
           <div class="form-row">
             <div class="col">
-              <span>Krótka data ważności:</span>
+              <span><i class="fas fa-hourglass-start mr-1" ></i>Krótka data ważności:</span>
               <span class="ml-2">
                 <input type="checkbox"  name="short_expiry" {% if ingredient.short_expiry %} checked {% endif %}>
               </span>
