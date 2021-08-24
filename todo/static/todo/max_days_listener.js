@@ -101,6 +101,12 @@ $(document).ready(function(){
     $('#dropdownMealContent_' + num_id).toggle(600);
   })
 
+  $('body').on('click', '.dropdownMenuButton_', function(e){
+    var id = e.target.id
+    var num_id = id.split('_')[1]
+    $('#update_ingredient_' + num_id).toggle(600);
+  })
+
 
 
     $('.shoppingListSettingsButton').click(function(e){
@@ -139,17 +145,14 @@ $(document).ready(function(){
     $('#update_recipe').toggleClass('d-none');
    });
 
-  $('#option_name').on('click', function(e){
+  $('body').on('click', '#option_name', function(e){
     $('#new_meal_option_name').toggle(600);
   });
+
 
   $('#add_invoice_button').on('click', function(e){
     $('#add_invoice').toggle(600);
   });
-
-
-
-
 
   $('input[name=day]').change(function(){
     var atLeastOneIsChecked = $('input[name=day]').is(':checked');

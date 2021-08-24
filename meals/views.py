@@ -124,14 +124,22 @@ def meals(request):
                 ingredients_for_meal.append(ingredient)
 
         meal_ingredients_dict[meal] = ingredients_for_meal
+
     for meal, ingredients in meal_ingredients_dict.items():
         kcal = []
+        short_expiry = []
+
         for ingredient in ingredients:
+            if ingredient.short_expiry:
+                short_expiry.append(1)
+
             kcal.append((ingredient.calories_per_100_gram * ingredient.quantity/100))
+        print(kcal)
+        print(short_expiry)
         for option, meals_in_option in all_meals_in_option_dict.items():
             for m in meals_in_option:
                 if m[0].id == meal:
-                    m[1] = round(sum(kcal))
+                    m[1] = [round(sum(kcal)), short_expiry]
     day_meal_option_meal_list = []
 
     # table
