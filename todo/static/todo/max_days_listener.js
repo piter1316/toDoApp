@@ -56,8 +56,9 @@ $(document).ready(function(){
         }
       });
       setTimeout(function(){$('#meal_options_form, #meal_options_form_hr').hide(600)}, 200);
-      var day_short = $('#meals_list tr:last th').text().trim()
+      var day_short = $('#meals_list .text-center:last span b').text().split(' ')[0];
       $('#first_day').attr('readonly', true);
+
       switch(day_short){
       case 'PN':
         $('#first_day').val(2);
@@ -154,7 +155,8 @@ $(document).ready(function(){
     $('#add_invoice').toggle(600);
   });
 
-  $('input[name=day]').change(function(){
+//  $('input[name=day]').change(function(){
+  $('body').on('change','input[name=day]',function(){
     var atLeastOneIsChecked = $('input[name=day]').is(':checked');
     if(atLeastOneIsChecked){
       $('.deleteSelectedDaysButton').removeAttr("disabled");
@@ -166,7 +168,7 @@ $(document).ready(function(){
     CheckedMealsListItemsArray.pop()
     if($(this).is(':checked')) {
       function check(element, index, array) {
-        $('.mealsListPosition_'+element).prop('checked', true)
+        $('.mealsListPosition_'+element).prop('checked', true).prop('checked', true)
       }
       CheckedMealsListItemsArray.forEach(check);
     }else {

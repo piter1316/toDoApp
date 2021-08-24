@@ -134,8 +134,6 @@ def meals(request):
                 short_expiry.append(1)
 
             kcal.append((ingredient.calories_per_100_gram * ingredient.quantity/100))
-        print(kcal)
-        print(short_expiry)
         for option, meals_in_option in all_meals_in_option_dict.items():
             for m in meals_in_option:
                 if m[0].id == meal:
@@ -353,10 +351,12 @@ def generate_meals_list(request):
 
     if append_existing:
         days = appended_days_generator(request.user, first_day, int(how_many_days))
+        current_days = int(len(current_meals_list)/len(user_meals_options))
+
     else:
         current_meals_list.delete()
         days = days_generator(first_day, int(how_many_days))
-
+        current_days = 0
     for option in user_meals_options:
         option_meals_list = []
         meals_in_option = Meal.objects.filter(meal_option=option, user=request.user, special=0)
@@ -376,14 +376,14 @@ def generate_meals_list(request):
         for item in option_meals_list:
             if item not in meals_with_short_expiry_in_option:
                 meals_without_short_expiry_in_option.append(item)
-        print(meals_without_short_expiry_in_option)
         random_meals_list = []
         if twice_the_same_meal:
             day = 1
+            if append_existing:
+                day = current_days + 1
             if int(how_many_days) % 2 == 0:
                 while len(random_meals_list) < int(how_many_days):
                     if day > 4:
-                        print('short_expiry-logic')
                         item = random.choice(meals_without_short_expiry_in_option)
                         random_meals_list.append(item)
                         random_meals_list.append(item)
@@ -397,9 +397,10 @@ def generate_meals_list(request):
                         day += 2
             else:
                 day = 1
+                if append_existing:
+                    day = current_days + 1
                 while len(random_meals_list) < int(how_many_days):
                     if day > 4:
-                        print('short_expiry-logic for uneven')
                         item = random.choice(meals_without_short_expiry_in_option)
                         if len(random_meals_list) == int(how_many_days) - 1:
                             random_meals_list.append(item)
@@ -421,10 +422,20 @@ def generate_meals_list(request):
                             day += 2
         else:
             for i in range(int(how_many_days)):
+                day = 1
+                if append_existing:
+                    day = current_days + 1
                 while len(random_meals_list) < int(how_many_days):
-                    item = random.choice(option_meals_list)
-                    random_meals_list.append(item)
-                    option_meals_list.remove(item)
+                    if day > 4:
+                        item = random.choice(meals_without_short_expiry_in_option)
+                        random_meals_list.append(item)
+                        meals_without_short_expiry_in_option.remove(item)
+                        day += 1
+                    else:
+                        item = random.choice(option_meals_list)
+                        random_meals_list.append(item)
+                        option_meals_list.remove(item)
+                        day += 1
 
         if empty_meals_list:
             for k in range(len(random_meals_list)):

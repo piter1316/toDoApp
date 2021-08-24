@@ -139,6 +139,10 @@
         var row = rows[i]
         if (row.value.includes(form_id)){
           var thToRefresh = row.parentNode
+          var checkboxCheck = $(row);
+          if($(checkboxCheck).is(':checked')){
+          var checkbox = row;
+          }
           }
       }
       $.ajax({
@@ -161,6 +165,9 @@
           var tdToRefresh = thToRefresh.id.replace('th', 'td')
           var trToRefresh = thToRefresh.id.replace('th', 'tr').replace('div_', '')
           $('#' + trToRefresh).replaceWith($('#' + trToRefresh,data));
+          console.log(checkbox);
+          $(checkbox).fadeOut();
+          $(checkbox).prop('checked', true);
       }, 200);
 
         }
