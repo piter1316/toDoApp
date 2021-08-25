@@ -237,7 +237,8 @@
 
         setTimeout (function() {
           $('#shop_'+ shop_id).replaceWith($('#shop_'+ shop_id,json))
-          $('#addProdForm_'+ shop_id + ' #id_product_name').val('').focus();
+          $('#addProdForm_'+ shop_id + ' #id_product_name').val('');
+          $('#addProdForm_'+ shop_id + ' #id_product_name').focus()
       }, 100);
       }
     });
