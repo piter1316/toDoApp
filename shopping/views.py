@@ -79,7 +79,7 @@ def add_product(request, shopping_list_id):
                            quantity=request.POST['quantity'],
                            unit_id=request.POST['prod_unit'])
     new_product.save()
-    return HttpResponse('')
+    return redirect('shopping:shopping_list_index')
 
 
 def update_product(request, product_id):
