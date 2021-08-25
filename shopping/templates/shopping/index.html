@@ -161,13 +161,15 @@
           {% endfor %}
         </ul>
           <div class="list-group-item d-flex justify-content-between align-items-center addProdForm" >
-            <form class="addProdForm_ input-group" action="" method="POST" id="addProdForm_{{shop.id}}">
+            <form class="addProdForm_ input-group" action="" method="POST" id="addProdForm_{{shop.id}}" style="position:relative">
               {% csrf_token %}
               {% include 'shopping/product_form.html' %}
               <div class="input-group-append">
                 <button class="btn btn-outline-secondary" type="submit">+</button>
               </div>
             </form>
+            <div id="saveAlert_{{shop.id}}" class="alert alert-info text-center rounded shadow mt-2"
+                  style="position: absolute; left:20%; width:60%; display:none;">Zapisywanie</div>
           </div>
       </div>
     </div>
@@ -221,6 +223,9 @@
     e.preventDefault();
     var id = e.target.id
     var shop_id = parseInt(id.split('_')[1])
+    $('#addProdForm_'+ shop_id + ' #id_product_name').blur()
+    $('#saveAlert_'+ shop_id).fadeIn();
+
     $.ajax({
       type:'POST',
       url:'shopping/add/product/' + shop_id,
@@ -231,15 +236,15 @@
         csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
       },
       success: function(json){
-        $('#addProdForm_'+ shop_id + ' #id_product_name').val('Zapisywanie...')
+        $('#addProdForm_'+ shop_id).fadeIn();
         $('#addProdForm_'+ shop_id + ' #id_quantity').val(1)
         $('#addProdForm_'+ shop_id + ' #id_prod_unit').val(1)
-
+        $('#saveAlert_'+ shop_id).fadeOut();
         setTimeout (function() {
           $('#shop_'+ shop_id).replaceWith($('#shop_'+ shop_id,json))
           $('#addProdForm_'+ shop_id + ' #id_product_name').val('');
-          $('#addProdForm_'+ shop_id + ' #id_product_name').focus()
-      }, 100);
+          $('#addProdForm_'+ shop_id + ' #id_product_name').focus();
+      }, 200);
       }
     });
 
