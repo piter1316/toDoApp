@@ -20,7 +20,6 @@ def shopping_list_index(request):
     for i in range(len(shopping_lists)):
         products_on_shopping_list = Products.objects.filter(shopping_list_id=shopping_lists[i].id)
         products = []
-
         for product in products_on_shopping_list:
             meals_with_product = []
             generated_meals_with_product = []
@@ -40,7 +39,6 @@ def shopping_list_index(request):
             product_quantity_bought = [product.quantity, product.bought, product.id, product.unit, generated_meals_with_product]
             product_quantity = {product: product_quantity_bought}
             products.append(product_quantity)
-
         shopping_lists_dict[shopping_lists[i]] = products
     context = {
         'shopping_lists': shopping_lists_dict,
