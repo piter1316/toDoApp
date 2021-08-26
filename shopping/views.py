@@ -1,3 +1,5 @@
+import os
+
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -5,6 +7,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 
 from meals.models import Unit, Meal, Ingredient, MealsList, MealIngredient
+from myproject.settings import BASE_DIR
 from shopping.forms import ShoppingListForm, ProductsForm
 from shopping.models import ShoppingList, Products
 
@@ -79,7 +82,7 @@ def add_product(request, shopping_list_id):
                            quantity=request.POST['quantity'],
                            unit_id=request.POST['prod_unit'])
     new_product.save()
-    file = open('shopping/templates/shopping/add_to_shopping_list.html', encoding='utf-8')
+    file = open(os.path.join(BASE_DIR, 'shopping/templates/shopping/add_to_shopping_list.html'), encoding='utf-8')
     file_lines = file.readlines()
     html = ' '.join(file_lines)
     html = html.replace('####', str(new_product.pk))

@@ -241,12 +241,11 @@
         $('#addProdForm_'+ shop_id + ' #id_prod_unit').val(1)
         $('#saveAlert_'+ shop_id).fadeOut();
         setTimeout (function() {
-        console.log(json)
           //$('#shop_'+ shop_id).replaceWith($('#shop_'+ shop_id,json))
           $('#shop_'+ shop_id).append(json)
           $('#addProdForm_'+ shop_id + ' #id_product_name').val('');
           $('#addProdForm_'+ shop_id + ' #id_product_name').focus();
-      }, 200);
+      }, 100);
       }
     });
 
@@ -270,7 +269,6 @@
       },
       success: function(data){
         setTimeout (function() {
-          console.log(data);
           if (data.includes('!DOCTYPE html')){
             $('#prod_'+prod_id).replaceWith($('#prod_' + prod_id,data));
             $('#detailsPosition_'+prod_id).replaceWith($('#detailsPosition_'+prod_id,data));
@@ -300,7 +298,6 @@
       data:{
       },
       success: function(data){
-      console.log(data);
       },
     });
   });
