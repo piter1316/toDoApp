@@ -223,9 +223,6 @@
     e.preventDefault();
     var id = e.target.id
     var shop_id = parseInt(id.split('_')[1])
-    $('#addProdForm_'+ shop_id + ' #id_product_name').blur()
-    //$('#saveAlert_'+ shop_id).fadeIn();
-
     $.ajax({
       type:'POST',
       url:'shopping/add/product/' + shop_id,
