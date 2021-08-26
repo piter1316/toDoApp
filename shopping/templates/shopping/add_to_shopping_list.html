@@ -1,0 +1,71 @@
+<li class="  bg-light list-group-item d-flex justify-content-between align-items-center py-md-1" id="prod_####">
+  <span><input class="" type="checkbox" name="bought_many" id="boughtMany_####">
+    <a class="shoppingBought_ pointer text-dark" id="shoppingBought_####">###product##
+    </a>
+  </span>
+  <span>
+    <span class=" badge badge-dark badge-pill">1,0</span>
+    <span class=" badge badge-dark badge-pill">szt</span>
+    <span class="dropdown_shopping_item badge badge-dark badge-pill fas fa-cog " id="dropdown_####" style="cursor:pointer;" aria-hidden="true"> </span>
+  </span>
+</li>
+<li class="list-group-item p-0 border-bottom pb-2" id="####" style="display:none">
+  <ul class="nav nav-tabs " id="myTab" role="tablist">
+    <li class="nav-item active">
+      <a class="editPosition_ nav-link " id="editPosition-tab" data-toggle="tab" href="#editPosition_####" role="tab" aria-controls="home" aria-selected="true">Edycja</a>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link " id="detailsPosition-tab" data-toggle="tab" href="#detailsPosition_####" role="tab" aria-controls="profile" aria-selected="false">Szczegóły</a>
+    </li>
+
+  </ul>
+  <div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="editPosition_####" role="tabpanel" aria-labelledby="home-tab">
+      <form id="editProd_####" class="editProd_ form p-1 " action="/shopping/update_product/####" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="Mvbb1rALwLBqEanBltg4hrrwVKvOpbeEEIhz0ir83sI2PiG5N7WQtC6bYmBIhW7v">
+        <div class="from-group row">
+          <div class="col-12">
+            <input class="form-control" type="text" name="new_product_name" id="newProductName_####" value="###product##">
+          </div>
+        </div>
+        <div class="from-group row">
+          <div class="col-6 pr-0">
+            <input class="form-control" type="number" name="new_quantity" step="0.01" id="newQuantity_####" value="1.0">
+          </div>
+          <div class="col-6 pl-0">
+            <select class="form-control" name="new_unit" id="newUnit_####">
+              <option value="1">szt</option>
+              <option disabled="">-----</option>
+
+                <option value="1">szt</option>
+
+                <option value="2">g</option>
+
+                <option value="3">ml</option>
+
+                <option value="5">opak</option>
+
+            </select>
+          </div>
+        </div>
+        <div class="form-group row mb-0">
+          <div class="col-12">
+            <button class="btn btn-primary btn-block" type="submit">Zmień</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="tab-pane fade" id="detailsPosition_####" role="tabpanel" aria-labelledby="profile-tab">
+      <div class="p-1" id="prodDetails_####">
+
+        <small class="mb-1">Brak posiłków zawierających ###product##</small>
+
+        <ul id="show_meals_containing_ingr_list" class="list-group m-2">
+          ###LOOP###
+
+
+        </ul>
+      </div>
+    </div>
+  </div>
+</li>

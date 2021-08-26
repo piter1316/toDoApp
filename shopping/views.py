@@ -79,15 +79,48 @@ def add_product(request, shopping_list_id):
                            quantity=request.POST['quantity'],
                            unit_id=request.POST['prod_unit'])
     new_product.save()
-    return redirect('shopping:shopping_list_index')
+    file = open('shopping/templates/shopping/add_to_shopping_list.html', encoding='utf-8')
+    file_lines = file.readlines()
+    html = ' '.join(file_lines)
+    html = html.replace('####', str(new_product.pk))
+    html = html.replace('###product##', str(new_product))
+    try:
+        ingredient = Ingredient.objects.get(name__contains=new_product, user_id=request.user)
+        meals_with_product_query = MealIngredient.objects.filter(ingredient_id=ingredient)
+        html = html.replace("""<small class="mb-1">Brak posiłków zawierających {}</small>""".format(str(new_product)), '')
+        loop_html_total = ""
+        for meal in meals_with_product_query:
+            query_set = MealsList.objects.filter(meal_id=meal.meal_id_id)
+            if len(query_set) > 0:
+                loop_html = """
+                <li class="list-group-item p-0">
+                  <small>
+                    <a class="text-dark" href="/mealsEdit">{}</a>: <a class="text-dark" href="/mealsEdit/edit_meal_ingredients/{}">{}</a>
+                  </small>
+                </li>
+                """.format(str(query_set[0].meal_option), str(query_set[0].meal_id), query_set[0])
+                loop_html_total += loop_html
+
+        html = html.replace('###LOOP###', loop_html_total)
+    except Exception as e:
+        html = html.replace('###LOOP###', '')
+
+    return HttpResponse(html)
 
 
 def update_product(request, product_id):
+    old_name = ''
+    old_name_guery = Products.objects.filter(pk=product_id)
+    for query in old_name_guery:
+        old_name = str(query.product_name)
     new_name = request.POST['new_product_name'].lower()
     new_quantity = request.POST['new_quantity']
     new_unit = request.POST['new_unit']
     Products.objects.filter(pk=product_id).update(product_name=new_name, quantity=new_quantity, unit=new_unit)
-    return redirect('shopping:shopping_list_index')
+    if old_name != new_name:
+        return redirect('shopping:shopping_list_index')
+    else:
+        return HttpResponse(str(new_quantity) + '_' + str(new_unit))
 
 
 def bought(request, id):
@@ -99,7 +132,7 @@ def bought(request, id):
 
 def delete_bought(request, shopping_list_id):
     Products.objects.filter(bought__exact=True, shopping_list_id=shopping_list_id).delete()
-    return redirect('shopping:shopping_list_index')
+    return HttpResponse('Selected products deleted from list')
 
 
 def purge_list(request, shopping_list_id):

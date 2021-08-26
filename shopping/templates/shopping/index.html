@@ -92,8 +92,8 @@
               {% endif %}
             </span>
             <span>
-              <span class="{% if qt.1 %}todo-completed {%endif%} badge badge-dark badge-pill">{{qt.0}}</span>
-              <span class="{% if qt.1 %}todo-completed {%endif%} badge badge-dark badge-pill">{{qt.3}}</span>
+              <span class="{% if qt.1 %}todo-completed {%endif%} badge badge-dark badge-pill" id="quantity_{{prod.id}}">{{qt.0}}</span>
+              <span class="{% if qt.1 %}todo-completed {%endif%} badge badge-dark badge-pill" id="unit_{{prod.id}}" >{{qt.3}}</span>
               <span class="dropdown_shopping_item badge badge-dark badge-pill fas fa-cog {% if qt.1 %}d-none{%endif%}" id="dropdown_{{prod.id}}" style="cursor:pointer;"> </span>
             </span>
           </li>
@@ -224,7 +224,7 @@
     var id = e.target.id
     var shop_id = parseInt(id.split('_')[1])
     $('#addProdForm_'+ shop_id + ' #id_product_name').blur()
-    $('#saveAlert_'+ shop_id).fadeIn();
+    //$('#saveAlert_'+ shop_id).fadeIn();
 
     $.ajax({
       type:'POST',
@@ -241,7 +241,9 @@
         $('#addProdForm_'+ shop_id + ' #id_prod_unit').val(1)
         $('#saveAlert_'+ shop_id).fadeOut();
         setTimeout (function() {
-          $('#shop_'+ shop_id).replaceWith($('#shop_'+ shop_id,json))
+        console.log(json)
+          //$('#shop_'+ shop_id).replaceWith($('#shop_'+ shop_id,json))
+          $('#shop_'+ shop_id).append(json)
           $('#addProdForm_'+ shop_id + ' #id_product_name').val('');
           $('#addProdForm_'+ shop_id + ' #id_product_name').focus();
       }, 200);
@@ -255,6 +257,8 @@
     e.preventDefault();
     var id = e.target.id
     var prod_id = parseInt(id.split('_')[1])
+    $('#quantity_'+prod_id).text(parseFloat($('#newQuantity_'+ prod_id).val()).toFixed(1).replace('.', ','));
+    $('#unit_'+prod_id).text($('#newUnit_'+prod_id + ' option:selected').text());
     $.ajax({
       type:'POST',
       url:'shopping/update_product/' + prod_id,
@@ -266,8 +270,11 @@
       },
       success: function(data){
         setTimeout (function() {
-          $('#prod_'+prod_id).replaceWith($('#prod_' + prod_id,data));
-          $('#detailsPosition_'+prod_id).replaceWith($('#detailsPosition_'+prod_id,data));
+          console.log(data);
+          if (data.includes('!DOCTYPE html')){
+            $('#prod_'+prod_id).replaceWith($('#prod_' + prod_id,data));
+            $('#detailsPosition_'+prod_id).replaceWith($('#detailsPosition_'+prod_id,data));
+          }
       }, 100);
       }
     });
@@ -284,6 +291,7 @@
     $('#dropdown_'+prod_id).hide();
     $('#boughtMany_'+prod_id).hide();
     $('#shoppingBought_'+prod_id).replaceWith('<span class=disabled>'+ e.target.text +'</span>');
+    $('#' + prod_id).remove();
 
 
     $.ajax({
