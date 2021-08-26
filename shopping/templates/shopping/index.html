@@ -279,14 +279,20 @@
     var prod_id = parseInt(id.split('_')[1])
     $('#prod_'+prod_id).removeClass('bg-light');
     $('#prod_'+prod_id).addClass('bg-secondary');
+    $('#prod_'+prod_id).addClass('todo-completed');
+    $('#prod_'+prod_id + ' .badge-pill').addClass('disabled todo-completed');
+    $('#dropdown_'+prod_id).hide();
+    $('#boughtMany_'+prod_id).hide();
+    $('#shoppingBought_'+prod_id).replaceWith('<span class=disabled>'+ e.target.text +'</span>');
+
+
     $.ajax({
       type:'GET',
       url:'shopping/bought/' + prod_id,
       data:{
       },
       success: function(data){
-      $('#'+prod_id).hide('slow');
-          $('#prod_'+prod_id).replaceWith($('#prod_' + prod_id,data));
+      console.log(data);
       },
     });
   });
