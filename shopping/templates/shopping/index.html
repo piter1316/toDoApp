@@ -7,15 +7,16 @@
       <h3 class="text-center">MOJE LISTY ZAKUPÓW</h3>
       <hr class="my-2">
       <div class="form-row">
-        <div class="col-12 {% if shopping_lists %}col-md-9{% endif %}">
+        <div class="col-12 {% if shopping_lists %}col-md-8{% endif %}">
           <button type="button" class="btn btn-primary btn-block mb-1 mb-md-0" data-toggle="modal"
                   data-target="#addNewList">
             Dodaj nową
           </button>
         </div>
-        <div class="col-12 col-md-3">
+        <div class="col-12 col-md-4">
           <div class="btn-group btn-block {% if shopping_lists %}{%else%}d-none{% endif %}" role="group">
-            <button type="button" class="btn btn-secondary" onclick="printAllShoppingLists()"><i class="fas fa-print"></i> </button>
+            <button type="button" class="btn btn-secondary " onclick="printAllShoppingLists()"><i class="fas fa-print"></i> </button>
+            <button type="button" class="btn btn-secondary" data-toggle="modal" data-target=".bd-checklist-modal-lg"><i class="fas fa-check-double"></i> </button>
             <a onclick="return confirm('Usunąć wszystkie listy zakupów?')"
              href="{% url 'shopping:delete_all_shopping_lists' %}"
              class="btn btn-warning  ">
@@ -26,10 +27,30 @@
       </div>
     </div>
   </div>
-  <div>
-    {% for checkitem in checklist %}
-    {{checkitem}}
-    {% endfor %}
+  <div class="modal fade bd-checklist-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="container p-1">
+          <form method="post" class="card text-center" name="checkListAdd" id="checkListAdd" action="{% url 'shopping:add_from_checklist' %}">{% csrf_token %}
+            <div class="card-header">
+              Zaznacz i dodaj na listę zakupów
+            </div>
+            <div class="card-body mx-auto">
+              {% for checkitem in checklist %}
+              <div class="form-row">
+                <label><input class="mr-1" type="checkbox" name="checkitem[]" value="{{checkitem}}###{{checkitem.shop}}">{{checkitem}}</label>
+              </div>
+              {% endfor %}
+            </div>
+            <div class="card-footer text-muted">
+              <button type="submit" class="btn btn-primary">Dodaj do list zakupów</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
   </div>
   {% if shopping_lists %}
   <div class="row d-flex justify-content-center">
@@ -336,6 +357,26 @@
       }
     });
    });
+
+   /*$('#checkListAdd').on('submit', function(e){
+    e.preventDefault();
+    to_add_array = []
+    $.ajax({
+      type:'POST',
+      url:'shopping/add_from_checklist',
+      data:{
+        products_to_add:$("input:checkbox[name=checkitem[]",
+        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+      },
+      success: function(json){
+        setTimeout (function() {
+          alert('success');
+      }, 100);
+      }
+    });
+
+   }); */
+
 
 </script>
 
