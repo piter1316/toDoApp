@@ -196,3 +196,11 @@ def delete_item(request, item_id):
     print(item_id)
     Checklist.objects.filter(user_id=request.user, pk=item_id).delete()
     return redirect('shopping:edit_check_list')
+
+
+def update_item(request, item_id):
+    if request.method == 'POST':
+        new_name = request.POST['updatePosOnCheckListName']
+        new_shop = get_object_or_404(Shop, pk=request.POST['updatePosOnCheckListShop'])
+        Checklist.objects.filter(pk=item_id).update(product_name=new_name, shop_id=new_shop)
+    return redirect('shopping:edit_check_list')

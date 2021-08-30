@@ -24,32 +24,30 @@
     </div>
   </form>
   {% for check in checklist %}
-    <form>
-  <div class="form-row align-items-center">
-    <div class="col-auto">
-      <label class="sr-only" for="inlineFormInput">Name</label>
-      <input type="text" class="form-control mb-2" id="inlineFormInput" value="{{check}}">
-    </div>
-    <div class="col-auto">
-      <label class="sr-only" for="inlineFormInputGroup">Username</label>
-      <div class="input-group mb-2">
-        <div class="input-group-prepend">
-          <div class="input-group-text"><i class="fas fa-shopping-cart"></i></div>
+    <form id="updatePosOnCheckList_{{check.id}}" method="post" action="{% url 'shopping:update_item' check.id %}">{%csrf_token%}
+      <div class="form-row align-items-center">
+        <div class="col-auto">
+          <input type="text" class="form-control mb-2" name="updatePosOnCheckListName" id="updatePosOnCheckListName_{{check.id}}" value="{{check}}">
         </div>
-        <select  class="form-control" id="inlineFormInputGroup" >
-          {% for shop in user_shops %}
-          <option value="{{shop.id}}" {% if shop == check.shop%} selected {% endif %}>{{shop}}</option>
-          {% endfor %}
-        </select>
+        <div class="col-auto">
+          <div class="input-group mb-2">
+            <div class="input-group-prepend">
+              <div class="input-group-text"><i class="fas fa-shopping-cart"></i></div>
+            </div>
+            <select  class="form-control" id="updatePosOnCheckListShop_{{check.id}}" name="updatePosOnCheckListShop" >
+              {% for shop in user_shops %}
+              <option value="{{shop.id}}" {% if shop == check.shop%} selected {% endif %}>{{shop}}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="col-auto">
+        </div>
+        <div class="col-auto">
+          <button type="submit" class="btn btn-primary mb-2"><i class="fas fa-check"></i></button>
+          <a href=" {% url 'shopping:delete_item' check.id %} " type="submit" class="btn btn-danger mb-2"><i class="far fa-trash-alt"></i></a>
+        </div>
       </div>
-    </div>
-    <div class="col-auto">
-    </div>
-    <div class="col-auto">
-      <button type="submit" class="btn btn-primary mb-2"><i class="fas fa-check"></i></button>
-      <a href=" {% url 'shopping:delete_item' check.id %} " type="submit" class="btn btn-danger mb-2"><i class="far fa-trash-alt"></i></a>
-    </div>
-  </div>
 </form>
   {% endfor %}
 </div>
