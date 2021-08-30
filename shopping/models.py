@@ -3,7 +3,7 @@ from django.db import models
 
 
 # Create your models here.
-from meals.models import Unit
+from meals.models import Unit, Shop
 
 
 class ShoppingList(models.Model):
@@ -24,4 +24,15 @@ class Products(models.Model):
 
     def __str__(self):
         return self.product_name
+
+
+class ShoppingChecklist(models.Model):
+    user = models.ForeignKey(User, models.DO_NOTHING, blank=True, null=True)
+    shop = models.ForeignKey(Shop, models.DO_NOTHING, blank=True, null=True)
+    product_name = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'shopping_checklist'
+
 
