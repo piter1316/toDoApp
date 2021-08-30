@@ -1,12 +1,13 @@
 {% extends 'todo/base.html' %}
 {% block body %}
-<div class="container">
-    <form id="addNewPosToCheckList" method="post" action="{% url 'shopping:add_item' %}">{%csrf_token%}
+<div class="container text-center">
+  <form class="form p-3 border shadow my-2" id="addNewPosToCheckList" method="post" action="{% url 'shopping:add_item' %}">{%csrf_token%}
+    <span>Nowa pozycja do checklisty:</span>
     <div class="form-row align-items-center">
-      <div class="col-sm-3 my-1">
+      <div class="col-12 my-1">
         <input type="text" class="form-control" id="addNewPosToCheckListName" name="addNewPosToCheckListName" placeholder="Nowa pozycja">
       </div>
-      <div class="col-sm-3 my-1">
+      <div class="col-12 my-1">
         <div class="input-group">
           <div class="input-group-prepend">
             <div class="input-group-text"><i class="fas fa-shopping-cart"></i></div>
@@ -18,37 +19,46 @@
         </select>
         </div>
       </div>
-      <div class="col-auto my-1">
-        <button type="submit" class="btn btn-primary">Dodaj</button>
+      <div class="col-12 my-1">
+        <button type="submit" class="btn btn-primary btn-block">Dodaj</button>
       </div>
     </div>
   </form>
+  <span class=" text-ceenter mt-2">Pozycje i edycja checklisty:</span>
   {% for check in checklist %}
-    <form id="updatePosOnCheckList_{{check.id}}" method="post" action="{% url 'shopping:update_item' check.id %}">{%csrf_token%}
-      <div class="form-row align-items-center">
-        <div class="col-auto">
-          <input type="text" class="form-control mb-2" name="updatePosOnCheckListName" id="updatePosOnCheckListName_{{check.id}}" value="{{check}}">
-        </div>
-        <div class="col-auto">
-          <div class="input-group mb-2">
-            <div class="input-group-prepend">
-              <div class="input-group-text"><i class="fas fa-shopping-cart"></i></div>
-            </div>
-            <select  class="form-control" id="updatePosOnCheckListShop_{{check.id}}" name="updatePosOnCheckListShop" >
-              {% for shop in user_shops %}
-              <option value="{{shop.id}}" {% if shop == check.shop%} selected {% endif %}>{{shop}}</option>
-              {% endfor %}
-            </select>
+  <form class="form p-1 border shadow mb-2" id="updatePosOnCheckList_{{check.id}}" method="post" action="{% url 'shopping:update_item' check.id %}">{%csrf_token%}
+    <div class="form-row align-items-center">
+      <div class="col-12 col-md-5">
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <div class="input-group-text"><i class="fas fa-shopping-basket"></i></div>
           </div>
+          <input type="text" class="form-control" name="updatePosOnCheckListName" id="updatePosOnCheckListName_{{check.id}}" value="{{check}}">
         </div>
-        <div class="col-auto">
-        </div>
-        <div class="col-auto">
-          <button type="submit" class="btn btn-primary mb-2"><i class="fas fa-check"></i></button>
-          <a href=" {% url 'shopping:delete_item' check.id %} " type="submit" class="btn btn-danger mb-2"><i class="far fa-trash-alt"></i></a>
+
+      </div>
+      <div class="col-12 col-md-5">
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <div class="input-group-text"><i class="fas fa-shopping-cart"></i></div>
+          </div>
+          <select  class="form-control" id="updatePosOnCheckListShop_{{check.id}}" name="updatePosOnCheckListShop" >
+            {% for shop in user_shops %}
+            <option value="{{shop.id}}" {% if shop == check.shop%} selected {% endif %}>{{shop}}</option>
+            {% endfor %}
+          </select>
         </div>
       </div>
-</form>
+      <div class="col-12 col-md-2 mt-2 mt-md-0">
+        <div class="btn-group btn-block" role="group">
+          <button type="submit" class="btn btn-primary mr-2"><i class="fas fa-check"></i></button>
+          <a href=" {% url 'shopping:delete_item' check.id %} " type="submit" class="btn btn-danger"><i class="far fa-trash-alt"></i></a>
+        </div>
+
+      </div>
+    </div>
+  </form>
+  <hr class="d-md-none">
   {% endfor %}
 </div>
 
