@@ -4,7 +4,7 @@
 <div class="container-fluid mt-2">
   <div class="container">
     <div class="jumbotron shadow p-2">
-      <h3 class="text-center">MOJE LISTY ZAKUPÓW</h3>
+        <h3 class="text-center">MOJE LISTY ZAKUPÓW<a href="{% url 'shopping:edit_check_list' %}" class="fas fa-cogs ml-3 text-dark"></a></h3>
       <hr class="my-2">
       <div class="form-row">
         <div class="col-12 {% if shopping_lists %}col-md-8{% endif %}">
@@ -50,8 +50,6 @@
       </div>
     </div>
   </div>
-
-
   {% if shopping_lists %}
   <div class="row d-flex justify-content-center">
     {% for shop, products in shopping_lists.items %}

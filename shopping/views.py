@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 # Create your views here.
 from django.views.decorators.http import require_POST
 
-from meals.models import Unit, Meal, Ingredient, MealsList, MealIngredient
+from meals.models import Unit, Meal, Ingredient, MealsList, MealIngredient, Shop
 from myproject.settings import BASE_DIR
 from shopping.forms import ShoppingListForm, ProductsForm
 from shopping.models import ShoppingList, Products, Checklist
@@ -170,3 +170,29 @@ def add_from_checklist(request):
         new_shopping_product.save()
 
     return redirect('shopping:shopping_list_index')
+
+
+def edit_check_list(request):
+    checklist = Checklist.objects.filter(user=request.user.id)
+    user_shops = Shop.objects.filter(user_id= request.user)
+    context = {
+        'checklist': checklist,
+        'user_shops': user_shops,
+    }
+    return render(request, 'shopping/edit_checklist.html', context)
+
+
+def add_item(request):
+    if request.method == 'POST':
+        print(request.POST)
+        shop = get_object_or_404(Shop, pk=request.POST['addNewPosToCheckListShop'])
+        new_checklist_position = Checklist(user_id=request.user.id, product_name=request.POST['addNewPosToCheckListName'],
+                                           shop_id=shop.pk)
+        new_checklist_position.save()
+    return redirect('shopping:edit_check_list')
+
+
+def delete_item(request, item_id):
+    print(item_id)
+    Checklist.objects.filter(user_id=request.user, pk=item_id).delete()
+    return redirect('shopping:edit_check_list')
