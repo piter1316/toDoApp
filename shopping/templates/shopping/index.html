@@ -26,6 +26,11 @@
       </div>
     </div>
   </div>
+  <div>
+    {% for checkitem in checklist %}
+    {{checkitem}}
+    {% endfor %}
+  </div>
   {% if shopping_lists %}
   <div class="row d-flex justify-content-center">
     {% for shop, products in shopping_lists.items %}

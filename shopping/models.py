@@ -26,10 +26,13 @@ class Products(models.Model):
         return self.product_name
 
 
-class ShoppingChecklist(models.Model):
+class Checklist(models.Model):
     user = models.ForeignKey(User, models.DO_NOTHING, blank=True, null=True)
     shop = models.ForeignKey(Shop, models.DO_NOTHING, blank=True, null=True)
     product_name = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.product_name
 
     class Meta:
         managed = False

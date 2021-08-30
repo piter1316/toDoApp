@@ -9,7 +9,7 @@ from django.views.decorators.http import require_POST
 from meals.models import Unit, Meal, Ingredient, MealsList, MealIngredient
 from myproject.settings import BASE_DIR
 from shopping.forms import ShoppingListForm, ProductsForm
-from shopping.models import ShoppingList, Products
+from shopping.models import ShoppingList, Products, Checklist
 
 
 @login_required(login_url='/accounts/login')
@@ -19,6 +19,7 @@ def shopping_list_index(request):
     form = ShoppingListForm(request.POST)
     form_2 = ProductsForm(request.POST)
     units = Unit.objects.all()
+    checklist = Checklist.objects.filter(user=request.user.id)
 
     for i in range(len(shopping_lists)):
         products_on_shopping_list = Products.objects.filter(shopping_list_id=shopping_lists[i].id)
@@ -47,7 +48,8 @@ def shopping_list_index(request):
         'shopping_lists': shopping_lists_dict,
         'form': form,
         'form_2': form_2,
-        'units': units
+        'units': units,
+        'checklist': checklist
     }
 
     return render(request, 'shopping/index.html', context)
