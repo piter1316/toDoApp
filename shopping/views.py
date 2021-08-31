@@ -84,11 +84,15 @@ def add_product(request, shopping_list_id):
                            quantity=request.POST['quantity'],
                            unit_id=request.POST['prod_unit'])
     new_product.save()
+    quantity = new_product.quantity
+    quantity = str(float(quantity)).replace('.', ',')
     file = open(os.path.join(BASE_DIR, 'shopping/templates/shopping/add_to_shopping_list.html'), encoding='utf-8')
     file_lines = file.readlines()
     html = ' '.join(file_lines)
     html = html.replace('####', str(new_product.pk))
     html = html.replace('###product##', str(new_product))
+    html = html.replace('###quantity##', quantity)
+    html = html.replace('###unit##', str(new_product.unit))
     try:
         ingredient = Ingredient.objects.get(name__contains=new_product, user_id=request.user)
         meals_with_product_query = MealIngredient.objects.filter(ingredient_id=ingredient)
