@@ -252,7 +252,6 @@ def meals(request, current=1):
         average_protein_per_day = 0
         average_carb_per_day = 0
         average_fat_per_day = 0
-    print( type(current))
 
     context = {
         'meals_list': meals_list,

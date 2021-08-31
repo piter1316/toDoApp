@@ -20,7 +20,7 @@
       </div>
         <div class="table-responsive-sm shadow " id="meals_list" >
           <table  class="table table-light table-striped table-hover " id="table"
-                  {% if not current %}style="color: gray !important; pointer-events: none; opacity: 0.7;"{% endif %}>
+                  {% if not current %}style="color: gray !important; opacity: 0.7;"{% endif %}>
             <thead id="meals_list_head" class="thead-dark">
             <tr class="text-center text-light">
               <th nowrap class="px-auto py-0 text-center" scope="col" id="b-t-w">
@@ -81,6 +81,7 @@
                   {% endif %}
                 </span>
                 <div class="dropdown-menu p-0" id="dropdownMenu_{{ch_meal.id}}">
+                  {% if current %}
                   <small>Zmiana posiłku:</small>
                   <form id="form_{{ch_meal.id}}" action="{% url 'meals:update_meals_list' %}" method="post" class="form">{% csrf_token %}
                     <input type="hidden" name="record_id" value="{{ch_meal.id}}">
@@ -93,6 +94,7 @@
                       {% endfor %}
                     </select>
                   </form>
+                  {% endif %}
                   <span id="span_{{ch_meal.id}}">
                   {% if ch_meal.meal_id %}
                     <a href="{% url 'meals:edit_meal_ingredients' ch_meal.meal_id %}" id="a_{{ch_meal.id}}" class="btn btn-sm btn-block btn-primary mt-1">Edytuj {{ch_meal}}</a>
