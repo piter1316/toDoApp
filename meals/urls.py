@@ -1,9 +1,11 @@
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect
 from django.urls import path
 from . import views
 
 app_name = 'meals'
 urlpatterns = [
+    path('mealsList', views.meals, name='index'),
     path('mealsList/<current>', views.meals, name='index'),
     path('mealsList/1/purge_meals_list', views.purge_meals_list, name='purge_meals_list'),
     path('mealsList/1/delete_selected_days', views.delete_selected_days, name='delete_selected_days'),

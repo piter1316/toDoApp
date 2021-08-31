@@ -84,7 +84,7 @@ def get_maximum_no_of_days_no_repeat(request):
 
 
 @login_required(login_url='/accounts/login')
-def meals(request, current):
+def meals(request, current=1):
     start = time.time()
     in_meals_list = True
     user_meals_options = MealOption.objects.filter(user=request.user).order_by('position')
