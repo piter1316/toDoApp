@@ -4,12 +4,12 @@ from . import views
 
 app_name = 'meals'
 urlpatterns = [
-    path('mealsList', views.meals, name='index'),
-    path('mealsList/purge_meals_list', views.purge_meals_list, name='purge_meals_list'),
-    path('mealsList/delete_selected_days', views.delete_selected_days, name='delete_selected_days'),
-    path('mealsList/update', views.update_meals_list, name='update_meals_list'),
-    path('mealsList/generate_meals_list', views.generate_meals_list, name='generate_meals_list'),
-    path('mealsList/generate_shopping_lists', views.generate_shopping_lists, name='generate_shopping_lists'),
+    path('mealsList/<current>', views.meals, name='index'),
+    path('mealsList/1/purge_meals_list', views.purge_meals_list, name='purge_meals_list'),
+    path('mealsList/1/delete_selected_days', views.delete_selected_days, name='delete_selected_days'),
+    path('mealsList/1/update', views.update_meals_list, name='update_meals_list'),
+    path('mealsList/1/generate_meals_list', views.generate_meals_list, name='generate_meals_list'),
+    path('mealsList/1/generate_shopping_lists', views.generate_shopping_lists, name='generate_shopping_lists'),
     path('mealsEdit', views.edit_meals, name='edit_meals'),
     path('ingredientsEdit', views.edit_ingredients, name='edit_ingredients'),
     path('ingredientsEdit/addShop', views.add_shop, name='add_shop'),

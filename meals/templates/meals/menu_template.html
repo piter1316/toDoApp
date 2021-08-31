@@ -26,6 +26,7 @@
       <a href="{% url 'meals:purge_meals_list' %}" class="btn btn-outline-danger btn-block mt-1" onclick="return confirm('Wyczyścić jadłospis?')">
         Wyczyść jadłospis
       </a>
+      <a class="btn btn-block btn-dark" href="{% url 'meals:index' 0 %}">Wyświetl poprzedni jadłospis</a>
     {% endif %}
     {% endif %}
   </div>

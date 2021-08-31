@@ -54,7 +54,7 @@
           <a class="nav-link" href="{% url 'todo:index' %}">To do</a>
         </li>
         <li class="nav-item dropdown">
-          <a class="nav-link" href="{% url 'meals:index' %}">Jadłospis</a>
+          <a class="nav-link" href="{% url 'meals:index' 1 %}">Jadłospis</a>
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle pl-0" style="cursor:pointer;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -102,6 +102,7 @@
     </div>
   </nav>
   {% if in_meals_list %}
+  {% if current %}
     <nav class="navbar d-md-none navbar-light bg-light border-top shadow">
       <button class="navbar-toggler btn-block shadow" type="button" data-toggle="collapse" id="mealsOptionsButton" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span id="mealsOptionsButtonText">opcje</span><span class="navbar-toggler-icon" id="mealsOptionsButtonIcon"></span>
@@ -110,6 +111,7 @@
         {% include 'meals/menu_template.html' %}
       </div>
     </nav>
+  {% endif %}
   {% endif %}
 
 </div>

@@ -31,7 +31,7 @@ def days_generator(first, how_many):
 def appended_days_generator(request, first, how_many):
     days = ['PN', 'WT', 'ŚR', 'CZW', 'PT', 'SB', 'ND']
     days_list = []
-    meals_list_ids = MealsList.objects.filter(user_id=request)
+    meals_list_ids = MealsList.objects.filter(user_id=request, current=1)
     itr = meals_list_ids.reverse()[0].id
     space = '_'
     for i in range(how_many):
@@ -59,7 +59,7 @@ def get_maximum_no_of_days(request):
 
 
 def get_maximum_no_of_days_no_repeat(request):
-    current_meals_list = MealsList.objects.filter(user=request.user)
+    current_meals_list = MealsList.objects.filter(user=request.user,current=1)
     current_meals = []
     no_of_meals_in_option = []
     for item in (list(current_meals_list)):
@@ -84,13 +84,13 @@ def get_maximum_no_of_days_no_repeat(request):
 
 
 @login_required(login_url='/accounts/login')
-def meals(request):
+def meals(request, current):
     start = time.time()
     in_meals_list = True
     user_meals_options = MealOption.objects.filter(user=request.user).order_by('position')
-    generated_user_meals_options = MealsList.objects.filter(user=request.user).order_by('meal_option__position').values(
+    generated_user_meals_options = MealsList.objects.filter(user=request.user, current=current).order_by('meal_option__position').values(
         'meal_option__meal_option', 'meal_option_id').distinct()
-    meals_list = MealsList.objects.all().filter(user=request.user)
+    meals_list = MealsList.objects.all().filter(user=request.user, current=current)
     days = []
     all_meals_in_option_dict = {}
     all_meals = []
@@ -146,7 +146,7 @@ def meals(request):
             days.append(item.day)
     day_calories = []
     for day in days:
-        meals_on_day = MealsList.objects.select_related('meal').filter(user=request.user, day=day).order_by(
+        meals_on_day = MealsList.objects.select_related('meal').filter(user=request.user, current=current, day=day).order_by(
             'meal_option__position')
         day_meals_list = []
         meals = []
@@ -194,7 +194,7 @@ def meals(request):
     maximum_no_of_days_to_generate = get_maximum_no_of_days(request)
     maximum_no_of_days_to_generate_no_repeat = get_maximum_no_of_days_no_repeat(request)
     first_day_input_list = Week.objects.all()
-    user_meals_options_select = MealsList.objects.filter(user=request.user).order_by('meal_option__position').values(
+    user_meals_options_select = MealsList.objects.filter(user=request.user, current=current).order_by('meal_option__position').values(
         'meal_option_id', 'meal_option_id__meal_option').distinct()
     option_meals_dict = {}
     user_meals_options_select = []
@@ -207,9 +207,9 @@ def meals(request):
         option_meals_dict[meal_option] = option_meals_list
 
     # average calories for whole mealsList
-    all_meals = MealsList.objects.filter(user=request.user)
-    meal_options = MealsList.objects.filter(user=request.user).values('meal_option_id').distinct()
-    meals = MealsList.objects.select_related('meal').filter(user=request.user)
+    all_meals = MealsList.objects.filter(user=request.user, current=current)
+    meal_options = MealsList.objects.filter(user=request.user, current=current).values('meal_option_id').distinct()
+    meals = MealsList.objects.select_related('meal').filter(user=request.user, current=current)
     calories_total = 0
     protein_total = 0
     fat_total = 0
@@ -252,6 +252,7 @@ def meals(request):
         average_protein_per_day = 0
         average_carb_per_day = 0
         average_fat_per_day = 0
+    print( type(current))
 
     context = {
         'meals_list': meals_list,
@@ -267,6 +268,7 @@ def meals(request):
         'average_protein_per_day': average_protein_per_day,
         'average_fat_per_day': average_fat_per_day,
         'average_carb_per_day': average_carb_per_day,
+        'current': int(current),
     }
     return render(request, 'meals/meals_list.html', context)
 
@@ -342,7 +344,8 @@ def generate_meals_list(request):
     first_day = int(request.POST['first_day']) - 1
     append_existing = request.POST.get('append_existing', False)
     no_repetition = request.POST.get('no_repetition', False)
-    current_meals_list = MealsList.objects.filter(user=request.user)
+    current_meals_list = MealsList.objects.filter(user=request.user, current=1)
+    previous_meals_list = MealsList.objects.filter(user=request.user, current=0)
     current_meals = []
     for item in (list(current_meals_list)):
         if item.meal_id:
@@ -354,7 +357,8 @@ def generate_meals_list(request):
         current_days = int(len(current_meals_list)/len(user_meals_options))
 
     else:
-        current_meals_list.delete()
+        previous_meals_list.delete()
+        current_meals_list.update(current=0)
         days = days_generator(first_day, int(how_many_days))
         current_days = 0
     for option in user_meals_options:
@@ -440,14 +444,14 @@ def generate_meals_list(request):
         if empty_meals_list:
             for k in range(len(random_meals_list)):
                 new_meals_list = MealsList(day=days[k], meal_id=None, meal_option_id=meal_option.id,
-                                           user_id=request.user.id)
+                                           user_id=request.user.id, current=1)
                 new_meals_list.save()
         else:
             for k in range(len(random_meals_list)):
                 new_meals_list = MealsList(day=days[k], meal_id=random_meals_list[k].id, meal_option_id=meal_option.id,
-                                           user_id=request.user.id)
+                                           user_id=request.user.id, current=1)
                 new_meals_list.save()
-    return redirect('meals:index')
+    return redirect('/mealsList/1')
 
 
 @require_POST
@@ -456,7 +460,7 @@ def update_meals_list(request):
     to_update = request.POST['to_update']
 
     MealsList.objects.filter(pk=int(record_id)).update(meal_id=to_update)
-    return redirect('meals:index')
+    return redirect('/mealsList/1')
 
 
 def delete_meal_option(request, meal_option_id):
@@ -545,8 +549,8 @@ def delete_meal(request, meal_id):
 
 
 def purge_meals_list(request):
-    MealsList.objects.filter(user=request.user).delete()
-    return redirect('meals:index')
+    MealsList.objects.filter(user=request.user, current=1).delete()
+    return redirect('/mealsList/1')
 
 
 def update_meal_option(request, meal_option_id):
@@ -567,7 +571,7 @@ def update_meal_name(request, meal_id):
 
 
 def generate_shopping_lists(request):
-    meals = MealsList.objects.filter(user=request.user)
+    meals = MealsList.objects.filter(user=request.user, current=1)
     shops = Shop.objects.filter(user_id=request.user)
     shops = list(shops)
     shops.append(None)
@@ -639,7 +643,7 @@ def delete_selected_days(request):
     meals_list_positions_to_delete_list = request.POST.getlist('mealsListPosition')
     for item in meals_list_positions_to_delete_list:
         MealsList.objects.filter(user=request.user, pk=item).delete()
-    return redirect('meals:index')
+    return redirect('/mealsList/1')
 
 
 def edit_ingredients(request):

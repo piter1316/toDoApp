@@ -68,6 +68,7 @@ class MealsList(models.Model):
     day = models.TextField(max_length=10)
     meal_option = models.ForeignKey(MealOption, on_delete=models.DO_NOTHING, default=1)
     meal = models.ForeignKey(Meal, on_delete=models.DO_NOTHING, default=1, null=True, blank=True)
+    current = models.BooleanField(default=False)
 
     def __str__(self):
         if self.meal:
