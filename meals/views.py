@@ -280,11 +280,10 @@ def edit_meals(request):
             fat = 0
             carbohydrates = 0
             for ingr in ingredients:
-                ingr_obj = get_object_or_404(Ingredient, pk=ingr.ingredient_id.id)
-                calories += (ingr.quantity) / 100 * int(ingr_obj.calories_per_100_gram)
-                protein += (ingr.quantity / 100) * int(ingr_obj.protein_per_100_gram)
-                fat += (ingr.quantity / 100) * int(ingr_obj.fat_per_100_gram)
-                carbohydrates += (ingr.quantity / 100) * int(ingr_obj.carbohydrates_per_100_gram)
+                calories += (ingr.quantity) / 100 * int(ingr.ingredient_id.calories_per_100_gram)
+                protein += (ingr.quantity / 100) * int(ingr.ingredient_id.protein_per_100_gram)
+                fat += (ingr.quantity / 100) * int(ingr.ingredient_id.fat_per_100_gram)
+                carbohydrates += (ingr.quantity / 100) * int(ingr.ingredient_id.carbohydrates_per_100_gram)
             meals.append([meal, [round(calories), round(protein), round(fat), round(carbohydrates)]])
         meals_options_dict[meals_options[i]] = meals
 
