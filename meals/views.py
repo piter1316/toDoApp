@@ -561,7 +561,7 @@ def update_meal_name(request, meal_id):
 
 
 def generate_shopping_lists(request):
-    meals = MealsList.objects.filter(user=request.user, current=1)
+    meals = MealsList.objects.select_related('meal').filter(user=request.user, current=1)
     shops = Shop.objects.filter(user_id=request.user)
     shops = list(shops)
     shops.append(None)
@@ -578,17 +578,13 @@ def generate_shopping_lists(request):
         how_many_people = int(how_many_people)
     for meal in meals:
         if meal.meal_id:
-            meal_instance = get_object_or_404(Meal, pk=meal.meal_id)
-            for ingredient in MealIngredient.objects.filter(meal_id=meal_instance):
+            meal_instance = meal.meal_id
+            for ingredient in MealIngredient.objects.select_related('ingredient_id').filter(meal_id=meal_instance):
                 ingredients_list.append(ingredient)
-
-    for ingredient in ingredients_list:
-        ingredient_object = get_object_or_404(Ingredient, pk=ingredient.ingredient_id_id)
-
     for shop in shops:
         for ingredient in ingredients_list:
-            ingredient_object = get_object_or_404(Ingredient, pk=ingredient.ingredient_id_id)
-            shop_id = ingredient_object.shop_id
+            ingredient_object = ingredient.ingredient_id
+            shop_id = ingredient.ingredient_id.shop_id
             try:
                 id = shop.id
             except Exception:
@@ -609,7 +605,6 @@ def generate_shopping_lists(request):
         if len(ingr_qt_dict) > 0:
             shopping_lists.append({shop: ingr_qt_dict})
         ingr_qt_dict = {}
-
     for item in shopping_lists:
         shop = list(item.keys())[0]
         if shop is None:
@@ -617,6 +612,7 @@ def generate_shopping_lists(request):
         new_shopping_list = ShoppingList(user_id=request.user, name=shop, generated=1)
         new_shopping_list.save()
         for shop, shoping_list_items in item.items():
+            new_list_position_list = []
             for shopping_item, qt in shoping_list_items.items():
                 if qt[1] != 0:
                     unit = 1
@@ -625,7 +621,8 @@ def generate_shopping_lists(request):
                 new_list_position = Products(product_name=shopping_item, quantity=qt[0],
                                              shopping_list_id_id=new_shopping_list.id,
                                              unit_id=unit)
-                new_list_position.save()
+                new_list_position_list.append(new_list_position)
+            Products.objects.bulk_create(new_list_position_list)
     return redirect('shopping:shopping_list_index')
 
 
