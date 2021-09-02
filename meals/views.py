@@ -269,12 +269,15 @@ def edit_meals(request):
     meals_options = MealOption.objects.filter(user=request.user).order_by('position')
     meals_options_dict = {}
     units = Unit.objects.all()
-
     for i in range(len(meals_options)):
-        meals_in_meals_options = Meal.objects.filter(meal_option=meals_options[i]).order_by('name')
         meals = []
-        for meal in meals_in_meals_options:
-            ingredients = MealIngredient.objects.select_related('ingredient_id').filter(meal_id=meal.id)
+        meals_in_meals_options = MealIngredient.objects.select_related('meal_id').select_related('ingredient_id').filter(meal_id__meal_option=meals_options[i]).order_by('meal_id__name')
+        meals_tmp = Meal.objects.filter(meal_option=meals_options[i]).order_by('name')
+        for meal_tmp in meals_tmp:
+            ingredients = []
+            for meal in meals_in_meals_options:
+                if meal_tmp == meal.meal_id:
+                    ingredients.append(meal)
             calories = 0
             protein = 0
             fat = 0
@@ -284,7 +287,7 @@ def edit_meals(request):
                 protein += (ingr.quantity / 100) * int(ingr.ingredient_id.protein_per_100_gram)
                 fat += (ingr.quantity / 100) * int(ingr.ingredient_id.fat_per_100_gram)
                 carbohydrates += (ingr.quantity / 100) * int(ingr.ingredient_id.carbohydrates_per_100_gram)
-            meals.append([meal, [round(calories), round(protein), round(fat), round(carbohydrates)]])
+            meals.append([meal_tmp, [round(calories), round(protein), round(fat), round(carbohydrates)]])
         meals_options_dict[meals_options[i]] = meals
 
     context = {
