@@ -460,8 +460,6 @@ def delete_meal_option(request, meal_option_id):
 
 @login_required(login_url='/accounts/login')
 def edit_meal_ingredients(request, meal_id):
-    print('edit')
-    start = time.time()
     meal = Meal.objects.filter(user_id=request.user, pk=meal_id)
     ingredients = MealIngredient.objects.select_related('ingredient_id').filter(meal_id=meal_id)
     user_ingredients = Ingredient.objects.filter(user=request.user).order_by('name')
@@ -492,8 +490,6 @@ def edit_meal_ingredients(request, meal_id):
         'fat': round(fat),
         'carbohydrates': round(carbohydrates)
     }
-    end = time.time()
-    print(end-start)
     return render(request, 'meals/meal_edit.html', context)
 
 @login_required(login_url='/accounts/login')
