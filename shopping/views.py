@@ -28,8 +28,11 @@ def shopping_list_index(request):
         for product in products_on_shopping_list:
             if not product.bought:
                 names.append(product.product_name)
-        names_to_query = str(names)
-        names_to_query = names_to_query.replace('[','(').replace(']', ')').replace('%','%%')
+        if len(names) > 0:
+            names_to_query = str(names)
+            names_to_query = names_to_query.replace('[','(').replace(']', ')').replace('%','%%')
+        else:
+            names_to_query = "('','')"
         sql = """
         SELECT
             *,
