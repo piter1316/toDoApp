@@ -1,4 +1,5 @@
 import os
+import time
 
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
@@ -14,6 +15,7 @@ from shopping.models import ShoppingList, Products, Checklist
 
 @login_required(login_url='/accounts/login')
 def shopping_list_index(request):
+    start = time.time()
     shopping_lists = ShoppingList.objects.filter(user_id=request.user.id)
     shopping_lists_dict = {}
     form = ShoppingListForm(request.POST)
@@ -24,25 +26,43 @@ def shopping_list_index(request):
     for i in range(len(shopping_lists)):
         products_on_shopping_list = Products.objects.filter(shopping_list_id=shopping_lists[i].id)
         products = []
+        names = []
         for product in products_on_shopping_list:
-            meals_with_product = []
-            generated_meals_with_product = []
             if not product.bought:
-                try:
-                    ingredient = Ingredient.objects.get(name__contains=product, user_id=request.user)
-                    meals_with_product_query = MealIngredient.objects.filter(ingredient_id=ingredient)
-                    for item in meals_with_product_query:
-                        meals_with_product.append(item)
-                except Exception:
-                    pass
-            for meal in meals_with_product:
-                query_set = MealsList.objects.filter(meal_id=meal.meal_id_id)
-                if len(query_set) > 0:
-                    generated_meals_with_product.append(query_set[0])
-
+                names.append(product.product_name)
+        names_to_query = str(names)
+        names_to_query = names_to_query.replace('[','(').replace(']', ')').replace('%','%%')
+        sql = """
+        SELECT
+            *,
+				meals_meal.name as mealName,
+				meals_meal.meal_option_id as mealOption,
+				meals_mealoption.meal_option as mealOption
+        FROM
+            meals_ingredient
+        LEFT JOIN meals_mealingredient ON meals_ingredient.id = meals_mealingredient.ingredient_id_id
+        LEFT JOIN meals_meal ON meals_meal.id = meals_mealingredient.meal_id_id
+        LEFT JOIN meals_mealoption ON meals_meal.meal_option_id = meals_mealoption.id
+        WHERE
+            meals_ingredient.`name` IN {}
+        AND meals_ingredient.user_id = {}
+        AND meals_mealingredient.meal_id_id IN (
+            SELECT
+                meal_id
+            FROM
+                meals_mealslist
+        )
+        """.format(names_to_query, request.user.id)
+        meals_with_ingredients = Ingredient.objects.raw(sql)
+        for product in products_on_shopping_list:
+            generated_meals_with_product =[]
+            for ingr in meals_with_ingredients:
+                if product.product_name == ingr.name:
+                    generated_meals_with_product.append(ingr)
             product_quantity_bought = [product.quantity, product.bought, product.id, product.unit, generated_meals_with_product]
             product_quantity = {product: product_quantity_bought}
             products.append(product_quantity)
+
         shopping_lists_dict[shopping_lists[i]] = products
     context = {
         'shopping_lists': shopping_lists_dict,
@@ -51,7 +71,8 @@ def shopping_list_index(request):
         'units': units,
         'checklist': checklist
     }
-
+    end = time.time()
+    print(end-start)
     return render(request, 'shopping/index.html', context)
 
 

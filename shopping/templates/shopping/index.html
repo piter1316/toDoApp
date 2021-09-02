@@ -176,7 +176,7 @@
                     {% for element in qt.4 %}
                     <li class="list-group-item p-0">
                       <small>
-                        <a class="text-dark" href="{% url 'meals:edit_meals' %}">{{element.meal_option}}</a>: <a class="text-dark" href="{% url 'meals:edit_meal_ingredients' element.meal.id %}">{{element.meal}}</a>
+                        <a class="text-dark" href="{% url 'meals:edit_meals' %}">{{element.mealOption}}</a>: <a class="text-dark" href="{% url 'meals:edit_meal_ingredients' element.meal_id_id %}">{{element.mealName}}</a>
                       </small>
                     </li>
                     {% endfor %}
