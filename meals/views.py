@@ -460,6 +460,8 @@ def delete_meal_option(request, meal_option_id):
 
 @login_required(login_url='/accounts/login')
 def edit_meal_ingredients(request, meal_id):
+    print('edit')
+    start = time.time()
     meal = Meal.objects.filter(user_id=request.user, pk=meal_id)
     ingredients = MealIngredient.objects.select_related('ingredient_id').filter(meal_id=meal_id)
     user_ingredients = Ingredient.objects.filter(user=request.user).order_by('name')
@@ -474,11 +476,10 @@ def edit_meal_ingredients(request, meal_id):
     fat = 0
     carbohydrates = 0
     for ingr in ingredients:
-        ingr_obj = get_object_or_404(Ingredient, pk=ingr.ingredient_id.id)
-        calories += (ingr.quantity) / 100 * int(ingr_obj.calories_per_100_gram)
-        protein += (ingr.quantity) / 100 * int(ingr_obj.protein_per_100_gram)
-        fat += (ingr.quantity) / 100 * int(ingr_obj.fat_per_100_gram)
-        carbohydrates += (ingr.quantity) / 100 * int(ingr_obj.carbohydrates_per_100_gram)
+        calories += (ingr.quantity) / 100 * int(ingr.ingredient_id.calories_per_100_gram)
+        protein += (ingr.quantity) / 100 * int(ingr.ingredient_id.protein_per_100_gram)
+        fat += (ingr.quantity) / 100 * int(ingr.ingredient_id.fat_per_100_gram)
+        carbohydrates += (ingr.quantity) / 100 * int(ingr.ingredient_id.carbohydrates_per_100_gram)
     context = {
         'meal': meal,
         'ingredients': ingredients,
@@ -491,6 +492,8 @@ def edit_meal_ingredients(request, meal_id):
         'fat': round(fat),
         'carbohydrates': round(carbohydrates)
     }
+    end = time.time()
+    print(end-start)
     return render(request, 'meals/meal_edit.html', context)
 
 @login_required(login_url='/accounts/login')

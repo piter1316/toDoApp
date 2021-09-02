@@ -132,7 +132,7 @@ $(document).ready(function(){
       $('#settings_'+(s_id)).toggleClass('d-none');
    });
 
-  $('#allow_update_recipe').on('click', function(e){
+  $('body').on('click','#allow_update_recipe', function(e){
     $('#allow_update_recipe').hide('slow');
     $('#update_recipe_textarea').removeAttr('readonly');
     var rows = $('#update_recipe_textarea').attr('rows');

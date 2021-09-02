@@ -164,9 +164,10 @@
   </div>
   <script type="text/javascript">
 
-  function reloadData() {
-    $('#ingredients_list').load(document.URL + ' #ingredients_list');
-    $('#card-header').load(document.URL + ' #edit_panel');
+  function reloadData(json) {
+    $('#ingredients_list').replaceWith($('#ingredients_list', json));
+    //$('#card-header').load(document.URL + ' #edit_panel');
+    $('#card-header').replaceWith($('#card-header', json));
   }
 
   $('#new_ingredient_form').on('submit', function(e){
@@ -181,11 +182,9 @@
         csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
       },
       success: function(json){
-        $('#addding_ingr_info').show('slow')
         setTimeout (function() {
-        $('#addding_ingr_info').hide('slow')
-         reloadData();
-      }, 1000);
+         reloadData(json);
+      }, 200);
       }
     });
   });
@@ -203,8 +202,8 @@
       },
       success: function(json){
         setTimeout (function() {
-          reloadData();
-      }, 1000);
+          reloadData(json);
+      }, 200);
       }
     });
   });
@@ -220,8 +219,8 @@
       },
       success: function(json){
         setTimeout (function() {
-          $('#update_recipe_container').load(document.URL + ' #update_recipe_container');
-      }, 1000);
+          $('#update_recipe_container').replaceWith($('#update_recipe_container', json));
+      }, 200);
       }
     });
   });
@@ -238,8 +237,8 @@
       },
       success: function(json){
         setTimeout (function() {
-          $('#card-header').load(document.URL + ' #edit_panel');
-      }, 1000);
+          $('#card-header').replaceWith($('#card-header', json));
+      }, 200);
       }
     });
   });
@@ -253,8 +252,8 @@
       url:'/mealsEdit/delete_ingredient/'+{{meal.0.id}} +'/'+ ingr_id,
       data:{
       },
-      success: function(data){
-        reloadData();
+      success: function(json){
+        reloadData(json);
       },
     });
   });
