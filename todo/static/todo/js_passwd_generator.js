@@ -4,7 +4,7 @@ function generate() {
   var specials = document.getElementById('specials').checked
   var chars_int = parseInt(chars)
   var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  var special_characters = '!"#$%&()*+,-./:;<=>?@[\]^_`{|}~'
+  var special_characters = '!"#$%&()*+,-./:;=?@[\]^_`{|}~'
   var characters_with_special_characters = characters + special_characters
   var charactersLength = characters.length;
   characters_with_special_charactersLenght = characters_with_special_characters.length
