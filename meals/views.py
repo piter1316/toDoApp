@@ -85,7 +85,6 @@ def get_maximum_no_of_days_no_repeat(request):
 
 @login_required(login_url='/accounts/login')
 def meals(request, current=1):
-    start = time.time()
     in_meals_list = True
     user_meals_options = MealOption.objects.filter(user=request.user).order_by('position')
     generated_user_meals_options = MealsList.objects.filter(user=request.user, current=current).order_by('meal_option__position').values(
@@ -241,8 +240,6 @@ def meals(request, current=1):
         average_protein_per_day = 0
         average_carb_per_day = 0
         average_fat_per_day = 0
-    end = time.time()
-    print(end-start)
     context = {
         'meals_list': meals_list,
         'user_meals_options': user_meals_options,

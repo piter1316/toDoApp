@@ -1,3 +1,5 @@
+import time
+
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
@@ -54,9 +56,9 @@ def deleteAll(request):
 def home(request):
     if request.user.is_authenticated:
         all_to_do_count = Todo.objects.filter(user=request.user, complete=False)
-        all_meals = MealsList.objects.filter(user=request.user)
+        all_meals = MealsList.objects.filter(user=request.user, current=1)
         meal_options = MealsList.objects.filter(user=request.user).values('meal_option_id').distinct()
-        meals = MealsList.objects.select_related('meal').filter(user=request.user)
+        meals = MealsList.objects.select_related('meal').filter(user=request.user, current=1)
         cars_owned = Car.objects.filter(user=request.user, sold=0)
         cars_sold = Car.objects.filter(user=request.user, sold=1)
         calories_total = 0
@@ -68,17 +70,12 @@ def home(request):
         fat = 0
         carb = 0
         for meal in meals:
-            try:
-                one_meal = Meal.objects.get(id=meal.meal_id)
-            except Exception:
-                one_meal = None
-            ingredients = MealIngredient.objects.select_related('ingredient_id').filter(meal_id=one_meal)
+            ingredients = MealIngredient.objects.select_related('ingredient_id').filter(meal_id=meal.meal_id)
             for ingr in ingredients:
-                ingr_obj = get_object_or_404(Ingredient, pk=ingr.ingredient_id.id)
-                calories += (ingr.quantity / 100) * int(ingr_obj.calories_per_100_gram)
-                protein += (ingr.quantity / 100) * int(ingr_obj.protein_per_100_gram)
-                fat += (ingr.quantity / 100) * int(ingr_obj.fat_per_100_gram)
-                carb += (ingr.quantity / 100) * int(ingr_obj.carbohydrates_per_100_gram)
+                calories += (ingr.quantity / 100) * int(ingr.ingredient_id.calories_per_100_gram)
+                protein += (ingr.quantity / 100) * int(ingr.ingredient_id.protein_per_100_gram)
+                fat += (ingr.quantity / 100) * int(ingr.ingredient_id.fat_per_100_gram)
+                carb += (ingr.quantity / 100) * int(ingr.ingredient_id.carbohydrates_per_100_gram)
                 calories_total += calories
                 protein_total += protein
                 fat_total += fat
@@ -111,7 +108,6 @@ def home(request):
             if meal.meal:
                 if meal.meal.name not in distinct_meals:
                     distinct_meals.append(meal.meal.name)
-
 
         context = {
             'all_to_do_count': len(all_to_do_count),
