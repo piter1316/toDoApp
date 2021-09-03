@@ -83,7 +83,6 @@ def get_maximum_no_of_days_no_repeat(request):
 
 @login_required(login_url='/accounts/login')
 def meals(request, current=1):
-    start = time.time()
     in_meals_list = True
     user_meals_options = MealOption.objects.filter(user=request.user).order_by('position')
     generated_user_meals_options = MealsList.objects.filter(user=request.user, current=current).order_by('meal_option__position').values(
@@ -257,9 +256,6 @@ def meals(request, current=1):
         'average_carb_per_day': average_carb_per_day,
         'current': int(current),
     }
-
-    end = time.time()
-    print(end-start)
     return render(request, 'meals/meals_list.html', context)
 
 @login_required(login_url='/accounts/login')
@@ -341,8 +337,7 @@ def generate_meals_list(request):
     current_meals = []
     for item in (list(current_meals_list)):
         if item.meal_id:
-            meal = get_object_or_404(Meal, pk=item.meal_id)
-            current_meals.append(meal)
+            current_meals.append(item.meal_id)
 
     if append_existing:
         days = appended_days_generator(request.user, first_day, int(how_many_days))
@@ -360,17 +355,17 @@ def generate_meals_list(request):
         meals_with_short_expiry_in_option = []
         meals_without_short_expiry_in_option = []
         for ingredient in ingredients_with_short:
-            meals_with_short_expiry_in_option.append(get_object_or_404(Meal, pk=ingredient.meal_id.id))
+            meals_with_short_expiry_in_option.append(ingredient.meal_id.id)
         meal_option = get_object_or_404(MealOption, pk=option, user=request.user)
         for meal in meals_in_option:
             if no_repetition:
-                if meal not in current_meals:
+                if meal.id not in current_meals:
                     option_meals_list.append(meal)
             else:
                 option_meals_list.append(meal)
 
         for item in option_meals_list:
-            if item not in meals_with_short_expiry_in_option:
+            if item.pk not in meals_with_short_expiry_in_option:
                 meals_without_short_expiry_in_option.append(item)
         random_meals_list = []
         if twice_the_same_meal:
@@ -432,17 +427,21 @@ def generate_meals_list(request):
                         random_meals_list.append(item)
                         option_meals_list.remove(item)
                         day += 1
-
+        new_meals_list_list = []
         if empty_meals_list:
+
             for k in range(len(random_meals_list)):
                 new_meals_list = MealsList(day=days[k], meal_id=None, meal_option_id=meal_option.id,
                                            user_id=request.user.id, current=1)
-                new_meals_list.save()
+                new_meals_list_list.append(new_meals_list)
+            MealsList.objects.bulk_create(new_meals_list_list)
         else:
+            new_meals_list_list = []
             for k in range(len(random_meals_list)):
                 new_meals_list = MealsList(day=days[k], meal_id=random_meals_list[k].id, meal_option_id=meal_option.id,
                                            user_id=request.user.id, current=1)
-                new_meals_list.save()
+                new_meals_list_list.append(new_meals_list)
+            MealsList.objects.bulk_create(new_meals_list_list)
     return redirect('/mealsList/1')
 
 
