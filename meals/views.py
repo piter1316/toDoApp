@@ -64,16 +64,14 @@ def get_maximum_no_of_days_no_repeat(request):
     no_of_meals_in_option = []
     for item in (list(current_meals_list)):
         if item.meal_id:
-            meal = get_object_or_404(Meal, pk=item.meal_id)
-            current_meals.append(meal)
-    user_meals_options = MealOption.objects.filter(user=request.user)
+            current_meals.append(item.meal_id)
 
+    user_meals_options = MealOption.objects.filter(user=request.user)
     for option in user_meals_options:
         meals_in_option = Meal.objects.filter(meal_option=option, user=request.user, special=0)
-        # meal_option = get_object_or_404(MealOption, pk=option, user=request.user)
         option_meals_list = []
         for meal in meals_in_option:
-            if meal not in current_meals:
+            if meal.id not in current_meals:
                 option_meals_list.append(meal)
         no_of_meals_in_option.append(len(option_meals_list))
     if len(no_of_meals_in_option) > 0:
@@ -85,6 +83,7 @@ def get_maximum_no_of_days_no_repeat(request):
 
 @login_required(login_url='/accounts/login')
 def meals(request, current=1):
+    start = time.time()
     in_meals_list = True
     user_meals_options = MealOption.objects.filter(user=request.user).order_by('position')
     generated_user_meals_options = MealsList.objects.filter(user=request.user, current=current).order_by('meal_option__position').values(
@@ -143,9 +142,11 @@ def meals(request, current=1):
         while item.day not in days:
             days.append(item.day)
     day_calories = []
+    meals_on_day = MealsList.objects.select_related('meal').filter(user=request.user, current=current, day__in=days).order_by('meal_option__position')
     for day in days:
-        meals_on_day = MealsList.objects.select_related('meal').filter(user=request.user, current=current, day=day).order_by(
-            'meal_option__position')
+        # meals_on_day = MealsList.objects.select_related('meal').filter(user=request.user, current=current, day=day).order_by(
+        #     'meal_option__position')
+
         day_meals_list = []
         meals = []
         meal_ingredients = []
@@ -153,31 +154,31 @@ def meals(request, current=1):
         meal_fat = []
         meal_carbohydrates = []
         for meal in meals_on_day:
-            all_meals_to_select = []
-            calories = 0
-            protein = 0
-            fat = 0
-            carbohydrates = 0
-            if meal.meal_id:
-                ingredients = meal_ingredients_dict[meal.meal_id]
-                for ingr in ingredients:
-                    calories += (ingr.quantity / 100) * int(ingr.calories_per_100_gram)
-                    protein += (ingr.quantity / 100) * int(ingr.protein_per_100_gram)
-                    fat += (ingr.quantity / 100) * int(ingr.fat_per_100_gram)
-                    carbohydrates += (ingr.quantity / 100) * int(ingr.carbohydrates_per_100_gram)
-                    meal_ingredients.append(round(calories, 0))
-                    meal_protein.append(round(protein, 0))
-                    meal_fat.append(round(fat, 0))
-                    meal_carbohydrates.append(round(carbohydrates, 0))
-                    calories = 0
-                    protein = 0
-                    fat = 0
-                    carbohydrates = 0
-            else:
+            if day == meal.day:
+                all_meals_to_select = []
                 calories = 0
-            meals.append(meal.meal_id)
-
-            day_meals_list.append({meal: all_meals_in_option_dict.get(meal.meal_option.id)})
+                protein = 0
+                fat = 0
+                carbohydrates = 0
+                if meal.meal_id:
+                    ingredients = meal_ingredients_dict[meal.meal_id]
+                    for ingr in ingredients:
+                        calories += (ingr.quantity / 100) * int(ingr.calories_per_100_gram)
+                        protein += (ingr.quantity / 100) * int(ingr.protein_per_100_gram)
+                        fat += (ingr.quantity / 100) * int(ingr.fat_per_100_gram)
+                        carbohydrates += (ingr.quantity / 100) * int(ingr.carbohydrates_per_100_gram)
+                        meal_ingredients.append(round(calories, 0))
+                        meal_protein.append(round(protein, 0))
+                        meal_fat.append(round(fat, 0))
+                        meal_carbohydrates.append(round(carbohydrates, 0))
+                        calories = 0
+                        protein = 0
+                        fat = 0
+                        carbohydrates = 0
+                else:
+                    calories = 0
+                meals.append(meal.meal_id)
+                day_meals_list.append({meal: all_meals_in_option_dict.get(meal.meal_option.id)})
         day_calories.append({day: [round(sum(meal_ingredients), 0)]})
         day_meal_option_meal_list.append(
             [{day: day_meals_list},
@@ -193,7 +194,7 @@ def meals(request, current=1):
     for option in user_meals_options_select:
         option_meals_list = []
         meals_in_option = Meal.objects.filter(meal_option=option['meal_option_id'], user=request.user)
-        meal_option = get_object_or_404(MealOption, pk=option['meal_option_id'], user=request.user)
+        meal_option = option
         for meal in meals_in_option:
             option_meals_list.append(meal)
         option_meals_dict[meal_option] = option_meals_list
@@ -256,6 +257,9 @@ def meals(request, current=1):
         'average_carb_per_day': average_carb_per_day,
         'current': int(current),
     }
+
+    end = time.time()
+    print(end-start)
     return render(request, 'meals/meals_list.html', context)
 
 @login_required(login_url='/accounts/login')
