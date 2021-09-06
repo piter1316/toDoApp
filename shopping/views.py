@@ -186,22 +186,24 @@ def bought_many(request):
 
 
 def add_from_checklist(request):
+    new_shopping_product_list = []
     for element in request.POST.getlist('checkitem[]'):
         product_name = element.split('###')[0]
         shop_name = element.split('###')[1]
         try:
             shopping_list_to_update = ShoppingList.objects.filter(name=shop_name, user_id_id=request.user)[0]
             new_shopping_product = Products(product_name=product_name, quantity=1, bought=0, shopping_list_id=shopping_list_to_update, unit_id=1)
-            new_shopping_product.save()
+            new_shopping_product_list.append(new_shopping_product)
         except Exception as e:
             pass
+    Products.objects.bulk_create(new_shopping_product_list)
 
     return redirect('shopping:shopping_list_index')
 
 
 def edit_check_list(request):
     checklist = Checklist.objects.filter(user=request.user.id)
-    user_shops = Shop.objects.filter(user_id= request.user)
+    user_shops = Shop.objects.filter(user_id=request.user)
     context = {
         'checklist': checklist,
         'user_shops': user_shops,
