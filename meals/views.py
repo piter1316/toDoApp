@@ -83,6 +83,7 @@ def get_maximum_no_of_days_no_repeat(request):
 
 @login_required(login_url='/accounts/login')
 def meals(request, current=1):
+    start = time.time()
     in_meals_list = True
     user_meals_options = MealOption.objects.filter(user=request.user).order_by('position')
     generated_user_meals_options = MealsList.objects.filter(user=request.user, current=current).order_by('meal_option__position').values(
@@ -152,7 +153,9 @@ def meals(request, current=1):
         meal_protein = []
         meal_fat = []
         meal_carbohydrates = []
+
         for meal in meals_on_day:
+
             if day == meal.day:
                 all_meals_to_select = []
                 calories = 0
@@ -177,7 +180,8 @@ def meals(request, current=1):
                 else:
                     calories = 0
                 meals.append(meal.meal_id)
-                day_meals_list.append({meal: all_meals_in_option_dict.get(meal.meal_option.id)})
+                day_meals_list.append({meal: all_meals_in_option_dict.get(meal.meal_option_id)})
+                # print(day_meals_list)
         day_calories.append({day: [round(sum(meal_ingredients), 0)]})
         day_meal_option_meal_list.append(
             [{day: day_meals_list},
@@ -256,6 +260,7 @@ def meals(request, current=1):
         'average_carb_per_day': average_carb_per_day,
         'current': int(current),
     }
+    print(time.time()-start)
     return render(request, 'meals/meals_list.html', context)
 
 @login_required(login_url='/accounts/login')
