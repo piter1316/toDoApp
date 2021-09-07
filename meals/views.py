@@ -389,6 +389,8 @@ def generate_meals_list(request):
                         random_meals_list.append(item)
                         random_meals_list.append(item)
                         option_meals_list.remove(item)
+                        if item in meals_without_short_expiry_in_option:
+                            meals_without_short_expiry_in_option.remove(item)
 
                         day += 2
             else:
@@ -433,6 +435,8 @@ def generate_meals_list(request):
                         item = random.choice(option_meals_list)
                         random_meals_list.append(item)
                         option_meals_list.remove(item)
+                        if item in meals_without_short_expiry_in_option:
+                            meals_without_short_expiry_in_option.remove(item)
                         day += 1
         new_meals_list_list = []
         if empty_meals_list:
