@@ -51,7 +51,7 @@ def shopping_list_index(request):
             SELECT
                 meal_id
             FROM
-                meals_mealslist
+                meals_mealslist WHERE meals_mealslist.current = 1
         )
         """.format(names_to_query, request.user.id)
         meals_with_ingredients = Ingredient.objects.raw(sql)
@@ -119,7 +119,7 @@ def add_product(request, shopping_list_id):
         html = html.replace("""<small class="mb-1">Brak posiłków zawierających {}</small>""".format(str(new_product)), '')
         loop_html_total = ""
         for meal in meals_with_product_query:
-            query_set = MealsList.objects.filter(meal_id=meal.meal_id_id)
+            query_set = MealsList.objects.filter(meal_id=meal.meal_id_id, current=1)
             if len(query_set) > 0:
                 loop_html = """
                 <li class="list-group-item p-0">
