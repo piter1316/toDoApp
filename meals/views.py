@@ -363,9 +363,8 @@ def generate_meals_list(request):
             meals_with_short_expiry_in_option.append(ingredient.meal_id.id)
         meal_option = get_object_or_404(MealOption, pk=option, user=request.user)
         for meal in meals_in_option:
-            if no_repetition:
-                if meal.id not in current_meals:
-                    option_meals_list.append(meal)
+            if meal.id not in current_meals:
+                option_meals_list.append(meal)
             else:
                 option_meals_list.append(meal)
 
@@ -390,6 +389,7 @@ def generate_meals_list(request):
                         random_meals_list.append(item)
                         random_meals_list.append(item)
                         option_meals_list.remove(item)
+
                         day += 2
             else:
                 day = 1
@@ -405,6 +405,7 @@ def generate_meals_list(request):
                             random_meals_list.append(item)
                             random_meals_list.append(item)
                             meals_without_short_expiry_in_option.remove(item)
+                            option_meals_list.remove(item)
                             day += 2
                     else:
                         item = random.choice(option_meals_list)
@@ -415,6 +416,7 @@ def generate_meals_list(request):
                             random_meals_list.append(item)
                             random_meals_list.append(item)
                             option_meals_list.remove(item)
+                            meals_without_short_expiry_in_option.remove(item)
                             day += 2
         else:
             for i in range(int(how_many_days)):

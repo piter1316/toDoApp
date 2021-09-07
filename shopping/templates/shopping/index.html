@@ -99,7 +99,7 @@
               <form style="display:none" class="bought_checkbox_form dropdown-item" action="{% url 'shopping:bought_many' %}" method="POST" id="boughtManyForm_{{forloop.counter}}">{% csrf_token %}
                 <button class="btn btn-secondary btn-block btn-sm" type="submit">Zaznaczone = kupione</button>
                   {% for product in products %}
-                  <input style="display:none"  type="checkbox" name="bought_checkbox" class="bought_checkbox" id="checked_{% for prod, qt in product.items %}{{prod.id}}{% endfor %}" value="{% for prod, qt in product.items %}{{prod.id}}{% endfor %}">
+                  <input style="display:none"  type="checkbox" name="bought_checkbox" class="bought_checkbox" id="checked_{% for prod, qt in product.items %}{{qt.2}}{% endfor %}" value="{% for prod, qt in product.items %}{{qt.2}}{% endfor %}">
                 {% endfor %}
               </form>
               {% endif %}
@@ -110,8 +110,8 @@
           <input type="hidden" value="{{shop}}">
           {% for product in products %}
           {% for prod, qt in product.items %}
-          <li class=" {% if qt.1 %}todo-completed bg-secondary  {%else%} bg-light {%endif%}list-group-item d-flex justify-content-between align-items-center py-md-1" id="prod_{{prod.id}}">
-            <span><input class="{% if qt.1 %}d-none{%endif%}" type="checkbox" name="bought_many" id="boughtMany_{{prod.id}}">
+          <li class=" {% if qt.1 %}todo-completed bg-secondary  {%else%} bg-light {%endif%}list-group-item d-flex justify-content-between align-items-center py-md-1" id="prod_{{qt.2}}">
+            <span><input class="{% if qt.1 %}d-none{%endif%}" type="checkbox" name="bought_many" id="boughtMany_{{qt.2}}">
               {% if qt.1 %}
               <span class="disabled">{{prod}}</span>
               {% else %}
@@ -120,37 +120,37 @@
               {% endif %}
             </span>
             <span>
-              <span class="{% if qt.1 %}todo-completed {%endif%} badge badge-dark badge-pill" id="quantity_{{prod.id}}">{{qt.0}}</span>
-              <span class="{% if qt.1 %}todo-completed {%endif%} badge badge-dark badge-pill" id="unit_{{prod.id}}" >{{qt.3}}</span>
-              <span class="dropdown_shopping_item badge badge-dark badge-pill fas fa-cog {% if qt.1 %}d-none{%endif%}" id="dropdown_{{prod.id}}" style="cursor:pointer;"> </span>
+              <span class="{% if qt.1 %}todo-completed {%endif%} badge badge-dark badge-pill" id="quantity_{{qt.2}}">{{qt.0}}</span>
+              <span class="{% if qt.1 %}todo-completed {%endif%} badge badge-dark badge-pill" id="unit_{{qt.2}}" >{{qt.3}}</span>
+              <span class="dropdown_shopping_item badge badge-dark badge-pill fas fa-cog {% if qt.1 %}d-none{%endif%}" id="dropdown_{{qt.2}}" style="cursor:pointer;"> </span>
             </span>
           </li>
-          <li class="list-group-item p-0 border-bottom pb-2" id="{{prod.id}}" style="display:none;">
+          <li class="list-group-item p-0 border-bottom pb-2" id="{{qt.2}}" style="display:none;">
             <ul class="nav nav-tabs " id="myTab" role="tablist">
               <li class="nav-item active">
-                <a class="editPosition_ nav-link " id="editPosition-tab" data-toggle="tab" href="#editPosition_{{prod.id}}" role="tab" aria-controls="home" aria-selected="true">Edycja</a>
+                <a class="editPosition_ nav-link " id="editPosition-tab" data-toggle="tab" href="#editPosition_{{qt.2}}" role="tab" aria-controls="home" aria-selected="true">Edycja</a>
               </li>
 
               <li class="nav-item">
-                <a class="nav-link " id="detailsPosition-tab" data-toggle="tab" href="#detailsPosition_{{prod.id}}" role="tab" aria-controls="profile" aria-selected="false">Szczegóły</a>
+                <a class="nav-link " id="detailsPosition-tab" data-toggle="tab" href="#detailsPosition_{{qt.2}}" role="tab" aria-controls="profile" aria-selected="false">Szczegóły</a>
               </li>
 
             </ul>
             <div class="tab-content" id="myTabContent">
-              <div class="tab-pane fade show active" id="editPosition_{{prod.id}}" role="tabpanel" aria-labelledby="home-tab">
-                <form id="editProd_{{prod.id}}" class="editProd_ form p-1 " action="{% url 'shopping:update_product' prod.id %}" method="post">{% csrf_token %}
+              <div class="tab-pane fade show active" id="editPosition_{{qt.2}}" role="tabpanel" aria-labelledby="home-tab">
+                <form id="editProd_{{qt.2}}" class="editProd_ form p-1 " action="{% url 'shopping:update_product' qt.2 %}" method="post">{% csrf_token %}
                   <div class="from-group row">
                     <div class="col-12">
-                      <input class="form-control" type="text" name="new_product_name" id="newProductName_{{prod.id}}" value="{{prod}}">
+                      <input class="form-control" type="text" name="new_product_name" id="newProductName_{{qt.2}}" value="{{prod}}">
                     </div>
                   </div>
                   <div class="from-group row">
                     <div class="col-6 pr-0">
-                      <input class="form-control" type="number" name="new_quantity" step="0.01" id="newQuantity_{{prod.id}}" value="{% localize off %}{{qt.0}}{% endlocalize %}">
+                      <input class="form-control" type="number" name="new_quantity" step="0.01" id="newQuantity_{{qt.2}}" value="{% localize off %}{{qt.0}}{% endlocalize %}">
                     </div>
                     <div class="col-6 pl-0">
-                      <select class="form-control" name="new_unit" id="newUnit_{{prod.id}}">
-                        <option value="{{qt.3.id}}">{{qt.3}}</option>
+                      <select class="form-control" name="new_unit" id="newUnit_{{qt.2}}">
+                        <option value="{{qt.5}}">{{qt.3}}</option>
                         <option disabled>-----</option>
                         {% for unit in units %}
                           <option value="{{unit.id}}">{{unit}}</option>
@@ -165,8 +165,8 @@
                   </div>
                 </form>
               </div>
-              <div class="tab-pane fade" id="detailsPosition_{{prod.id}}" role="tabpanel" aria-labelledby="profile-tab">
-                <div class="p-1" id="prodDetails_{{prod.id}}">
+              <div class="tab-pane fade" id="detailsPosition_{{qt.2}}" role="tabpanel" aria-labelledby="profile-tab">
+                <div class="p-1" id="prodDetails_{{qt.2}}">
                   {% if qt.4 %}
                   <small class="mb-1">Posiłki zawierające {{prod}}</small>
                   {% else %}

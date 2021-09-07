@@ -15,6 +15,7 @@ from shopping.models import ShoppingList, Products, Checklist
 
 @login_required(login_url='/accounts/login')
 def shopping_list_index(request):
+    start = time.time()
     shopping_lists = ShoppingList.objects.filter(user_id=request.user.id)
     shopping_lists_dict = {}
     form = ShoppingListForm(request.POST)
@@ -22,12 +23,13 @@ def shopping_list_index(request):
     units = Unit.objects.all()
     checklist = Checklist.objects.filter(user=request.user.id)
     for i in range(len(shopping_lists)):
-        products_on_shopping_list = Products.objects.filter(shopping_list_id=shopping_lists[i].id)
+        products_on_shopping_list = Products.objects.select_related('Unit').filter(shopping_list_id=shopping_lists[i].id).order_by('pk')\
+            .values('product_name','unit_id__unit', 'bought', 'quantity', 'id','unit_id__id')
         products = []
         names = []
         for product in products_on_shopping_list:
-            if not product.bought:
-                names.append(product.product_name)
+            if not product['bought']:
+                names.append(product['product_name'])
         if len(names) > 0:
             names_to_query = str(names)
             names_to_query = names_to_query.replace('[','(').replace(']', ')').replace('%','%%')
@@ -57,11 +59,13 @@ def shopping_list_index(request):
         meals_with_ingredients = Ingredient.objects.raw(sql)
         for product in products_on_shopping_list:
             generated_meals_with_product =[]
+
             for ingr in meals_with_ingredients:
-                if product.product_name == ingr.name:
+                if product['product_name'] == ingr.name:
                     generated_meals_with_product.append(ingr)
-            product_quantity_bought = [product.quantity, product.bought, product.id, product.unit, generated_meals_with_product]
-            product_quantity = {product: product_quantity_bought}
+            product_quantity_bought = [product['quantity'], product['bought'], product['id'], product['unit_id__unit'], generated_meals_with_product, product['unit_id__id']]
+            # product_quantity_bought = ['product.quantity', 'product.bought', 'product.id', 'product.unit', generated_meals_with_product]
+            product_quantity = {product['product_name']: product_quantity_bought}
             products.append(product_quantity)
 
         shopping_lists_dict[shopping_lists[i]] = products
@@ -72,6 +76,7 @@ def shopping_list_index(request):
         'units': units,
         'checklist': checklist
     }
+    print(time.time()-start)
     return render(request, 'shopping/index.html', context)
 
 
@@ -145,6 +150,7 @@ def update_product(request, product_id):
     new_name = request.POST['new_product_name'].lower()
     new_quantity = request.POST['new_quantity']
     new_unit = request.POST['new_unit']
+    print(request.POST)
     Products.objects.filter(pk=product_id).update(product_name=new_name, quantity=new_quantity, unit=new_unit)
     if old_name != new_name:
         return redirect('shopping:shopping_list_index')
