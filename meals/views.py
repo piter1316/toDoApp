@@ -82,7 +82,6 @@ def get_maximum_no_of_days_no_repeat(request):
 
 @login_required(login_url='/accounts/login')
 def meals(request, current=1):
-    start = time.time()
     in_meals_list = True
     user_meals_options = MealOption.objects.filter(user=request.user).order_by('position')
     generated_user_meals_options = MealsList.objects.filter(user=request.user, current=current).order_by('meal_option__position').values(
@@ -180,7 +179,6 @@ def meals(request, current=1):
                     calories = 0
                 meals.append(meal.meal_id)
                 day_meals_list.append({meal: all_meals_in_option_dict.get(meal.meal_option_id)})
-                # print(day_meals_list)
         day_calories.append({day: [round(sum(meal_ingredients), 0)]})
         day_meal_option_meal_list.append(
             [{day: day_meals_list},
@@ -259,7 +257,6 @@ def meals(request, current=1):
         'average_carb_per_day': average_carb_per_day,
         'current': int(current),
     }
-    print(time.time()-start)
     return render(request, 'meals/meals_list.html', context)
 
 @login_required(login_url='/accounts/login')
@@ -342,7 +339,6 @@ def generate_meals_list(request):
     for item in (list(current_meals_list)):
         if item.meal_id:
             current_meals.append(item.meal_id)
-    print('current_meals', current_meals)
     if append_existing:
         days = appended_days_generator(request.user, first_day, int(how_many_days))
         current_days = int(len(current_meals_list)/len(user_meals_options))
