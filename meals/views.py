@@ -65,7 +65,6 @@ def get_maximum_no_of_days_no_repeat(request):
     for item in (list(current_meals_list)):
         if item.meal_id:
             current_meals.append(item.meal_id)
-
     user_meals_options = MealOption.objects.filter(user=request.user)
     for option in user_meals_options:
         meals_in_option = Meal.objects.filter(meal_option=option, user=request.user, special=0)
@@ -343,7 +342,7 @@ def generate_meals_list(request):
     for item in (list(current_meals_list)):
         if item.meal_id:
             current_meals.append(item.meal_id)
-
+    print('current_meals', current_meals)
     if append_existing:
         days = appended_days_generator(request.user, first_day, int(how_many_days))
         current_days = int(len(current_meals_list)/len(user_meals_options))
@@ -364,8 +363,6 @@ def generate_meals_list(request):
         meal_option = get_object_or_404(MealOption, pk=option, user=request.user)
         for meal in meals_in_option:
             if meal.id not in current_meals:
-                option_meals_list.append(meal)
-            else:
                 option_meals_list.append(meal)
 
         for item in option_meals_list:
@@ -418,7 +415,8 @@ def generate_meals_list(request):
                             random_meals_list.append(item)
                             random_meals_list.append(item)
                             option_meals_list.remove(item)
-                            meals_without_short_expiry_in_option.remove(item)
+                            if item in meals_without_short_expiry_in_option:
+                                meals_without_short_expiry_in_option.remove(item)
                             day += 2
         else:
             for i in range(int(how_many_days)):
