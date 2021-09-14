@@ -314,23 +314,24 @@
 
           for (var i=0; i<average_array.length; i++){
             if(average_array[i]> consumption_array[i]){
-              bars_color_array.push('rgba(50,102,71,1)')
+              bars_color_array.push('rgba(40, 167, 69,1)')
             }else{
-              bars_color_array.push('rgba(255,193,7,1)')
+              bars_color_array.push('rgba(220, 53, 69,1)')
             }
           }
 
           var mixedChart = new Chart(ctx, {
-            type: 'bar',
+            type: 'line',
             data: {
               datasets: [{
                 label: 'L/100KM',
+                fill: false,
                 data: consumption_array,
                 backgroundColor: bars_color_array
               }, {
                 label: 'Średnie: '+ average_array[0] ,
                 data: average_array,
-                borderColor: 'rgba(61,205,88,1)',
+                borderColor: 'rgba(0, 0, 0, 0.5)',
                 // Changes this dataset to become a line
                 type: 'line',
                 fill: false,
@@ -345,7 +346,6 @@
                   ticks: {
                       beginAtZero: false,
                       suggestedMin: 5,
-                      suggestedMax: 10
                   }
               }]
             }
