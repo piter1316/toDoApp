@@ -23,6 +23,15 @@ class Meal(models.Model):
         return self.name
 
 
+class ProductDivision(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1, null=True)
+    division_name = models.TextField(max_length=100)
+    priority = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.division_name
+
+
 class Shop(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     name = models.TextField(max_length=100)
@@ -48,6 +57,7 @@ class Ingredient(models.Model):
     weight_per_unit = models.PositiveIntegerField(default=0)
     shop = models.ForeignKey(Shop, on_delete=models.SET_NULL, default=1, null=True)
     short_expiry = models.BooleanField(default=False, null=True)
+    division = models.ForeignKey(ProductDivision, on_delete=models.DO_NOTHING, default=None)
 
     def __str__(self):
         return self.name
@@ -86,10 +96,4 @@ class Week(models.Model):
         return self.day_of_the_week
 
 
-class ProductDivision(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
-    division_name = models.TextField(max_length=100)
-    priority = models.IntegerField(default=0)
 
-    def __str__(self):
-        return self.division_name
