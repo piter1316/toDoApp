@@ -759,5 +759,14 @@ def edit_ingredient(request, ingr_id):
 
 
 def edit_division(request, division_id):
-    print(division_id)
+    division_to_edit = get_object_or_404(ProductDivision, pk=division_id, user=request.user)
+    division_to_edit.division_name = request.POST['new_name']
+    division_to_edit.save()
+    return HttpResponse(str(division_id))
+
+
+def edit_division_priority(request, division_id):
+    division_to_edit = get_object_or_404(ProductDivision, pk=division_id, user=request.user)
+    division_to_edit.priority = request.POST['new_priority']
+    division_to_edit.save()
     return HttpResponse(str(division_id))

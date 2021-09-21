@@ -209,6 +209,10 @@ $(document).ready(function(){
  $('#info-tab').addClass('active');
  }
 
+ $(".divisionPriority_").keypress(function(e) {
+    if (isNaN(String.fromCharCode(e.which))) e.preventDefault();
+});
+
 });
 
 $('body').on('click','.dropdown_shopping_item',function(e){

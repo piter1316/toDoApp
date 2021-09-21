@@ -1,7 +1,7 @@
 {% extends 'todo/base.html' %}
 {% block body %}
 
-<div class="container mt-2">
+<div class="container mt-2" style="position:relative">
   <ul class="nav nav-tabs mb-1 row no-gutters" id="myShopMacrosTab" role="tablist">
     <li class="nav-item col">
       <a class="btn btn-outline-secondary  w-100 active" id="macro-tab" data-toggle="tab" href="#macro"
@@ -252,6 +252,7 @@
   </div>
 </div>
 {% endfor %}
+
 <script>
    $('body').on('focusout','.shop_',function(e){
     e.preventDefault();
@@ -323,6 +324,27 @@
       success: function(json){
         setTimeout (function() {
           console.log(json)
+      }, 200);
+      }
+    });
+  });
+
+  $('body').on('focusout','.divisionPriority_',function(e){
+    e.preventDefault();
+    var id = e.target.id
+    var division_id = parseInt(id.split('_')[1])
+    console.log(division_id)
+    $.ajax({
+      type:'POST',
+      url:'ingredientsEdit/editDivisionPriority/' + division_id,
+      data:{
+        new_priority:$('#divisionPriority_'+ division_id).text(),
+        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+      },
+      success: function(json){
+      $('.toast').toast('show');
+        setTimeout (function() {
+          ;
       }, 200);
       }
     });
