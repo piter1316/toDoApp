@@ -58,7 +58,6 @@ class MealIngredient(models.Model):
     ingredient_id = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
     quantity = models.FloatField(default=1)
 
-
     def __str__(self):
         return self.ingredient_id.name
 
@@ -85,3 +84,12 @@ class Week(models.Model):
 
     def __str__(self):
         return self.day_of_the_week
+
+
+class ProductDivision(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+    division_name = models.TextField(max_length=100)
+    priority = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.division_name

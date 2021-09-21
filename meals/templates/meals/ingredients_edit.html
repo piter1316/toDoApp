@@ -7,6 +7,13 @@
       <a class="btn btn-outline-secondary  w-100 active" id="macro-tab" data-toggle="tab" href="#macro"
          role="tab"
          aria-controls="chart" aria-selected="false" style=" border-radius: 5px 0px 0px 5px !important;">
+        <i class="fas fa-list"></i>
+      </a>
+    </li>
+    <li class="nav-item col">
+      <a class="btn btn-outline-secondary rounded-0  w-100" id="division-tab" data-toggle="tab" href="#division"
+         role="tab"
+         aria-controls="chart" aria-selected="false" style=" border-radius: 0px 0px 0px 0px !important;">
         <i class="fas fa-egg"></i>
         <i class="fas fa-bacon"></i>
         <i class="fas fa-drumstick-bite"></i>
@@ -15,7 +22,7 @@
       </a>
     </li>
     <li class="nav-item col">
-    <a class="btn btn-outline-secondary   w-100" id="shop-tab" data-toggle="tab" href="#shop"
+    <a class="btn btn-outline-secondary  w-100" id="shop-tab" data-toggle="tab" href="#shop"
        role="tab"
        aria-controls="fuel" aria-selected="true" style=" border-radius: 0px 5px 5px 0px !important;">
       <i class="fas fa-shopping-cart"></i>
@@ -45,6 +52,29 @@
           </td>
         </tr>
         {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="tab-pane fade " id="division">
+
+      <table class="table table-light table-striped table-hover" id="divisions_tab">
+        <thead class="thead-dark text-center">
+        <tr>
+        <th class="text-left" >Dział</th>
+        <th class="text-right">Priorytet</th>
+        </tr>
+        </thead>
+        <tbody>
+          {% for division in user_divisions %}
+            <tr>
+              <td class="text-left ">
+                <input class="form-control" type="text" value="{{division}}" name="division" id="division_{{division.id}}">
+              </td>
+              <td class="text-right">
+                <input class="form-control" type="number" value="{{division.priority}}" name="divisionPriority" id="divisionPriority_{{division.id}}">
+              </td>
+            </tr>
+          {% endfor %}
         </tbody>
       </table>
     </div>
@@ -91,6 +121,7 @@
       </div>
     </div>
     </div>
+
   <div class="row">
     <div class="col-12 col-md-4 col-xl-2">
 

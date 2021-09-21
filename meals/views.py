@@ -7,7 +7,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 
 from meals.forms import MealForm, IngredientForm, MealOptionForm
-from meals.models import MealOption, Meal, Ingredient, MealsList, Week, Unit, MealIngredient, Shop
+from meals.models import MealOption, Meal, Ingredient, MealsList, Week, Unit, MealIngredient, Shop, ProductDivision
 from shopping.models import ShoppingList, Products
 
 
@@ -641,12 +641,14 @@ def delete_selected_days(request):
 def edit_ingredients(request):
     user_ingredients = Ingredient.objects.filter(user=request.user).order_by('name')
     user_shops = Shop.objects.filter(user=request.user.id)
+    user_divisions = ProductDivision.objects.filter(user=request.user).order_by('priority')
     form = IngredientForm()
     context = {
         'user_ingredients': user_ingredients,
         'user_shops': user_shops,
         'form': form,
         'active_tab': 'shop',
+        'user_divisions': user_divisions,
     }
     return render(request, 'meals/ingredients_edit.html', context)
 
