@@ -68,10 +68,10 @@
           {% for division in user_divisions %}
             <tr>
               <td class="text-left ">
-                <input class="form-control" type="text" value="{{division}}" name="division" id="division_{{division.id}}">
+                <span class="division_" contenteditable="true" id="division_{{division.id}}">{{division}}</span>
               </td>
               <td class="text-right">
-                <input class="form-control" type="number" value="{{division.priority}}" name="divisionPriority" id="divisionPriority_{{division.id}}">
+                <span class="divisionPriority_" contenteditable="true" id="divisionPriority_{{division.id}}">{{division.priority}}</span>
               </td>
             </tr>
           {% endfor %}
@@ -303,6 +303,26 @@
         setTimeout (function() {
           $('#addShopModalCloseButton').click();
           $('#shop').load(document.URL + ' #shops_tab');
+      }, 200);
+      }
+    });
+  });
+
+  $('body').on('focusout','.division_',function(e){
+    e.preventDefault();
+    var id = e.target.id
+    var division_id = parseInt(id.split('_')[1])
+    console.log(division_id)
+    $.ajax({
+      type:'POST',
+      url:'ingredientsEdit/editDivision/' + division_id,
+      data:{
+        new_name:$('#division_'+ division_id).text(),
+        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+      },
+      success: function(json){
+        setTimeout (function() {
+          console.log(json)
       }, 200);
       }
     });

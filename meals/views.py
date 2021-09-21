@@ -2,6 +2,7 @@ import random
 import time
 
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 # Create your views here.
 from django.views.decorators.http import require_POST
@@ -755,3 +756,8 @@ def edit_ingredient(request, ingr_id):
     edited_ingredient.save()
 
     return redirect('meals:edit_ingredients')
+
+
+def edit_division(request, division_id):
+    print(division_id)
+    return HttpResponse(str(division_id))

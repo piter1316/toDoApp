@@ -20,6 +20,7 @@ urlpatterns = [
     path('ingredientsEdit/newIngredient', views.new_ingredient, name='new_ingredient'),
     path('ingredientsEdit/deleteIngredient/<ingr_id>', views.delete_ingr, name='delete_ingr'),
     path('ingredientsEdit/editIngredient/<ingr_id>', views.edit_ingredient, name='edit_ingredient'),
+    path('ingredientsEdit/editDivision/<division_id>', views.edit_division, name='edit_ingredient'),
     path('mealsEdit/add_meal/<meal_option_id>', views.add_meal, name='add_meal'),
     path('mealsEdit/delete_meal/<meal_id>', views.delete_meal, name='delete_meal'),
     path('mealsEdit/update_meal_name/<meal_id>', views.update_meal_name, name='update_meal_name'),
