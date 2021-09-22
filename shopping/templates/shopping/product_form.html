@@ -1,5 +1,11 @@
 {{form_2.product_name}}
 {{form_2.quantity}}
+<select class="form-control" name="prod_division" id="id_prod_division" style="max-width:75px;">
+  <option value="1">dział</option>
+  {% for division in divisions %}
+  <option value="{{division.id}}">{{division}}</option>
+  {% endfor %}
+</select>
 <select class="form-control" name="prod_unit" id="id_prod_unit" style="max-width:75px;">
   {% for unit in units %}
   <option value="{{unit.id}}">{{unit}}</option>

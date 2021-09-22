@@ -7,7 +7,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 # Create your views here.
 from django.views.decorators.http import require_POST
 
-from meals.models import Unit, Meal, Ingredient, MealsList, MealIngredient, Shop
+from meals.models import Unit, Meal, Ingredient, MealsList, MealIngredient, Shop, ProductDivision
 from myproject.settings import BASE_DIR
 from shopping.forms import ShoppingListForm, ProductsForm
 from shopping.models import ShoppingList, Products, Checklist
@@ -22,6 +22,7 @@ def shopping_list_index(request):
     form_2 = ProductsForm(request.POST)
     units = Unit.objects.all()
     checklist = Checklist.objects.filter(user=request.user.id)
+    divisions = ProductDivision.objects.filter(user=request.user.id)
     for i in range(len(shopping_lists)):
         products_on_shopping_list = Products.objects.select_related('unit').select_related('division_id').filter(shopping_list_id=shopping_lists[i].id).order_by('-division_id_id__priority')\
             .values('product_name', 'unit_id__unit', 'bought', 'quantity', 'id', 'unit_id__id')
@@ -75,7 +76,8 @@ def shopping_list_index(request):
         'form': form,
         'form_2': form_2,
         'units': units,
-        'checklist': checklist
+        'checklist': checklist,
+        'divisions': divisions
     }
     print(time.time()-start)
     return render(request, 'shopping/index.html', context)
@@ -104,11 +106,13 @@ def delete_all_shopping_lists(request):
 def add_product(request, shopping_list_id):
     shopping_list = get_object_or_404(ShoppingList, pk=shopping_list_id)
     form = ProductsForm(request.POST)
-
+    print(request.POST)
     new_product = Products(shopping_list_id=shopping_list,
                            product_name=request.POST['product_name'].lower(),
                            quantity=request.POST['quantity'],
-                           unit_id=request.POST['prod_unit'])
+                           unit_id=request.POST['prod_unit'],
+                           division_id_id=request.POST['prod_division'])
+
     new_product.save()
     quantity = new_product.quantity
     quantity = str(float(quantity)).replace('.', ',')
@@ -119,6 +123,7 @@ def add_product(request, shopping_list_id):
     html = html.replace('###product##', str(new_product))
     html = html.replace('###quantity##', quantity)
     html = html.replace('###unit##', str(new_product.unit))
+    html = html.replace('###division###', str(new_product.division_id.id))
     try:
         ingredient = Ingredient.objects.get(name__contains=new_product, user_id=request.user)
         meals_with_product_query = MealIngredient.objects.filter(ingredient_id=ingredient)
