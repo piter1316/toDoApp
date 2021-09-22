@@ -3,7 +3,7 @@ from django.db import models
 
 
 # Create your models here.
-from meals.models import Unit, Shop
+from meals.models import Unit, Shop, ProductDivision
 
 
 class ShoppingList(models.Model):
@@ -21,6 +21,7 @@ class Products(models.Model):
     quantity = models.FloatField(default=1)
     unit = models.ForeignKey(Unit, default=1, on_delete=models.DO_NOTHING)
     bought = models.BooleanField(default=False)
+    division_id = models.ForeignKey(ProductDivision, on_delete=models.DO_NOTHING, default=None)
 
     def __str__(self):
         return self.product_name
