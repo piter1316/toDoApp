@@ -599,7 +599,7 @@ def generate_shopping_lists(request):
                 if ingredient_object in ingr_qt_dict.keys():
                     qt = ingr_qt_dict[ingredient_object][0]
                     qt += ingredient.quantity
-                    ingr_qt_dict[ingredient_object] = [qt, ingredient_object.weight_per_unit]
+                    ingr_qt_dict[ingredient_object] = [qt, ingredient_object.weight_per_unit ]
                 else:
                     ingr_qt_dict[ingredient_object] = [ingredient.quantity, ingredient_object.weight_per_unit]
 
@@ -626,7 +626,7 @@ def generate_shopping_lists(request):
                     unit = 2
                 new_list_position = Products(product_name=shopping_item, quantity=qt[0],
                                              shopping_list_id_id=new_shopping_list.id,
-                                             unit_id=unit)
+                                             unit_id=unit, division_id = shopping_item.division)
                 new_list_position_list.append(new_list_position)
             Products.objects.bulk_create(new_list_position_list)
     return redirect('shopping:shopping_list_index')
@@ -642,7 +642,7 @@ def delete_selected_days(request):
 def edit_ingredients(request):
     user_ingredients = Ingredient.objects.filter(user=request.user).order_by('name')
     user_shops = Shop.objects.filter(user=request.user.id)
-    user_divisions = ProductDivision.objects.filter(user=request.user).order_by('priority')
+    user_divisions = ProductDivision.objects.filter(user=request.user).order_by('-priority')
     form = IngredientForm()
     context = {
         'user_ingredients': user_ingredients,

@@ -21,7 +21,7 @@ class Products(models.Model):
     quantity = models.FloatField(default=1)
     unit = models.ForeignKey(Unit, default=1, on_delete=models.DO_NOTHING)
     bought = models.BooleanField(default=False)
-    division_id = models.ForeignKey(ProductDivision, on_delete=models.DO_NOTHING, default=None)
+    division_id = models.ForeignKey(ProductDivision, on_delete=models.DO_NOTHING, default=1)
 
     def __str__(self):
         return self.product_name

@@ -23,8 +23,9 @@ def shopping_list_index(request):
     units = Unit.objects.all()
     checklist = Checklist.objects.filter(user=request.user.id)
     for i in range(len(shopping_lists)):
-        products_on_shopping_list = Products.objects.select_related('Unit').filter(shopping_list_id=shopping_lists[i].id).order_by('pk')\
-            .values('product_name','unit_id__unit', 'bought', 'quantity', 'id','unit_id__id')
+        products_on_shopping_list = Products.objects.select_related('unit').select_related('division_id').filter(shopping_list_id=shopping_lists[i].id).order_by('-division_id_id__priority')\
+            .values('product_name', 'unit_id__unit', 'bought', 'quantity', 'id', 'unit_id__id')
+
         products = []
         names = []
         for product in products_on_shopping_list:
