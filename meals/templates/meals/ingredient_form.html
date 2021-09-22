@@ -3,6 +3,16 @@
     Nazwa
     <input type="text" class="form-control mb-1" name="ingr_name" required>
   </div>
+  <div class="col">
+    Dział
+    <select class="form-control" name="division">
+      {% for division in user_divisions %}
+      <option value="{{division.id}}">
+        {{division}}
+      </option>
+      {% endfor %}
+      <select/>
+  </div>
 </div>
 <div class="form-row">
   <div class="col-12 col-md-6">

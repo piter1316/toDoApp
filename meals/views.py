@@ -686,6 +686,7 @@ def new_ingredient(request):
     avg_unit = request.POST.get('avg_unit', False)
     shop_select = request.POST.get('shop', False)
     short_expiry = request.POST.get('short_expiry', False)
+    division = request.POST.get('division',1)
     if short_expiry:
         short_expiry = True
 
@@ -707,7 +708,7 @@ def new_ingredient(request):
                                 protein_per_100_gram=prot,
                                 fat_per_100_gram=fat,
                                 carbohydrates_per_100_gram=carb,
-                                weight_per_unit=avg_unit, shop=shop, short_expiry=short_expiry)
+                                weight_per_unit=avg_unit, shop=shop, short_expiry=short_expiry, division_id=division)
     new_ingredient.save()
     return redirect('meals:edit_ingredients')
 
@@ -726,6 +727,7 @@ def edit_ingredient(request, ingr_id):
     avg_unit = request.POST.get('avg_unit', False)
     shop_select = request.POST.get('shop', False)
     short_expiry = request.POST.get('short_expiry', False)
+    division = request.POST.get('division', 1)
     if short_expiry:
         short_expiry = True
 
@@ -743,6 +745,11 @@ def edit_ingredient(request, ingr_id):
         shop = None
     else:
         shop = Shop.objects.get(pk=shop_select)
+    if division == 1:
+        division = ProductDivision.objects.get(pk=1)
+    else:
+        division = ProductDivision.objects.get(pk=division)
+
 
     edited_ingredient = Ingredient.objects.get(pk=ingr_id)
     edited_ingredient.name = new_ingredient_name
@@ -753,6 +760,7 @@ def edit_ingredient(request, ingr_id):
     edited_ingredient.weight_per_unit = avg_unit
     edited_ingredient.shop = shop
     edited_ingredient.short_expiry = short_expiry
+    edited_ingredient.division = division
     edited_ingredient.save()
 
     return redirect('meals:edit_ingredients')
