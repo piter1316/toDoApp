@@ -1,5 +1,6 @@
 import random
 import time
+from django.contrib import messages
 
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
@@ -778,3 +779,19 @@ def edit_division_priority(request, division_id):
     division_to_edit.priority = request.POST['new_priority']
     division_to_edit.save()
     return HttpResponse(str(division_id))
+
+
+def add_new_division(request):
+    if request.method == 'POST':
+        print(request.POST)
+        new_division = ProductDivision(division_name=request.POST['division_name'], priority=request.POST['division_priority'], user_id=request.user.id)
+        new_division.save()
+    return redirect('/ingredientsEdit#division')
+
+
+def delete_division(request, division_id):
+    try:
+        ProductDivision.objects.filter(pk=division_id, user_id=request.user.id).delete()
+    except Exception as e:
+        messages.error(request, 'Podany dział zawiera produkty i nie zostanie usuniety.')
+    return redirect('/ingredientsEdit#division')

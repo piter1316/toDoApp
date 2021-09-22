@@ -24,7 +24,7 @@ class Meal(models.Model):
 
 
 class ProductDivision(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=None, null=True)
     division_name = models.TextField(max_length=100)
     priority = models.IntegerField(default=0)
 

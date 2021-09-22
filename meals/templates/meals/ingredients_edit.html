@@ -1,6 +1,21 @@
 {% extends 'todo/base.html' %}
 {% block body %}
+{% if messages %}
+<div class="alert alert-warning w-50 mx-auto p-2 mt-2">
+  <div class="toast-header">
+    <strong class="mr-auto">Niepowodzenie!!!</strong>
+    <button type="button" class="ml-2 mb-1 close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="toast-body">
+    {% for message in messages %}
+<p>{{message}}<p/>
+{% endfor %}
+</div>
+  </div>
 
+{% endif %}
 <div class="container mt-2" style="position:relative">
   <ul class="nav nav-tabs mb-1 row no-gutters" id="myShopMacrosTab" role="tablist">
     <li class="nav-item col">
@@ -56,7 +71,8 @@
       </table>
     </div>
     <div class="tab-pane fade " id="division">
-
+      <button class="btn btn-sm btn-block btn-dark mb-2" data-toggle="modal" data-target="#addDivisionModal"><i
+                  class="fas fa-plus"></i></button>
       <table class="table table-light table-striped table-hover" id="divisions_tab">
         <thead class="thead-dark text-center">
         <tr>
@@ -68,6 +84,7 @@
           {% for division in user_divisions %}
             <tr>
               <td class="text-left ">
+                <a href="{% url 'meals:delete_division' division.id %}" class="fas fa-minus-circle text-secondary mr-1"></a>
                 <span class="division_" contenteditable="true" id="division_{{division.id}}">{{division}}</span>
               </td>
               <td class="text-right">
@@ -167,6 +184,38 @@
         </div>
         <div class="modal-body">
           {% include 'meals/ingredient_form.html' %}
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
+          <button type="submit" class="btn btn-primary">Dodaj</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="addDivisionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <form method="post" action="{% url 'meals:add_new_division' %}">{%csrf_token%}
+        <div class="modal-header">
+          <h5 class="modal-title">Nowy Dział</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="col-12 col-md-6 mt-2">
+              Nazwa:
+              <input name="division_name" type="text" class="form-control">
+            </div>
+            <div class="col-12 col-md-6 mt-2">
+              Priorytet
+              <input name="division_priority" type="number" class="form-control">
+            </div>
+          </div>
 
         </div>
         <div class="modal-footer">

@@ -200,6 +200,15 @@ $(document).ready(function(){
  $('#service-tab').addClass('active');
  }
 
+ if(window.location.href.includes('#division')){
+ $('#macro').removeClass('show')
+ $('#macro').removeClass('active')
+ $('#macro-tab').removeClass('active')
+ $('#division').addClass('show');
+ $('#division').addClass('active');
+ $('#division-tab').addClass('active');
+ }
+
  if(window.location.href.includes('#info')){
  $('#fuel').removeClass('show')
  $('#fuel').removeClass('active')
