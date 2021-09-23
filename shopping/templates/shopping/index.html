@@ -111,7 +111,8 @@
           <input type="hidden" value="{{shop}}">
           {% for product in products %}
           {% for prod, qt in product.items %}
-          <li class=" {% if qt.1 %}todo-completed bg-secondary  {%else%} bg-light {%endif%}list-group-item d-flex justify-content-between align-items-center py-md-1" id="prod_{{qt.2}}">
+
+          <li class=" {% if qt.1 %}todo-completed bg-secondary  {%else%} bg-light {%endif%}list-group-item d-flex justify-content-between align-items-center py-md-1 {% if qt.6%}border-dark{%endif%}" id="prod_{{qt.2}}">
             <span><input class="{% if qt.1 %}d-none{%endif%}" type="checkbox" name="bought_many" id="boughtMany_{{qt.2}}">
               {% if qt.1 %}
               <span class="disabled">{{prod}}</span>

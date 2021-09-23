@@ -15,6 +15,7 @@ from shopping.models import ShoppingList, Products, Checklist
 
 @login_required(login_url='/accounts/login')
 def shopping_list_index(request):
+    names_test = [1,1,2,2,2,2,3,4,5]
     start = time.time()
     shopping_lists = ShoppingList.objects.filter(user_id=request.user.id)
     shopping_lists_dict = {}
@@ -25,7 +26,7 @@ def shopping_list_index(request):
     divisions = ProductDivision.objects.filter(user=request.user.id)
     for i in range(len(shopping_lists)):
         products_on_shopping_list = Products.objects.select_related('unit').select_related('division_id').filter(shopping_list_id=shopping_lists[i].id).order_by('-division_id_id__priority')\
-            .values('product_name', 'unit_id__unit', 'bought', 'quantity', 'id', 'unit_id__id')
+            .values('product_name', 'unit_id__unit', 'bought', 'quantity', 'id', 'unit_id__id','division_id_id')
 
         products = []
         names = []
@@ -59,15 +60,22 @@ def shopping_list_index(request):
         )
         """.format(names_to_query, request.user.id)
         meals_with_ingredients = Ingredient.objects.raw(sql)
-        for product in products_on_shopping_list:
+        for p in range(len(products_on_shopping_list)):
             generated_meals_with_product =[]
 
             for ingr in meals_with_ingredients:
-                if product['product_name'] == ingr.name:
+                if products_on_shopping_list[p]['product_name'] == ingr.name:
                     generated_meals_with_product.append(ingr)
-            product_quantity_bought = [product['quantity'], product['bought'], product['id'], product['unit_id__unit'], generated_meals_with_product, product['unit_id__id']]
+            first = False
+            if p > 0:
+                if products_on_shopping_list[p-1]['division_id_id'] != products_on_shopping_list[p]['division_id_id']:
+                    first = True
+                    print(products_on_shopping_list[p-1])
+                else:
+                    first = False
+            product_quantity_bought = [products_on_shopping_list[p]['quantity'], products_on_shopping_list[p]['bought'], products_on_shopping_list[p]['id'], products_on_shopping_list[p]['unit_id__unit'], generated_meals_with_product, products_on_shopping_list[p]['unit_id__id'], first]
             # product_quantity_bought = ['product.quantity', 'product.bought', 'product.id', 'product.unit', generated_meals_with_product]
-            product_quantity = {product['product_name']: product_quantity_bought}
+            product_quantity = {products_on_shopping_list[p]['product_name']: product_quantity_bought}
             products.append(product_quantity)
 
         shopping_lists_dict[shopping_lists[i]] = products
@@ -77,7 +85,8 @@ def shopping_list_index(request):
         'form_2': form_2,
         'units': units,
         'checklist': checklist,
-        'divisions': divisions
+        'divisions': divisions,
+        'names_test': names_test,
     }
     print(time.time()-start)
     return render(request, 'shopping/index.html', context)
