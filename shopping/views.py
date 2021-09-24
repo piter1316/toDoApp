@@ -70,7 +70,6 @@ def shopping_list_index(request):
             if p > 0:
                 if products_on_shopping_list[p-1]['division_id_id'] != products_on_shopping_list[p]['division_id_id']:
                     first = True
-                    print(products_on_shopping_list[p-1])
                 else:
                     first = False
             product_quantity_bought = [products_on_shopping_list[p]['quantity'], products_on_shopping_list[p]['bought'], products_on_shopping_list[p]['id'], products_on_shopping_list[p]['unit_id__unit'], generated_meals_with_product, products_on_shopping_list[p]['unit_id__id'], first]
@@ -88,7 +87,6 @@ def shopping_list_index(request):
         'divisions': divisions,
         'names_test': names_test,
     }
-    print(time.time()-start)
     return render(request, 'shopping/index.html', context)
 
 
@@ -115,7 +113,6 @@ def delete_all_shopping_lists(request):
 def add_product(request, shopping_list_id):
     shopping_list = get_object_or_404(ShoppingList, pk=shopping_list_id)
     form = ProductsForm(request.POST)
-    print(request.POST)
     new_product = Products(shopping_list_id=shopping_list,
                            product_name=request.POST['product_name'].lower(),
                            quantity=request.POST['quantity'],
@@ -165,7 +162,6 @@ def update_product(request, product_id):
     new_name = request.POST['new_product_name'].lower()
     new_quantity = request.POST['new_quantity']
     new_unit = request.POST['new_unit']
-    print(request.POST)
     Products.objects.filter(pk=product_id).update(product_name=new_name, quantity=new_quantity, unit=new_unit)
     if old_name != new_name:
         return redirect('shopping:shopping_list_index')
@@ -234,7 +230,6 @@ def edit_check_list(request):
 
 def add_item(request):
     if request.method == 'POST':
-        print(request.POST)
         shop = get_object_or_404(Shop, pk=request.POST['addNewPosToCheckListShop'])
         new_checklist_position = Checklist(user_id=request.user.id, product_name=request.POST['addNewPosToCheckListName'],
                                            shop_id=shop.pk)
@@ -243,7 +238,6 @@ def add_item(request):
 
 
 def delete_item(request, item_id):
-    print(item_id)
     Checklist.objects.filter(user_id=request.user, pk=item_id).delete()
     return redirect('shopping:edit_check_list')
 

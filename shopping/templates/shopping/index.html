@@ -112,7 +112,7 @@
           {% for product in products %}
           {% for prod, qt in product.items %}
 
-          <li class=" {% if qt.1 %}todo-completed bg-secondary  {%else%} bg-light {%endif%}list-group-item d-flex justify-content-between align-items-center py-md-1 {% if qt.6%}border-dark{%endif%}" id="prod_{{qt.2}}">
+          <li class=" {% if qt.1 %}todo-completed bg-secondary  {%else%} bg-light {%endif%}list-group-item d-flex justify-content-between align-items-center py-md-1 {% if qt.6%}border-dark firstInDivision{%endif%}" id="prod_{{qt.2}}">
             <span><input class="{% if qt.1 %}d-none{%endif%}" type="checkbox" name="bought_many" id="boughtMany_{{qt.2}}">
               {% if qt.1 %}
               <span class="disabled">{{prod}}</span>
@@ -348,7 +348,12 @@
       data:{
       },
       success: function(data){
+        if($('#shop_'+shop_id+ ' .todo-completed').hasClass('firstInDivision')){
         $('#shop_'+shop_id+ ' .todo-completed').remove();
+        $('#shop_'+ shop_id).load(document.URL + ' #shop_'+ shop_id )
+        } else{
+          $('#shop_'+shop_id+ ' .todo-completed').remove();
+        }
       },
     });
   });
