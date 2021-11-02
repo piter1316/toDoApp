@@ -232,6 +232,14 @@ $('body').on('click','.dropdown_shopping_item',function(e){
   $('#badge_edit_'+num_id).toggle(600);
 });
 
+$('body').on('click','.crossChecked_',function(e){
+  var id = e.target.id;
+  var num_id = id.split('_')[1]
+  $('#checkItemLabel_'+num_id).addClass('text-muted');
+  $('#checkItemLabel_'+num_id).css('text-decoration', 'line-through');
+//  $('#badge_edit_'+num_id).toggle(600);
+});
+
 $('body').on('click','.editToggleLg, .editToggle',function(e){
   var id = e.target.id;
   var num_id = id.split('_')[1]
