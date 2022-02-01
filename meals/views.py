@@ -48,7 +48,7 @@ def appended_days_generator(request, first, how_many):
 
 
 def get_maximum_no_of_days(request):
-    user_meals_options = MealOption.objects.filter(user=request.user)
+    user_meals_options = MealOption.objects.filter(user=request.user, is_taken_to_generation=1)
     no_of_meals_in_option = []
     for option in user_meals_options:
         meals_in_option = Meal.objects.filter(user=request.user, meal_option=option, special=0)
@@ -85,7 +85,7 @@ def get_maximum_no_of_days_no_repeat(request):
 @login_required(login_url='/accounts/login')
 def meals(request, current=1):
     in_meals_list = True
-    user_meals_options = MealOption.objects.filter(user=request.user).order_by('position')
+    user_meals_options = MealOption.objects.filter(user=request.user, is_taken_to_generation=1).order_by('position')
     generated_user_meals_options = MealsList.objects.filter(user=request.user, current=current).order_by('meal_option__position').values(
         'meal_option__meal_option', 'meal_option_id').distinct()
     meals_list = MealsList.objects.all().filter(user=request.user, current=current)
@@ -260,6 +260,7 @@ def meals(request, current=1):
         'current': int(current),
     }
     return render(request, 'meals/meals_list.html', context)
+
 
 @login_required(login_url='/accounts/login')
 def edit_meals(request):
@@ -552,7 +553,11 @@ def purge_meals_list(request):
 
 def update_meal_option(request, meal_option_id):
     new_name = request.POST['new_meal_option_name']
-    MealOption.objects.filter(pk=meal_option_id).update(meal_option=new_name)
+    is_taken_to_generation = request.POST.get('is_taken_to_generation', 0)
+    if is_taken_to_generation:
+        is_taken_to_generation = 1
+    MealOption.objects.filter(pk=meal_option_id).update(meal_option=new_name,
+                                                        is_taken_to_generation=is_taken_to_generation)
     return redirect('meals:edit_meals')
 
 

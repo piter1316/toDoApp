@@ -6,6 +6,7 @@ class MealOption(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     meal_option = models.TextField(max_length=15)
     position = models.SmallIntegerField(default=0)
+    is_taken_to_generation = models.IntegerField(blank=True, null=True, default=1)
 
     def __str__(self):
         return self.meal_option
@@ -78,8 +79,9 @@ class MealsList(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     day = models.TextField(max_length=10)
     meal_option = models.ForeignKey(MealOption, on_delete=models.DO_NOTHING, default=1)
-    meal = models.ForeignKey(Meal, on_delete=models.DO_NOTHING, default=1, null=True, blank=True)
+    meal = models.ForeignKey(Meal, on_delete=models.DO_NOTHING, db_column='meal_id', default=1, null=True, blank=True)
     current = models.BooleanField(default=False)
+    extras = models.ForeignKey(Meal, models.DO_NOTHING, db_column='extras', related_name='%(class)s_meals_meal', blank=True, null=True)
 
     def __str__(self):
         if self.meal:

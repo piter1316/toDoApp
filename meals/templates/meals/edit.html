@@ -53,7 +53,12 @@
               <div class="tab-pane fade" id="editMealOption_{{forloop.counter}}" role="tabpanel" aria-labelledby="editMealOption-tab">
                 <form action="{% url 'meals:update_meal_option' meal_option.id %}" method="post" class="pb-0 px-2 pt-2 mt-1">{% csrf_token %}
                   <input type="text" name="new_meal_option_name" class="form-control mb-1" value="{{meal_option}}">
-                  <button type="submit" class="btn btn-info btn-block mb-1">Zmień nazwę</button>
+                  <label class="float-left">
+                  <input type="checkbox" name="is_taken_to_generation" class=""
+                         {% if meal_option.is_taken_to_generation %} checked {% endif %}>
+                    Uwzglęgnić przy generacji jadłospisu?
+                    </label>
+                  <button type="submit" class="btn btn-info btn-block mb-1">Zapisz zmiany</button>
                 </form>
                 <div class="dropdown-divider"></div>
               </div>
