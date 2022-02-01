@@ -573,7 +573,7 @@ def update_meal_name(request, meal_id):
 
 
 def generate_shopping_lists(request):
-    meals = MealsList.objects.select_related('meal').filter(user=request.user, current=1)
+    meals = MealsList.objects.select_related('meal', 'extras').filter(user=request.user, current=1)
     shops = Shop.objects.filter(user_id=request.user)
     shops = list(shops)
     shops.append(None)
@@ -589,6 +589,10 @@ def generate_shopping_lists(request):
     else:
         how_many_people = int(how_many_people)
     for meal in meals:
+        if meal.extras:
+            meal_instance = meal.extras.id
+            for ingredient in MealIngredient.objects.select_related('ingredient_id').filter(meal_id=meal_instance):
+                ingredients_list.append(ingredient)
         if meal.meal_id:
             meal_instance = meal.meal_id
             for ingredient in MealIngredient.objects.select_related('ingredient_id').filter(meal_id=meal_instance):
