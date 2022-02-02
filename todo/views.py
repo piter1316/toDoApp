@@ -70,7 +70,10 @@ def home(request):
         fat = 0
         carb = 0
         for meal in meals:
-            ingredients = MealIngredient.objects.select_related('ingredient_id').filter(meal_id=meal.meal_id)
+            ingredients = list(MealIngredient.objects.select_related('ingredient_id').filter(meal_id=meal.meal_id))
+            if meal.extras:
+                extra_ingredients = MealIngredient.objects.select_related('ingredient_id').filter(meal_id=meal.extras.id)
+                ingredients.extend(extra_ingredients)
             for ingr in ingredients:
                 calories += (ingr.quantity / 100) * int(ingr.ingredient_id.calories_per_100_gram)
                 protein += (ingr.quantity / 100) * int(ingr.ingredient_id.protein_per_100_gram)
