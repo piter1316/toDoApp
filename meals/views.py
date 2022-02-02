@@ -162,18 +162,21 @@ def meals(request, current=1):
                 protein = 0
                 fat = 0
                 carbohydrates = 0
-                ingredients = []
+                ingredients_list = []
+                tmp_extra = []
                 if meal.meal_id:
-                    ingredients = meal_ingredients_dict[meal.meal_id]
+                    ingredients_list = meal_ingredients_dict[meal.meal_id]
                     if meal.extras:
-                        ingredients.extend(meal_ingredients_dict[meal.extras.id])
-
+                        ingredients_list.extend(meal_ingredients_dict[meal.extras.id])
+                        tmp_extra = meal_ingredients_dict[meal.extras.id]
                 else:
                     if meal.extras:
-                        ingredients.extend(meal_ingredients_dict[meal.extras.id])
+                        ingredients_list.extend(meal_ingredients_dict[meal.extras.id])
+                        tmp_extra = meal_ingredients_dict[meal.extras.id]
                     else:
                         calories = 0
-                for ingr in ingredients:
+
+                for ingr in ingredients_list:
                     calories += (ingr.quantity / 100) * int(ingr.calories_per_100_gram)
                     protein += (ingr.quantity / 100) * int(ingr.protein_per_100_gram)
                     fat += (ingr.quantity / 100) * int(ingr.fat_per_100_gram)
@@ -188,6 +191,10 @@ def meals(request, current=1):
                     carbohydrates = 0
                 meals.append(meal.meal_id)
                 day_meals_list.append({meal: all_meals_in_option_dict.get(meal.meal_option_id)})
+                for item in tmp_extra:
+                    if item in ingredients_list:
+                        ingredients_list.remove(item)
+                print(ingredients_list)
         day_calories.append({day: [round(sum(meal_ingredients), 0)]})
         day_meal_option_meal_list.append(
             [{day: day_meals_list},
@@ -211,6 +218,8 @@ def meals(request, current=1):
     all_meals = meals_list
     meal_options = generated_user_meals_options
     meals = MealsList.objects.select_related('meal').filter(user=request.user, current=current)
+    ingredients_total = []
+    tmp_extra_total = []
     calories_total = 0
     protein_total = 0
     fat_total = 0
@@ -219,15 +228,22 @@ def meals(request, current=1):
     protein = 0
     fat = 0
     carb = 0
+    # for key, value in meal_ingredients_dict.items():
+    #     print(key, value)
     for meal in meals:
+        print(meal.id)
         if meal.meal_id:
-            ingredients = meal_ingredients_dict[meal.meal_id]
-        else:
-            ingredients = []
+            ingredients_total = meal_ingredients_dict[meal.meal_id]
             if meal.extras:
-                ingredients.extend(meal_ingredients_dict[meal.extras.id])
-        for ingr in ingredients:
-            print(ingr)
+                ingredients_total.extend(meal_ingredients_dict[meal.extras.id])
+                tmp_extra_total = meal_ingredients_dict[meal.extras.id]
+        else:
+            ingredients_total = []
+            if meal.extras:
+                ingredients_total.extend(meal_ingredients_dict[meal.extras.id])
+                tmp_extra_total = meal_ingredients_dict[meal.extras.id]
+
+        for ingr in ingredients_total:
             calories += (ingr.quantity / 100) * int(ingr.calories_per_100_gram)
             protein += (ingr.quantity / 100) * int(ingr.protein_per_100_gram)
             fat += (ingr.quantity / 100) * int(ingr.fat_per_100_gram)
@@ -240,6 +256,9 @@ def meals(request, current=1):
             protein = 0
             fat = 0
             carb = 0
+        for item in tmp_extra_total:
+            if item in ingredients_total:
+                ingredients_total.remove(item)
 
     try:
         meals_list_length = int(len(all_meals) / len(meal_options))
