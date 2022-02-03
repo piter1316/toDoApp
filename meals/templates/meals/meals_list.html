@@ -84,7 +84,7 @@
                 <small style="cursor:pointer;" data-toggle="modal" data-target="#extrasModal_{{ch_meal.id}}"><i>{{ch_meal.extras}}</i></small>
                 {% endif %}
                 <div class="modal fade" id="extrasModal_{{ch_meal.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                <div class="modal-dialog modal-lg modal-dialog-centered no_print" role="document">
                   <div class="modal-content">
                     <div class="modal-header">
                       <h5 class="modal-title" id="modalTitle_{{ch_meal.id}}">Edytuj dodatki {% if ch_meal.meal_id %} dla <span id="modalTitleSpan_{{ch_meal.id}}">{{ch_meal}}</span> {% endif %}</h5>
