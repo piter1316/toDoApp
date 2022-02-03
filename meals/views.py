@@ -194,7 +194,6 @@ def meals(request, current=1):
                 for item in tmp_extra:
                     if item in ingredients_list:
                         ingredients_list.remove(item)
-                print(ingredients_list)
         day_calories.append({day: [round(sum(meal_ingredients), 0)]})
         day_meal_option_meal_list.append(
             [{day: day_meals_list},
@@ -231,7 +230,6 @@ def meals(request, current=1):
     # for key, value in meal_ingredients_dict.items():
     #     print(key, value)
     for meal in meals:
-        print(meal.id)
         if meal.meal_id:
             ingredients_total = meal_ingredients_dict[meal.meal_id]
             if meal.extras:
@@ -821,7 +819,6 @@ def edit_division_priority(request, division_id):
 
 def add_new_division(request):
     if request.method == 'POST':
-        print(request.POST)
         new_division = ProductDivision(division_name=request.POST['division_name'], priority=request.POST['division_priority'], user_id=request.user.id)
         new_division.save()
     return redirect('/ingredientsEdit#division')

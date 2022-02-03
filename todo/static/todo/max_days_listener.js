@@ -91,8 +91,14 @@ $(document).ready(function(){
     }
   });
 
-  $('.dropdown-menu').click(function(e){
+  $('.stopPropagation').click(function(e){
     e.stopPropagation();
+  })
+
+  $('.dropdownMeal').click(function(e){
+    var dropdown_div_id = 'dropdownMenu_' + $(this).attr('id').split('_')[1]
+    console.log($('#'+dropdown_div_id))
+    $('#'+dropdown_div_id).toggle()
   })
 
   $('.dropdownMeal').click(function(e){
