@@ -104,7 +104,8 @@
                       <div>Zmień:</div>
                       {% endif %}
                       {% for option, meals in all_meals_in_option_dict.items %}
-                      <select class="form-control mt-1">
+                      <form method="post" action="{% url 'meals:edit_extras' ch_meal.id  %}">{% csrf_token %}
+                      <select onchange="this.form.submit()" class="form-control mt-1" name="extras_select">
                         <option>
                           {% for meal in meals %}
                       {% ifchanged meal.0.meal_option %}
@@ -113,13 +114,14 @@
                       {% endfor  %}
                         </option>
                         {% for meal in meals %}
-                        <option>{{meal.0.name}} | {{meal.1.0}} kcal </option>
+                        <option value="{{meal.0.id}}">{{meal.0.name}} | {{meal.1.0}} kcal </option>
                         {% endfor %}
                       </select>
+                      </form>
                       <hr>
                       {% endfor %}
                       {% if ch_meal.extras %}
-                      <button class="btn btn-block btn-danger">Usuń {{ch_meal.extras}}</button>
+                      <a href="{% url 'meals:delete_extras' ch_meal.id %}" class="btn btn-block btn-danger text-light">Usuń {{ch_meal.extras}}</a>
                       {% endif %}
                     </div>
                     <div class="modal-footer">

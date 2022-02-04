@@ -67,7 +67,7 @@ def get_maximum_no_of_days_no_repeat(request):
     for item in (list(current_meals_list)):
         if item.meal_id:
             current_meals.append(item.meal_id)
-    user_meals_options = MealOption.objects.filter(user=request.user)
+    user_meals_options = MealOption.objects.filter(user=request.user, is_taken_to_generation=1)
     for option in user_meals_options:
         meals_in_option = Meal.objects.filter(meal_option=option, user=request.user, special=0)
         option_meals_list = []
@@ -834,3 +834,17 @@ def delete_division(request, division_id):
     except Exception as e:
         messages.error(request, 'Podany dział zawiera produkty i nie zostanie usuniety.')
     return redirect('/ingredientsEdit#division')
+
+
+def edit_extras(request, meals_list_id):
+    extras_to_add = request.POST.get('extras_select', False)
+    if request.method == "POST":
+        if extras_to_add:
+            MealsList.objects.filter(pk=meals_list_id).update(extras=extras_to_add)
+            print('edit_extras', meals_list_id, extras_to_add)
+    return redirect('/mealsList/1')
+
+
+def delete_extras(request, meals_list_id):
+    MealsList.objects.filter(pk=meals_list_id).update(extras=None)
+    return redirect('/mealsList/1')
