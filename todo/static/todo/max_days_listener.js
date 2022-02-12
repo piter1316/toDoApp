@@ -123,7 +123,7 @@ $(document).ready(function(){
     })
 
   $('#new_ingredient_form_toggle').click(function(e){
-    if ($(this).text() == "Opcje") {
+    if ($(this).text().trim() == "Opcje") {
           $(this).text("Zamknij");
       } else {
           $(this).text("Opcje");

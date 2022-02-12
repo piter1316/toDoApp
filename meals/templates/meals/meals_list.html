@@ -100,7 +100,20 @@
                       {% if not ch_meal.extras %}
                       Dodaj z posiłku:
                       {% else %}
-                      <div class="text-left"><small>Aktualny dodatek : <i>{{ch_meal.extras}}</i></small></div>
+                      <div class="text-left">
+                        <small>Aktualny dodatek :
+                          <a class="text-dark" href="{% url 'meals:edit_meal_ingredients' ch_meal.extras.id %}">
+                            <i>{{ch_meal.extras}}
+                            {% for option, meals in all_meals_in_option_dict.items %}
+                              {% for meal in meals %}
+                                {% if meal.0 == ch_meal.extras%} {{meal.1.0}} | kcal {% endif %}
+                              {% endfor %}
+                            {% endfor %}
+                            </i>
+                          </a>
+                          {{ch}}
+                        </small>
+                      </div>
                       <div>Zmień:</div>
                       {% endif %}
                       {% for option, meals in all_meals_in_option_dict.items %}
