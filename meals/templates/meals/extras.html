@@ -1,0 +1,57 @@
+{% extends 'todo/base.html' %}
+
+
+{% block body %}
+
+<div class="modal-dialog modal-lg modal-dialog-centered no_print" role="document">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title" id="modalTitle_{{ch_meal.id}}">
+        Dodatki{% if meals_list_object %} dla: <span id="modalTitleSpan_{{ch_meal.id}}">{{meals_list_object}}</span> {% endif %}
+      </h5>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body pt-0">
+
+      {% if not meals_list_object.extras %}
+      Dodaj z posiłku:
+      {% else %}
+      <div class="text-left">
+        <small>Aktualny dodatek :
+          <a class="text-dark" href="{% url 'meals:edit_meal_ingredients' meals_list_object.extras.id %}">
+            <i>{{meals_list_object.extras}}
+
+            </i>
+          </a>
+
+        </small>
+      </div>
+      <div>Zmień:</div>
+      {% endif %}
+
+      <form method="post" action="{% url 'meals:edit_extras' meals_list_object.extras  %}">{% csrf_token %}
+      <select onchange="this.form.submit()" class="form-control mt-1" name="extras_select">
+        <option>
+
+        </option>
+
+        <option value="{{meal.0.id}}">{{meal.0.name}} | {{meal.1.0}} kcal </option>
+
+      </select>
+      </form>
+      <hr>
+
+      {% if meals_list_object.extras %}
+      <a href="{% url 'meals:delete_extras' meals_list_object.id %}" class="btn btn-block btn-danger text-light">Usuń {{ch_meal.extras}}</a>
+      {% endif %}
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
+<!--                      <button type="button" class="btn btn-primary">Zapisz</button>-->
+    </div>
+  </div>
+</div>
+
+{% endblock %}

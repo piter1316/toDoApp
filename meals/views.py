@@ -837,14 +837,19 @@ def delete_division(request, division_id):
 
 
 def edit_extras(request, meals_list_id):
+    meals_list_object = get_object_or_404(MealsList, pk=meals_list_id)
     extras_to_add = request.POST.get('extras_select', False)
     if request.method == "POST":
         if extras_to_add:
             MealsList.objects.filter(pk=meals_list_id).update(extras=extras_to_add)
             print('edit_extras', meals_list_id, extras_to_add)
-    return redirect('/mealsList/1')
+    context = {
+        'meals_list_object': meals_list_object,
+    }
+    return render(request, 'meals/extras.html', context)
 
 
 def delete_extras(request, meals_list_id):
+    print(meals_list_id)
     MealsList.objects.filter(pk=meals_list_id).update(extras=None)
     return redirect('/mealsList/1')
