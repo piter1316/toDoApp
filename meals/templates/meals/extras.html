@@ -31,15 +31,18 @@
       <div>Zmień:</div>
       {% endif %}
 
-      <form method="post" action="{% url 'meals:edit_extras' meals_list_object.extras  %}">{% csrf_token %}
+      <form method="post" action="{% url 'meals:edit_extras' meals_list_object.id  %}">{% csrf_token %}
+      {% for meal_option, meals in all_meals_dict.items %}
       <select onchange="this.form.submit()" class="form-control mt-1" name="extras_select">
         <option>
-
+          {{meal_option}}
         </option>
-
-        <option value="{{meal.0.id}}">{{meal.0.name}} | {{meal.1.0}} kcal </option>
+        {% for meal in meals %}
+        <option value="{{meal.id}}">{{meal}} | {{meal.1.0}} kcal{{meal.id}} </option>
+        {% endfor %}
 
       </select>
+      {% endfor %}
       </form>
       <hr>
 
@@ -48,8 +51,7 @@
       {% endif %}
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
-<!--                      <button type="button" class="btn btn-primary">Zapisz</button>-->
+      <a type="button" href="{% url 'meals:index' %}" class="btn btn-secondary" data-dismiss="modal">Zamknij</a>
     </div>
   </div>
 </div>

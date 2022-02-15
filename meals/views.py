@@ -838,13 +838,27 @@ def delete_division(request, division_id):
 
 def edit_extras(request, meals_list_id):
     meals_list_object = get_object_or_404(MealsList, pk=meals_list_id)
+    all_meals = Meal.objects.select_related('meal_option').filter(user_id=request.user).order_by('meal_option', 'name')
+    all_meals_dict = {}
+    meals_in_option = []
+    for i, meal in enumerate(all_meals):
+        if i < len(all_meals)-1:
+            if all_meals[i].meal_option == all_meals[i+1].meal_option:
+                meals_in_option.append(meal)
+            else:
+                meals_in_option.append(meal)
+                all_meals_dict[meal.meal_option] = meals_in_option
+                meals_in_option = []
     extras_to_add = request.POST.get('extras_select', False)
+    print('edit_extras', meals_list_id, extras_to_add)
     if request.method == "POST":
         if extras_to_add:
             MealsList.objects.filter(pk=meals_list_id).update(extras=extras_to_add)
             print('edit_extras', meals_list_id, extras_to_add)
+            return redirect('/mealsList/1')
     context = {
         'meals_list_object': meals_list_object,
+        'all_meals_dict': all_meals_dict,
     }
     return render(request, 'meals/extras.html', context)
 
