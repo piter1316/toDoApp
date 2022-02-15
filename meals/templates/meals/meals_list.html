@@ -81,7 +81,9 @@
                   {% endif %}
                 </div>
                 {% if ch_meal.extras %}
-                <a href="{% url 'meals:edit_extras' ch_meal.id %}" class="text-dark" style="cursor:pointer;"><i>{{ch_meal.extras}}</i></a>
+                  <small>
+                    <a href="{% url 'meals:edit_extras' ch_meal.id %}" class="text-dark text-decoration-none" style="cursor:pointer;"><i>{{ch_meal.extras}}</i></a>
+                  </small>
                 {% endif %}
 
                 <div  class="dropdown-menu p-0" id="dropdownMenu_{{ch_meal.id}}">

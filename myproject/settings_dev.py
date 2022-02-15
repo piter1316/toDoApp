@@ -97,27 +97,27 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 #     }
 # }
 #
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'todoapp',
-#         'USER': 'root',
-#         'PASSWORD': '',
-#         'HOST': '',   # Or an IP Address that your DB is hosted on
-#         'PORT': '3306',
-#     }
-# }
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'todoapp',
-        'USER': 'b2b_roboczy',
-        'PASSWORD': 'b2b_roboczy',
-        'HOST': 'b2b.int-technics.pl',   # Or an IP Address that your DB is hosted on
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': '',   # Or an IP Address that your DB is hosted on
         'PORT': '3306',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'todoapp',
+#         'USER': 'b2b_roboczy',
+#         'PASSWORD': 'b2b_roboczy',
+#         'HOST': 'b2b.int-technics.pl',   # Or an IP Address that your DB is hosted on
+#         'PORT': '3306',
+#     }
+# }
 
 
 # Password validation

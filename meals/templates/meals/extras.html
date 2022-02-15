@@ -3,7 +3,7 @@
 
 {% block body %}
 
-<div class="modal-dialog modal-lg modal-dialog-centered no_print" role="document">
+<div class="modal-dialog modal-lg" role="document">
   <div class="modal-content">
     <div class="modal-header">
       <h5 class="modal-title" id="modalTitle_{{ch_meal.id}}">
@@ -14,40 +14,34 @@
       </button>
     </div>
     <div class="modal-body pt-0">
-
       {% if not meals_list_object.extras %}
-      Dodaj z posiłku:
+        Dodaj z posiłku:
       {% else %}
-      <div class="text-left">
-        <small>Aktualny dodatek :
-          <a class="text-dark" href="{% url 'meals:edit_meal_ingredients' meals_list_object.extras.id %}">
-            <i>{{meals_list_object.extras}}
-
-            </i>
-          </a>
-
-        </small>
-      </div>
-      <div>Zmień:</div>
+        <div class="text-left">
+          <small>Aktualny dodatek :
+            <a class="text-dark text-decoration-none" href="{% url 'meals:edit_meal_ingredients' meals_list_object.extras.id %}">
+              <i>{{meals_list_object.extras}}
+              </i>
+            </a>
+          </small>
+        </div>
+        <div>Zmień:</div>
       {% endif %}
-
-      <form method="post" action="{% url 'meals:edit_extras' meals_list_object.id  %}">{% csrf_token %}
       {% for meal_option, meals in all_meals_dict.items %}
-      <select onchange="this.form.submit()" class="form-control mt-1" name="extras_select">
-        <option>
-          {{meal_option}}
-        </option>
-        {% for meal in meals %}
-        <option value="{{meal.id}}">{{meal}} | {{meal.1.0}} kcal{{meal.id}} </option>
-        {% endfor %}
-
-      </select>
+        <form method="post" action="{% url 'meals:edit_extras' meals_list_object.id  %}">{% csrf_token %}
+          <select onchange="this.form.submit()" class="form-control mt-1" name="extras_select">
+            <option>{{meal_option}}</option>
+            {% for meal in meals %}
+              <option value="{{meal.id}}">{{meal}} | {{meal.1.0}} kcal </option>
+            {% endfor %}
+          </select>
+        </form>
       {% endfor %}
-      </form>
       <hr>
-
       {% if meals_list_object.extras %}
-      <a href="{% url 'meals:delete_extras' meals_list_object.id %}" class="btn btn-block btn-danger text-light">Usuń {{ch_meal.extras}}</a>
+      <a href="{% url 'meals:delete_extras' meals_list_object.id %}" class="btn btn-block btn-danger text-light">
+        Usuń {{meals_list_object.extras}}
+      </a>
       {% endif %}
     </div>
     <div class="modal-footer">
