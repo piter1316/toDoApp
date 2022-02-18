@@ -89,13 +89,13 @@ def meals(request, current=1):
     user_meals_options = MealOption.objects.filter(user=request.user, is_taken_to_generation=1).order_by('position')
     generated_user_meals_options = MealsList.objects.filter(user=request.user, current=current).order_by('meal_option__position').values(
         'meal_option__meal_option', 'meal_option_id').distinct()
-    all_user_meals_options = MealOption.objects.filter(user=request.user).order_by('position').values('meal_option', 'id')
+    all_user_meals_options = MealOption.objects.filter(user=request.user).order_by('position')
     meals_list = MealsList.objects.all().filter(user=request.user, current=current)
     days = []
     all_meals_in_option_dict = {}
     all_meals = []
     for option in all_user_meals_options:
-        meals_in_option = Meal.objects.filter(meal_option_id=option['id'], user=request.user).order_by(
+        meals_in_option = Meal.objects.filter(meal_option_id=option, user=request.user).order_by(
             'name')
         calories = 0
         all_meals_in_option = []
@@ -103,7 +103,7 @@ def meals(request, current=1):
             all_meals.append(meal.id)
             calories_sum = 0
             all_meals_in_option.append([meal, calories_sum])
-        all_meals_in_option_dict[option['id']] = all_meals_in_option
+        all_meals_in_option_dict[option] = all_meals_in_option
     sql = """
     SELECT
         *
@@ -191,7 +191,7 @@ def meals(request, current=1):
                     fat = 0
                     carbohydrates = 0
                 meals.append(meal.meal_id)
-                day_meals_list.append({meal: all_meals_in_option_dict.get(meal.meal_option_id)})
+                day_meals_list.append({meal: all_meals_in_option_dict.get(meal.meal_option)})
                 for item in tmp_extra:
                     if item in ingredients_list:
                         ingredients_list.remove(item)
@@ -841,7 +841,6 @@ def edit_extras(request, meals_list_id):
     if request.method == "POST":
         if extras_to_add:
             MealsList.objects.filter(pk=meals_list_id).update(extras=extras_to_add)
-            print('edit_extras', meals_list_id, extras_to_add)
     return redirect('/mealsList/1')
 
 

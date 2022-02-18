@@ -120,11 +120,7 @@
                       <form method="post" action="{% url 'meals:edit_extras' ch_meal.id  %}">{% csrf_token %}
                       <select onchange="this.form.submit()" class="form-control mt-1" name="extras_select">
                         <option>
-                          {% for meal in meals %}
-                      {% ifchanged meal.0.meal_option %}
-                     {{meal.0.meal_option}}
-                      {% endifchanged %}
-                      {% endfor  %}
+                          {{option}}
                         </option>
                         {% for meal in meals %}
                         <option value="{{meal.0.id}}">{{meal.0.name}} | {{meal.1.0}} kcal </option>
