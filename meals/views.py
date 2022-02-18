@@ -89,13 +89,13 @@ def meals(request, current=1):
     user_meals_options = MealOption.objects.filter(user=request.user, is_taken_to_generation=1).order_by('position')
     generated_user_meals_options = MealsList.objects.filter(user=request.user, current=current).order_by('meal_option__position').values(
         'meal_option__meal_option', 'meal_option_id').distinct()
-    all_user_meals_options = MealOption.objects.filter(user=request.user).order_by('position').values('meal_option', 'id')
+    all_user_meals_options = MealOption.objects.filter(user=request.user).order_by('position')
     meals_list = MealsList.objects.all().filter(user=request.user, current=current)
     days = []
     all_meals_in_option_dict = {}
     all_meals = []
     for option in all_user_meals_options:
-        meals_in_option = Meal.objects.filter(meal_option_id=option['id'], user=request.user).order_by(
+        meals_in_option = Meal.objects.filter(meal_option_id=option, user=request.user).order_by(
             'name')
         calories = 0
         all_meals_in_option = []
@@ -103,7 +103,7 @@ def meals(request, current=1):
             all_meals.append(meal.id)
             calories_sum = 0
             all_meals_in_option.append([meal, calories_sum])
-        all_meals_in_option_dict[option['id']] = all_meals_in_option
+        all_meals_in_option_dict[option] = all_meals_in_option
     sql = """
     SELECT
         *
@@ -191,7 +191,7 @@ def meals(request, current=1):
                     fat = 0
                     carbohydrates = 0
                 meals.append(meal.meal_id)
-                day_meals_list.append({meal: all_meals_in_option_dict.get(meal.meal_option_id)})
+                day_meals_list.append({meal: all_meals_in_option_dict.get(meal.meal_option)})
                 for item in tmp_extra:
                     if item in ingredients_list:
                         ingredients_list.remove(item)
@@ -837,52 +837,11 @@ def delete_division(request, division_id):
 
 
 def edit_extras(request, meals_list_id):
-    meals_list_object = get_object_or_404(MealsList, pk=meals_list_id)
-
-    all_meals = Meal.objects.select_related('meal_option').filter(user_id=request.user).order_by('meal_option', 'name')
-    all_user_meals_with_ingredients = MealIngredient.objects.filter(meal_id__in=all_meals)
-    meal_ingr_dict = {}
-    ingredients_in_meal = []
-    for i in range(len(all_user_meals_with_ingredients)):
-        # x=element
-        # print('%', i, element, len(all_user_meals_with_ingredients)-1)
-        if i < len(all_user_meals_with_ingredients)-1:
-            # if all_user_meals_with_ingredients[i].meal_id == all_user_meals_with_ingredients[i+1].meal_id:
-            #     pass
-            if True:
-                pass
-                # ingredients_in_meal.append((element.ingredient_id.calories_per_100_gram * element.quantity) / 100)
-            else:
-                # ingredients_in_meal.append((element.ingredient_id.calories_per_100_gram * element.quantity) / 100)
-                # print(element.meal_id.id)
-                # meal_ingr_dict[element.meal_id.id] = sum(ingredients_in_meal)
-                ingredients_in_meal = []
-                pass
-
-
-    all_meals_dict = {}
-    meals_in_option = []
-    for i, meal in enumerate(all_meals):
-        meals_in_option.append(meal)
-        if i == len(all_meals)-1:
-            all_meals_dict[meal.meal_option] = meals_in_option
-            break
-        else:
-            if all_meals[i].meal_option != all_meals[i+1].meal_option:
-                all_meals_dict[meal.meal_option] = meals_in_option
-                meals_in_option = []
-
     extras_to_add = request.POST.get('extras_select', False)
     if request.method == "POST":
         if extras_to_add:
             MealsList.objects.filter(pk=meals_list_id).update(extras=extras_to_add)
-            print('edit_extras', meals_list_id, extras_to_add)
-            return redirect('/mealsList/1')
-    context = {
-        'meals_list_object': meals_list_object,
-        'all_meals_dict': all_meals_dict,
-    }
-    return render(request, 'meals/extras.html', context)
+    return redirect('/mealsList/1')
 
 
 def delete_extras(request, meals_list_id):
