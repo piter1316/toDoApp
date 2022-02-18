@@ -83,6 +83,7 @@
                 {% if ch_meal.extras %}
                 <small style="cursor:pointer;" data-toggle="modal" data-target="#extrasModal_{{ch_meal.id}}"><i>{{ch_meal.extras}}</i></small>
                 {% endif %}
+<!--                make it one-->
                 <div class="modal fade" id="extrasModal_{{ch_meal.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered no_print" role="document">
                   <div class="modal-content">
@@ -122,6 +123,7 @@
                         <option>
                           {{option}}
                         </option>
+
                         {% for meal in meals %}
                         <option value="{{meal.0.id}}">{{meal.0.name}} | {{meal.1.0}} kcal </option>
                         {% endfor %}
