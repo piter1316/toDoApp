@@ -84,7 +84,7 @@ def get_maximum_no_of_days_no_repeat(request):
 
 @login_required(login_url='/accounts/login')
 def meals(request, current=1):
-
+    start = time.time()
     in_meals_list = True
     user_meals_options = MealOption.objects.filter(user=request.user, is_taken_to_generation=1).order_by('position')
     generated_user_meals_options = MealsList.objects.filter(user=request.user, current=current).order_by('meal_option__position').values(
@@ -203,8 +203,8 @@ def meals(request, current=1):
     maximum_no_of_days_to_generate = get_maximum_no_of_days(request)
     maximum_no_of_days_to_generate_no_repeat = get_maximum_no_of_days_no_repeat(request)
     first_day_input_list = Week.objects.all()
-    user_meals_options_select = MealsList.objects.filter(user=request.user, current=current).order_by('meal_option__position').values(
-        'meal_option_id', 'meal_option_id__meal_option').distinct()
+    # user_meals_options_select = MealsList.objects.filter(user=request.user, current=current).order_by('meal_option__position').values(
+    #     'meal_option_id', 'meal_option_id__meal_option').distinct()
     option_meals_dict = {}
     user_meals_options_select = []
     for option in user_meals_options_select:
@@ -232,6 +232,7 @@ def meals(request, current=1):
     carb = 0
     # for key, value in meal_ingredients_dict.items():
     #     print(key, value)
+
     for meal in meals:
         if meal.meal_id:
             ingredients_total = meal_ingredients_dict[meal.meal_id]
@@ -290,6 +291,7 @@ def meals(request, current=1):
         'current': int(current),
         'all_meals_in_option_dict': all_meals_in_option_dict,
     }
+    end = time.time()
     return render(request, 'meals/meals_list.html', context)
 
 
@@ -839,7 +841,6 @@ def delete_division(request, division_id):
 def edit_extras(request):
     extras_to_add = request.POST.get('extras_select', False)
     meals_list_id = request.POST.get('meals_list_position', False)
-    print(request.POST)
     if request.method == "POST":
         MealsList.objects.filter(pk=meals_list_id).update(extras=extras_to_add)
     return redirect('/mealsList/1')
