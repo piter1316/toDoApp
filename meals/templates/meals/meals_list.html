@@ -85,6 +85,11 @@
                   <i class="editExtras" id="editExtrasSmall_{{ch_meal.id}}">
                     {{ch_meal.extras}}
                   <input type="hidden" id="clicked_position_meal_{{ch_meal.id}}" value="{{ch_meal}}">
+                  <input type="hidden" id="clicked_position_extras_{{ch_meal.id}}" value="{{ch_meal.extras}}">
+                    {% for option, meals in all_meals_in_option_dict.items %}{% for meal in meals %}{% if meal.0 == ch_meal.extras%}
+                    <input type="hidden" id="extras_calories_{{ch_meal.id}}" value="{{meal.1.0}}">
+                    {%else%}{% endif %}{% endfor %}{% endfor %}
+                    <input type="hidden" id="extras_link" value="{% url 'meals:edit_meal_ingredients' ch_meal.extras.id %}">
                   </i>
                 </small>
                 {% endif %}
@@ -160,16 +165,14 @@
         </button>
       </div>
       <div class="modal-body pt-0">
-<!--        Dodaj z posiłku:-->
+        <span id="add_extras_span" class="text-center">Dodaj z posiłku:</span>
         <div class="text-left">
-          <small>Aktualny dodatek :
-            <a class="text-dark" href="#">
-              <i>-------</i>
+          <small id="current_extra_small" style="display:none;">Aktualny dodatek :
+            <a id="current_extras" class="text-dark" href="#">
             </a>
           </small>
         </div>
-        <div>Zmień:</div>
-
+        <div id="current_change_div" style="display:none;">Zmień:</div>
         {% for option, meals in all_meals_in_option_dict.items %}
         <form method="post" action="{% url 'meals:edit_extras' %}">{% csrf_token %}
           <input type="hidden" id="" name="meals_list_position" value="">
@@ -185,7 +188,7 @@
         </form>
         <hr>
         {% endfor %}
-        <a id="delete_extras" href="{%url 'meals:delete_extras' ' ' %}" class="btn btn-block btn-danger text-light">Usuń ---------</a>
+        <a id="delete_extras" style="display:none;" href="{%url 'meals:delete_extras' ' ' %}" class="btn btn-block btn-danger text-light"></a>
         <input id="base_delete_url" type="hidden" value="{%url 'meals:delete_extras' ' ' %}">
       </div>
       <div class="modal-footer">

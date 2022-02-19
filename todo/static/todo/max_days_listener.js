@@ -124,11 +124,29 @@ $(document).ready(function(){
       $('#extrasModalTitleSpan').text($('#clicked_position_meal_'+ num_id).val());
       var base_url = $('#base_delete_url').val()
       $('#delete_extras').attr('href', base_url + num_id)
+      var current_extra = $('#clicked_position_extras_'+num_id).val();
+      var current_extra_kcal = $('#extras_calories_' + num_id).val();
+      if (current_extra && current_extra_kcal){
+        $('#current_extras').text(current_extra + ' | ' + current_extra_kcal + 'kcal' )
+        var extras_link = $('#extras_link').val()
+        $('#current_extras').attr('href', extras_link)
+        $('#delete_extras').text('Usuń' + ' ' + current_extra);
+        $('#delete_extras').fadeIn();
+        $('#current_extra_small').fadeIn();
+        $('#current_change_div').fadeIn();
+        $('#add_extras_span').fadeOut();
+      }
+
     })
 
     $('#extrasModal').on('hidden.bs.modal', function () {
       var base_url = $('#base_delete_url').val()
       $('#delete_extras').attr('href', base_url);
+      $('#current_extras').text('')
+      $('#current_extras').attr('href','')
+      $('#delete_extras').fadeOut();
+      $('#add_extras_span').fadeIn();
+
     })
 
     $('.shoppingListSettingsButton').click(function(e){
