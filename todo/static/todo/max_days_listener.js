@@ -117,7 +117,6 @@ $(document).ready(function(){
       var id = e.target.id
       var num_id = id.split('_')[1]
       var group = $('input[name="meals_list_position"]');
-      console.log(group)
       group.each(function () {
               $(this).attr("value", num_id);
          });
@@ -145,6 +144,8 @@ $(document).ready(function(){
       $('#current_extras').text('')
       $('#current_extras').attr('href','')
       $('#delete_extras').fadeOut('fast');
+      $('#current_change_div').fadeOut('fast');
+      $('#current_extra_small').fadeOut('fast');
       $('#add_extras_span').fadeIn('fast');
 
     })
