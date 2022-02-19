@@ -116,15 +116,20 @@ $(document).ready(function(){
   $('body').on('click', '.editExtras', function(e){
       var id = e.target.id
       var num_id = id.split('_')[1]
-      $('#meals_list_position_id').val(num_id);
+      var group = $('input[name="meals_list_position"]');
+      console.log(group)
+      group.each(function () {
+              $(this).attr("value", num_id);
+         });
       $('#extrasModalTitleSpan').text($('#clicked_position_meal_'+ num_id).val());
-      var current_url = $('#delete_extras').attr('href')
-      $('#delete_extras').attr('href', current_url + '/delete_extras/' +num_id)
-
-
+      var base_url = $('#base_delete_url').val()
+      $('#delete_extras').attr('href', base_url + num_id)
     })
 
-
+    $('#extrasModal').on('hidden.bs.modal', function () {
+      var base_url = $('#base_delete_url').val()
+      $('#delete_extras').attr('href', base_url);
+    })
 
     $('.shoppingListSettingsButton').click(function(e){
     var id = e.target.id;

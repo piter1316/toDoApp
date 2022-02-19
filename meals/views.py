@@ -836,11 +836,12 @@ def delete_division(request, division_id):
     return redirect('/ingredientsEdit#division')
 
 
-def edit_extras(request, meals_list_id):
+def edit_extras(request):
     extras_to_add = request.POST.get('extras_select', False)
+    meals_list_id = request.POST.get('meals_list_position', False)
+    print(request.POST)
     if request.method == "POST":
-        if extras_to_add:
-            MealsList.objects.filter(pk=meals_list_id).update(extras=extras_to_add)
+        MealsList.objects.filter(pk=meals_list_id).update(extras=extras_to_add)
     return redirect('/mealsList/1')
 
 

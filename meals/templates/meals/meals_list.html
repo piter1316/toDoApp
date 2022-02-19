@@ -109,13 +109,12 @@
                     <a href="{% url 'meals:edit_meal_ingredients' ch_meal.meal_id %}" id="a_{{ch_meal.id}}" class="btn btn-sm btn-block btn-primary mt-1">Edytuj {{ch_meal}}</a>
                   {% endif %}
                     {% if not ch_meal.extras %}
-                    <button class="editExtras btn btn-sm btn-block btn-secondary mt-1"
+                    <button class="editExtras btn btn-sm btn-block btn-secondary mt-1 font-italic"
                             id="editExtrasButton_{{ch_meal.id}}" style="cursor:pointer;" data-toggle="modal"
                             data-target="#extrasModal">
-                      <input type="hidden" id="clicked_position_meal_{{ch_meal.id}}" value="{{ch_meal}}">
-                      <i>Dodatki</i>
-
+                      Dodatki
                     </button>
+                    <input type="hidden" id="clicked_position_meal_{{ch_meal.id}}" value="{{ch_meal}}">
                     {% endif %}
                   </span>
                 </div>
@@ -170,11 +169,11 @@
           </small>
         </div>
         <div>Zmień:</div>
-        <input type="hidden" id="meals_list_position_id" value="">
-
 
         {% for option, meals in all_meals_in_option_dict.items %}
-        <form method="post" action="#">{% csrf_token %}
+        <form method="post" action="{% url 'meals:edit_extras' %}">{% csrf_token %}
+          <input type="hidden" id="" name="meals_list_position" value="">
+          <input type="hidden" id="current_meal_id" value="">
           <select onchange="this.form.submit()" class="form-control mt-1" name="extras_select">
             <option>
               {{option}}
@@ -186,7 +185,8 @@
         </form>
         <hr>
         {% endfor %}
-        <a id="delete_extras" href="{%url 'meals:index' 1 %}" class="btn btn-block btn-danger text-light">Usuń ---------</a>
+        <a id="delete_extras" href="{%url 'meals:delete_extras' ' ' %}" class="btn btn-block btn-danger text-light">Usuń ---------</a>
+        <input id="base_delete_url" type="hidden" value="{%url 'meals:delete_extras' ' ' %}">
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
