@@ -128,13 +128,13 @@ $(document).ready(function(){
       var current_extra_kcal = $('#extras_calories_' + num_id).val();
       if (current_extra && current_extra_kcal){
         $('#current_extras').text(current_extra + ' | ' + current_extra_kcal + 'kcal' )
-        var extras_link = $('#extras_link').val()
+        var extras_link = $('#extras_link_'+ num_id).val()
         $('#current_extras').attr('href', extras_link)
         $('#delete_extras').text('Usuń' + ' ' + current_extra);
-        $('#delete_extras').fadeIn();
-        $('#current_extra_small').fadeIn();
-        $('#current_change_div').fadeIn();
-        $('#add_extras_span').fadeOut();
+        $('#delete_extras').fadeIn('fast');
+        $('#current_extra_small').fadeIn('fast');
+        $('#current_change_div').fadeIn('fast');
+        $('#add_extras_span').fadeOut('fast');
       }
 
     })
@@ -144,8 +144,8 @@ $(document).ready(function(){
       $('#delete_extras').attr('href', base_url);
       $('#current_extras').text('')
       $('#current_extras').attr('href','')
-      $('#delete_extras').fadeOut();
-      $('#add_extras_span').fadeIn();
+      $('#delete_extras').fadeOut('fast');
+      $('#add_extras_span').fadeIn('fast');
 
     })
 

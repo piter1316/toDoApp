@@ -89,7 +89,7 @@
                     {% for option, meals in all_meals_in_option_dict.items %}{% for meal in meals %}{% if meal.0 == ch_meal.extras%}
                     <input type="hidden" id="extras_calories_{{ch_meal.id}}" value="{{meal.1.0}}">
                     {%else%}{% endif %}{% endfor %}{% endfor %}
-                    <input type="hidden" id="extras_link" value="{% url 'meals:edit_meal_ingredients' ch_meal.extras.id %}">
+                    <input type="hidden" id="extras_link_{{ch_meal.id}}" value="{% url 'meals:edit_meal_ingredients' ch_meal.extras.id %}">
                   </i>
                 </small>
                 {% endif %}
