@@ -97,7 +97,6 @@ $(document).ready(function(){
 
   $('.dropdownMeal').click(function(e){
     var dropdown_div_id = 'dropdownMenu_' + $(this).attr('id').split('_')[1]
-    console.log($('#'+dropdown_div_id))
     $('#'+dropdown_div_id).toggle()
   })
 
@@ -113,6 +112,17 @@ $(document).ready(function(){
     var num_id = id.split('_')[1]
     $('#update_ingredient_' + num_id).toggle(600);
   })
+
+  $('body').on('click', '.editExtras', function(e){
+      var id = e.target.id
+      var num_id = id.split('_')[1]
+      $('#meals_list_position_id').val(num_id);
+      $('#extrasModalTitleSpan').text($('#clicked_position_meal_'+ num_id).val());
+      var current_url = $('#delete_extras').attr('href')
+      $('#delete_extras').attr('href', current_url + '/delete_extras/' +num_id)
+
+
+    })
 
 
 
@@ -252,7 +262,6 @@ $('body').on('click','.editToggleLg, .editToggle',function(e){
   $('.serviceEditButton_' + num_id).toggle('slow')
   $('.invoiceEditButton_' + num_id).toggle('slow')
   $('.deleteServiceButton_' + num_id).toggle('slow')
-  console.log(num_id)
 });
 
 
