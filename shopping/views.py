@@ -15,7 +15,8 @@ from shopping.models import ShoppingList, Products, Checklist
 
 @login_required(login_url='/accounts/login')
 def shopping_list_index(request):
-    names_test = [1,1,2,2,2,2,3,4,5]
+
+    names_test = [1, 1, 2, 2, 2, 2, 3, 4, 5]
     start = time.time()
     shopping_lists = ShoppingList.objects.filter(user_id=request.user.id)
     shopping_lists_dict = {}
@@ -25,8 +26,9 @@ def shopping_list_index(request):
     checklist = Checklist.objects.filter(user=request.user.id)
     divisions = ProductDivision.objects.filter(user=request.user.id)
     for i in range(len(shopping_lists)):
-        products_on_shopping_list = Products.objects.select_related('unit').select_related('division_id').filter(shopping_list_id=shopping_lists[i].id).order_by('-division_id_id__priority')\
-            .values('product_name', 'unit_id__unit', 'bought', 'quantity', 'id', 'unit_id__id','division_id_id')
+        products_on_shopping_list = Products.objects.select_related('unit').select_related('division_id').filter(
+            shopping_list_id=shopping_lists[i].id).order_by('-division_id_id__priority') \
+            .values('product_name', 'unit_id__unit', 'bought', 'quantity', 'id', 'unit_id__id', 'division_id_id')
 
         products = []
         names = []
@@ -35,15 +37,15 @@ def shopping_list_index(request):
                 names.append(product['product_name'])
         if len(names) > 0:
             names_to_query = str(names)
-            names_to_query = names_to_query.replace('[','(').replace(']', ')').replace('%','%%')
+            names_to_query = names_to_query.replace('[', '(').replace(']', ')').replace('%', '%%')
         else:
             names_to_query = "('','')"
         sql = """
         SELECT
             *,
-				meals_meal.name as mealName,
-				meals_meal.meal_option_id as mealOption,
-				meals_mealoption.meal_option as mealOption
+            meals_meal.name as mealName,
+            meals_meal.meal_option_id as mealOption,
+            meals_mealoption.meal_option as mealOption
         FROM
             meals_ingredient
         LEFT JOIN meals_mealingredient ON meals_ingredient.id = meals_mealingredient.ingredient_id_id
@@ -56,23 +58,31 @@ def shopping_list_index(request):
             SELECT
                 meal_id
             FROM
-                meals_mealslist WHERE meals_mealslist.current = 1
+                meals_mealslist WHERE meals_mealslist.current = 1 and user_id = {}
+            UNION
+            SELECT
+                extras
+            FROM
+                meals_mealslist WHERE meals_mealslist.current = 1 and user_id = {}
         )
-        """.format(names_to_query, request.user.id)
+        """.format(names_to_query, request.user.id, request.user.id, request.user.id)
         meals_with_ingredients = Ingredient.objects.raw(sql)
         for p in range(len(products_on_shopping_list)):
-            generated_meals_with_product =[]
+            generated_meals_with_product = []
 
             for ingr in meals_with_ingredients:
                 if products_on_shopping_list[p]['product_name'] == ingr.name:
                     generated_meals_with_product.append(ingr)
             first = False
             if p > 0:
-                if products_on_shopping_list[p-1]['division_id_id'] != products_on_shopping_list[p]['division_id_id']:
+                if products_on_shopping_list[p - 1]['division_id_id'] != products_on_shopping_list[p]['division_id_id']:
                     first = True
                 else:
                     first = False
-            product_quantity_bought = [products_on_shopping_list[p]['quantity'], products_on_shopping_list[p]['bought'], products_on_shopping_list[p]['id'], products_on_shopping_list[p]['unit_id__unit'], generated_meals_with_product, products_on_shopping_list[p]['unit_id__id'], first]
+            product_quantity_bought = [products_on_shopping_list[p]['quantity'], products_on_shopping_list[p]['bought'],
+                                       products_on_shopping_list[p]['id'],
+                                       products_on_shopping_list[p]['unit_id__unit'], generated_meals_with_product,
+                                       products_on_shopping_list[p]['unit_id__id'], first]
             # product_quantity_bought = ['product.quantity', 'product.bought', 'product.id', 'product.unit', generated_meals_with_product]
             product_quantity = {products_on_shopping_list[p]['product_name']: product_quantity_bought}
             products.append(product_quantity)
@@ -133,7 +143,8 @@ def add_product(request, shopping_list_id):
     try:
         ingredient = Ingredient.objects.get(name__contains=new_product, user_id=request.user)
         meals_with_product_query = MealIngredient.objects.filter(ingredient_id=ingredient)
-        html = html.replace("""<small class="mb-1">Brak posiłków zawierających {}</small>""".format(str(new_product)), '')
+        html = html.replace("""<small class="mb-1">Brak posiłków zawierających {}</small>""".format(str(new_product)),
+                            '')
         loop_html_total = ""
         for meal in meals_with_product_query:
             query_set = MealsList.objects.filter(meal_id=meal.meal_id_id, current=1)
@@ -209,7 +220,8 @@ def add_from_checklist(request):
         shop_name = element.split('###')[1]
         try:
             shopping_list_to_update = ShoppingList.objects.filter(name=shop_name, user_id_id=request.user)[0]
-            new_shopping_product = Products(product_name=product_name, quantity=1, bought=0, shopping_list_id=shopping_list_to_update, unit_id=1)
+            new_shopping_product = Products(product_name=product_name, quantity=1, bought=0,
+                                            shopping_list_id=shopping_list_to_update, unit_id=1)
             new_shopping_product_list.append(new_shopping_product)
         except Exception as e:
             pass
@@ -231,7 +243,8 @@ def edit_check_list(request):
 def add_item(request):
     if request.method == 'POST':
         shop = get_object_or_404(Shop, pk=request.POST['addNewPosToCheckListShop'])
-        new_checklist_position = Checklist(user_id=request.user.id, product_name=request.POST['addNewPosToCheckListName'],
+        new_checklist_position = Checklist(user_id=request.user.id,
+                                           product_name=request.POST['addNewPosToCheckListName'],
                                            shop_id=shop.pk)
         new_checklist_position.save()
     return redirect('shopping:edit_check_list')
