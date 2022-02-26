@@ -15,7 +15,6 @@ from shopping.models import ShoppingList, Products, Checklist
 
 @login_required(login_url='/accounts/login')
 def shopping_list_index(request):
-
     names_test = [1, 1, 2, 2, 2, 2, 3, 4, 5]
     start = time.time()
     shopping_lists = ShoppingList.objects.filter(user_id=request.user.id)
@@ -147,17 +146,23 @@ def add_product(request, shopping_list_id):
                             '')
         loop_html_total = ""
         for meal in meals_with_product_query:
-            query_set = MealsList.objects.filter(meal_id=meal.meal_id_id, current=1)
-            if len(query_set) > 0:
-                loop_html = """
+            loop_html = """
                 <li class="list-group-item p-0">
                   <small>
                     <a class="text-dark" href="/mealsEdit">{}</a>: <a class="text-dark" href="/mealsEdit/edit_meal_ingredients/{}">{}</a>
                   </small>
                 </li>
-                """.format(str(query_set[0].meal_option), str(query_set[0].meal_id), query_set[0])
+                """
+            query_set = MealsList.objects.filter(meal_id=meal.meal_id_id, current=1)
+            query_set_e = MealsList.objects.filter(extras=meal.meal_id_id, current=1)
+            if len(query_set) > 0:
+                loop_html = loop_html.format(str(query_set[0].meal_option), str(query_set[0].meal_id), query_set[0])
                 loop_html_total += loop_html
-
+            if len(query_set_e) > 0:
+                print('from extras')
+                loop_html = loop_html.format(str(query_set_e[0].extras.meal_option), str(query_set_e[0].extras.id),
+                                             query_set_e[0].extras)
+                loop_html_total += loop_html
         html = html.replace('###LOOP###', loop_html_total)
     except Exception as e:
         html = html.replace('###LOOP###', '')
