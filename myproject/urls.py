@@ -31,6 +31,7 @@ urlpatterns = [
     path('', include('shopping.urls')),
     path('', include('meals.urls')),
     path('', include('cars.urls')),
+    path('', include('exchange_rates.urls')),
     url(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
 
 ]

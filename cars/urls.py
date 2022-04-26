@@ -19,3 +19,4 @@ urlpatterns = [
     path('cars/carDetails/<pk>/delete_fuel_fill', views.delete_fuel_fill, name='delete_fuel_fill'),
 
 ]
+

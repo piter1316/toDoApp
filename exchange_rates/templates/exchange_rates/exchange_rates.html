@@ -1,0 +1,31 @@
+{% extends 'todo/base.html' %}
+
+
+{% block body %}
+<div class="container">
+  <div class="card bg-dark text-light">
+    <div class="card-body p-2">
+      <div class="d-flex justify-content-between">
+        <span>WALUTA</span>
+        <span>OPIS</span>
+        <span>KURS ŚREDNI</span>
+      </div>
+    </div>
+  </div>
+  {% for rate in user_rates_to_render %}
+  <div class="card">
+    <div class="card-body p-1">
+      <div class="d-flex justify-content-between">
+        <span>1 <b>{{rate.code}}</b></span>
+        <span>{{rate.currency}}</span>
+        <span>= {{rate.mid}} PLN</span>
+      </div>
+    </div>
+  </div>
+
+  {% endfor %}
+
+</div>
+
+
+{% endblock %}
