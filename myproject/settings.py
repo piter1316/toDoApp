@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'shopping',
     'meals',
     'cars',
+    'exchange_rates',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
