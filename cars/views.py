@@ -43,7 +43,6 @@ def car_details(request, car_id):
     json_serializer = serializers.get_serializer("json")()
     chart_dates = json_serializer.serialize(Fuel.objects.filter(car_id=car_id).order_by('date'), ensure_ascii=False)
     service_list = Service.objects.select_related().filter(car_id=car_id).order_by('-date')
-
     total_fuel_list = []
     total_km_list = []
     for fuel in car_fuel_fill_list:
@@ -61,6 +60,7 @@ def car_details(request, car_id):
     except IndexError:
         last_service = ''
     service_dictionary = {}
+    service_total_cost = 0
     for service in service_list:
         parts_sum = 0
         spare_parts_in_service = SparePart.objects.filter(service_id=service).order_by('service', 'price')
@@ -72,6 +72,8 @@ def car_details(request, car_id):
         #       Invoice.objects.filter(service_id=service), '\n'
         #       )
         service_dictionary[service] = [spare_parts_in_service, invoices_in_service, parts_sum]
+        service_total_cost += parts_sum
+    print(service_total_cost)
 
     context = {
         'car': car,
@@ -82,6 +84,7 @@ def car_details(request, car_id):
         'service_dictionary': service_dictionary,
         'last_service': last_service,
         'average_consumption': average_consumption,
+        'service_total_cost': service_total_cost,
     }
     return render(request, 'cars/car_details.html', context)
 
