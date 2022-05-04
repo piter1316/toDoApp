@@ -14,6 +14,7 @@ urlpatterns = [
     path('cars/carDetails/<car_id>/<pk>/editServiceDetails', views.ServiceDeailsUpdate.as_view(), name='edit_service_details'),
     path('cars/carDetails/<car_id>/<service_id>/editInvoices/invoiceDelete/<invoice_id>', views.delete_invoice, name='delete_invoice'),
     path('cars/carDetails/<pk>/edit', views.CarUpdate.as_view(), name='car_edit'),
+    path('cars/carDetails/<car_id>/download_history', views.download_history, name='download_history'),
     path('cars/carDetails/<pk>/addService', views.add_service_form, name='add_service_form'),
     path('cars/carDetails/<pk>/add_fuel_fill', views.add_fuel_fill, name='add_fuel_fill'),
     path('cars/carDetails/<pk>/delete_fuel_fill', views.delete_fuel_fill, name='delete_fuel_fill'),

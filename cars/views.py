@@ -21,6 +21,22 @@ from cars.forms import CarForm, FuelFillForm, AddServiceForm, LinkForm, BaseLink
 from cars.models import Car, Fuel, Service, SparePart, Invoice
 from myproject.settings import BASE_DIR
 from django.core import serializers
+import xlwt
+
+
+def get_services_as_dict(services_list):
+    service_total_cost = 0
+    service_dictionary = {}
+    for service in services_list:
+        parts_sum = 0
+        spare_parts_in_service = SparePart.objects.filter(service_id=service).order_by('service', 'price')
+        invoices_in_service = Invoice.objects.filter(service_id=service)
+        for part in spare_parts_in_service:
+            parts_sum += part.price
+        service_dictionary[service] = [spare_parts_in_service, invoices_in_service, parts_sum]
+        service_total_cost += parts_sum
+    return service_dictionary, service_total_cost
+
 
 @login_required(login_url='/accounts/login')
 def cars_home(request):
@@ -33,6 +49,7 @@ def cars_home(request):
         'user_sold_cars': user_sold_cars
     }
     return render(request, 'cars/home.html', context)
+
 
 @login_required(login_url='/accounts/login')
 def car_details(request, car_id):
@@ -51,7 +68,7 @@ def car_details(request, car_id):
     total_fuel = sum(total_fuel_list)
     total_km = sum(total_km_list)
     try:
-        average_consumption = round(total_fuel/total_km * 100, 2)
+        average_consumption = round(total_fuel / total_km * 100, 2)
     except ZeroDivisionError:
         average_consumption = 0
 
@@ -60,20 +77,8 @@ def car_details(request, car_id):
     except IndexError:
         last_service = ''
     service_dictionary = {}
-    service_total_cost = 0
-    for service in service_list:
-        parts_sum = 0
-        spare_parts_in_service = SparePart.objects.filter(service_id=service).order_by('service', 'price')
-        invoices_in_service = Invoice.objects.filter(service_id=service)
-        for part in spare_parts_in_service:
-            parts_sum += part.price
-        # print(service,'\n',
-        #       SparePart.objects.filter(service_id=service), '\n',
-        #       Invoice.objects.filter(service_id=service), '\n'
-        #       )
-        service_dictionary[service] = [spare_parts_in_service, invoices_in_service, parts_sum]
-        service_total_cost += parts_sum
-    print(service_total_cost)
+
+    print(service_dictionary)
 
     context = {
         'car': car,
@@ -81,10 +86,10 @@ def car_details(request, car_id):
         'car_fuel_fill_list': car_fuel_fill_list,
         'car_fill_form': car_fill_form,
         'chart_dates': chart_dates,
-        'service_dictionary': service_dictionary,
+        'service_dictionary': get_services_as_dict(service_list)[0],
         'last_service': last_service,
         'average_consumption': average_consumption,
-        'service_total_cost': service_total_cost,
+        'service_total_cost': get_services_as_dict(service_list)[1],
     }
     return render(request, 'cars/car_details.html', context)
 
@@ -122,7 +127,6 @@ class CarUpdate(UpdateView):
 
         return '{}#info'.format(reverse('cars:car_details', kwargs={'car_id': pk}))
 
-
     template_name = 'cars/car_edit.html'
     # success_url = redirect('cars:car_details', Car.pk)
 
@@ -138,8 +142,8 @@ def add_new_car(request):
                                     '{}-{}'.format(request.user.id, request.user.username),
                                     '{}-{}'.format(car.pk, car.name), 'images')
             location_to_database = os.path.join('user_uploads',
-                                    '{}-{}'.format(request.user.id, request.user.username),
-                                    '{}-{}'.format(car.pk, car.name), 'images', )
+                                                '{}-{}'.format(request.user.id, request.user.username),
+                                                '{}-{}'.format(car.pk, car.name), 'images', )
             fs = FileSystemStorage(location=location)
             image = request.FILES.get('image', False)
             logo = request.FILES.get('logo', False)
@@ -199,7 +203,6 @@ def add_service_form(request, pk):
 
 
 def edit_parts_services(request, car_id, service_id):
-
     service_instance = get_object_or_404(Service, pk=service_id)
     car_id = car_id
 
@@ -208,7 +211,7 @@ def edit_parts_services(request, car_id, service_id):
     user_links = SparePart.objects.filter(service_id=service_id)
 
     link_data = [{'part_service': l.name, 'price': l.price, 'service': l.service}
-                    for l in user_links]
+                 for l in user_links]
 
     if request.method == 'POST':
         link_formset = LinkFormSet(request.POST)
@@ -325,3 +328,53 @@ def delete_invoice(request, car_id, service_id, invoice_id):
     Invoice.objects.filter(pk=invoice_id).delete()
 
     return redirect('/cars/carDetails/{}/{}/editInvoices'.format(car_id, service_id))
+
+
+def download_history(request, car_id):
+    services_list = Service.objects.select_related().filter(car_id=car_id).order_by('-date')
+    services_dict = get_services_as_dict(services_list)[0]
+
+    # content-type of response
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="Historia serwisowa {} .xls"'.format(
+        Car.objects.filter(pk=car_id)[0].name)
+
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet("Historia")
+    row_num = 0
+    column_font_style = xlwt.XFStyle()
+    # headers are bold
+    column_font_style.font.bold = True
+
+    columns = ['Data', 'Przebieg', 'Część/Usługa', 'Cena [PLN]']
+
+    for col_num in range(len(columns)):
+        ws.write(row_num, col_num, columns[col_num], column_font_style)
+    ws.col(0).width = 3000
+    ws.col(1).width = 3000
+    ws.col(2).width = 7500
+    ws.col(3).width = 3000
+
+    font_style = xlwt.XFStyle()
+
+    sum_font_style = xlwt.XFStyle()
+    sum_font_style.font.bold = True
+    for service, elements in services_dict.items():
+        print(service.date, service.mileage)
+        row_num = row_num + 1
+        ws.write(row_num, 0, str(service.date), font_style)
+        ws.write(row_num, 1, service.mileage, font_style)
+
+        for element in elements[0]:
+            ws.write(row_num, 2, str(element), font_style)
+            ws.write(row_num, 3, element.price, font_style)
+            row_num += 1
+            print('\t', element, element.price)
+        ws.write(row_num, 2, 'SUMA', sum_font_style)
+        ws.write(row_num, 3, elements[2], sum_font_style)
+        row_num += 1
+    ws.write(row_num + 2, 0, 'SUMA CAŁKOWITA:', column_font_style)
+    ws.write(row_num + 2, 3, get_services_as_dict(services_list)[1], column_font_style)
+
+    wb.save(response)
+    return response
