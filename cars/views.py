@@ -369,7 +369,7 @@ def download_history(request, car_id):
     ws.write(row_num + 2, 3, get_services_as_dict(services_list)[1], column_font_style)
     excel_save_path = os.path.join(BASE_DIR, 'media', 'user_uploads', '-'.join([str(request.user.id), request.user.username]),
                                    '-'.join([car_id, car_name]), 'service_history.xls')
-    user_invoices_paths = [(invoice.file.path, str(invoice.service_id.date)) for invoice in
+    user_invoices_paths = [(str(invoice.file), str(invoice.service_id.date)) for invoice in
                            Invoice.objects.select_related().filter(service_id_id__in=[
                                service.id for service in services_list]).order_by('service_id_id__date')
                            ]
@@ -379,6 +379,7 @@ def download_history(request, car_id):
     for file in user_invoices_paths:
         filename = os.path.basename(os.path.normpath(file[0]))
         zip_file.write(file[0], os.path.join(file[1], filename))
+        print(file[0])
     zip_file.write(excel_save_path, f'historia_serwisowa_{car_name}.xls')
     zip_file.close()
     response = HttpResponse(byte_data.getvalue(), content_type='application/zip')
