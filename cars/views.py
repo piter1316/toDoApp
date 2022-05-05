@@ -19,9 +19,11 @@ from pymysql import IntegrityError
 from cars import forms
 from cars.forms import CarForm, FuelFillForm, AddServiceForm, LinkForm, BaseLinkFormSet, InvoiceForm
 from cars.models import Car, Fuel, Service, SparePart, Invoice
-from myproject.settings import BASE_DIR
+from myproject.settings import BASE_DIR, MEDIA_ROOT
 from django.core import serializers
 import xlwt
+from io import BytesIO, StringIO
+import zipfile
 
 
 def get_services_as_dict(services_list):
@@ -76,9 +78,6 @@ def car_details(request, car_id):
         last_service = service_list[0]
     except IndexError:
         last_service = ''
-    service_dictionary = {}
-
-    print(service_dictionary)
 
     context = {
         'car': car,
@@ -333,11 +332,7 @@ def delete_invoice(request, car_id, service_id, invoice_id):
 def download_history(request, car_id):
     services_list = Service.objects.select_related().filter(car_id=car_id).order_by('-date')
     services_dict = get_services_as_dict(services_list)[0]
-
-    # content-type of response
-    response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename="Historia serwisowa {} .xls"'.format(
-        Car.objects.filter(pk=car_id)[0].name)
+    car_name = Car.objects.filter(pk=car_id)[0].name
 
     wb = xlwt.Workbook(encoding='utf-8')
     ws = wb.add_sheet("Historia")
@@ -360,21 +355,34 @@ def download_history(request, car_id):
     sum_font_style = xlwt.XFStyle()
     sum_font_style.font.bold = True
     for service, elements in services_dict.items():
-        print(service.date, service.mileage)
         row_num = row_num + 1
         ws.write(row_num, 0, str(service.date), font_style)
         ws.write(row_num, 1, service.mileage, font_style)
-
         for element in elements[0]:
             ws.write(row_num, 2, str(element), font_style)
             ws.write(row_num, 3, element.price, font_style)
             row_num += 1
-            print('\t', element, element.price)
         ws.write(row_num, 2, 'SUMA', sum_font_style)
         ws.write(row_num, 3, elements[2], sum_font_style)
         row_num += 1
     ws.write(row_num + 2, 0, 'SUMA CAŁKOWITA:', column_font_style)
     ws.write(row_num + 2, 3, get_services_as_dict(services_list)[1], column_font_style)
+    excel_save_path = os.path.join(MEDIA_ROOT, 'user_uploads', '-'.join([str(request.user.id), request.user.username]),
+                                   '-'.join([car_id, car_name]), 'service_history.xls')
+    user_invoices_paths = [(invoice.file.path, str(invoice.service_id.date)) for invoice in
+                           Invoice.objects.select_related().filter(service_id_id__in=[
+                               service.id for service in services_list]).order_by('service_id_id__date')
+                           ]
+    byte_data = BytesIO()
+    wb.save(excel_save_path)
+    zip_file = zipfile.ZipFile(byte_data, "w")
+    for file in user_invoices_paths:
+        filename = os.path.basename(os.path.normpath(file[0]))
+        zip_file.write(file[0], os.path.join(file[1], filename))
+    zip_file.write(excel_save_path, f'historia_serwisowa_{car_name}.xls')
+    zip_file.close()
+    response = HttpResponse(byte_data.getvalue(), content_type='application/zip')
+    response['Content-Disposition'] = f'attachment; filename=historia_serwisowa_{car_name}.zip'
 
-    wb.save(response)
     return response
+
