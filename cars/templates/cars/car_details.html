@@ -108,7 +108,7 @@
         <a href="{% url 'cars:add_service_form' car.0.pk %}" class="btn btn-outline-secondary ">Nowy
         serwis</a>
       {% if service_dictionary.items %}
-        <a href="{% url 'cars:download_history' car.0.id %}" class="btn btn-outline-dark">Pobierz historię (.xls)</a>
+        <a href="{% url 'cars:download_history' car.0.id %}" class="btn btn-outline-dark">Pobierz historię</a>
       {% endif %}
 
       </div>

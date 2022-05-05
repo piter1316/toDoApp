@@ -367,7 +367,7 @@ def download_history(request, car_id):
         row_num += 1
     ws.write(row_num + 2, 0, 'SUMA CAŁKOWITA:', column_font_style)
     ws.write(row_num + 2, 3, get_services_as_dict(services_list)[1], column_font_style)
-    excel_save_path = os.path.join(MEDIA_ROOT, 'user_uploads', '-'.join([str(request.user.id), request.user.username]),
+    excel_save_path = os.path.join(BASE_DIR, 'media', 'user_uploads', '-'.join([str(request.user.id), request.user.username]),
                                    '-'.join([car_id, car_name]), 'service_history.xls')
     user_invoices_paths = [(invoice.file.path, str(invoice.service_id.date)) for invoice in
                            Invoice.objects.select_related().filter(service_id_id__in=[
