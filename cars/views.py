@@ -377,10 +377,11 @@ def download_history(request, car_id):
     wb.save(excel_save_path)
     zip_file = zipfile.ZipFile(byte_data, "w")
     for file in user_invoices_paths:
-        if 'media/media' in file[0]:
-            file[0] = file[0].replace('media/media', 'media')
-        filename = os.path.basename(os.path.normpath(file[0]))
-        zip_file.write(file[0], os.path.join(file[1], filename))
+        url = file[0]
+        if 'media/media' in url:
+            url = url.replace('media/media', 'media')
+        filename = os.path.basename(os.path.normpath(url))
+        zip_file.write(url, os.path.join(file[1], filename))
     zip_file.write(excel_save_path, f'historia_serwisowa_{car_name}.xls')
     zip_file.close()
     response = HttpResponse(byte_data.getvalue(), content_type='application/zip')
