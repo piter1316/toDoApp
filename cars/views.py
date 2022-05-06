@@ -355,6 +355,7 @@ def download_history(request, car_id):
     sum_font_style = xlwt.XFStyle()
     sum_font_style.font.bold = True
     for service, elements in services_dict.items():
+        print(service)
         row_num = row_num + 1
         ws.write(row_num, 0, str(service.date), font_style)
         ws.write(row_num, 1, service.mileage, font_style)
@@ -367,14 +368,23 @@ def download_history(request, car_id):
         row_num += 1
     ws.write(row_num + 2, 0, 'SUMA CAŁKOWITA:', column_font_style)
     ws.write(row_num + 2, 3, get_services_as_dict(services_list)[1], column_font_style)
-    excel_save_path = os.path.join(BASE_DIR, 'media', 'user_uploads', '-'.join([str(request.user.id), request.user.username]),
+    excel_save_path = os.path.join(BASE_DIR, 'media', 'user_uploads',
+                                   '-'.join([str(request.user.id), request.user.username]),
                                    '-'.join([car_id, car_name]), 'service_history.xls')
+    excel_mkdir_path = os.path.join(BASE_DIR, 'media', 'user_uploads',
+                                    '-'.join([str(request.user.id), request.user.username]),
+                                    '-'.join([car_id, car_name]))
     user_invoices_paths = [(os.path.join(BASE_DIR, invoice.file.path), str(invoice.service_id.date)) for invoice in
                            Invoice.objects.select_related().filter(service_id_id__in=[
                                service.id for service in services_list]).order_by('service_id_id__date')
                            ]
     byte_data = BytesIO()
-    wb.save(excel_save_path)
+    try:
+        wb.save(excel_save_path)
+    except FileNotFoundError:
+        print('create dir')
+        os.mkdir(excel_mkdir_path)
+        wb.save(excel_save_path)
     zip_file = zipfile.ZipFile(byte_data, "w")
     for file in user_invoices_paths:
         url = file[0]
@@ -388,4 +398,3 @@ def download_history(request, car_id):
     response['Content-Disposition'] = f'attachment; filename=historia_serwisowa_{car_name}.zip'
 
     return response
-
