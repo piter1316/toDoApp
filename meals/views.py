@@ -862,31 +862,82 @@ def delete_extras(request, meals_list_id):
 def generate_shopping_list_for_meal(request, meal_id):
     portions = request.POST.get('portions')
     append_to_existing_shopping_lists = request.POST.get('append_to_existing_shopping_lists')
-    print(append_to_existing_shopping_lists)
     meal_ingredients = MealIngredient.objects.select_related('ingredient_id').filter(meal_id_id=meal_id)
     meal_name = Meal.objects.filter(pk=meal_id)[0].name
+    shop_dict = {}
+    user_shops_query = Shop.objects.filter(user_id=request.user)
+    existing_shopping_lists = {}
 
+    for shopping_list in ShoppingList.objects.filter(user_id_id=request.user):
+        existing_shopping_lists[shopping_list.id] = shopping_list.name
+    for shop in user_shops_query:
+        shop_dict[shop.id] = shop.name
+    data_to_insert = []
+    for ingredient in meal_ingredients:
+        if ingredient.ingredient_id.weight_per_unit > 0:
+            quantity = round(ingredient.quantity / ingredient.ingredient_id.weight_per_unit, 2)
+            unit = 1
+        else:
+            quantity = ingredient.quantity
+            unit = 2
+        final_quantity = round(quantity * int(portions), 2)
+        data_to_insert.append(
+            {'ingredient': ingredient, 'quantity': final_quantity, 'unit': unit,
+             'division': ingredient.ingredient_id.division, 'shop_id': shop_dict.get(ingredient.ingredient_id.shop_id)})
     if append_to_existing_shopping_lists:
-        pass
+        shopping_list_positions_dict = {}
+        for position in data_to_insert:
+            if position.get('shop_id'):
+                for key, value in existing_shopping_lists.items():
+                    if value == position.get('shop_id'):
+                        if position.get('shop_id') not in shopping_list_positions_dict.keys():
+                            shopping_list_positions_dict[existing_shopping_lists.get(key)] = Products.objects.filter(
+                                shopping_list_id=key)
+            else:
+                for key, value in existing_shopping_lists.items():
+                    if value == 'NIEPRZYPISANY':
+                        if 'NIEPRZYPISANY' not in shopping_list_positions_dict.keys():
+                            shopping_list_positions_dict[existing_shopping_lists.get(key)] = Products.objects.filter(
+                                shopping_list_id=key)
+
+        for position in data_to_insert:
+            if position.get('shop_id'):
+                shop_to_alter = position.get('shop_id')
+            else:
+                shop_to_alter = 'NIEPRZYPISANY'
+            if shopping_list_positions_dict.get(shop_to_alter) is None:
+                if shop_to_alter not in existing_shopping_lists.values():
+                    new_shopping_list = ShoppingList(user_id=request.user, name=shop_to_alter, generated=1)
+                    new_shopping_list.save()
+                    new_product = Products(product_name=position.get('ingredient'), quantity=position.get('quantity'),
+                                           shopping_list_id_id=new_shopping_list.id,
+                                           unit_id=position.get('unit'), division_id=position.get('division')).save()
+                    existing_shopping_lists[new_shopping_list.id] = new_shopping_list.name
+                    shopping_list_positions_dict[new_shopping_list.name] = Products.objects.filter(
+                        product_name=position.get('ingredient'), shopping_list_id__name=new_shopping_list.name)
+            else:
+                if str(position.get('ingredient')) in [str(item.product_name) for item in
+                                                       shopping_list_positions_dict.get(shop_to_alter)]:
+                    product_to_alter = Products.objects.filter(product_name=str(position.get('ingredient')),
+                                                               shopping_list_id_id__name=shop_to_alter)[0]
+                    product_to_alter.quantity = round(product_to_alter.quantity + float(position.get('quantity')), 2)
+                    product_to_alter.save()
+                else:
+                    for k, v in existing_shopping_lists.items():
+                        if shop_to_alter == v:
+                            shop_to_alter = k
+                    new_product = Products(product_name=position.get('ingredient'), quantity=position.get('quantity'),
+                                           shopping_list_id_id=shop_to_alter,
+                                           unit_id=position.get('unit'), division_id=position.get('division')).save()
     else:
         new_shopping_list = ShoppingList(user_id=request.user, name=meal_name, generated=1)
         new_shopping_list.save()
         new_list_position_list = []
-        for ingredient in meal_ingredients:
-            if ingredient.ingredient_id.weight_per_unit > 0:
-                quantity = round(ingredient.quantity / ingredient.ingredient_id.weight_per_unit, 2)
-                unit = 1
-            else:
-                quantity = ingredient.quantity
-                unit = 2
-            final_quantity = round(quantity * int(portions), 2)
-
-            print(ingredient, final_quantity, ingredient.ingredient_id.weight_per_unit,
-                  ingredient.ingredient_id.division.id)
-            new_list_position = Products(product_name=ingredient, quantity=final_quantity,
-                                         shopping_list_id_id=new_shopping_list.id,
-                                         unit_id=unit, division_id=ingredient.ingredient_id.division)
+        for position in data_to_insert:
+            position['shop_id'] = new_shopping_list.id
+            new_list_position = Products(product_name=position.get('ingredient'), quantity=position.get('quantity'),
+                                         shopping_list_id_id=position.get('shop_id'),
+                                         unit_id=position.get('unit'), division_id=position.get('division'))
             new_list_position_list.append(new_list_position)
         Products.objects.bulk_create(new_list_position_list)
-
     return redirect('shopping:shopping_list_index')
