@@ -61,7 +61,7 @@ def get_maximum_no_of_days(request):
 
 
 def get_maximum_no_of_days_no_repeat(request):
-    current_meals_list = MealsList.objects.filter(user=request.user,current=1)
+    current_meals_list = MealsList.objects.filter(user=request.user, current=1)
     current_meals = []
     no_of_meals_in_option = []
     for item in (list(current_meals_list)):
@@ -87,7 +87,8 @@ def meals(request, current=1):
     start = time.time()
     in_meals_list = True
     user_meals_options = MealOption.objects.filter(user=request.user, is_taken_to_generation=1).order_by('position')
-    generated_user_meals_options = MealsList.objects.filter(user=request.user, current=current).order_by('meal_option__position').values(
+    generated_user_meals_options = MealsList.objects.filter(user=request.user, current=current).order_by(
+        'meal_option__position').values(
         'meal_option__meal_option', 'meal_option_id').distinct()
     all_user_meals_options = MealOption.objects.filter(user=request.user).order_by('position')
     meals_list = MealsList.objects.all().filter(user=request.user, current=current)
@@ -114,7 +115,7 @@ def meals(request, current=1):
     )
     WHERE
         `meal_id_id` IN {}
-        """.format(str(all_meals).replace('[','(').replace(']',')'))
+        """.format(str(all_meals).replace('[', '(').replace(']', ')'))
     all_ingredients = MealIngredient.objects.raw(sql)
 
     meal_ingredients_dict = {}
@@ -133,7 +134,7 @@ def meals(request, current=1):
             if ingredient.short_expiry:
                 short_expiry.append(1)
 
-            kcal.append((ingredient.calories_per_100_gram * ingredient.quantity/100))
+            kcal.append((ingredient.calories_per_100_gram * ingredient.quantity / 100))
         for option, meals_in_option in all_meals_in_option_dict.items():
             for m in meals_in_option:
                 if m[0].id == meal:
@@ -144,7 +145,8 @@ def meals(request, current=1):
         while item.day not in days:
             days.append(item.day)
     day_calories = []
-    meals_on_day = MealsList.objects.select_related('meal').filter(user=request.user, current=current, day__in=days).order_by('meal_option__position')
+    meals_on_day = MealsList.objects.select_related('meal').filter(user=request.user, current=current,
+                                                                   day__in=days).order_by('meal_option__position')
     for day in days:
         # meals_on_day = MealsList.objects.select_related('meal').filter(user=request.user, current=current, day=day).order_by(
         #     'meal_option__position')
@@ -209,12 +211,12 @@ def meals(request, current=1):
     user_meals_options_select = []
     for option in user_meals_options_select:
         option_meals_list = []
-        meals_in_option = Meal.objects.select_related('meal_option_id').filter(meal_option=option['meal_option_id'], user=request.user)
+        meals_in_option = Meal.objects.select_related('meal_option_id').filter(meal_option=option['meal_option_id'],
+                                                                               user=request.user)
         meal_option = option
         for meal in meals_in_option:
             option_meals_list.append(meal)
         option_meals_dict[meal_option] = option_meals_list
-
 
     # average calories for whole mealsList
     all_meals = meals_list
@@ -278,7 +280,7 @@ def meals(request, current=1):
         'meals_list': meals_list,
         'user_meals_options': user_meals_options,
         'generated_user_meals_options': generated_user_meals_options,
-        'day_meal_option_meal_list': day_meal_option_meal_list, # dictionary to build table in template
+        'day_meal_option_meal_list': day_meal_option_meal_list,  # dictionary to build table in template
         'maximum_no_of_days_to_generate': maximum_no_of_days_to_generate,
         'maximum_no_of_days_to_generate_default': maximum_no_of_days_to_generate * 2,
         'in_meals_list': in_meals_list,
@@ -305,7 +307,8 @@ def edit_meals(request):
     units = Unit.objects.all()
     for i in range(len(meals_options)):
         meals = []
-        meals_in_meals_options = MealIngredient.objects.select_related('meal_id').select_related('ingredient_id').filter(meal_id__meal_option=meals_options[i]).order_by('meal_id__name')
+        meals_in_meals_options = MealIngredient.objects.select_related('meal_id').select_related(
+            'ingredient_id').filter(meal_id__meal_option=meals_options[i]).order_by('meal_id__name')
         meals_tmp = Meal.objects.filter(meal_option=meals_options[i]).order_by('name')
         for meal_tmp in meals_tmp:
             ingredients = []
@@ -377,7 +380,7 @@ def generate_meals_list(request):
             current_meals.append(item.meal_id)
     if append_existing:
         days = appended_days_generator(request.user, first_day, int(how_many_days))
-        current_days = int(len(current_meals_list)/len(user_meals_options))
+        current_days = int(len(current_meals_list) / len(user_meals_options))
 
     else:
         previous_meals_list.delete()
@@ -387,7 +390,8 @@ def generate_meals_list(request):
     for option in user_meals_options:
         option_meals_list = []
         meals_in_option = Meal.objects.filter(meal_option=option, user=request.user, special=0)
-        ingredients_with_short = MealIngredient.objects.select_related('meal_id').select_related('ingredient_id').filter(ingredient_id__short_expiry=1, meal_id__meal_option_id=option)
+        ingredients_with_short = MealIngredient.objects.select_related('meal_id').select_related(
+            'ingredient_id').filter(ingredient_id__short_expiry=1, meal_id__meal_option_id=option)
         meals_with_short_expiry_in_option = []
         meals_without_short_expiry_in_option = []
         for ingredient in ingredients_with_short:
@@ -499,6 +503,7 @@ def delete_meal_option(request, meal_option_id):
     MealOption.objects.filter(pk=meal_option_id).delete()
     return redirect('meals:edit_meals')
 
+
 @login_required(login_url='/accounts/login')
 def edit_meal_ingredients(request, meal_id):
     meal = Meal.objects.filter(user_id=request.user, pk=meal_id)
@@ -533,6 +538,7 @@ def edit_meal_ingredients(request, meal_id):
     }
     return render(request, 'meals/meal_edit.html', context)
 
+
 @login_required(login_url='/accounts/login')
 def add_ingredient(request, meal_id):
     meal = get_object_or_404(Meal, pk=meal_id)
@@ -549,11 +555,13 @@ def add_ingredient(request, meal_id):
     new_ingredient.save()
     return redirect('meals:edit_meal_ingredients', meal_id=meal_id)
 
+
 @login_required(login_url='/accounts/login')
 def add_recipe(request, meal_id):
     recipe = request.POST['update_recipe_textarea']
     Meal.objects.filter(pk=meal_id).update(recipe=recipe)
     return redirect('meals:edit_meal_ingredients', meal_id=meal_id)
+
 
 @login_required(login_url='/accounts/login')
 def update_ingredient(request, ingredient_id, meal_id):
@@ -642,7 +650,7 @@ def generate_shopping_lists(request):
                 if ingredient_object in ingr_qt_dict.keys():
                     qt = ingr_qt_dict[ingredient_object][0]
                     qt += ingredient.quantity
-                    ingr_qt_dict[ingredient_object] = [qt, ingredient_object.weight_per_unit ]
+                    ingr_qt_dict[ingredient_object] = [qt, ingredient_object.weight_per_unit]
                 else:
                     ingr_qt_dict[ingredient_object] = [ingredient.quantity, ingredient_object.weight_per_unit]
 
@@ -669,7 +677,7 @@ def generate_shopping_lists(request):
                     unit = 2
                 new_list_position = Products(product_name=shopping_item, quantity=qt[0],
                                              shopping_list_id_id=new_shopping_list.id,
-                                             unit_id=unit, division_id = shopping_item.division)
+                                             unit_id=unit, division_id=shopping_item.division)
                 new_list_position_list.append(new_list_position)
             Products.objects.bulk_create(new_list_position_list)
     return redirect('shopping:shopping_list_index')
@@ -729,7 +737,7 @@ def new_ingredient(request):
     avg_unit = request.POST.get('avg_unit', False)
     shop_select = request.POST.get('shop', False)
     short_expiry = request.POST.get('short_expiry', False)
-    division = request.POST.get('division',1)
+    division = request.POST.get('division', 1)
     if short_expiry:
         short_expiry = True
 
@@ -793,7 +801,6 @@ def edit_ingredient(request, ingr_id):
     else:
         division = ProductDivision.objects.get(pk=division)
 
-
     edited_ingredient = Ingredient.objects.get(pk=ingr_id)
     edited_ingredient.name = new_ingredient_name
     edited_ingredient.calories_per_100_gram = kcal
@@ -825,7 +832,8 @@ def edit_division_priority(request, division_id):
 
 def add_new_division(request):
     if request.method == 'POST':
-        new_division = ProductDivision(division_name=request.POST['division_name'], priority=request.POST['division_priority'], user_id=request.user.id)
+        new_division = ProductDivision(division_name=request.POST['division_name'],
+                                       priority=request.POST['division_priority'], user_id=request.user.id)
         new_division.save()
     return redirect('/ingredientsEdit#division')
 
@@ -849,3 +857,36 @@ def edit_extras(request):
 def delete_extras(request, meals_list_id):
     MealsList.objects.filter(pk=meals_list_id).update(extras=None)
     return redirect('/mealsList/1')
+
+
+def generate_shopping_list_for_meal(request, meal_id):
+    portions = request.POST.get('portions')
+    append_to_existing_shopping_lists = request.POST.get('append_to_existing_shopping_lists')
+    print(append_to_existing_shopping_lists)
+    meal_ingredients = MealIngredient.objects.select_related('ingredient_id').filter(meal_id_id=meal_id)
+    meal_name = Meal.objects.filter(pk=meal_id)[0].name
+
+    if append_to_existing_shopping_lists:
+        pass
+    else:
+        new_shopping_list = ShoppingList(user_id=request.user, name=meal_name, generated=1)
+        new_shopping_list.save()
+        new_list_position_list = []
+        for ingredient in meal_ingredients:
+            if ingredient.ingredient_id.weight_per_unit > 0:
+                quantity = round(ingredient.quantity / ingredient.ingredient_id.weight_per_unit, 2)
+                unit = 1
+            else:
+                quantity = ingredient.quantity
+                unit = 2
+            final_quantity = round(quantity * int(portions), 2)
+
+            print(ingredient, final_quantity, ingredient.ingredient_id.weight_per_unit,
+                  ingredient.ingredient_id.division.id)
+            new_list_position = Products(product_name=ingredient, quantity=final_quantity,
+                                         shopping_list_id_id=new_shopping_list.id,
+                                         unit_id=unit, division_id=ingredient.ingredient_id.division)
+            new_list_position_list.append(new_list_position)
+        Products.objects.bulk_create(new_list_position_list)
+
+    return redirect('shopping:shopping_list_index')
