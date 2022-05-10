@@ -10,11 +10,8 @@ def get_rates_in_time(time, total_data):
     for rate in total_data:
         rates.append(rate)
         if rate['effectiveDate'] == str(time):
-            print('found')
             break
         if rate['effectiveDate'] < str(time):
-            print('brak notowania zanleziono pierwsze notowanie')
-            print(rate)
             break
     return json.dumps(list(reversed(rates)))
 
@@ -23,6 +20,7 @@ def get_all_currencies():
     nbp_api_request = requests.get('https://api.nbp.pl/api/exchangerates/tables/A?format=json')
     npb_exchange_rates = nbp_api_request.json()
     exchange_rate_date = npb_exchange_rates[0]['effectiveDate']
+    all_rates = npb_exchange_rates[0]['rates']
     user_rates_to_render = []
     for rate in all_rates:
         user_rates_to_render.append(rate)
