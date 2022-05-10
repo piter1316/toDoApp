@@ -13,15 +13,17 @@
     </div>
   </div>
   {% for rate in user_rates_to_render %}
-  <div class="card">
-    <div class="card-body p-1">
-      <div class="d-flex justify-content-between">
-        <span>1 <b>{{rate.code}}</b></span>
-        <span>{{rate.currency}}</span>
-        <span>= {{rate.mid}} PLN</span>
+  <a href="{% url 'exchange_rates:exchange_rates_diagram' rate.code %}" class="text-dark">
+    <div class="card">
+      <div class="card-body p-1">
+        <div class="d-flex justify-content-between">
+          <span>1 <b>{{rate.code}}</b></span>
+          <span>{{rate.currency}}</span>
+          <span>= {{rate.mid}} PLN</span>
+        </div>
       </div>
     </div>
-  </div>
+  </a>
   {% endfor %}
 </div>
 

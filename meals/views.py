@@ -297,6 +297,7 @@ def meals(request, current=1):
     return render(request, 'meals/meals_list.html', context)
 
 
+
 @login_required(login_url='/accounts/login')
 def edit_meals(request):
     form = MealForm(request.POST)

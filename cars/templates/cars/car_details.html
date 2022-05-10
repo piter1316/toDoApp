@@ -316,7 +316,7 @@
       </div>
 
     <div class="tab-pane fade mx-auto col-lg-10 p-0"  id="chart"  role="tabpanel" aria-labelledby="chart-tab">
-      <canvas class="bg-light rounded p-1" id="myChart"></canvas>
+      <canvas class="bg-light rounded p-1 w-100" id="myChart"></canvas>
       <script>
           var ctx = document.getElementById('myChart').getContext('2d');
           var chart_data_json = JSON.parse('{{chart_dates|escapejs }}');

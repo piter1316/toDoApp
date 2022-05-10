@@ -1,0 +1,49 @@
+<canvas class="bg-light rounded p-1 w-100" id="myChart_{{time}}"></canvas>
+<script>
+    var chart_data_json_{{time}} = JSON.parse('{{ time_scope|escapejs }}');
+    const ctx_{{time}} = document.getElementById('myChart_{{time}}').getContext('2d');
+    console.log(chart_data_json_{{time}});
+    var dates_array = []
+    var rates_array = []
+    var backgroundColor_array = []
+    var borderColor_array = []
+
+    for (var i=0; i<chart_data_json_{{time}}.length; i++){
+    dates_array.push(chart_data_json_{{time}}[i].effectiveDate)
+    rates_array.push(chart_data_json_{{time}}[i].mid)
+    backgroundColor_array.push('rgba(90, 98, 104, 0.3)')
+    borderColor_array.push('rgba(90, 98, 104, 0.8)')
+    }
+    if(dates_array.length < 60){
+      var pointRadius_{{time}} = 3
+    }else{
+    var point_radius = 0
+    }
+    console.log('{{time}}')
+    console.log(dates_array.length > 30)
+    console.log(dates_array.length)
+    console.log(point_radius)
+
+    label_text = '{{currency}}' + ' | MIN: ' + Math.min.apply(Math, rates_array) + ' MAX: ' + Math.max.apply(Math, rates_array)
+    const myChart_{{time}} = new Chart(ctx_{{time}}, {
+      type: 'line',
+      data: {
+          labels: dates_array,
+          datasets: [{
+              label: label_text,
+              data: rates_array,
+              pointRadius:point_radius,
+              backgroundColor: backgroundColor_array,
+              borderColor: borderColor_array,
+              borderWidth: 1
+          }]
+      },
+      options: {
+          scales: {
+              y: {
+                  beginAtZero: false
+              }
+          }
+      }
+  });
+</script>

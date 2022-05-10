@@ -1,0 +1,99 @@
+{% extends 'todo/base.html' %}
+
+
+{% block body %}
+<div class="container-fluid mt-2">
+  <form>
+  <select class="form-control" style="text-align: center;" onchange="location = this.value;">
+  {% for cur in currencies %}
+
+  <option {% ifequal cur.code currency %}selected{% endifequal %} value="{% url 'exchange_rates:exchange_rates'%}/{{cur.code}} ">
+    {{cur.code }} | {{ cur.currency}}
+  </option>
+  {% endfor %}
+  </select>
+    </form>
+  <div class="row">
+    <div class="col-12 col-lg-2 text-center">
+      <div class="nav flex-column nav-pills " id="v-pills-tab" role="tablist" aria-orientation="vertical">
+        <a class="nav-link btn-secondary mb-1" id="v-pills-week-tab" data-toggle="pill" href="#v-pills-week" role="tab" aria-controls="v-pills-week" aria-selected="true">Tydzień</a>
+        <a class="nav-link btn-secondary mb-1 active" id="v-pills-month-tab" data-toggle="pill" href="#v-pills-month" role="tab" aria-controls="v-pills-month" aria-selected="false">Miesiąc</a>
+        <a class="nav-link btn-secondary mb-1" id="v-pills-2-months-tab" data-toggle="pill" href="#v-pills-2-months" role="tab" aria-controls="v-pills-2-months" aria-selected="false">2 miesiące</a>
+        <a class="nav-link btn-secondary mb-1" id="v-pills-3-months-tab" data-toggle="pill" href="#v-pills-3-months" role="tab" aria-controls="v-pills-2-months" aria-selected="false">3 miesiące</a>
+        <a class="nav-link btn-secondary mb-1" id="v-pills-6-months-tab" data-toggle="pill" href="#v-pills-6-months" role="tab" aria-controls="v-pills-2-months" aria-selected="false">6 Miesięcy</a>
+        <a class="nav-link btn-secondary mb-1" id="v-pills-year-tab" data-toggle="pill" href="#v-pills-year" role="tab" aria-controls="v-pills-year" aria-selected="false">Rok</a>
+        <a class="nav-link btn-secondary mb-1" id="v-pills-2-years-tab" data-toggle="pill" href="#v-pills-2-years" role="tab" aria-controls="v-pills-2-years" aria-selected="false">2 Lata</a>
+        <a class="nav-link btn-secondary mb-1" id="v-pills-3-years-tab" data-toggle="pill" href="#v-pills-3-years" role="tab" aria-controls="v-pills-3-years" aria-selected="false">3 Lata</a>
+        <a class="nav-link btn-secondary mb-1" id="v-pills-5-years-tab" data-toggle="pill" href="#v-pills-5-years" role="tab" aria-controls="v-pills-5-years" aria-selected="false">5 Lat</a>
+      </div>
+    </div>
+    <div class="col-12 col-lg-10">
+      <div class="tab-content" id="v-pills-tabContent">
+        <div class="tab-pane fade" id="v-pills-week" role="tabpanel" aria-labelledby="v-pills-week-tab">
+          {% with time_scope=week %}
+          {% with time='week' %}
+          {% include 'exchange_rates/diagram_template.html' %}
+          {% endwith %}
+          {% endwith %}
+        </div>
+        <div class="tab-pane fade show active" id="v-pills-month" role="tabpanel" aria-labelledby="v-pills-month-tab">
+          {% with time_scope=month %}
+          {% with time='month' %}
+          {% include 'exchange_rates/diagram_template.html' %}
+          {% endwith %}
+          {% endwith %}
+        </div>
+        <div class="tab-pane fade" id="v-pills-2-months" role="tabpanel" aria-labelledby="v-pills-2-months-tab">
+          {% with time_scope=two_months %}
+          {% with time='two_months' %}
+          {% include 'exchange_rates/diagram_template.html' %}
+          {% endwith %}
+          {% endwith %}
+        </div>
+        <div class="tab-pane fade" id="v-pills-3-months" role="tabpanel" aria-labelledby="v-pills-3-months-tab">
+          {% with time_scope=three_months %}
+          {% with time='three_months' %}
+          {% include 'exchange_rates/diagram_template.html' %}
+          {% endwith %}
+          {% endwith %}
+        </div>
+        <div class="tab-pane fade" id="v-pills-6-months" role="tabpanel" aria-labelledby="v-pills-6-months-tab">
+          {% with time_scope=six_months %}
+          {% with time='six_months' %}
+          {% include 'exchange_rates/diagram_template.html' %}
+          {% endwith %}
+          {% endwith %}
+        </div>
+        <div class="tab-pane fade" id="v-pills-year" role="tabpanel" aria-labelledby="v-pills-year-tab">
+          {% with time_scope=one_year %}
+          {% with time='one_year' %}
+          {% include 'exchange_rates/diagram_template.html' %}
+          {% endwith %}
+          {% endwith %}
+        </div>
+        <div class="tab-pane fade" id="v-pills-2-years" role="tabpanel" aria-labelledby="v-pills-2-years-tab">
+          {% with time_scope=two_years %}
+          {% with time='two_years' %}
+          {% include 'exchange_rates/diagram_template.html' %}
+          {% endwith %}
+          {% endwith %}
+        </div>
+        <div class="tab-pane fade" id="v-pills-3-years" role="tabpanel" aria-labelledby="v-pills-3-years-tab">
+          {% with time_scope=three_years %}
+          {% with time='three_years' %}
+          {% include 'exchange_rates/diagram_template.html' %}
+          {% endwith %}
+          {% endwith %}
+        </div>
+        <div class="tab-pane fade" id="v-pills-5-years" role="tabpanel" aria-labelledby="v-pills-5-years-tab">
+          {% with time_scope=five_years %}
+          {% with time='five_years' %}
+          {% include 'exchange_rates/diagram_template.html' %}
+          {% endwith %}
+          {% endwith %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
