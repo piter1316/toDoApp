@@ -21,14 +21,26 @@ def get_all_currencies():
     npb_exchange_rates = nbp_api_request.json()
     exchange_rate_date = npb_exchange_rates[0]['effectiveDate']
     all_rates = npb_exchange_rates[0]['rates']
+    previous_nbp_api_request = requests.get('http://api.nbp.pl/api/exchangerates/tables/a/last/2/')
+    previous_rates = previous_nbp_api_request.json()[0]['rates']
     user_rates_to_render = []
     for rate in all_rates:
         user_rates_to_render.append(rate)
-    return user_rates_to_render
+    for rate in user_rates_to_render:
+        for prev in previous_rates:
+            if prev['code'] == rate['code']:
+                previous_rate = prev['mid']
+                rate['previous'] = previous_rate
+                rate['percent'] = round((rate['mid'] - previous_rate)/rate['mid'] * 100, 2)
+                break
+    return user_rates_to_render, exchange_rate_date
 
 
 def exchange_rates(request):
-    context = {'user_rates_to_render': get_all_currencies()}
+    context = {
+        'user_rates_to_render': get_all_currencies()[0],
+        'exchange_rate_date': get_all_currencies()[1]
+    }
     return render(request, 'exchange_rates/exchange_rates.html', context)
 
 
@@ -71,6 +83,6 @@ def exchange_rates_diagram(request, currency):
                'two_years': get_rates_in_time(two_years_back, total_data),
                'three_years': get_rates_in_time(three_years_back, total_data),
                'five_years': get_rates_in_time(five_years_back, total_data),
-               'currencies': get_all_currencies()
+               'currencies': get_all_currencies()[0]
                }
     return render(request, 'exchange_rates/exchange_rates_diagram.html', context)

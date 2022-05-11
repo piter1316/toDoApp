@@ -8,7 +8,7 @@
       <div class="d-flex justify-content-between">
         <span>WALUTA</span>
         <span>OPIS</span>
-        <span>KURS ŚREDNI</span>
+        <span>KURS ŚREDNI<sup>({{exchange_rate_date}})</sup></span>
       </div>
     </div>
   </div>
@@ -19,7 +19,15 @@
         <div class="d-flex justify-content-between">
           <span>1 <b>{{rate.code}}</b></span>
           <span>{{rate.currency}}</span>
-          <span>= {{rate.mid}} PLN</span>
+          <span><b>{{rate.mid}}</b> PLN
+            {% if rate.mid > rate.previous %}
+              <sup class="text-success">{{rate.percent}}%</sup>
+            {% elif rate.mid == rate.previous %}
+              <sup>{{rate.percent}}%</sup>
+            {% else %}
+              <sup class="text-danger">{{rate.percent}}%</sup>
+            {% endif %}
+          </span>
         </div>
       </div>
     </div>
