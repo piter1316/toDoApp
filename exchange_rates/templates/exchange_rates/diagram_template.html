@@ -2,7 +2,6 @@
 <script>
     var chart_data_json_{{time}} = JSON.parse('{{ time_scope|escapejs }}');
     const ctx_{{time}} = document.getElementById('myChart_{{time}}').getContext('2d');
-    console.log(chart_data_json_{{time}});
     var dates_array = []
     var rates_array = []
     var backgroundColor_array = []
@@ -19,10 +18,8 @@
     }else{
     var point_radius = 0
     }
-    console.log('{{time}}')
-    console.log(dates_array.length > 30)
-    console.log(dates_array.length)
-    console.log(point_radius)
+    var dane_na_dzien = document.getElementById('dane_na_dzien')
+    dane_na_dzien.innerText= 'Dane z dnia ' + dates_array.at(-1);
 
     label_text = '{{currency}}' + ' | MIN: ' + Math.min.apply(Math, rates_array) + ' MAX: ' + Math.max.apply(Math, rates_array)
     const myChart_{{time}} = new Chart(ctx_{{time}}, {

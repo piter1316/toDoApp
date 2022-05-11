@@ -4,15 +4,15 @@
 {% block body %}
 <div class="container-fluid mt-2">
   <form>
-  <select class="form-control" style="text-align: center;" onchange="location = this.value;">
-  {% for cur in currencies %}
-
-  <option {% ifequal cur.code currency %}selected{% endifequal %} value="{% url 'exchange_rates:exchange_rates'%}/{{cur.code}} ">
-    {{cur.code }} | {{ cur.currency}}
-  </option>
-  {% endfor %}
-  </select>
-    </form>
+    <select class="form-control mb-1" style="text-align: center;" onchange="location = this.value;">
+      {% for cur in currencies %}
+      <option {% ifequal cur.code currency %}selected{% endifequal %} value="{% url 'exchange_rates:exchange_rates'%}/{{cur.code}} ">
+        {{cur.code }} | {{ cur.currency}} | {{cur.mid}} PLN
+      </option>
+      {% endfor %}
+    </select>
+  </form>
+  <div><i id="dane_na_dzien"></i></div>
   <div class="row">
     <div class="col-12 col-lg-2 text-center">
       <div class="nav flex-column nav-pills " id="v-pills-tab" role="tablist" aria-orientation="vertical">
