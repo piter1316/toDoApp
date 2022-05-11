@@ -4,9 +4,9 @@
 {% block body %}
 <div class="container-fluid mt-2">
   <form>
-    <select class="form-control mb-1" style="text-align: center;" onchange="location = this.value;">
+    <select class="form-control mb-1" style="text-align: center;" onchange="location = this.value + document.getElementsByClassName('show active')[0].id">
       {% for cur in currencies %}
-      <option {% ifequal cur.code currency %}selected{% endifequal %} value="{% url 'exchange_rates:exchange_rates'%}/{{cur.code}} ">
+      <option {% ifequal cur.code currency %}selected{% endifequal %} value="{% url 'exchange_rates:exchange_rates'%}/{{cur.code}}#">
         {{cur.code }} | {{ cur.currency}} | {{cur.mid}} PLN
       </option>
       {% endfor %}

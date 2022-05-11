@@ -231,6 +231,24 @@ $(document).ready(function(){
     $('[data-toggle="tooltip"]').tooltip()
   })
 
+  var v_pills = $('#v-pills-tab a');
+  v_pills_array = []
+  v_pills.each(function(a){v_pills_array.push($(this).attr('href'))})
+  console.log(v_pills_array,window.location.href)
+
+  v_pills_array.forEach(function(element, index,v_pills_array){
+    if(window.location.href.includes(element)){
+      console.log(element)
+      $(element+'-tab').addClass('active')
+      $(element).addClass('show active')
+    }
+    else if (window.location.href.includes('#')){
+      $(element+'-tab').removeClass('active')
+      $(element).removeClass('active')
+      $(element).removeClass('show')
+    }
+  })
+
  if(window.location.href.includes('#service')){
  $('#fuel').removeClass('show')
  $('#fuel').removeClass('active')
