@@ -64,11 +64,25 @@ def car_details(request, car_id):
     service_list = Service.objects.select_related().filter(car_id=car_id).order_by('-date')
     total_fuel_list = []
     total_km_list = []
+    averages_list = []
+    fuel_cost_list = []
+    dates_list = []
     for fuel in car_fuel_fill_list:
         total_fuel_list.append(fuel.liters)
         total_km_list.append(fuel.kilometers)
-    total_fuel = sum(total_fuel_list)
-    total_km = sum(total_km_list)
+        averages_list.append(round(fuel.liters/fuel.kilometers * 100, 2))
+        fuel_cost_list.append(fuel.liters * float(fuel.fuel_price))
+        dates_list.append(fuel.date)
+
+    first_last_fuel_time_interval = max(dates_list) - min(dates_list)
+    first_last_fuel_time_interval_months = first_last_fuel_time_interval.days / 31
+    total_fuel = round(sum(total_fuel_list), 2)
+    total_km = round(sum(total_km_list), 2)
+    total_fuel_cost = round(sum(fuel_cost_list), 2)
+    lowest_average = min(averages_list)
+    highest_average = max(averages_list)
+    month_average = round(total_fuel_cost / first_last_fuel_time_interval_months, 2)
+    km_month_average = round(total_km / first_last_fuel_time_interval_months, 2)
     try:
         average_consumption = round(total_fuel / total_km * 100, 2)
     except ZeroDivisionError:
@@ -89,6 +103,13 @@ def car_details(request, car_id):
         'last_service': last_service,
         'average_consumption': average_consumption,
         'service_total_cost': get_services_as_dict(service_list)[1],
+        'lowest_average': lowest_average,
+        'highest_average': highest_average,
+        'total_fuel_cost': total_fuel_cost,
+        'month_average': month_average,
+        'total_fuel': total_fuel,
+        'total_km': total_km,
+        'km_month_average': km_month_average,
     }
     return render(request, 'cars/car_details.html', context)
 
