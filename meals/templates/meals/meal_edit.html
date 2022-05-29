@@ -84,7 +84,7 @@
               {% endfor %}
             </ul>
             <ul class="list-group list-group-flush">
-              <li class="list-group-item mt-2 d-flex justify-content-between">
+              <li class="list-group-item mt-2">
                 <div class="btn-group mr-2" role="group" aria-label="First group">
                   <button id="new_ingredient_form_toggle" type="button" class="btn btn-outline-secondary btn-sm ml-1">
                     Opcje
@@ -92,11 +92,12 @@
                   <button id="print_meal_recipe" onclick="createPDFRecipe()" type="button" class="btn btn-outline-secondary btn-sm">
                     <i class="fas fa-print"></i>
                   </button>
+                  <button type="button" class="btn btn-dark btn-sm" style=" border-radius: 0px 5px 5px 0px !important;" data-toggle="modal" data-target="#shopping_list_modal">
+                    <i class="px-2 fas fa-shopping-cart"></i>
+                  </button>
                   <button class="btn btn-block btn-outline-info btn-block btn-sm" id="addding_ingr_info" style="display:none">Zapisywanie...</button>
                 </div>
-                <button type="button" class="btn btn-dark btn-sm" data-toggle="modal" data-target="#shopping_list_modal">
-                  <i class="px-2 fas fa-shopping-cart"></i>
-                </button>
+
                 <form style="display:none;" class="mt-2" action="{% url 'meals:add_ingredient' meal.0.id %}"
                       method="post" id="new_ingredient_form">{% csrf_token %}
 
