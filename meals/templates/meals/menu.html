@@ -62,8 +62,8 @@
         <div class="form-row">
           <div class="input-group mb-3">
             <select class="form-control" name="first_day" id="first_day">
-              {% for day in first_day_input_list %}
-              <option value="{{day.id}}">{{day}}</option>
+              {% for day, date in first_day_input_list.items %}
+              <option value="{{date.1.0.id}}|{{date.0|date:"Y-m-d"}}">{{day}} | {{date.0|date:"Y-m-d"}}</option>
               {% endfor %}
             </select>
             <div class="input-group-append">

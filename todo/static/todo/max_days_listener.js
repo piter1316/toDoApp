@@ -56,30 +56,48 @@ $(document).ready(function(){
         }
       });
       setTimeout(function(){$('#meal_options_form, #meal_options_form_hr').hide(600)}, 200);
-      var day_short = $('#meals_list .text-center:last span b').text().split(' ')[0];
+      var day_short = $('#meals_list .text-center:last span b').text().split(' | ')[0];
+      var date_short = $('#meals_list .text-center:last span b').text().split('|')[1].split(' : ')[0].trim();
+      var parsed_date = new Date(date_short)
+      parsed_date.setDate(parsed_date.getDate() + 1)
+      var year = parsed_date.getFullYear()
+      var month = parsed_date.getMonth()
+      month +=1
+      if (month <= 9)
+        month = '0'+ String(month)
+      var day = parsed_date.getDate()
+      if (day <= 9)
+        day = '0'+ String(day)
+      var proper_date = String(year) + '-' + String(month) + '-' + String(day)
       $('#first_day').attr('readonly', true);
-
       switch(day_short){
       case 'PN':
-        $('#first_day').val(2);
+        $('#first_day').append($('<option>',{value: '2|'+ proper_date, text : "WTOREK "+ " | "+ proper_date}));
+        $('#first_day').val('2|'+ proper_date);
         break;
       case 'WT':
-        $('#first_day').val(3);
+        $('#first_day').append($('<option>',{value: '3|'+ proper_date, text : "ŚRODA "+ " | "+ proper_date}));
+        $('#first_day').val('3|'+ proper_date);
         break;
       case 'ŚR':
-        $('#first_day').val(4);
+        $('#first_day').append($('<option>',{value: '4|'+ proper_date, text : "CZWARTEK "+ " | "+ proper_date}));
+        $('#first_day').val('4|'+ proper_date);
         break;
       case 'CZW':
-        $('#first_day').val(5);
+        $('#first_day').append($('<option>',{value: '5|'+ proper_date, text : "PIĄTEK "+ " | "+ proper_date}));
+        $('#first_day').val('5|'+ proper_date);
         break;
       case 'PT':
-        $('#first_day').val(6);
+        $('#first_day').append($('<option>',{value: '6|'+ proper_date, text : "SOBOTA "+ " | "+ proper_date}));
+        $('#first_day').val('6|'+ proper_date);
         break;
       case 'SB':
-        $('#first_day').val(7);
+        $('#first_day').append($('<option>',{value: '7|'+ proper_date, text : "NIEDZIELA "+ " | "+ proper_date}));
+        $('#first_day').val('7|'+ proper_date);
         break;
       case 'ND':
-        $('#first_day').val(1);
+        $('#first_day').append($('<option>',{value: '1|'+ proper_date, text : "PONIEDZIAŁEK "+ " | "+ proper_date}));
+        $('#first_day').val('1|'+ proper_date);
         break;
       }
     }else {

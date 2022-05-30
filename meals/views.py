@@ -1,3 +1,4 @@
+import datetime
 import random
 import time
 from django.contrib import messages
@@ -18,15 +19,13 @@ def days_generator(first, how_many):
     days_list = []
     itr = ''
     space = ''
+    first_date = datetime.datetime.strptime(first[1], '%Y-%m-%d').date()
+    first = first[0]
     for i in range(how_many):
-        days_list.append(days[first] + space + str(itr))
+        days_list.append(days[first] + space + str(itr) + ' | ' + str(first_date + datetime.timedelta(days=i)))
         first += 1
         if first == len(days):
             first = 0
-            if itr == '':
-                itr = 1
-            itr += 1
-            space = '_'
     return days_list
 
 
@@ -36,14 +35,14 @@ def appended_days_generator(request, first, how_many):
     meals_list_ids = MealsList.objects.filter(user_id=request, current=1)
     itr = meals_list_ids.reverse()[0].id
     space = '_'
+    first_date = datetime.datetime.strptime(first[1], '%Y-%m-%d').date()
+    first = first[0]
     for i in range(how_many):
-        days_list.append(days[first] + space + str(itr))
+        days_list.append(days[first] + ' | ' + str(first_date + datetime.timedelta(days=i)))
         first += 1
         if first == len(days):
             first = 0
-            if itr == '':
-                itr = 1
-            itr += 1
+    print(days_list)
     return days_list
 
 
@@ -204,9 +203,16 @@ def meals(request, current=1):
               round(sum(meal_carbohydrates))]])
     maximum_no_of_days_to_generate = get_maximum_no_of_days(request)
     maximum_no_of_days_to_generate_no_repeat = get_maximum_no_of_days_no_repeat(request)
-    first_day_input_list = Week.objects.all()
-    # user_meals_options_select = MealsList.objects.filter(user=request.user, current=current).order_by('meal_option__position').values(
-    #     'meal_option_id', 'meal_option_id__meal_option').distinct()
+    first_day_input_list = {}
+    days_of_the_week = Week.objects.all()
+    today = datetime.date.today().weekday()
+    dates_counter = 0
+    for i in range(today, today+7):
+        if i > 6:
+            first_day_input_list[days_of_the_week[i-7]] = (datetime.date.today() + datetime.timedelta(days=dates_counter),days_of_the_week.filter(day_of_the_week=days_of_the_week[i-7]))
+        else:
+            first_day_input_list[days_of_the_week[i]] = (datetime.date.today() + datetime.timedelta(days=dates_counter),days_of_the_week.filter(day_of_the_week=days_of_the_week[i]))
+        dates_counter += 1
     option_meals_dict = {}
     user_meals_options_select = []
     for option in user_meals_options_select:
@@ -297,7 +303,6 @@ def meals(request, current=1):
     return render(request, 'meals/meals_list.html', context)
 
 
-
 @login_required(login_url='/accounts/login')
 def edit_meals(request):
     form = MealForm(request.POST)
@@ -370,7 +375,8 @@ def generate_meals_list(request):
     how_many_days = request.POST['howManyDays']
     twice_the_same_meal = request.POST.get('twice_the_same_meal', False)
     empty_meals_list = request.POST.get('empty_meals_list', False)
-    first_day = int(request.POST['first_day']) - 1
+    first_day = (int(request.POST['first_day'].split('|')[0])-1, request.POST['first_day'].split('|')[1])
+    print(request.POST)
     append_existing = request.POST.get('append_existing', False)
     no_repetition = request.POST.get('no_repetition', False)
     current_meals_list = MealsList.objects.filter(user=request.user, current=1)
