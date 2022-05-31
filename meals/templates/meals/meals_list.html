@@ -19,7 +19,7 @@
         </small>
       </div>
         <div class="table-responsive-sm shadow " id="meals_list" >
-          <table  class="table table-light table-striped table-hover " id="table"
+          <table  class="table table-light table-striped" id="table"
                   {% if not current %}style="color: gray !important; opacity: 0.7;"{% endif %}>
             <thead id="meals_list_head" class="thead-dark">
             <tr class="text-center text-light">
@@ -42,8 +42,8 @@
             <tbody>
             {% for item in day_meal_option_meal_list %}
             {% for day, meals in item.0.items %}
-             <tr class="d-xl-none no_print" id="tr_{{day}}">
-                {% with day_as_list=day|split %}
+            {% with day_as_list=day|split %}
+             <tr class="d-xl-none no_print {% if today_to_template|date:"Y-m-d" == day_as_list.1 %} bg-secondary text-light {% endif %}" id="tr_{{day}}">
                 <td class="text-center" colspan="6" id="div_td_{{day}}">
                   <b>{{day_as_list.0}} | {{day_as_list.1}} : {{item.1.0}} kcal</b><br>
                   <small class="">
@@ -54,9 +54,9 @@
                 </td>
                 {% endwith %}
             </tr>
-            <tr class="text-center">
+            {% with day_as_list=day|split %}
+            <tr class="text-center {% if today_to_template|date:"Y-m-d" == day_as_list.1 %} bg-secondary text-light {% endif %}" >
               <th nowrap class="text-left pl-1 pr-0" id="th_{{day}}">
-                {% with day_as_list=day|split %}
                 <div id="div_th_{{day}}">
                   <input style="text-align: center;vertical-align: middle;" type="checkbox" name="day" class="checkbox my-auto mr-1" value="{% for meal in meals %}{% for ml in meal%}{{ml.id}},{% endfor %}{% endfor %}">
                   <span class="d-none d-xl-inline">
