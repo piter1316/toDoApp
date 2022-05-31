@@ -21,6 +21,9 @@
                 <ul class="p-xl-0">
                   {% for meal in todays_meals %}
                     <li>{{meal.meal_option}} : <a href="{% url 'meals:edit_meal_ingredients' meal.meal_id %}" class="text-dark">{{meal}}</a></li>
+                  {% if meal.extras %}
+                  <li class="small">Dodatek : <a href="{% url 'meals:edit_meal_ingredients' meal.extras.id %}" class="text-dark">{{meal.extras}}</a></li>
+                  {% endif %}
                   {% endfor %}
                 </ul>
                   <ul class="p-xl-0">

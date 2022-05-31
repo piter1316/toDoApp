@@ -105,7 +105,7 @@ def home(request):
                 protein = 0
                 fat = 0
                 carb = 0
-
+        print(todays_meals)
         todays_macro = (round(day_calories, 0), round(day_protein, 0), round(day_fat, 0), round(day_carb, 0))
         # todays_meals[meal.meal_option] = todays_meals[meal.meal_option].append(calories)
 
