@@ -1,3 +1,4 @@
+import datetime
 import time
 
 from django.contrib import messages
@@ -52,6 +53,7 @@ def deleteAll(request):
     Todo.objects.filter(user=request.user).delete()
     return redirect('todo:index')
 
+
 @login_required(login_url='/accounts/login')
 def home(request):
     if request.user.is_authenticated:
@@ -69,10 +71,21 @@ def home(request):
         protein = 0
         fat = 0
         carb = 0
+        today = datetime.datetime.now().date()
+        todays_meals = []
+        day_calories = 0
+        day_protein = 0
+        day_fat = 0
+        day_carb = 0
+
         for meal in meals:
+
+            if meal.day.split('_')[1] == str(today):
+                todays_meals.append(meal)
             ingredients = list(MealIngredient.objects.select_related('ingredient_id').filter(meal_id=meal.meal_id))
             if meal.extras:
-                extra_ingredients = MealIngredient.objects.select_related('ingredient_id').filter(meal_id=meal.extras.id)
+                extra_ingredients = MealIngredient.objects.select_related('ingredient_id').filter(
+                    meal_id=meal.extras.id)
                 ingredients.extend(extra_ingredients)
             for ingr in ingredients:
                 calories += (ingr.quantity / 100) * int(ingr.ingredient_id.calories_per_100_gram)
@@ -83,17 +96,25 @@ def home(request):
                 protein_total += protein
                 fat_total += fat
                 carb_total += carb
+                if meal.day.split('_')[1] == str(today):
+                    day_calories += calories
+                    day_protein += protein
+                    day_fat += fat
+                    day_carb += carb
                 calories = 0
                 protein = 0
                 fat = 0
                 carb = 0
 
+        todays_macro = (round(day_calories, 0), round(day_protein, 0), round(day_fat, 0), round(day_carb, 0))
+        # todays_meals[meal.meal_option] = todays_meals[meal.meal_option].append(calories)
+
         try:
             meals_list_length = int(len(all_meals) / len(meal_options))
-            average_clories_per_day = int(calories_total/meals_list_length)
-            average_protein_per_day = int(protein_total/meals_list_length)
-            average_fat_per_day = int(fat_total/meals_list_length)
-            average_carb_per_day = int(carb_total/meals_list_length)
+            average_clories_per_day = int(calories_total / meals_list_length)
+            average_protein_per_day = int(protein_total / meals_list_length)
+            average_fat_per_day = int(fat_total / meals_list_length)
+            average_carb_per_day = int(carb_total / meals_list_length)
         except ZeroDivisionError:
             meals_list_length = 0
             average_clories_per_day = 0
@@ -106,7 +127,7 @@ def home(request):
         for product in shopping_lists:
             for item in Products.objects.filter(shopping_list_id=product, bought=False):
                 products_to_buy_counter += 1
-        distinct_meals =[]
+        distinct_meals = []
         for meal in meals:
             if meal.meal:
                 if meal.meal.name not in distinct_meals:
@@ -125,9 +146,10 @@ def home(request):
             'average_protein_per_day': average_protein_per_day,
             'average_fat_per_day': average_fat_per_day,
             'average_carb_per_day': average_carb_per_day,
+            'todays_macro': todays_macro,
+            'todays_meals': todays_meals,
+            'today': today,
         }
     else:
         context = {}
     return render(request, 'todo/home.html', context)
-
-

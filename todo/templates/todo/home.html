@@ -6,32 +6,38 @@
     <div class="col-12 mx-auto" id="">
       {% if user.is_authenticated %}
         <div class="row d-flex justify-content-center">
-          <div class="ccol-12 col-md-6 col-xl-3 mb-2">
+          <div class="col-12 col-md-6 col-xl-3 mb-2">
             <div class="card shadow" style="height:100%;">
-              <div class="card-header bg-secondary text-light">
-                Jadłospis
+              <div class="card-header bg-secondary text-light text-center">
+                <img src="{% static 'todo/img/utensils-solid.svg' %}" height="45" >
               </div>
               <div class="card-body">
-                <div class="row">
-                  <div class="col-3">
-                    <img src="{% static 'todo/img/utensils-solid.svg' %}" height="75" >
+                <div class="text-center"><b>{{today}} : {{todays_macro.0}} kcal</b></div>
+                  <div class="text-center">
+                    {{todays_macro.1}}g <sup>białko</sup>|
+                    {{todays_macro.2}}g <sup>tłuszcze</sup>|
+                    {{todays_macro.3}}g <sup>węglowodany</sup>
                   </div>
-                  <div class="col-9">
-                    <ul>
-                      {% if meals_list_length %}
-                      <li>{{meals_list_length}} {% if meals_list_length == 1 %}dzień{% else %} dni{% endif %}.</li>
-                      <li>{{meals}} {% if meals == 1 %}danie{% endif %}{% if meals > 1 and meals < 5 %} różne dania{% endif %}{% if meals >= 5 %}różnych dań{% endif %}.</li>
-                      <li>{{meal_options}} {% if meal_options == 1 %}posiłek{% endif %}{% if meal_options > 1 and meal_options < 5%}posiłki{% endif %}{% if meal_options >= 5 %}posiłków{% endif %} dziennie.</li>
-                      <li>Średnio: {{average_clories_per_day}} kcal,</li>
-                      <li>{{average_protein_per_day}}g białka,</li>
-                      <li>{{average_fat_per_day}}g tłuszczów,</li>
-                      <li>{{average_carb_per_day}}g węglowodanów dziennie.</li>
-                      {% else %}
-                      <li>Jadłospis jest pusty!</li>
-                      {% endif %}
-                    </ul>
-                  </div>
-                </div>
+                <ul class="p-xl-0">
+                  {% for meal in todays_meals %}
+                    <li>{{meal.meal_option}} : <a href="{% url 'meals:edit_meal_ingredients' meal.meal_id %}" class="text-dark">{{meal}}</a></li>
+                  {% endfor %}
+                </ul>
+                  <ul class="p-xl-0">
+                    {% if meals_list_length %}
+                    <li>
+                      {{meals_list_length}} {% if meals_list_length == 1 %}dzień{% else %} dni{% endif %}.
+                      {{meals}} {% if meals == 1 %}danie{% endif %}{% if meals > 1 and meals < 5 %} różne dania{% endif %}{% if meals >= 5 %}różnych dań{% endif %}.
+                    </li>
+                    <li>{{meal_options}} {% if meal_options == 1 %}posiłek{% endif %}{% if meal_options > 1 and meal_options < 5%}posiłki{% endif %}{% if meal_options >= 5 %}posiłków{% endif %} dziennie.</li>
+                    <li>Średnio: {{average_clories_per_day}} kcal,</li>
+                    <li>{{average_protein_per_day}}g białka,</li>
+                    <li>{{average_fat_per_day}}g tłuszczów,</li>
+                    <li>{{average_carb_per_day}}g węglowodanów dziennie.</li>
+                    {% else %}
+                    <li>Jadłospis jest pusty!</li>
+                    {% endif %}
+                  </ul>
               </div>
               <div class="mx-5 mb-2">
                 <a href="{% url 'meals:index' 1 %}" class="btn btn-secondary btn-block">Przejdź</a>
@@ -41,24 +47,17 @@
           <div class="col-12 col-md-6 col-xl-3 mb-2">
             <div class="card shadow" style="height:100%;">
               <div class="card-header bg-secondary text-light text-center">
-                Zakupy
+                <img src="{% static 'todo/img/shopping-cart-solid.svg' %}" height="45">
               </div>
               <div class="card-body">
-                <div class="row">
-                  <div class="col-4">
-                    <img src="{% static 'todo/img/shopping-cart-solid.svg' %}" height="75">
-                  </div>
-                  <div class="col-8">
-                    <ul>
-                      {%  if shopping_lists %}
-                      <li>{{shopping_lists}} {% if shopping_lists == 1 %}lista{% endif %}{% if shopping_lists > 1 and  shopping_lists < 5 %}listy{% endif %}{% if shopping_lists >= 5 %}list{% endif %} zakupów.</li>
-                      <li>{{products_to_buy_counter}} {% if products_to_buy_counter == 1 %}pozycja{% endif %}{% if products_to_buy_counter > 1 and  products_to_buy_counter < 5 %}pozycje{% endif %}{% if products_to_buy_counter >= 5 %}pozycji{% endif %} do kupienia</li>
-                      {% else %}
-                      <li>Brak list zakupów!</li>
-                      {% endif %}
-                    </ul>
-                  </div>
-                </div>
+                <ul>
+                  {%  if shopping_lists %}
+                  <li>{{shopping_lists}} {% if shopping_lists == 1 %}lista{% endif %}{% if shopping_lists > 1 and  shopping_lists < 5 %}listy{% endif %}{% if shopping_lists >= 5 %}list{% endif %} zakupów.</li>
+                  <li>{{products_to_buy_counter}} {% if products_to_buy_counter == 1 %}pozycja{% endif %}{% if products_to_buy_counter > 1 and  products_to_buy_counter < 5 %}pozycje{% endif %}{% if products_to_buy_counter >= 5 %}pozycji{% endif %} do kupienia</li>
+                  {% else %}
+                  <li>Brak list zakupów!</li>
+                  {% endif %}
+                </ul>
               </div>
               <div class="mx-5 mb-2">
                 <a href="{% url 'shopping:shopping_list_index' %}"  class="btn btn-secondary btn-block">Przejdź</a>
@@ -68,23 +67,16 @@
           <div class="col-12 col-md-6 col-xl-3 mb-2">
             <div class="card shadow" style="height:100%;">
               <div class="card-header bg-secondary text-light text-center">
-                TO DO
+                <img src="{% static 'todo/img/tasks-solid.svg' %}" height="45">
               </div>
               <div class="card-body">
-                <div class="row">
-                  <div class="col-4">
-                    <img src="{% static 'todo/img/tasks-solid.svg' %}" height="75">
-                  </div>
-                  <div class="col-8">
-                    <ul>
-                      {% if all_to_do_count %}
-                      <li>{{all_to_do_count}} {% if all_to_do_count == 1 %}zadanie{% endif %}{% if all_to_do_count > 1 and  all_to_do_count < 5 %}zadania{% endif %}{% if all_to_do_count >= 5 %}zadań{% endif %} do zrobienia</li>
-                      {% else %}
-                      <li>Brak zadań do zrobienia!</li>
-                      {% endif %}
-                    </ul>
-                  </div>
-                </div>
+                <ul>
+                  {% if all_to_do_count %}
+                  <li>{{all_to_do_count}} {% if all_to_do_count == 1 %}zadanie{% endif %}{% if all_to_do_count > 1 and  all_to_do_count < 5 %}zadania{% endif %}{% if all_to_do_count >= 5 %}zadań{% endif %} do zrobienia</li>
+                  {% else %}
+                  <li>Brak zadań do zrobienia!</li>
+                  {% endif %}
+                </ul>
               </div>
               <div class="mx-5 mb-2">
                 <a href="{% url 'todo:index' %}"  class="btn btn-secondary btn-block">Przejdź</a>
@@ -94,47 +86,40 @@
           <div class="col-12 col-md-6 col-xl-3 mb-2">
             <div class="card shadow" style="height:100%;">
               <div class="card-header bg-secondary text-light text-center">
-                GARAŻ
+                <img src="{% static 'todo/img/car-solid.svg' %}" height="45">
               </div>
               <div class="card-body">
                 <div class="row">
-                  <div class="col-4">
-                    <img src="{% static 'todo/img/car-solid.svg' %}" height="75">
-                  </div>
-                  <div class="col-8">
-                    <div class="row">
-                      {% if cars_owned or cars_sold %}
-                      <div class="col-6">
-                        <small>Posiadane</small>
-                        <ul>
-                          {% if cars_owned %}
-                            {% for car in cars_owned %}
-                            <li><a class="text-dark" href="{% url 'cars:car_details' car.id %}">{{car}}</a></li>
-                            {% endfor %}
-                          {% else %}
-                            <li>BRAK !</li>
-                          {% endif %}
-                        </ul>
-                      </div>
-                      <div class="col-6">
-                        <small>Sprzedane</small>
-                        <ul>
-                          {% if cars_sold %}
-                            {% for car in cars_sold %}
-                            <li><a class="text-dark" href="{% url 'cars:car_details' car.id %}">{{car}}</a></li>
-                            {% endfor %}
-                          {% else %}
-                            <li>BRAK !</li>
-                          {% endif %}
-                        </ul>
-                      </div>
+                  {% if cars_owned or cars_sold %}
+                  <div class="col-6">
+                    <small>Posiadane</small>
+                    <ul>
+                      {% if cars_owned %}
+                        {% for car in cars_owned %}
+                        <li><a class="text-dark" href="{% url 'cars:car_details' car.id %}">{{car}}</a></li>
+                        {% endfor %}
                       {% else %}
-                      <div class="col-12">
-                        <li>Garaż jest pusty!</li>
-                      </div>
+                        <li>BRAK !</li>
                       {% endif %}
-                    </div>
+                    </ul>
                   </div>
+                  <div class="col-6">
+                    <small>Sprzedane</small>
+                    <ul>
+                      {% if cars_sold %}
+                        {% for car in cars_sold %}
+                        <li><a class="text-dark" href="{% url 'cars:car_details' car.id %}">{{car}}</a></li>
+                        {% endfor %}
+                      {% else %}
+                        <li>BRAK !</li>
+                      {% endif %}
+                    </ul>
+                  </div>
+                  {% else %}
+                  <div class="col-12">
+                    <li>Garaż jest pusty!</li>
+                  </div>
+                  {% endif %}
                 </div>
               </div>
               <div class="mx-5 mb-2">
