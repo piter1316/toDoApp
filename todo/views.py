@@ -58,9 +58,8 @@ def deleteAll(request):
 def home(request):
     if request.user.is_authenticated:
         all_to_do_count = Todo.objects.filter(user=request.user, complete=False)
-        all_meals = MealsList.objects.filter(user=request.user, current=1)
         meal_options = MealsList.objects.filter(user=request.user).values('meal_option_id').distinct()
-        meals = MealsList.objects.select_related('meal').filter(user=request.user, current=1)
+        meals = MealsList.objects.select_related('meal').filter(user=request.user,)
         cars_owned = Car.objects.filter(user=request.user, sold=0)
         cars_sold = Car.objects.filter(user=request.user, sold=1)
         calories_total = 0
@@ -79,9 +78,9 @@ def home(request):
         day_carb = 0
 
         for meal in meals:
-
             if meal.day.split('_')[1] == str(today):
                 todays_meals.append(meal)
+
             ingredients = list(MealIngredient.objects.select_related('ingredient_id').filter(meal_id=meal.meal_id))
             if meal.extras:
                 extra_ingredients = MealIngredient.objects.select_related('ingredient_id').filter(
@@ -92,10 +91,11 @@ def home(request):
                 protein += (ingr.quantity / 100) * int(ingr.ingredient_id.protein_per_100_gram)
                 fat += (ingr.quantity / 100) * int(ingr.ingredient_id.fat_per_100_gram)
                 carb += (ingr.quantity / 100) * int(ingr.ingredient_id.carbohydrates_per_100_gram)
-                calories_total += calories
-                protein_total += protein
-                fat_total += fat
-                carb_total += carb
+                if meal.current:
+                    calories_total += calories
+                    protein_total += protein
+                    fat_total += fat
+                    carb_total += carb
                 if meal.day.split('_')[1] == str(today):
                     day_calories += calories
                     day_protein += protein
@@ -110,7 +110,7 @@ def home(request):
         # todays_meals[meal.meal_option] = todays_meals[meal.meal_option].append(calories)
 
         try:
-            meals_list_length = int(len(all_meals) / len(meal_options))
+            meals_list_length = int(len(meals.filter(current=1)) / len(meal_options))
             average_clories_per_day = int(calories_total / meals_list_length)
             average_protein_per_day = int(protein_total / meals_list_length)
             average_fat_per_day = int(fat_total / meals_list_length)
