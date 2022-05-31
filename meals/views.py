@@ -22,7 +22,7 @@ def days_generator(first, how_many):
     first_date = datetime.datetime.strptime(first[1], '%Y-%m-%d').date()
     first = first[0]
     for i in range(how_many):
-        days_list.append(days[first] + space + str(itr) + ' | ' + str(first_date + datetime.timedelta(days=i)))
+        days_list.append(days[first] + space + str(itr) + '_' + str(first_date + datetime.timedelta(days=i)))
         first += 1
         if first == len(days):
             first = 0
@@ -38,11 +38,10 @@ def appended_days_generator(request, first, how_many):
     first_date = datetime.datetime.strptime(first[1], '%Y-%m-%d').date()
     first = first[0]
     for i in range(how_many):
-        days_list.append(days[first] + ' | ' + str(first_date + datetime.timedelta(days=i)))
+        days_list.append(days[first] + '_' + str(first_date + datetime.timedelta(days=i)))
         first += 1
         if first == len(days):
             first = 0
-    print(days_list)
     return days_list
 
 
@@ -238,8 +237,6 @@ def meals(request, current=1):
     protein = 0
     fat = 0
     carb = 0
-    # for key, value in meal_ingredients_dict.items():
-    #     print(key, value)
 
     for meal in meals:
         if meal.meal_id:
@@ -376,7 +373,6 @@ def generate_meals_list(request):
     twice_the_same_meal = request.POST.get('twice_the_same_meal', False)
     empty_meals_list = request.POST.get('empty_meals_list', False)
     first_day = (int(request.POST['first_day'].split('|')[0])-1, request.POST['first_day'].split('|')[1])
-    print(request.POST)
     append_existing = request.POST.get('append_existing', False)
     no_repetition = request.POST.get('no_repetition', False)
     current_meals_list = MealsList.objects.filter(user=request.user, current=1)
