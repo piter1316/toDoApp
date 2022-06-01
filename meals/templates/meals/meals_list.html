@@ -60,7 +60,9 @@
                 <div id="div_th_{{day}}">
                   <input style="text-align: center;vertical-align: middle;" type="checkbox" name="day" class="checkbox my-auto mr-1" value="{% for meal in meals %}{% for ml in meal%}{{ml.id}},{% endfor %}{% endfor %}">
                   <span class="d-none d-xl-inline">
-                    <b>{{day_as_list.0}} | {{day_as_list.1}}: {{item.1.0}} kcal</b><br>
+                    <small>
+                      <b>{{day_as_list.0}} | <small>{{day_as_list.1}}</small>: {{item.1.0}} <sup>kcal</sup></b><br>
+                    </small>
                     <small>
                       {{item.1.1}}g <sup class="no_print">białko</sup>|
                       {{item.1.2}}g <sup class="no_print">tłuszcze</sup>|
