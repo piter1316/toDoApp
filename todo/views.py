@@ -132,6 +132,9 @@ def home(request):
                 if meal.meal:
                     if meal.meal.name not in distinct_meals:
                         distinct_meals.append(meal.meal.name)
+                if meal.extras:
+                    if meal.extras not in distinct_meals:
+                        distinct_meals.append(meal.extras)
         context = {
             'all_to_do_count': len(all_to_do_count),
             'meals_list_length': meals_list_length,
