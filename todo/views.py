@@ -128,10 +128,10 @@ def home(request):
                 products_to_buy_counter += 1
         distinct_meals = []
         for meal in meals:
-            if meal.meal:
-                if meal.meal.name not in distinct_meals:
-                    distinct_meals.append(meal.meal.name)
-
+            if meal.current:
+                if meal.meal:
+                    if meal.meal.name not in distinct_meals:
+                        distinct_meals.append(meal.meal.name)
         context = {
             'all_to_do_count': len(all_to_do_count),
             'meals_list_length': meals_list_length,
