@@ -1,3 +1,4 @@
+
 {% if current %}
 <div class="col-12 col-md-4 col-xl-2 mb-2 " style="position:relative;">
   <nav class="navbar navbar-expand-md navbar-light p-0">
@@ -133,6 +134,6 @@
     <i class="far fa-file-archive"></i>
   </p>
   <a class="btn btn-block btn-dark" href="{% url 'meals:index' 1 %}">Wyświetl aktualny jadłospis</a>
-
+  <small>{{today}}</small>
 </div>
 {% endif %}

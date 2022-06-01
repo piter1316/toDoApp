@@ -1,6 +1,7 @@
 import datetime
 import time
-
+import pytz
+from meals.views import TODAY
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
@@ -70,7 +71,7 @@ def home(request):
         protein = 0
         fat = 0
         carb = 0
-        today = datetime.datetime.now().date()
+        today = TODAY.date()
         todays_meals = []
         day_calories = 0
         day_protein = 0
