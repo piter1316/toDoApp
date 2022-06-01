@@ -14,7 +14,9 @@ from meals.forms import MealForm, IngredientForm, MealOptionForm
 from meals.models import MealOption, Meal, Ingredient, MealsList, Week, Unit, MealIngredient, Shop, ProductDivision
 from shopping.models import ShoppingList, Products
 
-TODAY = datetime.datetime.now()
+
+def get_today():
+    return datetime.datetime.now()
 
 
 def days_generator(first, how_many):
@@ -85,8 +87,7 @@ def get_maximum_no_of_days_no_repeat(request):
 
 @login_required(login_url='/accounts/login')
 def meals(request, current=1):
-    print(TODAY)
-    today_to_template = TODAY.date()
+    today_to_template = get_today().date()
     start = time.time()
     in_meals_list = True
     user_meals_options = MealOption.objects.filter(user=request.user, is_taken_to_generation=1).order_by('position')
@@ -209,15 +210,15 @@ def meals(request, current=1):
     maximum_no_of_days_to_generate_no_repeat = get_maximum_no_of_days_no_repeat(request)
     first_day_input_list = {}
     days_of_the_week = Week.objects.all()
-    today_weekday = TODAY.weekday()
+    today_weekday = get_today().weekday()
     dates_counter = 0
     for i in range(today_weekday, today_weekday + 7):
         if i > 6:
-            first_day_input_list[days_of_the_week[i - 7]] = (TODAY + datetime.timedelta(days=dates_counter),
+            first_day_input_list[days_of_the_week[i - 7]] = (get_today() + datetime.timedelta(days=dates_counter),
                                                              days_of_the_week.filter(
                                                                  day_of_the_week=days_of_the_week[i - 7]))
         else:
-            first_day_input_list[days_of_the_week[i]] = (TODAY + datetime.timedelta(days=dates_counter),
+            first_day_input_list[days_of_the_week[i]] = (get_today() + datetime.timedelta(days=dates_counter),
                                                          days_of_the_week.filter(day_of_the_week=days_of_the_week[i]))
         dates_counter += 1
     option_meals_dict = {}
@@ -304,7 +305,7 @@ def meals(request, current=1):
         'current': int(current),
         'all_meals_in_option_dict': all_meals_in_option_dict,
         'today_to_template': today_to_template,
-        'today': TODAY,
+        'today': get_today(),
     }
     end = time.time()
     return render(request, 'meals/meals_list.html', context)
