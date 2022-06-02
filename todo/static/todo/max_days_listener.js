@@ -305,11 +305,9 @@ $(document).ready(function(){
   var v_pills = $('#v-pills-tab a');
   v_pills_array = []
   v_pills.each(function(a){v_pills_array.push($(this).attr('href'))})
-  console.log(v_pills_array,window.location.href)
 
   v_pills_array.forEach(function(element, index,v_pills_array){
     if(window.location.href.includes(element)){
-      console.log(element)
       $(element+'-tab').addClass('active')
       $(element).addClass('show active')
     }
@@ -320,22 +318,22 @@ $(document).ready(function(){
     }
   })
 
- if(window.location.href.includes('#service')){
- $('#fuel').removeClass('show')
- $('#fuel').removeClass('active')
- $('#fuel-tab').removeClass('active')
- $('#service').addClass('show');
- $('#service').addClass('active');
- $('#service-tab').addClass('active');
+if(window.location.href.includes('#service')){
+   $('#fuel').removeClass('show')
+   $('#fuel').removeClass('active')
+   $('#fuel-tab').removeClass('active')
+   $('#service').addClass('show');
+   $('#service').addClass('active');
+   $('#service-tab').addClass('active');
  }
 
- if(window.location.href.includes('#division')){
- $('#macro').removeClass('show')
- $('#macro').removeClass('active')
- $('#macro-tab').removeClass('active')
- $('#division').addClass('show');
- $('#division').addClass('active');
- $('#division-tab').addClass('active');
+if(window.location.href.includes('#division')){
+   $('#macro').removeClass('show')
+   $('#macro').removeClass('active')
+   $('#macro-tab').removeClass('active')
+   $('#division').addClass('show');
+   $('#division').addClass('active');
+   $('#division-tab').addClass('active');
  }
 
  if(window.location.href.includes('#info')){
@@ -350,6 +348,19 @@ $(document).ready(function(){
  $(".divisionPriority_").keypress(function(e) {
     if (isNaN(String.fromCharCode(e.which))) e.preventDefault();
 });
+
+
+setInterval(function(){
+  var time_now_smalls = $('.time_now_')
+  var time_now = $(time_now_smalls[0]).text().split(' ')
+  var current_date_time = new Date()
+  var current_time = current_date_time.toTimeString().substring(0,5)
+  if (current_time != time_now[3]){
+    time_now.pop()
+    time_now.push(current_time)
+    $('.time_now_').replaceWith("<small class='time_now_'>"+time_now.join(' ')+"</small>");
+  }
+}, 1000);
 
 });
 

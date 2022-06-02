@@ -1,5 +1,6 @@
 
   <div class="menu_ul nav" id="menu_ul">
+    <small class="time_now_">{{today}}</small>
     <a class=" nav-item btn btn-outline-secondary btn-block mb-3" href="{% url 'meals:edit_meals' %}">Posiłki</a>
     <a class=" nav-item btn btn-outline-secondary btn-block mb-3" href="{% url 'meals:edit_ingredients' %}">Składniki/Sklepy</a>
     {% if in_meals_list %}
@@ -23,7 +24,8 @@
         Wyczyść jadłospis
       </a>
       <a class="btn btn-block btn-dark" href="{% url 'meals:index' 0 %}">Wyświetl poprzedni jadłospis</a>
-    <small>{{today}}</small>
+
     {% endif %}
     {% endif %}
   </div>
+<!--  <script>$(document).ready(function(){})</script>-->
