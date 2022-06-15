@@ -36,12 +36,18 @@
                 <small>Składniki:</small>
               </li>
               {% for ingredient in ingredients %}
-              <li class="list-group-item d-flex justify-content-between align-items-center py-1">
-                <span>{{ingredient}}
+              <li class="list-group-item d-flex justify-content-between align-items-center py-0">
+                <small>
+                  <b>{{ingredient}}</b>
                   {% if ingredient.ingredient_id.short_expiry %}
                     <i class="fas fa-hourglass-start" ></i>
                   {% endif %}
-                </span>
+                  <br>
+                  <SUP>{{ingredient.ingredient_id.calories_per_100_gram}}</SUP>&frasl;<sub>k</sub>
+                  <SUP>{{ingredient.ingredient_id.protein_per_100_gram}}</SUP>&frasl;<sub>b</sub>
+                  <SUP>{{ingredient.ingredient_id.fat_per_100_gram}}</SUP>&frasl;<sub>t</sub>
+                  <SUP>{{ingredient.ingredient_id.carbohydrates_per_100_gram}}</SUP>&frasl;<sub>w</sub>
+                </small>
                 <span>
                   <span class="badge badge-secondary badge-pill p-2">{{ingredient.quantity}} g</span>
                   {% if ingredient.quantity|divide:ingredient.ingredient_id.weight_per_unit > 0 %}
@@ -55,6 +61,11 @@
               <li class="list-group-item  update_ingredient_ px-1" id="update_ingredient_{{ingredient.id }}" style="display:none;">
                 <form class="updateIngredient_ form" action="{% url 'meals:update_ingredient' meal.0.id ingredient.id  %}"
                       method="post" id="updateIngredient_{{ingredient.id }}">{% csrf_token %}
+                  <small>W tym posiłku:</small>
+                  <small>{% widthratio ingredient.ingredient_id.calories_per_100_gram|divide:100 1 ingredient.quantity %} kcal </small>|
+                  <small>{% widthratio ingredient.ingredient_id.protein_per_100_gram|divide:100 1 ingredient.quantity %} b </small>|
+                  <small>{% widthratio ingredient.ingredient_id.fat_per_100_gram|divide:100 1 ingredient.quantity %} t </small>|
+                  <small>{% widthratio ingredient.ingredient_id.carbohydrates_per_100_gram|divide:100 1 ingredient.quantity %} w </small>
                   <div class="form-row mx-auto">
                     <div class="col-6 pr-0">
                       <input class="form-control" type="number" min="0" step="0.01" name="new_quantity" id="newQuantity_{{ingredient.id }}"
