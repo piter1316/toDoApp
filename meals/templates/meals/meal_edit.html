@@ -62,10 +62,10 @@
                 <form class="updateIngredient_ form" action="{% url 'meals:update_ingredient' meal.0.id ingredient.id  %}"
                       method="post" id="updateIngredient_{{ingredient.id }}">{% csrf_token %}
                   <small>W tym posiłku:</small>
-                  <small>{% widthratio ingredient.ingredient_id.calories_per_100_gram|divide:100 1 ingredient.quantity %} kcal </small>|
-                  <small>{% widthratio ingredient.ingredient_id.protein_per_100_gram|divide:100 1 ingredient.quantity %} b </small>|
-                  <small>{% widthratio ingredient.ingredient_id.fat_per_100_gram|divide:100 1 ingredient.quantity %} t </small>|
-                  <small>{% widthratio ingredient.ingredient_id.carbohydrates_per_100_gram|divide:100 1 ingredient.quantity %} w </small>
+                  <SUP>{{ingredient.kcal}}kcal</SUP>&frasl;<sub>{% widthratio ingredient.kcal|divide:calories 1 100 %}%</sub> |
+                  <SUP>{{ingredient.protein}}b</SUP>&frasl;<sub>{% widthratio ingredient.protein|divide:protein 1 100 %}%</sub> |
+                  <SUP>{{ingredient.fat}}t</SUP>&frasl;<sub>{% widthratio ingredient.fat|divide:fat 1 100 %}%</sub> |
+                  <SUP>{{ingredient.carb}}w</SUP>&frasl;<sub>{% widthratio ingredient.carb|divide:carbohydrates 1 100 %}%</sub>
                   <div class="form-row mx-auto">
                     <div class="col-6 pr-0">
                       <input class="form-control" type="number" min="0" step="0.01" name="new_quantity" id="newQuantity_{{ingredient.id }}"

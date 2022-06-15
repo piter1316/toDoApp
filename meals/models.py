@@ -1,3 +1,5 @@
+import math
+
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -60,8 +62,6 @@ class Ingredient(models.Model):
     short_expiry = models.BooleanField(default=False, null=True)
     division = models.ForeignKey(ProductDivision, models.DO_NOTHING)
 
-
-
     def __str__(self):
         return self.name
 
@@ -74,6 +74,22 @@ class MealIngredient(models.Model):
     def __str__(self):
         return self.ingredient_id.name
 
+    @property
+    def kcal(self):
+        return math.ceil(self.ingredient_id.calories_per_100_gram * self.quantity / 100)
+
+    @property
+    def protein(self):
+        return math.ceil(self.ingredient_id.protein_per_100_gram * self.quantity / 100)
+
+    @property
+    def fat(self):
+        return math.ceil(self.ingredient_id.fat_per_100_gram * self.quantity / 100)
+
+    @property
+    def carb(self):
+        return math.ceil(self.ingredient_id.carbohydrates_per_100_gram * self.quantity / 100)
+
 
 class MealsList(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
@@ -81,7 +97,8 @@ class MealsList(models.Model):
     meal_option = models.ForeignKey(MealOption, on_delete=models.DO_NOTHING, default=1)
     meal = models.ForeignKey(Meal, on_delete=models.DO_NOTHING, db_column='meal_id', default=1, null=True, blank=True)
     current = models.BooleanField(default=False)
-    extras = models.ForeignKey(Meal, models.DO_NOTHING, db_column='extras', related_name='%(class)s_meals_meal', blank=True, null=True)
+    extras = models.ForeignKey(Meal, models.DO_NOTHING, db_column='extras', related_name='%(class)s_meals_meal',
+                               blank=True, null=True)
 
     def __str__(self):
         if self.meal:
@@ -98,6 +115,3 @@ class Week(models.Model):
 
     def __str__(self):
         return self.day_of_the_week
-
-
-
