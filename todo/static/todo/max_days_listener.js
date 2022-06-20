@@ -182,6 +182,14 @@ $(document).ready(function(){
     var id = e.target.id
     var num_id = id.split('_')[1]
     $('#update_ingredient_' + num_id).toggle(600);
+    if($('#li_' + num_id).hasClass('default')){
+      $('#li_' + num_id).removeClass('default')
+      $('#li_' + num_id).addClass('bg-secondary text-light')
+    } else{
+      $('#li_' + num_id).removeClass('bg-secondary text-light')
+      $('#li_' + num_id).addClass('default')
+    }
+
   })
 
   $('body').on('click', '.editExtras', function(e){
