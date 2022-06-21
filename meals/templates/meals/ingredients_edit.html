@@ -115,7 +115,7 @@
           {% for ingredient in user_ingredients %}
           <tr>
             <td class="p-0 text-center">
-              <i class="fas fa-edit" data-toggle="modal" data-target="#editIngredientModal_{{ingredient.id}}"></i>
+              <a class="fas fa-edit text-dark" href="{% url 'meals:edit_ingredient_index' ingredient.id %}"></a>
               <a onclick="return confirm('Czy napewno usunąć składnik?')"
                  href="{% url 'meals:delete_ingr' ingredient.id %}" class="fas fa-minus-circle text-secondary"></a>
             </td>
@@ -225,93 +225,7 @@
     </div>
   </div>
 </div>
-{% for ingredient in user_ingredients %}
-<div class="modal fade" id="editIngredientModal_{{ingredient.id}}" tabindex="-1" role="dialog"
-     aria-labelledby="exampleModalCenterTitle"
-     aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <form method="post" action="{% url 'meals:edit_ingredient' ingredient.id %}">{%csrf_token%}
-        <div class="modal-header">
-          <h5 class="modal-title">{{ingredient}}</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <div class="form-row">
-            <div class="col">
-              Nazwa:
-              <input type="text" class="form-control mb-1" name="ingr_name" value="{{ingredient}}" required>
-            </div>
-            <div class="col">
-              Dział:
-              <select class="form-control" name="division">
-                <option value="1" {% if not ingredient.division_id %} selected {% endif %}>Nieprzypisany</option>
-                {% for division in user_divisions %}
-                <option value="{{division.id}}" {% if ingredient.division_id == division.id %} selected {% endif %}>
-                  {{division}}
-                </option>
-                {% endfor %}
-                <select/>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="col-12 col-md-6">
-              kcal / 100g
-              <input type="number" class="form-control" name="kcal" min="0" step="1" value="{{ingredient.calories_per_100_gram}}">
-            </div>
-            <div class="col-12 col-md-6">
-              białko / 100g
-              <input type="number" class="form-control" name="prot" min="0" step="1" value="{{ingredient.protein_per_100_gram}}">
-            </div>
-            <div class="col-12 col-md-6">
-              tłuszcz / 100g
-              <input type="number" class="form-control" name="fat" min="0" step="1" value="{{ingredient.fat_per_100_gram}}">
-            </div>
-            <div class="col-12 col-md-6">
-              węglowodany / 100g
-              <input type="number" class="form-control" name="carb" min="0" step="1" value="{{ingredient.carbohydrates_per_100_gram}}">
-            </div>
 
-          </div>
-          <div class="form-row">
-            <div class="col">
-              Średnia sztuka / opakowanie :
-              <input type="number" class="form-control" name="avg_unit" value="{{ingredient.weight_per_unit}}">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="col">
-              Sklep:
-              <select class="form-control" name="shop">
-                <option value="None" {% if not ingredient.shop %} selected {% endif %}>Nieprzypisany</option>
-                {% for shop in user_shops %}
-                <option value="{{shop.id}}" {% if shop.id == ingredient.shop.id %} selected {% endif %}>
-                  {{shop}}
-                </option>
-                {% endfor %}
-              </select>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="col">
-              <span><i class="fas fa-hourglass-start mr-1" ></i>Krótka data ważności:</span>
-              <span class="ml-2">
-                <input type="checkbox"  name="short_expiry" {% if ingredient.short_expiry %} checked {% endif %}>
-              </span>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuluj</button>
-          <button type="submit" class="btn btn-primary">Zapisz</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-{% endfor %}
 
 <script>
    $('body').on('focusout','.shop_',function(e){

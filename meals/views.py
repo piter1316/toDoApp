@@ -783,6 +783,18 @@ def delete_ingr(request, ingr_id):
     return redirect('meals:edit_ingredients')
 
 
+@login_required(login_url='/accounts/login')
+def edit_ingredient_index(request, ingr_id):
+    ingredient = Ingredient.objects.get(pk=ingr_id)
+    context = {
+        'ingredient': ingredient,
+        'user_shops': Shop.objects.filter(user=request.user.id)
+
+    }
+
+    return render(request, 'meals/ingredient_edit.html', context)
+
+
 def edit_ingredient(request, ingr_id):
     new_ingredient_name = request.POST['ingr_name']
     kcal = request.POST.get('kcal', False)

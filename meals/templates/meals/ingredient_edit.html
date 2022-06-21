@@ -1,0 +1,87 @@
+{% extends 'todo/base.html' %}
+{% block body %}
+
+
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <form method="post" action="{% url 'meals:edit_ingredient' ingredient.id %}">{%csrf_token%}
+        <div class="modal-header">
+          <h3 class="modal-title">{{ingredient}}</h3>
+          <a type="button" class="close" href="{% url 'meals:edit_ingredients' %}">
+            <span aria-hidden="true">&times;</span>
+          </a>
+        </div>
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="col">
+              Nazwa:
+              <input type="text" class="form-control mb-1" name="ingr_name" value="{{ingredient}}" required>
+            </div>
+            <div class="col">
+              Dział:
+              <select class="form-control" name="division">
+                <option value="1" {% if not ingredient.division_id %} selected {% endif %}>Nieprzypisany</option>
+                {% for division in user_divisions %}
+                <option value="{{division.id}}" {% if ingredient.division_id == division.id %} selected {% endif %}>
+                  {{division}}
+                </option>
+                {% endfor %}
+                <select/>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="col-12 col-md-6">
+              kcal / 100g
+              <input type="number" class="form-control" name="kcal" min="0" step="1" value="{{ingredient.calories_per_100_gram}}">
+            </div>
+            <div class="col-12 col-md-6">
+              białko / 100g
+              <input type="number" class="form-control" name="prot" min="0" step="1" value="{{ingredient.protein_per_100_gram}}">
+            </div>
+            <div class="col-12 col-md-6">
+              tłuszcz / 100g
+              <input type="number" class="form-control" name="fat" min="0" step="1" value="{{ingredient.fat_per_100_gram}}">
+            </div>
+            <div class="col-12 col-md-6">
+              węglowodany / 100g
+              <input type="number" class="form-control" name="carb" min="0" step="1" value="{{ingredient.carbohydrates_per_100_gram}}">
+            </div>
+
+          </div>
+          <div class="form-row">
+            <div class="col">
+              Średnia sztuka / opakowanie :
+              <input type="number" class="form-control" name="avg_unit" value="{{ingredient.weight_per_unit}}">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="col">
+              Sklep:
+              <select class="form-control" name="shop">
+                <option value="None" {% if not ingredient.shop %} selected {% endif %}>Nieprzypisany</option>
+                {% for shop in user_shops %}
+                <option value="{{shop.id}}" {% if shop.id == ingredient.shop.id %} selected {% endif %}>
+                  {{shop}}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="col">
+              <span><i class="fas fa-hourglass-start mr-1" ></i>Krótka data ważności:</span>
+              <span class="ml-2">
+                <input type="checkbox"  name="short_expiry" {% if ingredient.short_expiry %} checked {% endif %}>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <a type="button" class="btn btn-secondary" href="{% url 'meals:edit_ingredients' %}">Anuluj</a>
+          <button type="submit" class="btn btn-primary">Zapisz</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+{% endblock %}
