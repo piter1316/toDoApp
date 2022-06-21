@@ -234,8 +234,6 @@ def add_from_checklist(request):
             shopping_list_to_update_query = ShoppingList.objects.filter(name=shop_name, user_id_id=request.user)
             if shopping_list_to_update_query:
                 shopping_list_to_update = ShoppingList.objects.filter(name=shop_name, user_id_id=request.user)[0]
-                new_shopping_product = Products(product_name=product_name, quantity=1, bought=0,
-                                                shopping_list_id=shopping_list_to_update, unit_id=1)
             else:
                 shopping_list_to_update = ShoppingList()
                 shopping_list_to_update.name = shop_name
