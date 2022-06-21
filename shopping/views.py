@@ -189,7 +189,14 @@ def bought(request, id):
     product = Products.objects.get(pk=id)
     product.bought = True
     product.save()
-    return HttpResponse('Product: {} marked as bought'.format(product))
+    return redirect('shopping:shopping_list_index')
+
+
+def un_bought(request, id):
+    product = Products.objects.get(pk=id)
+    product.bought = False
+    product.save()
+    return redirect('shopping:shopping_list_index')
 
 
 def delete_bought(request, shopping_list_id):

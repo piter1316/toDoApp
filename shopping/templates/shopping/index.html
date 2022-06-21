@@ -121,9 +121,9 @@
           {% for prod, qt in product.items %}
 
           <li class=" {% if qt.1 %}todo-completed bg-secondary  {%else%} bg-light {%endif%}list-group-item d-flex justify-content-between align-items-center py-md-1 {% if qt.6%}border-dark firstInDivision{%endif%}" id="prod_{{qt.2}}">
-            <span><input class="{% if qt.1 %}d-none{%endif%}" type="checkbox" name="bought_many" id="boughtMany_{{qt.2}}">
+            <span><input {% if qt.1 %}style="display:none;"{%endif%} type="checkbox" name="bought_many" id="boughtMany_{{qt.2}}">
               {% if qt.1 %}
-              <span class="disabled">{{prod}}</span>
+              <a class="pointer text-dark shoppingUnBought_" id="shoppingUnBought_{{qt.2}}">{{prod}}</a>
               {% else %}
               <a  class="shoppingBought_ pointer text-dark" id="shoppingBought_{{qt.2}}" >{{prod}}
               </a>
@@ -132,7 +132,7 @@
             <span>
               <span class="{% if qt.1 %}todo-completed {%endif%} badge badge-dark badge-pill" id="quantity_{{qt.2}}">{{qt.0}}</span>
               <span class="{% if qt.1 %}todo-completed {%endif%} badge badge-dark badge-pill" id="unit_{{qt.2}}" >{{qt.3}}</span>
-              <span class="dropdown_shopping_item badge badge-dark badge-pill fas fa-cog {% if qt.1 %}d-none{%endif%}" id="dropdown_{{qt.2}}" style="cursor:pointer;"> </span>
+              <span class="dropdown_shopping_item badge badge-dark badge-pill fas fa-cog" id="dropdown_{{qt.2}}" style="cursor:pointer; {% if qt.1 %}display:none{%endif%};"> </span>
             </span>
           </li>
           <li class="list-group-item p-0 border-bottom pb-2" id="{{qt.2}}" style="display:none;">
@@ -332,9 +332,7 @@
     $('#prod_'+prod_id + ' .badge-pill').addClass('disabled todo-completed');
     $('#dropdown_'+prod_id).hide();
     $('#boughtMany_'+prod_id).hide();
-    $('#shoppingBought_'+prod_id).replaceWith('<span class=disabled>'+ e.target.text +'</span>');
-    $('#' + prod_id).remove();
-
+    $('#' + prod_id).hide();
 
     $.ajax({
       type:'GET',
@@ -342,9 +340,34 @@
       data:{
       },
       success: function(data){
+      $('#shoppingBought_'+prod_id).replaceWith($('#shoppingUnBought_'+prod_id,data))
       },
     });
   });
+
+  $('body').on('click','.shoppingUnBought_',function(e){
+    e.preventDefault();
+    var id = e.target.id
+    var prod_id = parseInt(id.split('_')[1])
+    $('#prod_'+prod_id).addClass('bg-light');
+      $('#prod_'+prod_id).removeClass('bg-secondary');
+      $('#prod_'+prod_id).removeClass('todo-completed');
+      $('#prod_'+prod_id + ' .badge-pill').removeClass('disabled todo-completed');
+      $('#dropdown_'+prod_id).show();
+      $('#boughtMany_'+prod_id).show();
+
+    $.ajax({
+      type:'GET',
+      url:'shopping/un_bought/' + prod_id,
+      data:{
+      },
+      success: function(data){
+      $('#shoppingUnBought_'+prod_id).replaceWith($('#shoppingBought_'+prod_id,data))
+
+      },
+    });
+  });
+
 
   $('body').on('click','.deleteBought_',function(e){
     e.preventDefault();
