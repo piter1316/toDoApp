@@ -786,9 +786,11 @@ def delete_ingr(request, ingr_id):
 @login_required(login_url='/accounts/login')
 def edit_ingredient_index(request, ingr_id):
     ingredient = Ingredient.objects.get(pk=ingr_id)
+    return_url = (request.META.get('HTTP_REFERER'))
     context = {
         'ingredient': ingredient,
-        'user_shops': Shop.objects.filter(user=request.user.id)
+        'user_shops': Shop.objects.filter(user=request.user.id),
+        'return_url': return_url
 
     }
 
@@ -805,6 +807,7 @@ def edit_ingredient(request, ingr_id):
     shop_select = request.POST.get('shop', False)
     short_expiry = request.POST.get('short_expiry', False)
     division = request.POST.get('division', 1)
+    return_url = request.POST.get('return_url', False)
     if short_expiry:
         short_expiry = True
 
@@ -838,8 +841,10 @@ def edit_ingredient(request, ingr_id):
     edited_ingredient.short_expiry = short_expiry
     edited_ingredient.division = division
     edited_ingredient.save()
-
-    return redirect('meals:edit_ingredients')
+    if return_url:
+        return redirect(return_url)
+    else:
+        return redirect('meals:edit_ingredients')
 
 
 def edit_division(request, division_id):
