@@ -4,13 +4,13 @@
 {% load divide %}
 {% block body %}
 
-<div class="container-fluid py-2 mt-3">
+<div class="container-fluid py-2">
   <div class="row">
     <div class="container">
       <div class="row">
         <div class="col-12 col-xl-8">
           <div class="card shadow  p-0" style="" id="card">
-            <div class="card-header text-center" id="card-header">
+            <div class="card-header text-center py-0 px-1" id="card-header">
               <div id="edit_panel">
                 <p id="option_name" class="lead mb-0" style="cursor:pointer;" title="Kliknj i edtyuj">
                   {{meal.0.name|upper}} {%if meal.0.special%} **{% endif %}<br>
@@ -31,6 +31,7 @@
                 </form>
               </div>
             </div>
+
             <ul class="list-group list-group-flush" id="ingredients_list">
               <li class="list-group-item p-0 ml-1" id="ingr">
                 <small>Składniki:</small>
@@ -120,17 +121,22 @@
             </ul>
             <ul class="list-group list-group-flush">
               <li class="list-group-item mt-2">
-                <div class="btn-group mr-2" role="group" aria-label="First group">
-                  <button id="new_ingredient_form_toggle" type="button" class="btn btn-outline-secondary btn-sm ml-1">
-                    Opcje
-                  </button>
-                  <button id="print_meal_recipe" onclick="createPDFRecipe()" type="button" class="btn btn-outline-secondary btn-sm">
-                    <i class="fas fa-print"></i>
-                  </button>
-                  <button type="button" class="btn btn-dark btn-sm" style=" border-radius: 0px 5px 5px 0px !important;" data-toggle="modal" data-target="#shopping_list_modal">
-                    <i class="px-2 fas fa-shopping-cart"></i>
-                  </button>
-                  <button class="btn btn-block btn-outline-info btn-block btn-sm" id="addding_ingr_info" style="display:none">Zapisywanie...</button>
+                <div class="d-flex justify-content-between">
+                  <div class="btn-group mr-2" role="group" aria-label="First group">
+                    <button id="new_ingredient_form_toggle" type="button" class="btn btn-outline-secondary btn-sm ml-1">
+                      Opcje
+                    </button>
+                    <button id="print_meal_recipe" onclick="createPDFRecipe()" type="button" class="btn btn-outline-secondary btn-sm">
+                      <i class="fas fa-print"></i>
+                    </button>
+                    <button type="button" class="btn btn-dark btn-sm" style=" border-radius: 0px 5px 5px 0px !important;" data-toggle="modal" data-target="#shopping_list_modal">
+                      <i class="px-2 fas fa-shopping-cart"></i>
+                    </button>
+                    <button class="btn btn-block btn-outline-info btn-block btn-sm" id="addding_ingr_info" style="display:none">Zapisywanie...</button>
+                  </div>
+                  <div>
+                    <a class="btn btn-outline-dark btn-sm" href="{% url 'meals:index' %}" >jadłospis</a>
+                  </div>
                 </div>
 
                 <form style="display:none;" class="mt-2" action="{% url 'meals:add_ingredient' meal.0.id %}"

@@ -6,13 +6,13 @@
     <div class="modal-content">
       <form method="post" action="{% url 'meals:edit_ingredient' ingredient.id %}">{%csrf_token%}
         <input type="hidden" name="return_url" id="return_url" value="{{return_url}}">
-        <div class="modal-header">
+        <div class="modal-header py-1">
           <h3 class="modal-title">{{ingredient}}</h3>
           <a type="button" class="close" href="{{return_url}}">
             <span aria-hidden="true">&times;</span>
           </a>
         </div>
-        <div class="modal-body">
+        <div class="modal-body py-1">
           <div class="form-row">
             <div class="col">
               Nazwa:
