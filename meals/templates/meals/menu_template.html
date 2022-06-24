@@ -1,31 +1,32 @@
 
   <div class="menu_ul nav" id="menu_ul">
-    <small class="time_now_">{{today}}</small>
-    <a class=" nav-item btn btn-outline-secondary btn-block  btn-sm" href="{% url 'meals:edit_meals' %}">Posiłki</a>
-    <a class=" nav-item btn btn-outline-secondary btn-block mb-1 btn-sm" href="{% url 'meals:edit_ingredients' %}">Składniki/Sklepy</a>
+    <small class="w-100 text-center time_now_">{{today}}</small>
+    <div class="btn-group w-100 mb-1" role="group">
+      <a type="button" class="btn btn-outline-secondary btn-sm w-50" href="{% url 'meals:edit_meals' %}">Posiłki</a>
+      <a type="button" class="btn btn-outline-secondary btn-sm w-50" href="{% url 'meals:edit_ingredients' %}">Składniki/Sklepy</a>
+    </div>
     {% if in_meals_list %}
-    <button type="button" class="btn btn-outline-info btn-block btn-sm" data-toggle="modal" data-target="#newMealsListModal">
-      Generuj nowy jadłospis
-    </button>
-    {% if meals_list %}
-      <button type="button" class="btn btn-outline-primary btn-block btn-sm" data-toggle="modal" data-target="#generateShoppingListsModal">
-      Generuj listy zakupów
+      <button type="button" class="btn btn-outline-info btn-block btn-sm" data-toggle="modal" data-target="#newMealsListModal">
+        Generuj nowy jadłospis
       </button>
-      <button type="button" onclick="createPDF()" class="btn btn-outline-secondary  btn-block btn-sm">
-        Drukuj jadłospis
-      </button>
-      <form action="{% url 'meals:delete_selected_days' %}" class="deleteSelectedDays my-1 w-100"  id="deleteSelectedDays" method="POST">{% csrf_token %}
-        {% for item in day_meal_option_meal_list %}{% for day, meals in item.0.items %}{% for meal in meals %}{% for ml in meal%}
-          <input type="checkbox"  style="display:none;" value="{{ml.id}}" class="mealsListPosition_{{ml.id}}" name="mealsListPosition">{% endfor %}
-        {% endfor %}{% endfor %}{% endfor %}
-        <button type="submit" class="btn btn-outline-dark btn-sm btn-block mt-1 deleteSelectedDaysButton" disabled  >Usuń zaznaczone dni</button>
-      </form>
-      <a href="{% url 'meals:purge_meals_list' %}" class="btn btn-outline-danger btn-sm btn-block mt-1" onclick="return confirm('Wyczyścić jadłospis?')">
-        Wyczyść jadłospis
-      </a>
-      <a class="btn btn-block btn-dark btn-sm" href="{% url 'meals:index' 0 %}">Wyświetl poprzedni jadłospis</a>
-
-    {% endif %}
+      {% if meals_list %}
+        <button type="button" class="btn btn-outline-primary btn-block btn-sm" data-toggle="modal" data-target="#generateShoppingListsModal">
+        Generuj listy zakupów
+        </button>
+        <button type="button" onclick="createPDF()" class="btn btn-outline-secondary  btn-block btn-sm">
+          Drukuj jadłospis
+        </button>
+        <form action="{% url 'meals:delete_selected_days' %}" class="deleteSelectedDays my-1 w-100"  id="deleteSelectedDays" method="POST">{% csrf_token %}
+          {% for item in day_meal_option_meal_list %}{% for day, meals in item.0.items %}{% for meal in meals %}{% for ml in meal%}
+            <input type="checkbox"  style="display:none;" value="{{ml.id}}" class="mealsListPosition_{{ml.id}}" name="mealsListPosition">{% endfor %}
+          {% endfor %}{% endfor %}{% endfor %}
+          <button type="submit" class="btn btn-outline-dark btn-sm btn-block mt-1 deleteSelectedDaysButton" disabled  >Usuń zaznaczone dni</button>
+        </form>
+        <a href="{% url 'meals:purge_meals_list' %}" class="btn btn-outline-danger btn-sm btn-block mt-1" onclick="return confirm('Wyczyścić jadłospis?')">
+          Wyczyść jadłospis
+        </a>
+        <a class="btn btn-block btn-dark btn-sm" href="{% url 'meals:index' 0 %}">Wyświetl poprzedni jadłospis</a>
+      {% endif %}
     {% endif %}
   </div>
 <!--  <script>$(document).ready(function(){})</script>-->
