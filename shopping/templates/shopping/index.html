@@ -363,6 +363,7 @@
       },
       success: function(data){
       $('#shoppingUnBought_'+prod_id).replaceWith($('#shoppingBought_'+prod_id,data))
+      $('#'+prod_id).replaceWith($('#'+prod_id,data))
 
       },
     });
