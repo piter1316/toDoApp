@@ -790,7 +790,9 @@ def edit_ingredient_index(request, ingr_id):
     context = {
         'ingredient': ingredient,
         'user_shops': Shop.objects.filter(user=request.user.id),
-        'return_url': return_url
+        'return_url': return_url,
+        'user_divisions': ProductDivision.objects.filter(user=request.user).order_by('-priority'),
+
 
     }
 
