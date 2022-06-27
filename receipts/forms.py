@@ -19,15 +19,17 @@ class ReceiptForm(forms.ModelForm):
                                    'placeholder': 'Cena', 'required': 'true', 'class': 'form-control'
                                }))
     shop = forms.CharField(max_length=100, required=False, widget=forms.TextInput(
-        attrs={'class': 'form-control mb-2',
+        attrs={'class': 'form-control',
                'placeholder': 'Sklep'}))
 
     notes = forms.CharField(required=False, widget=forms.Textarea(
         attrs={'class': 'form-control mb-2',
-               'placeholder': 'Notatki'}))
+               'placeholder': 'Notatki',
+               'rows': '4'
+               }))
 
     warranty = forms.IntegerField(required=False, widget=forms.NumberInput(
-        attrs={'class': 'form-control mb-2',
+        attrs={'class': 'form-control',
                'placeholder': 'ilość dni'}))
 
     file = forms.FileField(required=False,

@@ -1,1 +1,67 @@
-{{form}}
+<div class="form-row">
+  <div class="col">
+    <small>Nazwa:</small>
+    {{form.name}}
+  </div>
+</div>
+<div class="form-row">
+  <div class="col">
+    <label class="sr-only"></label>
+      <div class="input-group mb-2">
+        <div class="input-group-prepend" style="width: 17%;">
+          <div class="input-group-text p-0" style="width: 100%;"><i class="fa fa-solid fa-calendar-day mx-auto"></i></div>
+        </div>
+        {{form.purchase_date}}
+      </div>
+  </div>
+</div>
+<div class="form-row">
+  <div class="col">
+    <label class="sr-only"></label>
+      <div class="input-group mb-2">
+        <div class="input-group-prepend" style="width: 17%;">
+          <div class="input-group-text p-0" style="width: 100%;"><i class="fa fa-solid fa-dollar-sign mx-auto"></i></div>
+        </div>
+        {{form.price}}
+      </div>
+  </div>
+</div>
+<div class="form-row">
+  <div class="col">
+    <label class="sr-only"></label>
+      <div class="input-group mb-2">
+        <div class="input-group-prepend" style="width: 17%;">
+          <div class="input-group-text p-0" style="width: 100%;"><i class="fas fa-shopping-cart mx-auto"></i></div>
+        </div>
+        {{form.shop}}
+      </div>
+  </div>
+</div>
+<div class="form-row">
+  <div class="col">
+    <label class="sr-only"></label>
+      <div class="input-group mb-2">
+        <div class="input-group-prepend" style="width: 17%;">
+          <div class="input-group-text p-0" style="width: 100%;"><small class="mx-auto">Gwarancja:</small></div>
+        </div>
+        {{form.warranty}}
+      </div>
+  </div>
+</div>
+<div class="form-row">
+  <div class="col">
+    <small>Notatki:</small>
+    {{form.notes}}
+  </div>
+</div>
+<div class="form-row">
+  <div class="col">
+    <small>Plik:</small>
+    {{form.file}}
+  </div>
+</div>
+
+{{success_message}}
+{% for message in messages %}
+{{message}}
+{% endfor %}

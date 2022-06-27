@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
 from receipts.models import Receipt
 from receipts.forms import ReceiptForm
-from django.views.generic import UpdateView, CreateView
-from django.urls import reverse
+from django.views.generic import UpdateView, CreateView, DeleteView
+from django.urls import reverse, reverse_lazy
 
 
 def receipts_home(request):
@@ -36,4 +36,9 @@ class ReceiptEdit(UpdateView):
     #     return context
 
     def get_success_url(self):
-        return '{}'.format(reverse('receipts:receipt', kwargs={'pk': self.object.pk}))
+        return '{}'.format(reverse('receipts:receipts_home'))
+
+
+def receipt_delete(request, pk):
+    receipt_to_delete = Receipt.objects.filter(pk=pk).delete()
+    return redirect('receipts:receipts_home')

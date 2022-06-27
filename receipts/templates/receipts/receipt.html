@@ -2,70 +2,29 @@
 {% block body %}
 {% load static %}
 <div class="container">
-  <div class="card mt-1">
-  <div class="card-body">
-    <h5 class="card-title font-weight-bold">{{receipt}}</h5>
-  </div>
-  <ul class="list-group list-group-flush">
-    <li class="list-group-item d-flex justify-content-between">
-      <span>Data Zakupu:</span>
-      <span>{{receipt.purchase_date}}</span>
-    </li>
-    <li class="list-group-item d-flex justify-content-between">
-      <span>Cena:</span>
-      <span>{{receipt.price}} PLN</span>
-    </li>
-    <li class="list-group-item d-flex justify-content-between">
-      <span>Sklep:</span>
-      <span>{{receipt.shop}}</span>
-    </li>
-    <li class="list-group-item d-flex justify-content-between">
-      <span>Gwarancja:</span>
-      <span>{{receipt.warranty}}</span>
-    </li>
-    <li class="list-group-item d-flex justify-content-between">
-      <span>Kategoria:</span>
-      <span>{{receipt.category}}</span>
-    </li>
-    <li class="list-group-item d-flex justify-content-between">
-      <span>Plik:</span>
-      <a target="_blank" href="{{receipt.file}}" class="btn btn-secondary py-1 px-3">
-                    <i class="fas fa-file-invoice"></i>
-                  </a>
-    </li>
-    <li class="list-group-item">
-      <span>Notatki:</span><br>
-      <span>{{receipt.notes}}</span>
-    </li>
-  </ul>
-  <div class="card-body">
-    <button type="button" class="btn btn-block btn-dark" data-toggle="modal" data-target="#edit_form">
-      Edycja
-    </button>
-  </div>
-
-</div>
-<div class="modal fade" id="edit_form" tabindex="-1" role="dialog" aria-labelledby="edit_form" aria-hidden="true">
   <div class="modal-dialog" role="document">
-    <form method="post" enctype="multipart/form-data">{%csrf_token%}
+    <form method="post" action="" enctype="multipart/form-data">{%csrf_token%}
       <div class="modal-content">
-        <div class="modal-header">
+        <div class="modal-header py-1">
           <h5 class="modal-title" id="exampleModalLabel">{{receipt}}</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body p-1">
           {% include 'receipts/receipt_form.html' %}
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
+          <a href="{% url 'receipts:receipts_home' %}" class="btn btn-secondary" data-dismiss="modal">Zamknij</a>
           <button type="submit" class="btn btn-dark">Zapisz</button>
         </div>
+        <a href="{% url 'receipts:receipt_delete' receipt.id %}" class="btn btn-block btn-danger mt-1">Usuń paragon</a>
       </div>
+
     </form>
   </div>
+
 </div>
-</div>
+
 
 {% endblock %}
