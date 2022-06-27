@@ -1,9 +1,56 @@
 {% extends 'todo/base.html' %}
 {% block body %}
 {% load static %}
-<div class="container bg-dark text-light">
-  {% for user_receipt in user_receipts%}
-  {{user_receipt.category}}<br>{{user_receipt}} {{user_receipt.price}}
-  {% endfor %}
+
+<div class="container">
+    <button class="btn btn-dark btn-block mb-1" data-toggle="modal" data-target="#add_receipt_form">Dodaj paragon</button>
+    <div class="row">
+        {% for user_receipt in user_receipts%}
+        <a class="col-12 col-lg-6 mb-1" href="{% url 'receipts:receipt' user_receipt.id %}" style="text-decoration:none;">
+          <div class="row" style="height:100%">
+            <div class="col-2  bg-light p-1 d-flex align-items-center">
+              <img height="65" class="my-1 p-0" src="{% static 'todo/img/receipts_categories_imgs/' %}{{user_receipt.category.icon}}" style="width:100%">
+            </div>
+            <div class="col-10 bg-secondary text-light">
+              <div class="d-flex justify-content-between">
+                <div class="left">
+                  <h4>{{user_receipt}}</h4>
+                  <div>{{user_receipt.purchase_date}}</div>
+                  <div><b>{{user_receipt.price}}</b> PLN</div>
+                </div>
+                <div class="d-flex align-items-center">
+                  {% if  user_receipt.warranty_left > 0%}
+                  <div class="text-center">Gwarancja:<br>{{user_receipt.warranty_left}} dni</div>
+                  {% else %}
+                  <div class="text-center">Gwarancja:<br>wygasła</div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+</div>
+<div class="modal fade" id="add_receipt_form" tabindex="-1" role="dialog" aria-labelledby="edit_form" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <form method="post" action="create_receipt" enctype="multipart/form-data">{%csrf_token%}
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Dodaj nowy paragon</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          {% include 'receipts/receipt_form.html' %}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
+          <button type="submit" class="btn btn-dark">Zapisz</button>
+        </div>
+      </div>
+    </form>
+  </div>
 </div>
 {% endblock %}
