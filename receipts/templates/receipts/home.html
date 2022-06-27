@@ -1,0 +1,9 @@
+{% extends 'todo/base.html' %}
+{% block body %}
+{% load static %}
+<div class="container bg-dark text-light">
+  {% for user_receipt in user_receipts%}
+  {{user_receipt.category}}<br>{{user_receipt}} {{user_receipt.price}}
+  {% endfor %}
+</div>
+{% endblock %}
