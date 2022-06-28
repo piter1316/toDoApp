@@ -17,9 +17,16 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path, include
 from django.views.static import serve
+from django.contrib.auth.decorators import login_required
 
 from myproject import settings
 from todo import views
+
+
+@login_required
+def protected_serve(request, path, document_root=None, show_indexes=False):
+    return serve(request, path, document_root, show_indexes)
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -33,6 +40,6 @@ urlpatterns = [
     path('', include('cars.urls')),
     path('', include('exchange_rates.urls')),
     path('', include('receipts.urls')),
-    url(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+    url(r'^media/(?P<path>.*)$', protected_serve, {'document_root': settings.MEDIA_ROOT}),
 
 ]

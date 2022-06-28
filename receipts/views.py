@@ -7,8 +7,10 @@ from django.core.files.storage import FileSystemStorage
 import os
 from myproject.settings import BASE_DIR, MEDIA_ROOT
 from django.core.files.storage import default_storage
+from django.contrib.auth.decorators import login_required
 
 
+@login_required(login_url='/accounts/login')
 def receipts_home(request):
     user_receipts = Receipt.objects.select_related('category').filter(user=request.user).order_by('-purchase_date')
     form = ReceiptForm(request.POST, request.FILES)
@@ -23,6 +25,7 @@ class ReceiptCreateView(CreateView):
     model = Receipt
     form_class = ReceiptForm
     success_url = 'receipts'
+
     def get_initial(self):
         return {'purchase_date': '2022-11-11'}
 
@@ -74,6 +77,7 @@ class ReceiptEdit(UpdateView):
         return '{}'.format(reverse('receipts:receipts_home'))
 
 
+@login_required(login_url='/accounts/login')
 def receipt_delete(request, pk):
     receipt = get_object_or_404(Receipt, pk=pk)
     path = os.path.join(BASE_DIR, str(receipt.file))
