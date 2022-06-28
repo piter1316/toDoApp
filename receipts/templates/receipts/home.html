@@ -6,12 +6,19 @@
     <button class="btn btn-dark btn-block mb-1" data-toggle="modal" data-target="#add_receipt_form">Dodaj paragon</button>
     <div class="row">
         {% for user_receipt in user_receipts%}
-        <a class="col-12 col-lg-6 mb-1" href="{% url 'receipts:receipt' user_receipt.id %}" style="text-decoration:none;">
+        <div class="col-12 col-lg-6 mb-1" >
           <div class="row" style="height:100%">
-            <div class="col-2  bg-light p-1 d-flex align-items-center">
-              <img height="65" class="my-1 p-0" src="{% static 'todo/img/receipts_categories_imgs/' %}{{user_receipt.category.icon}}" style="width:100%">
+            <div class="col-2  bg-light p-1 text-center">
+              <a href="{% url 'home' %}{{user_receipt.file}}" class="small text-dark" target="_blank" style="text-decoration:none;">
+                <figure class="figure m-0">
+                  <img height="65" class="my-1 p-0" src="{% static 'todo/img/receipts_categories_imgs/' %}{{user_receipt.category.icon}}" style="width:100%">
+                  <figcaption class="figure-caption">
+                      wyświetl
+                  </figcaption>
+                </figure>
+              </a>
             </div>
-            <div class="col-10 bg-secondary text-light">
+            <a class="col-10 bg-secondary text-light" href="{% url 'receipts:receipt' user_receipt.id %}" style="text-decoration:none;">
               <div class="d-flex justify-content-between">
                 <div class="left">
                   <h4>{{user_receipt}}</h4>
@@ -26,9 +33,9 @@
                   {% endif %}
                 </div>
               </div>
-            </div>
+            </a>
           </div>
-        </a>
+        </div>
       {% endfor %}
     </div>
 </div>

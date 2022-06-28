@@ -56,11 +56,13 @@ class ReceiptEdit(UpdateView):
         fs = FileSystemStorage(location=location)
         file = self.request.FILES.get('file', False)
         current_receipt_object = get_object_or_404(Receipt, pk=form.instance.id)
-        if current_receipt_object.file:
-            default_storage.delete(os.path.join(BASE_DIR,str(current_receipt_object.file)))
-        fs.save(str(file), file)
-        form.instance.user_id = self.request.user.id
-        form.instance.file = os.path.join(location, str(file))
+
+        if self.request.FILES:
+            if current_receipt_object.file:
+                default_storage.delete(os.path.join(BASE_DIR, str(current_receipt_object.file)))
+            fs.save(str(file), file)
+            form.instance.user_id = self.request.user.id
+            form.instance.file = os.path.join(location, str(file))
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -68,5 +70,11 @@ class ReceiptEdit(UpdateView):
 
 
 def receipt_delete(request, pk):
+    receipt = get_object_or_404(Receipt, pk=pk)
+    path = os.path.join(BASE_DIR, str(receipt.file))
+    try:
+        default_storage.delete(path)
+    except Exception:
+        pass
     receipt_to_delete = Receipt.objects.filter(pk=pk).delete()
     return redirect('receipts:receipts_home')

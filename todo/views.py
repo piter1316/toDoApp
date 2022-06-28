@@ -79,8 +79,11 @@ def home(request):
         day_carb = 0
 
         for meal in meals:
-            if meal.day.split('_')[1] == str(today):
-                todays_meals.append(meal)
+            try:
+                if meal.day.split('_')[1] == str(today):
+                    todays_meals.append(meal)
+            except:
+                pass
 
             ingredients = list(MealIngredient.objects.select_related('ingredient_id').filter(meal_id=meal.meal_id))
             if meal.extras:

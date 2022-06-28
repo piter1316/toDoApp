@@ -18,13 +18,15 @@
           <a href="{% url 'receipts:receipts_home' %}" class="btn btn-secondary" data-dismiss="modal">Zamknij</a>
           <button type="submit" class="btn btn-dark">Zapisz</button>
         </div>
+        {% if receipt.file %}
+        <a href="{% url 'home' %}{{receipt.file}}" class="btn btn-block btn-dark" target="_blank">wyświelt paragon</a>
+        {% endif %}
         <a href="{% url 'receipts:receipt_delete' receipt.id %}" class="btn btn-block btn-danger mt-1">Usuń paragon</a>
       </div>
-
     </form>
   </div>
-
 </div>
+
 
 
 {% endblock %}
