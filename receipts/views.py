@@ -8,6 +8,7 @@ import os
 from myproject.settings import BASE_DIR, MEDIA_ROOT
 from django.core.files.storage import default_storage
 
+
 def receipts_home(request):
     user_receipts = Receipt.objects.select_related('category').filter(user=request.user).order_by('-purchase_date')
     form = ReceiptForm(request.POST, request.FILES)
@@ -22,6 +23,8 @@ class ReceiptCreateView(CreateView):
     model = Receipt
     form_class = ReceiptForm
     success_url = 'receipts'
+    def get_initial(self):
+        return {'purchase_date': '2022-11-11'}
 
     def form_valid(self, form):
         new_receipt = form.save(commit=False)
@@ -29,11 +32,13 @@ class ReceiptCreateView(CreateView):
                                 '{}-{}'.format(self.request.user.id, self.request.user.username), 'receipts', str(new_receipt.file))
         location_to_database = os.path.join('media', 'user_uploads',
                                             '{}-{}'.format(self.request.user.id, self.request.user.username), 'receipts')
+
         fs = FileSystemStorage(location=location)
         file = self.request.FILES.get('file', False)
-        fs.save(str(file), file)
+        if file:
+            fs.save(str(file), file)
+            form.instance.file = os.path.join(location_to_database, str(file))
         form.instance.user_id = self.request.user.id
-        form.instance.file = os.path.join(location_to_database, str(file))
         return super().form_valid(form)
 
 

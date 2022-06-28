@@ -9,20 +9,23 @@
         <div class="col-12 col-lg-6 mb-1" >
           <div class="row" style="height:100%">
             <div class="col-2  bg-light p-1 text-center">
-              <a href="{% url 'home' %}{{user_receipt.file}}" class="small text-dark" target="_blank" style="text-decoration:none;">
+              <a {% if user_receipt.file %}href="{% url 'home' %}{{user_receipt.file}}" {% endif %} class="small text-dark" target="_blank" style="text-decoration:none;">
+
                 <figure class="figure m-0">
                   <img height="65" class="my-1 p-0" src="{% static 'todo/img/receipts_categories_imgs/' %}{{user_receipt.category.icon}}" style="width:100%">
+                  {% if user_receipt.file %}
                   <figcaption class="figure-caption">
                       wyświetl
                   </figcaption>
+                  {% endif %}
                 </figure>
               </a>
             </div>
             <a class="col-10 bg-secondary text-light" href="{% url 'receipts:receipt' user_receipt.id %}" style="text-decoration:none;">
               <div class="d-flex justify-content-between">
                 <div class="left">
-                  <h4>{{user_receipt}}</h4>
-                  <div>{{user_receipt.purchase_date}}</div>
+                  <h4><b>{{user_receipt}}</b></h4>
+                  <div class="small">{{user_receipt.purchase_date}}</div>
                   <div><b>{{user_receipt.price}}</b> PLN</div>
                 </div>
                 <div class="d-flex align-items-center">
