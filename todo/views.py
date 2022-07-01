@@ -10,6 +10,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 
 from cars.models import Car
+from receipts.models import Receipt
 from meals.models import MealsList, MealIngredient, Meal, Ingredient
 from shopping.models import ShoppingList, Products
 from .forms import TodoForm
@@ -60,9 +61,15 @@ def home(request):
     if request.user.is_authenticated:
         all_to_do_count = Todo.objects.filter(user=request.user, complete=False)
         meal_options = MealsList.objects.filter(user=request.user).values('meal_option_id').distinct()
-        meals = MealsList.objects.select_related('meal').filter(user=request.user,)
+        meals = MealsList.objects.select_related('meal').filter(user=request.user, )
         cars_owned = Car.objects.filter(user=request.user, sold=0)
         cars_sold = Car.objects.filter(user=request.user, sold=1)
+        receipts = Receipt.objects.filter(user=request.user)
+        receipts_dict = {
+            'all': receipts,
+            'with_warranty': [receipt for receipt in receipts if int(receipt.warranty_left) > 0],
+            'without_warranty': [receipt for receipt in receipts if int(receipt.warranty_left) == 0]
+        }
         calories_total = 0
         protein_total = 0
         fat_total = 0
@@ -155,6 +162,7 @@ def home(request):
             'todays_macro': todays_macro,
             'todays_meals': todays_meals,
             'today': today,
+            'receipts': receipts_dict,
         }
     else:
         context = {}

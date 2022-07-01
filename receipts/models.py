@@ -28,6 +28,8 @@ class Receipt(models.Model):
 
     @property
     def warranty_left(self):
-        warranty_date = self.purchase_date + datetime.timedelta(days=self.warranty)
-        return (warranty_date - datetime.date.today()).days
+        if self.warranty:
+            warranty_date = self.purchase_date + datetime.timedelta(days=self.warranty)
+            return (warranty_date - datetime.date.today()).days
+        else:return 0
 

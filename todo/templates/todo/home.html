@@ -1,11 +1,11 @@
 {% extends 'todo/base.html' %}
 {% block body %}
 {% load static %}
-<div class="container-fluid" id="wrapper">
+<div class="container-fluid mt-1 mt-xl-5">
   <div class="row">
     <div class="col-12 mx-auto" id="">
       {% if user.is_authenticated %}
-        <div class="row d-flex justify-content-center">
+        <div class="row ">
           <div class="col-12 col-md-6 col-xl-3 mb-2">
             <div class="card shadow" style="height:100%;">
               <div class="card-header bg-secondary text-light text-center">
@@ -47,27 +47,91 @@
               </div>
             </div>
           </div>
-          <div class="col-12 col-md-6 col-xl-3 mb-2">
-            <div class="card shadow" style="height:100%;">
-              <div class="card-header bg-secondary text-light text-center">
-                <img src="{% static 'todo/img/shopping-cart-solid.svg' %}" height="45">
-              </div>
-              <div class="card-body">
-                <ul>
-                  {%  if shopping_lists %}
-                  <li>{{shopping_lists}} {% if shopping_lists == 1 %}lista{% endif %}{% if shopping_lists > 1 and  shopping_lists < 5 %}listy{% endif %}{% if shopping_lists >= 5 %}list{% endif %} zakupów.</li>
-                  <li>{{products_to_buy_counter}} {% if products_to_buy_counter == 1 %}pozycja{% endif %}{% if products_to_buy_counter > 1 and  products_to_buy_counter < 5 %}pozycje{% endif %}{% if products_to_buy_counter >= 5 %}pozycji{% endif %} do kupienia</li>
-                  {% else %}
-                  <li>Brak list zakupów!</li>
-                  {% endif %}
-                </ul>
-              </div>
-              <div class="mx-5 mb-2">
-                <a href="{% url 'shopping:shopping_list_index' %}"  class="btn btn-secondary btn-block">Przejdź</a>
+          <div class="col-md-6 col-xl-9 mb-2">
+            <div class="row" style="height:100%; !important">
+              <div class="col-12 col-xl-6 mb-1">
+              <div class="card shadow" style="height:100%;">
+                <div class="card-header bg-secondary text-light text-center">
+                  <img src="{% static 'todo/img/receipt-solid.svg' %}" height="45">
+                </div>
+                <div class="card-body">
+                  <ul>
+                    <li>Zapisane paragony: {{receipts.all|length}}</li>
+                    <li>Na gwarancji: {{receipts.with_warranty|length}}</li>
+                    <li>Po gwarancji: {{receipts.without_warranty|length}}</li>
+                  </ul>
+
+                </div>
+                <div class="mx-5 mb-2">
+                  <a href="{% url 'receipts:receipts_home' %}"  class="btn btn-secondary btn-block">Przejdź</a>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="col-12 col-md-6 col-xl-3 mb-2">
+              <div class="col-12 col-xl-6 mb-1">
+              <div class="card shadow" style="height:100%;">
+                <div class="card-header bg-secondary text-light text-center">
+                  <img src="{% static 'todo/img/car-solid.svg' %}" height="45">
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    {% if cars_owned or cars_sold %}
+                    <div class="col-6">
+                      <small>Posiadane</small>
+                      <ul>
+                        {% if cars_owned %}
+                          {% for car in cars_owned %}
+                          <li><a class="text-dark" href="{% url 'cars:car_details' car.id %}">{{car}}</a></li>
+                          {% endfor %}
+                        {% else %}
+                          <li>BRAK !</li>
+                        {% endif %}
+                      </ul>
+                    </div>
+                    <div class="col-6">
+                      <small>Sprzedane</small>
+                      <ul>
+                        {% if cars_sold %}
+                          {% for car in cars_sold %}
+                          <li><a class="text-dark" href="{% url 'cars:car_details' car.id %}">{{car}}</a></li>
+                          {% endfor %}
+                        {% else %}
+                          <li>BRAK !</li>
+                        {% endif %}
+                      </ul>
+                    </div>
+                    {% else %}
+                    <div class="col-12">
+                      <li>Garaż jest pusty!</li>
+                    </div>
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="mx-5 mb-2">
+                  <a href="{% url 'cars:cars_home' %}"  class="btn btn-secondary btn-block">Przejdź</a>
+                </div>
+              </div>
+            </div>
+              <div class="col-12 col-xl-6 mb-1">
+              <div class="card shadow" style="height:100%;">
+                <div class="card-header bg-secondary text-light text-center">
+                  <img src="{% static 'todo/img/shopping-cart-solid.svg' %}" height="45">
+                </div>
+                <div class="card-body">
+                  <ul>
+                    {%  if shopping_lists %}
+                    <li>{{shopping_lists}} {% if shopping_lists == 1 %}lista{% endif %}{% if shopping_lists > 1 and  shopping_lists < 5 %}listy{% endif %}{% if shopping_lists >= 5 %}list{% endif %} zakupów.</li>
+                    <li>{{products_to_buy_counter}} {% if products_to_buy_counter == 1 %}pozycja{% endif %}{% if products_to_buy_counter > 1 and  products_to_buy_counter < 5 %}pozycje{% endif %}{% if products_to_buy_counter >= 5 %}pozycji{% endif %} do kupienia</li>
+                    {% else %}
+                    <li>Brak list zakupów!</li>
+                    {% endif %}
+                  </ul>
+                </div>
+                <div class="mx-5 mb-2">
+                  <a href="{% url 'shopping:shopping_list_index' %}"  class="btn btn-secondary btn-block">Przejdź</a>
+                </div>
+              </div>
+            </div>
+              <div class="col-12 col-xl-6 mb-1">
             <div class="card shadow" style="height:100%;">
               <div class="card-header bg-secondary text-light text-center">
                 <img src="{% static 'todo/img/tasks-solid.svg' %}" height="45">
@@ -86,48 +150,6 @@
               </div>
             </div>
           </div>
-          <div class="col-12 col-md-6 col-xl-3 mb-2">
-            <div class="card shadow" style="height:100%;">
-              <div class="card-header bg-secondary text-light text-center">
-                <img src="{% static 'todo/img/car-solid.svg' %}" height="45">
-              </div>
-              <div class="card-body">
-                <div class="row">
-                  {% if cars_owned or cars_sold %}
-                  <div class="col-6">
-                    <small>Posiadane</small>
-                    <ul>
-                      {% if cars_owned %}
-                        {% for car in cars_owned %}
-                        <li><a class="text-dark" href="{% url 'cars:car_details' car.id %}">{{car}}</a></li>
-                        {% endfor %}
-                      {% else %}
-                        <li>BRAK !</li>
-                      {% endif %}
-                    </ul>
-                  </div>
-                  <div class="col-6">
-                    <small>Sprzedane</small>
-                    <ul>
-                      {% if cars_sold %}
-                        {% for car in cars_sold %}
-                        <li><a class="text-dark" href="{% url 'cars:car_details' car.id %}">{{car}}</a></li>
-                        {% endfor %}
-                      {% else %}
-                        <li>BRAK !</li>
-                      {% endif %}
-                    </ul>
-                  </div>
-                  {% else %}
-                  <div class="col-12">
-                    <li>Garaż jest pusty!</li>
-                  </div>
-                  {% endif %}
-                </div>
-              </div>
-              <div class="mx-5 mb-2">
-                <a href="{% url 'cars:cars_home' %}"  class="btn btn-secondary btn-block">Przejdź</a>
-              </div>
             </div>
           </div>
         </div>
