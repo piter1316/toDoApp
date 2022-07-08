@@ -2,8 +2,8 @@
   <div class="menu_ul nav" id="menu_ul">
     <small class="w-100 text-center time_now_">{{today}}</small>
     <div class="btn-group w-100 mb-1" role="group">
-      <a type="button" class="btn btn-outline-secondary btn-sm w-50" href="{% url 'meals:edit_meals' %}">Posiłki</a>
-      <a type="button" class="btn btn-outline-secondary btn-sm w-50" href="{% url 'meals:edit_ingredients' %}">Składniki / Sklepy</a>
+      <a type="button" class="btn btn-outline-secondary btn-sm w-45" href="{% url 'meals:edit_meals' %}">Posiłki</a>
+      <a type="button" class="btn btn-outline-secondary btn-sm w-55" href="{% url 'meals:edit_ingredients' %}">Składniki/Sklepy</a>
     </div>
     {% if in_meals_list %}
       <button type="button" class="btn btn-outline-info btn-block btn-sm" data-toggle="modal" data-target="#newMealsListModal">

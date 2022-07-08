@@ -3,12 +3,12 @@
 
 {% block body %}
 {% load split %}
-<div class="container-fluid py-0 py-md-2 mt-0 mt-md-2">
+<div class="container-fluid p-0 mt-0 mt-md-2">
 <input type="hidden" id="maximum_no_of_days_to_generate_no_repeat" value="{{maximum_no_of_days_to_generate_no_repeat}}">
         <input type="hidden" id="maximum_no_of_days_to_generate_default" value="{{maximum_no_of_days_to_generate_default}}">
-  <div class="row">
+  <div class="row no-gutters">
     {% include 'meals/menu.html' %}
-    <div class="col-12 col-md-8 col-xl-10 p-0">
+    <div class="col-12 col-md-8 col-xl-10 px-0 px-md-2">
       {% if meals_list %}
       <div class="alert alert-secondary text-center p-1 mb-1 d-xl-none" id="mobileAverageContainer">
         <small id="mobileAverage">
