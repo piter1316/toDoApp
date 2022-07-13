@@ -5,6 +5,7 @@ from django.db import models
 class ToDoMain(models.Model):
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     name = models.TextField(blank=True, null=True)
+    complete = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False

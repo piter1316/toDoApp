@@ -17,6 +17,25 @@ from .forms import TodoForm
 from .models import Todo, TodoTodostep, ToDoMain
 
 
+def get_all_to_do(user):
+    todo_list_dict = {}
+    main_todos = ToDoMain.objects.filter(user=user).order_by('id')
+    for main_todo in main_todos:
+        todo_list = Todo.objects.filter(to_do_main=main_todo)
+        second_level = {}
+        for element in todo_list:
+            steps = TodoTodostep.objects.filter(todo=element)
+            second_level[element] = [step for step in steps]
+        todo_list_dict[main_todo] = second_level
+    count = 0
+    for k, v in todo_list_dict.items():
+        if v.items():
+            for k2, v2 in v.items():
+                print('\t', k2)
+                count += 1
+    return count
+
+
 @login_required(login_url='/accounts/login')
 def index(request):
     todo_list_dict = {}
@@ -29,10 +48,10 @@ def index(request):
             second_level[element] = [step for step in steps]
         todo_list_dict[main_todo] = second_level
     form = TodoForm()
-    for k,v in todo_list_dict.items():
+    for k, v in todo_list_dict.items():
         print(k)
         for k2, v2 in v.items():
-            print('\t',k2)
+            print('\t', k2)
             for e in v2:
                 print('\t\t', e)
     context = {'todo_list': todo_list_dict, 'form': form}
@@ -71,8 +90,7 @@ def delete_all(request):
 @login_required(login_url='/accounts/login')
 def home(request):
     if request.user.is_authenticated:
-        # all_to_do_count = Todo.objects.filter(user=request.user, complete=False)
-        all_to_do_count = []
+        all_to_do_count = get_all_to_do(request.user)
         meal_options = MealsList.objects.filter(user=request.user).values('meal_option_id').distinct()
         meals = MealsList.objects.select_related('meal').filter(user=request.user, )
         cars_owned = Car.objects.filter(user=request.user, sold=0)
@@ -160,7 +178,7 @@ def home(request):
                     if meal.extras not in distinct_meals:
                         distinct_meals.append(meal.extras)
         context = {
-            'all_to_do_count': len(all_to_do_count),
+            'all_to_do_count': all_to_do_count,
             'meals_list_length': meals_list_length,
             'meals': len(distinct_meals),
             'meal_options': len(meal_options),

@@ -3,23 +3,41 @@
 <div class="container-fluid mx-0 mx-md-2 " id="wrapper">
 
   <div class="row mt-1">
-    <div class="col-12 col-md-6 col-xl-3">
+    <div class="col-12 col-md-4 col-xl-3">
       <li class="list-group-item bg-dark text-light">Aktualne listy</li>
-       {% for main, todos in todo_list.items %}
-        <li class="list-group-item">{{main.name}}</li>
-      {% endfor %}
-      <form action="{% url 'todo:add' %}" method="POST"  role="form">
-        {% csrf_token %}
-        <div class="form-group p-2 bg-dark">
-          <div class="input-group">
-            {{form.text}}
-            <span class="input-group-btn">
-              <button type="submit" class="btn btn-secondary" id="add-btn">Nowa lista</button>
-            </span>
-          </div>
-        </div>
-      </form>
+      <div class="nav flex-column  nav-tabs" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+        {% for main, todos in todo_list.items %}
+        <a class="btn btn-secondary mb-1" id="v-pills-{{main.id}}-tab" data-toggle="pill" href="#v-pills-{{main.id}}" role="tab" aria-controls="v-pills-{{main.id}}" aria-selected="true">{{main.name}}</a>
+        {% endfor %}
     </div>
+    <form action="{% url 'todo:add' %}" method="POST"  role="form">
+      {% csrf_token %}
+      <div class="form-group p-2 bg-dark">
+        <div class="input-group">
+          {{form.text}}
+          <span class="input-group-btn">
+            <button type="submit" class="btn btn-secondary" id="add-btn">Nowa lista</button>
+          </span>
+        </div>
+      </div>
+    </form>
+    </div>
+    <div class="col-12 col-md-8 col-xl-9">
+    <div class="tab-content" id="v-pills-tabContent">
+      {% for main, todos in todo_list.items %}
+      <div class="tab-pane fade" id="v-pills-{{main.id}}" role="tabpanel" aria-labelledby="v-pills-{{main.name}}-tab">
+        <li class="list-group-item bg-dark text-light">{{main.name}}</li>
+        {% for todo, steps in todos.items %}
+          <li class="list-group-item py-1 bg-secondary text-light">{{ todo.text }}</li>
+          {% for step in steps %}
+            <li class="list-group-item py-0 small pl-5">{{step.text}}</li>
+          {% endfor %}
+        {% endfor %}
+      </div>
+      {% endfor %}
+
+    </div>
+  </div>
   </div>
 </div>
 {% endblock %}
