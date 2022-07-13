@@ -21,10 +21,10 @@ def get_all_to_do(user):
     todo_list_dict = {}
     main_todos = ToDoMain.objects.filter(user=user).order_by('id')
     for main_todo in main_todos:
-        todo_list = Todo.objects.filter(to_do_main=main_todo)
+        todo_list = Todo.objects.filter(to_do_main=main_todo, complete=0)
         second_level = {}
         for element in todo_list:
-            steps = TodoTodostep.objects.filter(todo=element)
+            steps = TodoTodostep.objects.filter(todo=element, complete=0)
             second_level[element] = [step for step in steps]
         todo_list_dict[main_todo] = second_level
     count = 0
@@ -83,6 +83,27 @@ def delete_main_list(request, list_id):
 def complete_todo(request, todo_id):
     todo = Todo.objects.get(pk=todo_id)
     todo.complete = True
+    todo.save()
+    return redirect('todo:index')
+
+
+def un_complete_todo(request, todo_id):
+    todo = Todo.objects.get(pk=todo_id)
+    todo.complete = False
+    todo.save()
+    return redirect('todo:index')
+
+
+def complete_step(request, step_id):
+    todo = TodoTodostep.objects.get(pk=step_id)
+    todo.complete = True
+    todo.save()
+    return redirect('todo:index')
+
+
+def un_complete_step(request, step_id):
+    todo = TodoTodostep.objects.get(pk=step_id)
+    todo.complete = False
     todo.save()
     return redirect('todo:index')
 
