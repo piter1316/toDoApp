@@ -34,7 +34,7 @@
         </div>
         {% for todo, steps in todos.items %}
         <div class="list-group-item d-flex justify-content-between py-1 bg-secondary text-light {% if todo.complete %} todo-completed text-muted small {% endif %}">
-          <div class="py-auto">
+          <div class="py-auto" id="toDoItem_{{todo.id}}">
             {% if todo.complete %}
             <a class="text-light"  href="{% url 'todo:un_complete_todo' todo.id %}">{{ todo.text }}</a>
             {% else %}
@@ -43,27 +43,32 @@
           </div>
           <button class="btn btn-dark btn-sm toDoButtonAdd" id="toDoButtonAdd_{{todo.id}}">+</button>
         </div>
+        <div id="steps_{{todo.id}}">
           {% for step in steps %}
+          <div class="d-flex justify-content-between list-group-item py-1 pl-5 {% if step.complete %}todo-completed{% endif %}">
             {% if step.complete %}
-              <a class="list-group-item py-0 pl-5 text-dark todo-completed text-muted small"  href="{% url 'todo:un_complete_step' step.id %}">{{step.text}}</a>
+              <a class=" text-dark  text-muted "  href="{% url 'todo:un_complete_step' step.id %}">{{step.text}}</a>
             {% else %}
-            <a class="list-group-item py-0 pl-5 text-dark font-weight-bold "  href="{% url 'todo:complete_step' step.id %}">{{step.text}}</a>
+              <a class="text-dark font-weight-bold "  href="{% url 'todo:complete_step' step.id %}">{{step.text}}</a>
             {% endif %}
+            <a onclick="return confirm('Czy napewno usunąć krok: {{step.text}}?')" href="#" class="fas fa-minus-circle text-secondary py-auto" aria-hidden="true"></a>
+          </div>
 
           {% endfor %}
-          <div class="list-group-item py-0 small pl-5">
-          <form action="{% url 'todo:add_step' todo.id %}" method="POST"  role="form" style="display:none;" id="toDo_{{todo.id}}" name="addStep">
-            {% csrf_token %}
-            <div class="form-group my-1">
-              <div class="input-group">
-                <input type="text" placeholder="kolejny krok" class="form-control" required name="addStep_{{todo.id}}" id="addStep_{{todo.id}}">
-                <span class="input-group-btn">
-                  <button type="submit" class="btn btn-secondary"> + </button>
-                </span>
-              </div>
+        </div>
+        <div class="list-group-item py-0 small pl-5">
+        <form action="{% url 'todo:add_step' todo.id %}" method="POST"  role="form" style="display:none;" id="toDo_{{todo.id}}" name="addStep">
+          {% csrf_token %}
+          <div class="form-group my-1">
+            <div class="input-group">
+              <input type="text" placeholder="kolejny krok" class="form-control" required name="addStep_{{todo.id}}" id="addStep_{{todo.id}}">
+              <span class="input-group-btn">
+                <button type="submit" class="btn btn-secondary"> + </button>
+              </span>
             </div>
-          </form>
           </div>
+        </form>
+        </div>
         {% endfor %}
         <form action="{% url 'todo:add_todo' main.id %}" method="POST"  role="form">
           {% csrf_token %}
