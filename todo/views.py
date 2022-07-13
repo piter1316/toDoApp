@@ -57,20 +57,19 @@ def add_todo_list(request):
     if form.is_valid():
         new_todo = ToDoMain(name=request.POST['text'], user=request.user)
         new_todo.save()
-
     return redirect('todo:index')
 
 
 def add_todo(request, list_id):
     to_do_name = request.POST.get('text')
-    new_todo = Todo(text=to_do_name, to_do_main_id=list_id)
+    new_todo = Todo(text=to_do_name, to_do_main_id=list_id, user_id=request.user)
     new_todo.save()
     return redirect('todo:index')
 
 
 def add_step(request, to_do_id):
     step_text = request.POST.get('addStep_' + str(to_do_id))
-    new_step = TodoTodostep(todo_id=to_do_id, text=step_text)
+    new_step = TodoTodostep(todo_id=to_do_id, text=step_text, user_id=request.user)
     new_step.save()
     return redirect('todo:index')
 
@@ -81,28 +80,28 @@ def delete_main_list(request, list_id):
 
 
 def complete_todo(request, todo_id):
-    todo = Todo.objects.get(pk=todo_id)
+    todo = Todo.objects.get(pk=todo_id, user_id=request.user)
     todo.complete = True
     todo.save()
     return redirect('todo:index')
 
 
 def un_complete_todo(request, todo_id):
-    todo = Todo.objects.get(pk=todo_id)
+    todo = Todo.objects.get(pk=todo_id, user_id=request.user)
     todo.complete = False
     todo.save()
     return redirect('todo:index')
 
 
 def complete_step(request, step_id):
-    todo = TodoTodostep.objects.get(pk=step_id)
+    todo = TodoTodostep.objects.get(pk=step_id, user_id=request.user)
     todo.complete = True
     todo.save()
     return redirect('todo:index')
 
 
 def un_complete_step(request, step_id):
-    todo = TodoTodostep.objects.get(pk=step_id)
+    todo = TodoTodostep.objects.get(pk=step_id, user_id=request.user)
     todo.complete = False
     todo.save()
     return redirect('todo:index')
