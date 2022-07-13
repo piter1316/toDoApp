@@ -71,7 +71,8 @@ def delete_all(request):
 @login_required(login_url='/accounts/login')
 def home(request):
     if request.user.is_authenticated:
-        all_to_do_count = Todo.objects.filter(user=request.user, complete=False)
+        # all_to_do_count = Todo.objects.filter(user=request.user, complete=False)
+        all_to_do_count = []
         meal_options = MealsList.objects.filter(user=request.user).values('meal_option_id').distinct()
         meals = MealsList.objects.select_related('meal').filter(user=request.user, )
         cars_owned = Car.objects.filter(user=request.user, sold=0)
