@@ -419,3 +419,14 @@ var id_num = $(this).attr('id').split('_')[1]
   }
 });
 
+
+$('body').on('click','.toDoButtonAdd',function(e){
+  var id_num = $(this).attr('id').split('_')[1]
+  if($('#toDo_'+id_num).is(":visible")){
+    $('#toDo_'+id_num).hide('slow');
+    $(this).text('+')
+  }else{
+    $('#toDo_'+id_num).show('slow');
+    $(this).text('-')
+  }
+});

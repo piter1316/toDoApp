@@ -59,12 +59,24 @@ def index(request):
 
 
 @require_POST
-def add_todo(request):
+def add_todo_list(request):
     form = TodoForm(request.POST)
     if form.is_valid():
-        new_todo = Todo(text=request.POST['text'], user=request.user)
+        new_todo = ToDoMain(name=request.POST['text'], user=request.user)
         new_todo.save()
 
+    return redirect('todo:index')
+
+
+def add_todo(request, list_id):
+    to_do_name = request.POST.get('text')
+    new_todo = Todo(text=to_do_name, to_do_main_id=list_id)
+    new_todo.save()
+    return redirect('todo:index')
+
+
+def delete_main_list(request, list_id):
+    ToDoMain.objects.filter(user_id=request.user, pk=list_id).delete()
     return redirect('todo:index')
 
 
@@ -72,7 +84,6 @@ def complete_todo(request, todo_id):
     todo = Todo.objects.get(pk=todo_id)
     todo.complete = True
     todo.save()
-
     return redirect('todo:index')
 
 
