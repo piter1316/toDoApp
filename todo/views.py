@@ -14,22 +14,34 @@ from receipts.models import Receipt
 from meals.models import MealsList, MealIngredient, Meal, Ingredient
 from shopping.models import ShoppingList, Products
 from .forms import TodoForm
-from .models import Todo
+from .models import Todo, TodoTodostep, ToDoMain
 
 
 @login_required(login_url='/accounts/login')
 def index(request):
-    todo_list = Todo.objects.filter(user=request.user).order_by('id')
-
+    todo_list_dict = {}
+    main_todos = ToDoMain.objects.filter(user=request.user).order_by('id')
+    for main_todo in main_todos:
+        todo_list = Todo.objects.filter(to_do_main=main_todo)
+        second_level = {}
+        for element in todo_list:
+            steps = TodoTodostep.objects.filter(todo=element)
+            second_level[element] = [step for step in steps]
+        todo_list_dict[main_todo] = second_level
     form = TodoForm()
-    context = {'todo_list': todo_list, 'form': form}
+    for k,v in todo_list_dict.items():
+        print(k)
+        for k2, v2 in v.items():
+            print('\t',k2)
+            for e in v2:
+                print('\t\t', e)
+    context = {'todo_list': todo_list_dict, 'form': form}
     return render(request, 'todo/toDo.html', context)
 
 
 @require_POST
-def addTodo(request):
+def add_todo(request):
     form = TodoForm(request.POST)
-
     if form.is_valid():
         new_todo = Todo(text=request.POST['text'], user=request.user)
         new_todo.save()
@@ -37,7 +49,7 @@ def addTodo(request):
     return redirect('todo:index')
 
 
-def completeTodo(request, todo_id):
+def complete_todo(request, todo_id):
     todo = Todo.objects.get(pk=todo_id)
     todo.complete = True
     todo.save()
@@ -45,13 +57,13 @@ def completeTodo(request, todo_id):
     return redirect('todo:index')
 
 
-def deleteCompleted(request):
+def delete_completed(request):
     Todo.objects.filter(complete__exact=True, user=request.user).delete()
 
     return redirect('todo:index')
 
 
-def deleteAll(request):
+def delete_all(request):
     Todo.objects.filter(user=request.user).delete()
     return redirect('todo:index')
 

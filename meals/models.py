@@ -60,7 +60,7 @@ class Ingredient(models.Model):
     weight_per_unit = models.PositiveIntegerField(default=0)
     shop = models.ForeignKey(Shop, on_delete=models.SET_NULL, default=1, null=True)
     short_expiry = models.BooleanField(default=False, null=True)
-    division = models.ForeignKey(ProductDivision, models.DO_NOTHING)
+    division = models.ForeignKey(ProductDivision, models.DO_NOTHING, default=1)
 
     def __str__(self):
         return self.name
