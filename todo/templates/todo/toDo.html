@@ -43,7 +43,7 @@
             <div class="list-group-item py-0 pl-5">{{step.text}}</div>
           {% endfor %}
           <div class="list-group-item py-0 small pl-5">
-          <form action="#" method="POST"  role="form" style="display:none;" id="toDo_{{todo.id}}">
+          <form action="{% url 'todo:add_step' todo.id %}" method="POST"  role="form" style="display:none;" id="toDo_{{todo.id}}" name="addStep">
             {% csrf_token %}
             <div class="form-group">
               <div class="input-group">

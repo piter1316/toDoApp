@@ -31,7 +31,6 @@ def get_all_to_do(user):
     for k, v in todo_list_dict.items():
         if v.items():
             for k2, v2 in v.items():
-                print('\t', k2)
                 count += 1
     return count
 
@@ -48,12 +47,6 @@ def index(request):
             second_level[element] = [step for step in steps]
         todo_list_dict[main_todo] = second_level
     form = TodoForm()
-    for k, v in todo_list_dict.items():
-        print(k)
-        for k2, v2 in v.items():
-            print('\t', k2)
-            for e in v2:
-                print('\t\t', e)
     context = {'todo_list': todo_list_dict, 'form': form}
     return render(request, 'todo/toDo.html', context)
 
@@ -72,6 +65,13 @@ def add_todo(request, list_id):
     to_do_name = request.POST.get('text')
     new_todo = Todo(text=to_do_name, to_do_main_id=list_id)
     new_todo.save()
+    return redirect('todo:index')
+
+
+def add_step(request, to_do_id):
+    step_text = request.POST.get('addStep_' + str(to_do_id))
+    new_step = TodoTodostep(todo_id=to_do_id, text=step_text)
+    new_step.save()
     return redirect('todo:index')
 
 
