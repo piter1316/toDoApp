@@ -5,7 +5,7 @@ from django.db import models
 class ToDoMain(models.Model):
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     name = models.TextField(blank=True, null=True)
-    complete = models.IntegerField(blank=True, null=True)
+    complete = models.BooleanField(default=False)
 
     class Meta:
         managed = False
@@ -15,7 +15,7 @@ class ToDoMain(models.Model):
 class Todo(models.Model):
     text = models.CharField(max_length=200)
     complete = models.BooleanField(default=False)
-    to_do_main = models.ForeignKey(ToDoMain, on_delete=models.DO_NOTHING)
+    to_do_main = models.ForeignKey(ToDoMain, on_delete=models.CASCADE)
 
     class Meta:
         managed = False
@@ -23,9 +23,9 @@ class Todo(models.Model):
 
 
 class TodoTodostep(models.Model):
-    todo = models.ForeignKey(Todo, models.DO_NOTHING)
+    todo = models.ForeignKey(Todo, on_delete=models.CASCADE)
     text = models.TextField(blank=True, null=True)
-    complete = models.IntegerField(blank=True, null=True)
+    complete = models.BooleanField(default=False)
 
     class Meta:
         managed = False

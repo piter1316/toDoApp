@@ -33,14 +33,16 @@
           </a>
         </div>
         {% for todo, steps in todos.items %}
-        <div class="list-group-item d-flex justify-content-between py-1 bg-secondary text-light">
+        <div class="list-group-item d-flex justify-content-between py-1 bg-secondary text-light {% if todo.complete %} todo-completed {% endif %}">
           <div class="">
             {{ todo.text }}
           </div>
           <button class="btn btn-dark btn-sm toDoButtonAdd" id="toDoButtonAdd_{{todo.id}}">+</button>
         </div>
           {% for step in steps %}
-            <div class="list-group-item py-0 pl-5">{{step.text}}</div>
+            <div class="list-group-item py-0 pl-5{% if step.complete %} todo-completed {% endif %}">
+              {{step.text}}
+            </div>
           {% endfor %}
           <div class="list-group-item py-0 small pl-5">
           <form action="{% url 'todo:add_step' todo.id %}" method="POST"  role="form" style="display:none;" id="toDo_{{todo.id}}" name="addStep">
