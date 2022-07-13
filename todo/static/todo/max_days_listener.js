@@ -428,5 +428,6 @@ $('body').on('click','.toDoButtonAdd',function(e){
   }else{
     $('#toDo_'+id_num).show('slow');
     $(this).text('-')
+    $('#addStep_'+id_num).focus()
   }
 });

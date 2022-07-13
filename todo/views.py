@@ -62,14 +62,14 @@ def add_todo_list(request):
 
 def add_todo(request, list_id):
     to_do_name = request.POST.get('text')
-    new_todo = Todo(text=to_do_name, to_do_main_id=list_id, user_id=request.user)
+    new_todo = Todo(text=to_do_name, to_do_main_id=list_id, user_id=request.user.id)
     new_todo.save()
     return redirect('todo:index')
 
 
 def add_step(request, to_do_id):
     step_text = request.POST.get('addStep_' + str(to_do_id))
-    new_step = TodoTodostep(todo_id=to_do_id, text=step_text, user_id=request.user)
+    new_step = TodoTodostep(todo_id=to_do_id, text=step_text, user_id=request.user.id)
     new_step.save()
     return redirect('todo:index')
 

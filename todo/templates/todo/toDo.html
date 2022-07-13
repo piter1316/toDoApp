@@ -56,7 +56,7 @@
             {% csrf_token %}
             <div class="form-group my-1">
               <div class="input-group">
-                <input type="text" placeholder="kolejny krok" class="form-control" required name="addStep_{{todo.id}}">
+                <input type="text" placeholder="kolejny krok" class="form-control" required name="addStep_{{todo.id}}" id="addStep_{{todo.id}}">
                 <span class="input-group-btn">
                   <button type="submit" class="btn btn-secondary"> + </button>
                 </span>
@@ -67,11 +67,11 @@
         {% endfor %}
         <form action="{% url 'todo:add_todo' main.id %}" method="POST"  role="form">
           {% csrf_token %}
-          <div class="form-group p-2 bg-dark">
+          <div class="form-group p-2 bg-secondary">
             <div class="input-group">
               {{form.text}}
               <span class="input-group-btn">
-                <button type="submit" class="btn btn-secondary">+ zadanie</button>
+                <button type="submit" class="btn btn-dark">+ zadanie</button>
               </span>
             </div>
           </div>
