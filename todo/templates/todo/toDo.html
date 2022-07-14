@@ -33,38 +33,38 @@
             </a>
           </div>
           {% for todo, steps in todos.items %}
-          <div class="list-group-item d-flex justify-content-between py-1 bg-secondary text-light {% if todo.complete %} todo-completed text-muted {% endif %}">
+          <div class="list-group-item d-flex justify-content-between py-1 bg-secondary text-light {% if todo.complete %} todo-completed text-muted {% endif %}" id="toDoItemContainer_{{todo.id}}">
             <div class="py-auto" id="toDoItem_{{todo.id}}">
               {% if todo.complete %}
-              <a class="text-light"  href="{% url 'todo:un_complete_todo' todo.id %}">{{ todo.text }}</a>
+              <a class="text-light toDoItemUnComplete_" id="toDoItemUnComplete_{{todo.id}}"  href="{% url 'todo:un_complete_todo' todo.id %}">{{ todo.text }}</a>
               {% else %}
-              <a class="text-light font-weight-bold"  href="{% url 'todo:complete_todo' todo.id %}">{{ todo.text }}</a>
+              <a class="text-light font-weight-bold toItemComplete_" id="toDoItemComplete_{{todo.id}}"  href="{% url 'todo:complete_todo' todo.id %}">{{ todo.text }}</a>
               {% endif %}
             </div>
             <div class="btn-group btn-group-sm" role="group">
               <button class="btn btn-dark btn-sm toDoButtonAdd" id="toDoButtonAdd_{{todo.id}}"><i class="fas fa-plus"></i></button>
-              <a href="{% url 'todo:delete_todo' todo.id %}" onclick="return confirm('Czy napewno usunąć zadanie: {{todo.text}}?')" class="btn btn-dark btn-sm" id="deleteToDo_{{todo.id}}"><i class="far fa-trash-alt"></i></a>
+              <a href="{% url 'todo:delete_todo' todo.id %}"  class="btn btn-dark btn-sm deleteToDo" id="deleteToDo_{{todo.id}}"><i class="far fa-trash-alt"></i></a>
             </div>
 
           </div>
           <div id="steps_{{todo.id}}">
             {% for step in steps %}
-            <div class="d-flex justify-content-between list-group-item py-0 py-md-1 pl-5 {% if step.complete %}todo-completed{% endif %}">
+            <div class="d-flex justify-content-between list-group-item py-0 py-md-1 pl-5 {% if step.complete %}todo-completed{% endif %}" id="stepContainer_{{step.id}}">
               {% if step.complete %}
-                <a class=" text-dark  text-muted "  href="{% url 'todo:un_complete_step' step.id %}">{{step.text}}</a>
+                <a class=" text-dark  text-muted unCompleteStep" id="unCompleteStep_{{step.id}}"  href="{% url 'todo:un_complete_step' step.id %}">{{step.text}}</a>
               {% else %}
-                <a class="text-dark font-weight-bold "  href="{% url 'todo:complete_step' step.id %}">{{step.text}}</a>
+                <a class="text-dark font-weight-bold completeStep" id="completeStep_{{step.id}}"  href="{% url 'todo:complete_step' step.id %}">{{step.text}}</a>
               {% endif %}
-              <a onclick="return confirm('Czy napewno usunąć krok: {{step.text}}?')" href="{% url 'todo:delete_step' step.id %}" class="btn btn-secondary btn-sm py-0" aria-hidden="true"><i class="fas fa-minus-circle text-light "></i></a>
+              <a id="deleteStep_{{step.id}}"  href="{% url 'todo:delete_step' step.id %}" class="btn btn-secondary btn-sm py-0 deleteStep" aria-hidden="true"><i class="fas fa-minus-circle text-light "></i></a>
             </div>
             {% endfor %}
           </div>
           <div class="list-group-item py-0 small pl-5">
-          <form action="{% url 'todo:add_step' todo.id %}" method="POST"  role="form" style="display:none;" id="toDo_{{todo.id}}" name="addStep">
+          <form action="{% url 'todo:add_step' todo.id %}" method="POST"  role="form" style="display:none;" id="toDo_{{todo.id}}" name="addStep" class="addStep">
             {% csrf_token %}
             <div class="form-group my-1">
               <div class="input-group">
-                <input type="text" placeholder="kolejny krok" class="form-control" required name="addStep_{{todo.id}}" id="addStep_{{todo.id}}">
+                <input type="text" placeholder="kolejny krok" class="form-control" required name="addStep" id="addStep_{{todo.id}}">
                 <span class="input-group-btn">
                   <button type="submit" class="btn btn-secondary"><i class="fas fa-plus"></i></button>
                 </span>
@@ -73,11 +73,11 @@
           </form>
           </div>
           {% endfor %}
-          <form action="{% url 'todo:add_todo' main.id %}" method="POST"  role="form">
+          <form action="{% url 'todo:add_todo' main.id %}" method="POST" class="addTodoForm"  role="form" id="addTodoForm_{{main.id}}">
             {% csrf_token %}
-            <div class="form-group p-2 bg-secondary">
+            <div class="form-group p-1 bg-secondary">
               <div class="input-group">
-                {{form.text}}
+                <input type="text" name="text" class="form-control" placeholder="" aria-label="Todo" aria-describedby="add-btn" maxlength="60" required="" id="addToDoInput_{{main.id}}">
                 <span class="input-group-btn">
                   <button type="submit" class="btn btn-dark">+ zadanie</button>
                 </span>
@@ -97,22 +97,130 @@
   </div>
   </div>
 </div>
-<!--<script>-->
-<!--  $('#add_to_do_list').on('submit', function(e){-->
-<!--    e.preventDefault();-->
-<!--    alert('post');-->
-<!--    $.ajax({-->
-<!--      type:'POST',-->
-<!--      url:'add',-->
-<!--      data:{-->
-<!--        text:$('#id_text').val(),-->
-<!--        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),-->
-<!--      },-->
-<!--      success: function(data){-->
-<!--      console.log(data)-->
-<!--      $('#v-pills-tab').replaceWith($('#v-pills-tab',data));-->
-<!--      }-->
-<!--    });-->
-<!--    });-->
-<!--</script>-->
+<script>
+  $('body').on('submit','.addTodoForm' ,function(e){
+    e.preventDefault();
+    var id = (e.target.id).split('_')[1];
+    $.ajax({
+      type:'POST',
+      url:'add_todo/' + id,
+      data:{
+        text:$('#addToDoInput_' + id).val(),
+        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+      },
+      success: function(data){
+      console.log(data)
+      $('#v-pills-' + id).replaceWith($('#v-pills-' + id,data));
+      }
+    });
+   });
+
+   $('body').on('click','.deleteToDo' ,function(e){
+    e.preventDefault();
+    var id = (e.currentTarget.id).split('_')[1];
+    console.log(id);
+    if (confirm('Usunąć zadanie?')) {
+      $.ajax({
+        url:'delete_todo/' + id,
+        success: function(data){
+        console.log(data)
+        $('#toDoItemContainer_' + id).remove();
+        $('#steps_' + id).remove();
+        $('#toDo_' + id).remove();
+
+
+        }
+      });
+    }
+
+   });
+
+  $('body').on('click','.toItemComplete_' ,function(e){
+    e.preventDefault();
+    var id = (e.currentTarget.id).split('_')[1];
+    console.log(id);
+    $.ajax({
+      url:'complete_todo/' + id,
+      success: function(data){
+      console.log(data)
+      $('#toDoItemContainer_' + id).replaceWith($('#toDoItemContainer_' + id,data));
+      }
+    });
+  });
+
+  $('body').on('click','.toDoItemUnComplete_' ,function(e){
+    e.preventDefault();
+    var id = (e.currentTarget.id).split('_')[1];
+    console.log(id);
+    $.ajax({
+      url:'un_complete_todo/' + id,
+      success: function(data){
+      console.log(data)
+      $('#toDoItemContainer_' + id).replaceWith($('#toDoItemContainer_' + id,data));
+      }
+    });
+  });
+
+  $('body').on('click','.completeStep' ,function(e){
+      e.preventDefault();
+      var id = (e.currentTarget.id).split('_')[1];
+      console.log(id);
+      $.ajax({
+        url:'complete_step/' + id,
+        success: function(data){
+        console.log(data)
+        $('#stepContainer_' + id).replaceWith($('#stepContainer_' + id,data));
+        }
+      });
+    });
+
+
+  $('body').on('click','.unCompleteStep' ,function(e){
+    e.preventDefault();
+    var id = (e.currentTarget.id).split('_')[1];
+    console.log(id);
+    $.ajax({
+      url:'un_complete_step/' + id,
+      success: function(data){
+      console.log(data)
+      $('#stepContainer_' + id).replaceWith($('#stepContainer_' + id,data));
+      }
+    });
+  });
+
+  $('body').on('click','.deleteStep' ,function(e){
+    e.preventDefault();
+    var id = (e.currentTarget.id).split('_')[1];
+    console.log(id);
+    if(confirm('Czy napewno usunąć krok?')){
+      $.ajax({
+      url:'delete_step/' + id,
+      success: function(data){
+      console.log(data)
+      $('#stepContainer_' + id).remove();
+      }
+    });
+    }
+  });
+
+  $('body').on('submit','.addStep' ,function(e){
+    e.preventDefault();
+    var id = (e.target.id).split('_')[1];
+    $.ajax({
+      type:'POST',
+      url:'addStep/' + id,
+      data:{
+        addStep:$('#addStep_' + id).val(),
+        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+      },
+      success: function(data){
+      console.log(data)
+      $('#addStep_' + id).val('');
+      $('#steps_' + id).replaceWith($('#steps_' + id,data));
+      $('#addStep_' + id).focus()
+      }
+    });
+   });
+
+</script>
 {% endblock %}
