@@ -1,62 +1,70 @@
-{% for main, todos in todo_list.items %}
-      <div class="{{class}}" id="{{id}}">
-        <div class="list-group-item bg-dark text-light d-flex justify-content-between">
-          <span class="my-auto">{{main.name}}</span>
-          <a href="{% url 'todo:delete_main_list' main.id %}" type="submit" class="btn btn-outline-light " onclick="return confirm('Usunąć listę {{main.name}}?')">
-            <i class="far fa-trash-alt" aria-hidden="true"></i>
-          </a>
+{% if todo_list %}
+  {% for main, todos in todo_list.items %}
+    <div class="{{class}}" id="{{id}}">
+      <div class="list-group-item bg-dark text-light d-flex justify-content-between">
+        <span class="my-auto">{{main.name}}</span>
+        <a href="{% url 'todo:delete_main_list' main.id %}" type="submit" class="btn btn-outline-light " onclick="return confirm('Usunąć listę {{main.name}}?')">
+          <i class="far fa-trash-alt" aria-hidden="true"></i>
+        </a>
+      </div>
+      {% for todo, steps in todos.items %}
+      <div class="list-group-item d-flex justify-content-between py-1 bg-secondary text-light {% if todo.complete %} todo-completed text-muted {% endif %}">
+        <div class="py-auto" id="toDoItem_{{todo.id}}">
+          {% if todo.complete %}
+          <a class="text-light"  href="{% url 'todo:un_complete_todo' todo.id %}">{{ todo.text }}</a>
+          {% else %}
+          <a class="text-light font-weight-bold"  href="{% url 'todo:complete_todo' todo.id %}">{{ todo.text }}</a>
+          {% endif %}
         </div>
-        {% for todo, steps in todos.items %}
-        <div class="list-group-item d-flex justify-content-between py-1 bg-secondary text-light {% if todo.complete %} todo-completed text-muted {% endif %}">
-          <div class="py-auto" id="toDoItem_{{todo.id}}">
-            {% if todo.complete %}
-            <a class="text-light"  href="{% url 'todo:un_complete_todo' todo.id %}">{{ todo.text }}</a>
-            {% else %}
-            <a class="text-light font-weight-bold"  href="{% url 'todo:complete_todo' todo.id %}">{{ todo.text }}</a>
-            {% endif %}
-          </div>
-          <div class="btn-group btn-group-sm" role="group">
-            <button class="btn btn-dark btn-sm toDoButtonAdd" id="toDoButtonAdd_{{todo.id}}"><i class="fas fa-plus"></i></button>
-            <a href="{% url 'todo:delete_todo' todo.id %}" onclick="return confirm('Czy napewno usunąć zadanie: {{todo.text}}?')" class="btn btn-dark btn-sm" id="deleteToDo_{{todo.id}}"><i class="far fa-trash-alt"></i></a>
-          </div>
+        <div class="btn-group btn-group-sm" role="group">
+          <button class="btn btn-dark btn-sm toDoButtonAdd" id="toDoButtonAdd_{{todo.id}}"><i class="fas fa-plus"></i></button>
+          <a href="{% url 'todo:delete_todo' todo.id %}" onclick="return confirm('Czy napewno usunąć zadanie: {{todo.text}}?')" class="btn btn-dark btn-sm" id="deleteToDo_{{todo.id}}"><i class="far fa-trash-alt"></i></a>
+        </div>
 
-        </div>
-        <div id="steps_{{todo.id}}">
-          {% for step in steps %}
-          <div class="d-flex justify-content-between list-group-item py-1 pl-5 {% if step.complete %}todo-completed{% endif %}">
-            {% if step.complete %}
-              <a class=" text-dark  text-muted "  href="{% url 'todo:un_complete_step' step.id %}">{{step.text}}</a>
-            {% else %}
-              <a class="text-dark font-weight-bold "  href="{% url 'todo:complete_step' step.id %}">{{step.text}}</a>
-            {% endif %}
-            <a onclick="return confirm('Czy napewno usunąć krok: {{step.text}}?')" href="{% url 'todo:delete_step' step.id %}" class="btn btn-secondary btn-sm py-0" aria-hidden="true"><i class="fas fa-minus-circle text-light "></i></a>
-          </div>
-          {% endfor %}
-        </div>
-        <div class="list-group-item py-0 small pl-5">
-        <form action="{% url 'todo:add_step' todo.id %}" method="POST"  role="form" style="display:none;" id="toDo_{{todo.id}}" name="addStep">
-          {% csrf_token %}
-          <div class="form-group my-1">
-            <div class="input-group">
-              <input type="text" placeholder="kolejny krok" class="form-control" required name="addStep_{{todo.id}}" id="addStep_{{todo.id}}">
-              <span class="input-group-btn">
-                <button type="submit" class="btn btn-secondary"><i class="fas fa-plus"></i></button>
-              </span>
-            </div>
-          </div>
-        </form>
+      </div>
+      <div id="steps_{{todo.id}}">
+        {% for step in steps %}
+        <div class="d-flex justify-content-between list-group-item py-0 py-md-1 pl-5 {% if step.complete %}todo-completed{% endif %}">
+          {% if step.complete %}
+            <a class=" text-dark  text-muted "  href="{% url 'todo:un_complete_step' step.id %}">{{step.text}}</a>
+          {% else %}
+            <a class="text-dark font-weight-bold "  href="{% url 'todo:complete_step' step.id %}">{{step.text}}</a>
+          {% endif %}
+          <a onclick="return confirm('Czy napewno usunąć krok: {{step.text}}?')" href="{% url 'todo:delete_step' step.id %}" class="btn btn-secondary btn-sm py-0" aria-hidden="true"><i class="fas fa-minus-circle text-light "></i></a>
         </div>
         {% endfor %}
-        <form action="{% url 'todo:add_todo' main.id %}" method="POST"  role="form">
-          {% csrf_token %}
-          <div class="form-group p-2 bg-secondary">
-            <div class="input-group">
-              {{form.text}}
-              <span class="input-group-btn">
-                <button type="submit" class="btn btn-dark">+ zadanie</button>
-              </span>
-            </div>
+      </div>
+      <div class="list-group-item py-0 small pl-5">
+      <form action="{% url 'todo:add_step' todo.id %}" method="POST"  role="form" style="display:none;" id="toDo_{{todo.id}}" name="addStep">
+        {% csrf_token %}
+        <div class="form-group my-1">
+          <div class="input-group">
+            <input type="text" placeholder="kolejny krok" class="form-control" required name="addStep_{{todo.id}}" id="addStep_{{todo.id}}">
+            <span class="input-group-btn">
+              <button type="submit" class="btn btn-secondary"><i class="fas fa-plus"></i></button>
+            </span>
           </div>
-        </form>
+        </div>
+      </form>
       </div>
       {% endfor %}
+      <form action="{% url 'todo:add_todo' main.id %}" method="POST"  role="form">
+        {% csrf_token %}
+        <div class="form-group p-2 bg-secondary">
+          <div class="input-group">
+            {{form.text}}
+            <span class="input-group-btn">
+              <button type="submit" class="btn btn-dark">+ zadanie</button>
+            </span>
+          </div>
+        </div>
+      </form>
+    </div>
+  {% endfor %}
+{% else %}
+<div class="alert alert-secondary">
+  <p class="text-center">
+    Brak zadań !!!
+  </p>
+</div>
+{% endif %}

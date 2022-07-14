@@ -431,3 +431,12 @@ $('body').on('click','.toDoButtonAdd',function(e){
     $('#addStep_'+id_num).focus()
   }
 });
+
+$('body').on('click','#v-pills-tab a',function(e){
+  var id_num = $(this).attr('id').split('-')[2]
+  var tab_panes = $('.tab-pane')
+  for(var i=0; i<tab_panes.length; i++){
+  tab_panes[i].classList.remove("show");
+  tab_panes[i].classList.remove("active");
+  }
+});

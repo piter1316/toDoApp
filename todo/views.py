@@ -38,7 +38,7 @@ def get_all_to_do(user):
 @login_required(login_url='/accounts/login')
 def index(request):
     todo_list_dict = {}
-    main_todos = ToDoMain.objects.filter(user=request.user).order_by('id')
+    main_todos = ToDoMain.objects.filter(user=request.user).order_by('-id')
     for main_todo in main_todos:
         todo_list = Todo.objects.filter(to_do_main=main_todo)
         second_level = {}
