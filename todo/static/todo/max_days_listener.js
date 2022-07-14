@@ -424,10 +424,10 @@ $('body').on('click','.toDoButtonAdd',function(e){
   var id_num = $(this).attr('id').split('_')[1]
   if($('#toDo_'+id_num).is(":visible")){
     $('#toDo_'+id_num).hide('slow');
-    $(this).text('+')
+    $(this).html('<i class="fas fa-plus"></i>')
   }else{
     $('#toDo_'+id_num).show('slow');
-    $(this).text('-')
+    $(this).html('<i class="fas fa-minus"></i>')
     $('#addStep_'+id_num).focus()
   }
 });

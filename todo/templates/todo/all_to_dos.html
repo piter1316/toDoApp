@@ -1,35 +1,5 @@
-{% extends 'todo/base.html' %}
-{% block body %}
-<div class="container-fluid mx-0 mx-md-2 " id="wrapper">
-
-  <div class="row mt-1">
-    <div class="col-12 col-md-4 col-xl-3">
-      <a href="{% url 'todo:index' %}" class="list-group-item bg-dark text-light">Aktualne listy</a>
-      <div class="nav flex-column  nav-tabs" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-        {% for main, todos in todo_list.items %}
-        <a class="btn btn-secondary mb-1" id="v-pills-{{main.id}}-tab" data-toggle="pill" href="#v-pills-{{main.id}}" role="tab" aria-controls="v-pills-{{main.id}}" aria-selected="true">{{main.name}}</a>
-        {% endfor %}
-    </div>
-    <form action="{% url 'todo:add' %}" method="POST"  role="form">
-      {% csrf_token %}
-      <div class="form-group p-2 bg-dark">
-        <div class="input-group">
-          {{form.text}}
-          <span class="input-group-btn">
-            <button type="submit" class="btn btn-secondary" id="add-btn">Nowa lista</button>
-          </span>
-        </div>
-      </div>
-    </form>
-    </div>
-    <div class="col-12 col-md-8 col-xl-9">
-    <div class="tab-content" id="v-pills-tabContent">
-      <div class="tab-pane fade show active" id="v-pills-all" role="tabpanel" aria-labelledby="v-pills-all-tab">
-        {% include 'todo/all_to_dos.html' %}
-
-      </div>
-      {% for main, todos in todo_list.items %}
-      <div class="tab-pane fade" id="v-pills-{{main.id}}" role="tabpanel">
+{% for main, todos in todo_list.items %}
+      <div class="{{class}}" id="{{id}}">
         <div class="list-group-item bg-dark text-light d-flex justify-content-between">
           <span class="my-auto">{{main.name}}</span>
           <a href="{% url 'todo:delete_main_list' main.id %}" type="submit" class="btn btn-outline-light " onclick="return confirm('Usunąć listę {{main.name}}?')">
@@ -90,8 +60,3 @@
         </form>
       </div>
       {% endfor %}
-    </div>
-  </div>
-  </div>
-</div>
-{% endblock %}

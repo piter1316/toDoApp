@@ -93,6 +93,11 @@ def un_complete_todo(request, todo_id):
     return redirect('todo:index')
 
 
+def delete_todo(request, todo_id):
+    Todo.objects.get(pk=todo_id, user_id=request.user).delete()
+    return redirect('todo:index')
+
+
 def complete_step(request, step_id):
     todo = TodoTodostep.objects.get(pk=step_id, user_id=request.user)
     todo.complete = True
@@ -105,6 +110,13 @@ def un_complete_step(request, step_id):
     todo.complete = False
     todo.save()
     return redirect('todo:index')
+
+
+def delete_step(request, step_id):
+    TodoTodostep.objects.get(pk=step_id, user_id=request.user).delete()
+    return redirect('todo:index')
+
+
 
 
 def delete_completed(request):

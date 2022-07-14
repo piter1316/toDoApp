@@ -11,8 +11,10 @@ urlpatterns = [
     path('delete_main_list/<list_id>', views.delete_main_list, name='delete_main_list'),
     path('complete_todo/<todo_id>', views.complete_todo, name='complete_todo'),
     path('un_complete_todo/<todo_id>', views.un_complete_todo, name='un_complete_todo'),
+    path('delete_todo/<todo_id>', views.delete_todo, name='delete_todo'),
     path('complete_step/<step_id>', views.complete_step, name='complete_step'),
     path('un_complete_step/<step_id>', views.un_complete_step, name='un_complete_step'),
+    path('delete_step/<step_id>', views.delete_step, name='delete_step'),
     path('deletecomplete', views.delete_completed, name='deletecomplete'),
     path('delete_all', views.delete_all, name='delete_all'),
 
