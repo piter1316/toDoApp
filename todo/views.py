@@ -37,8 +37,11 @@ def get_all_to_do(user):
 
 @login_required(login_url='/accounts/login')
 def index(request):
+    archive = 0
+    if request.GET.get('archive'):
+        archive = 1
     todo_list_dict = {}
-    main_todos = ToDoMain.objects.filter(user=request.user).order_by('-id')
+    main_todos = ToDoMain.objects.filter(user=request.user, archive=archive).order_by('-id')
     for main_todo in main_todos:
         todo_list = Todo.objects.filter(to_do_main=main_todo)
         second_level = {}
@@ -76,6 +79,20 @@ def add_step(request, to_do_id):
 
 def delete_main_list(request, list_id):
     ToDoMain.objects.filter(user_id=request.user, pk=list_id).delete()
+    return redirect('todo:index')
+
+
+def archive_main_list(request, list_id):
+    list_to_archive = ToDoMain.objects.get(user_id=request.user, pk=list_id)
+    list_to_archive.archive = 1
+    list_to_archive.save()
+    return redirect('todo:index')
+
+
+def restore_main_list_from_archive(request, list_id):
+    list_to_archive = ToDoMain.objects.get(user_id=request.user, pk=list_id)
+    list_to_archive.archive = 0
+    list_to_archive.save()
     return redirect('todo:index')
 
 

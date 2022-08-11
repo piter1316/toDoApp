@@ -3,7 +3,10 @@
 <div class="container-fluid mx-0 mx-md-2 " id="wrapper">
   <div class="row mt-1">
     <div class="col-12 col-md-4 col-xl-3">
-      <a href="{% url 'todo:index' %}" class="list-group-item bg-dark text-light mb-0 mb-md-1">Aktualne listy</a>
+      <div class="form-row">
+        <div class="col"><a href="{% url 'todo:index' %}" class="list-group-item bg-dark text-light mb-0 mb-md-1">Aktualne</a></div>
+        <div class="col"><a href="{% url 'todo:index' %}?archive=1" class="list-group-item bg-dark text-light mb-0 mb-md-1">Archiwalne</a></div>
+      </div>
       <div class="nav flex-column  nav-tabs" id="v-pills-tab" role="tablist" aria-orientation="vertical">
         {% for main, todos in todo_list.items %}
         <a class="btn btn-secondary btn-sm mb-0 mb-md-1" id="v-pills-{{main.id}}-tab" data-toggle="pill" href="#v-pills-{{main.id}}" role="tab" aria-controls="v-pills-{{main.id}}" aria-selected="true">{{main.name}}</a>
@@ -22,18 +25,29 @@
     </form>
     </div>
     <div class="col-12 col-md-8 col-xl-9">
-    <div class="tab-content" id="v-pills-tabContent">
+    <div class="tab-content" id="v-pills-tabContent"  {% if request.GET.archive == '1' %}style="color: gray !important; opacity: 0.7;" {% endif %}>
       {% if todo_list %}
         {% for main, todos in todo_list.items %}
         <div class="tab-pane fade show active" id="v-pills-{{main.id}}" role="tabpanel">
           <div class="list-group-item bg-dark text-light d-flex justify-content-between">
             <span class="my-auto">{{main.name}}</span>
-            <a href="{% url 'todo:delete_main_list' main.id %}" type="submit" class="btn btn-outline-light " onclick="return confirm('Usunąć listę {{main.name}}?')">
-              <i class="far fa-trash-alt" aria-hidden="true"></i>
-            </a>
+            <div>
+              <a href="{% url 'todo:delete_main_list' main.id %}" type="submit" class="btn btn-outline-light " onclick="return confirm('Usunąć listę {{main.name}}?')">
+                <i class="far fa-trash-alt" aria-hidden="true"></i>
+              </a>
+              {% if main.archive == 0 %}
+              <a href="{% url 'todo:archive_main_list' main.id %}" type="submit" class="btn btn-outline-light " onclick="return confirm('Przenieść listę {{main.name}} do archiwum?')" data-placement="bottom" data-toggle="tooltip" title="Zarchiwizuj">
+                <i class="fas fa-inbox"></i>
+              </a>
+              {% else %}
+              <a href="{% url 'todo:restore_main_list_from_archive' main.id %}" type="submit" class="btn btn-outline-light " onclick="return confirm('Przywrócić listę {{main.name}}?')" data-placement="bottom" data-toggle="tooltip" title="Przywróć">
+                <i class="fas fa-backward"></i>
+              </a>
+              {% endif %}
+            </div>
           </div>
           {% for todo, steps in todos.items %}
-          <div class="list-group-item d-flex justify-content-between py-1 bg-secondary text-light {% if todo.complete %} todo-completed text-muted {% endif %}" id="toDoItemContainer_{{todo.id}}">
+          <div class="list-group-item d-flex justify-content-between py-1 bg-secondary text-light {% if todo.complete %} todo-completed text-muted {% endif %}" id="toDoItemContainer_{{todo.id}}" {% if request.GET.archive == '1' %}style="pointer-events: none"{% endif %} >
             <div class="py-auto" id="toDoItem_{{todo.id}}">
               {% if todo.complete %}
               <a class="text-light toDoItemUnComplete_" id="toDoItemUnComplete_{{todo.id}}"  href="{% url 'todo:un_complete_todo' todo.id %}">{{ todo.text }}</a>
@@ -49,7 +63,7 @@
           </div>
           <div id="steps_{{todo.id}}">
             {% for step in steps %}
-            <div class="d-flex justify-content-between list-group-item py-0 py-md-1 pl-5 {% if step.complete %}todo-completed{% endif %}" id="stepContainer_{{step.id}}">
+            <div class="d-flex justify-content-between list-group-item py-0 py-md-1 pl-5 {% if step.complete %}todo-completed{% endif %}" id="stepContainer_{{step.id}}" {% if request.GET.archive == '1' %}style="pointer-events: none"{% endif %}>
               {% if step.complete %}
                 <a class=" text-dark  text-muted unCompleteStep" id="unCompleteStep_{{step.id}}"  href="{% url 'todo:un_complete_step' step.id %}">{{step.text}}</a>
               {% else %}
@@ -109,7 +123,6 @@
         csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
       },
       success: function(data){
-      console.log(data)
       $('#v-pills-' + id).replaceWith($('#v-pills-' + id,data));
       }
     });
@@ -118,17 +131,13 @@
    $('body').on('click','.deleteToDo' ,function(e){
     e.preventDefault();
     var id = (e.currentTarget.id).split('_')[1];
-    console.log(id);
     if (confirm('Usunąć zadanie?')) {
       $.ajax({
         url:'delete_todo/' + id,
         success: function(data){
-        console.log(data)
         $('#toDoItemContainer_' + id).remove();
         $('#steps_' + id).remove();
         $('#toDo_' + id).remove();
-
-
         }
       });
     }
@@ -138,11 +147,9 @@
   $('body').on('click','.toItemComplete_' ,function(e){
     e.preventDefault();
     var id = (e.currentTarget.id).split('_')[1];
-    console.log(id);
     $.ajax({
       url:'complete_todo/' + id,
       success: function(data){
-      console.log(data)
       $('#toDoItemContainer_' + id).replaceWith($('#toDoItemContainer_' + id,data));
       }
     });
@@ -151,11 +158,9 @@
   $('body').on('click','.toDoItemUnComplete_' ,function(e){
     e.preventDefault();
     var id = (e.currentTarget.id).split('_')[1];
-    console.log(id);
     $.ajax({
       url:'un_complete_todo/' + id,
       success: function(data){
-      console.log(data)
       $('#toDoItemContainer_' + id).replaceWith($('#toDoItemContainer_' + id,data));
       }
     });
@@ -164,11 +169,9 @@
   $('body').on('click','.completeStep' ,function(e){
       e.preventDefault();
       var id = (e.currentTarget.id).split('_')[1];
-      console.log(id);
       $.ajax({
         url:'complete_step/' + id,
         success: function(data){
-        console.log(data)
         $('#stepContainer_' + id).replaceWith($('#stepContainer_' + id,data));
         }
       });
@@ -178,11 +181,9 @@
   $('body').on('click','.unCompleteStep' ,function(e){
     e.preventDefault();
     var id = (e.currentTarget.id).split('_')[1];
-    console.log(id);
     $.ajax({
       url:'un_complete_step/' + id,
       success: function(data){
-      console.log(data)
       $('#stepContainer_' + id).replaceWith($('#stepContainer_' + id,data));
       }
     });
@@ -191,12 +192,10 @@
   $('body').on('click','.deleteStep' ,function(e){
     e.preventDefault();
     var id = (e.currentTarget.id).split('_')[1];
-    console.log(id);
     if(confirm('Czy napewno usunąć krok?')){
       $.ajax({
       url:'delete_step/' + id,
       success: function(data){
-      console.log(data)
       $('#stepContainer_' + id).remove();
       }
     });
@@ -214,7 +213,6 @@
         csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
       },
       success: function(data){
-      console.log(data)
       $('#addStep_' + id).val('');
       $('#steps_' + id).replaceWith($('#steps_' + id,data));
       $('#addStep_' + id).focus()
