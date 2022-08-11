@@ -1,8 +1,8 @@
 {% extends 'todo/base.html' %}
 {% block body %}
-<div class="container-fluid mx-0 mx-md-2 " id="wrapper">
+<div class="container-fluid mx-0 " id="wrapper">
   <div class="row mt-1">
-    <div class="col-12 col-md-4 col-xl-3">
+    <div class="col-12 col-md-4 col-xl-3 px-1 px-md-2">
       <div class="form-row">
         <div class="col"><a href="{% url 'todo:index' %}" class="list-group-item bg-dark text-light mb-0 mb-md-1">Aktualne</a></div>
         <div class="col"><a href="{% url 'todo:index' %}?archive=1" class="list-group-item bg-dark text-light mb-0 mb-md-1">Archiwalne</a></div>
@@ -24,7 +24,7 @@
       </div>
     </form>
     </div>
-    <div class="col-12 col-md-8 col-xl-9">
+    <div class="col-12 col-md-8 col-xl-9 px-1 px-md-2">
     <div class="tab-content" id="v-pills-tabContent"  {% if request.GET.archive == '1' %}style="color: gray !important; opacity: 0.7;" {% endif %}>
       {% if todo_list %}
         {% for main, todos in todo_list.items %}
