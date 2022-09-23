@@ -25,6 +25,12 @@ class Meal(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def has_short_expiry(self):
+        meal_ingredients = MealIngredient.objects.filter(meal_id=self.id)
+        short_expiry_check = [ingr.ingredient_id.short_expiry for ingr in meal_ingredients]
+        return True in short_expiry_check
+
 
 class ProductDivision(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=None, null=True)

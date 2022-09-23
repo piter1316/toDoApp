@@ -85,7 +85,7 @@
                 {% if ch_meal.extras %}
                 <small  style="cursor:pointer;" data-toggle="modal" data-target="#extrasModal">
                   <i class="editExtras" id="editExtrasSmall_{{ch_meal.id}}">
-                    {{ch_meal.extras}}
+                    {{ch_meal.extras}}{% if ch_meal.extras.has_short_expiry %} <sup class="fas fa-hourglass-start" ></sup>{% endif %}
                   <input type="hidden" id="clicked_position_meal_{{ch_meal.id}}" value="{{ch_meal}}">
                   <input type="hidden" id="clicked_position_extras_{{ch_meal.id}}" value="{{ch_meal.extras}}">
                     {% for option, meals in all_meals_in_option_dict.items %}{% for meal in meals %}{% if meal.0 == ch_meal.extras%}
