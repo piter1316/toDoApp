@@ -3,6 +3,7 @@ from django.http import HttpResponse
 import requests
 import datetime
 import json
+from concurrent.futures import ThreadPoolExecutor, wait
 
 
 def get_rates_in_time(time, total_data):
@@ -31,7 +32,7 @@ def get_all_currencies():
             if prev['code'] == rate['code']:
                 previous_rate = prev['mid']
                 rate['previous'] = previous_rate
-                rate['percent'] = round((rate['mid'] - previous_rate)/rate['mid'] * 100, 2)
+                rate['percent'] = round((rate['mid'] - previous_rate) / rate['mid'] * 100, 2)
                 break
     return user_rates_to_render, exchange_rate_date
 
@@ -44,9 +45,12 @@ def exchange_rates(request):
     return render(request, 'exchange_rates/exchange_rates.html', context)
 
 
+def get_exchange(curr, period, date):
+    return requests.get(f'https://api.nbp.pl/api/exchangerates/rates/a/{curr}/{period}/{date}/?format=json').json()
+
+
 def exchange_rates_diagram(request, currency):
     # https://api.nbp.pl/api/exchangerates/rates/a/gbp/2021-05-10/2022-05-10/?format=json
-
     today = datetime.date.today()
     week_back = today - datetime.timedelta(days=7)
     month_back = today - datetime.timedelta(days=30)
@@ -58,16 +62,19 @@ def exchange_rates_diagram(request, currency):
     three_years_back = today - datetime.timedelta(days=1095)
     four_years_back = today - datetime.timedelta(days=1460)
     five_years_back = today - datetime.timedelta(days=1825)
+    five_years_data_poll = ThreadPoolExecutor(5)
+    one_year_back_poll = five_years_data_poll.submit(get_exchange, currency, one_year_back, today)
+    two_year_back_poll = five_years_data_poll.submit(get_exchange, currency, two_years_back, one_year_back)
+    three_years_back_poll = five_years_data_poll.submit(get_exchange, currency, three_years_back, two_years_back)
+    four_years_back_poll = five_years_data_poll.submit(get_exchange, currency, four_years_back, three_years_back)
+    five_years_back_poll = five_years_data_poll.submit(get_exchange, currency, five_years_back, four_years_back)
+    wait([one_year_back_poll])
     five_years_data_jsons = [
-        requests.get(f'https://api.nbp.pl/api/exchangerates/rates/a/{currency}/{one_year_back}/{today}/?format=json').json(),
-        requests.get(
-            f'https://api.nbp.pl/api/exchangerates/rates/a/{currency}/{two_years_back}/{one_year_back}/?format=json').json(),
-        requests.get(
-            f'https://api.nbp.pl/api/exchangerates/rates/a/{currency}/{three_years_back}/{two_years_back}/?format=json').json(),
-        requests.get(
-            f'https://api.nbp.pl/api/exchangerates/rates/a/{currency}/{four_years_back}/{three_years_back}/?format=json').json(),
-        requests.get(
-            f'https://api.nbp.pl/api/exchangerates/rates/a/{currency}/{five_years_back}/{four_years_back}/?format=json').json(),
+        one_year_back_poll.result(),
+        two_year_back_poll.result(),
+        three_years_back_poll.result(),
+        four_years_back_poll.result(),
+        five_years_back_poll.result(),
     ]
     total_data = []
     for js in five_years_data_jsons:
