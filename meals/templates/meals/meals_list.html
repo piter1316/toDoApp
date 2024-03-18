@@ -108,7 +108,6 @@
                       <select class="form-control" name="to_update" id="toUpdate_{{ch_meal.id}}">
                         <option value="">BRAK POSIŁKU</option>
                         {% for m in all %}
-                        <option>{{m.1.2}}</option>
                           <option {% if ch_meal.meal_id == m.0.id %}selected="true"{% endif %} value="{{m.0.id}}">{{m.0}} | {{m.1.0}} kcal{% if m.0.special %} ** {% endif %} {% if m.1.2 %} | B {% endif %} </option>
                         {% endfor %}
                       </select>
