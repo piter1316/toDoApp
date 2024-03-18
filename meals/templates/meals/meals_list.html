@@ -76,7 +76,7 @@
               <td  class="px-0"{%for ch_meal, all in meal.items%} id="td_{{ch_meal.id}}" {% endfor %}  >{%for ch_meal, all in meal.items%}
                 <div class="" style="cursor:pointer;" id="dropdownMeal_{{ch_meal.id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   {% if ch_meal.meal_id %}
-                    {{ch_meal}}{% for m in all %}{% if ch_meal.meal_id == m.0.id %} {% if m.0.special %} **{% endif %}{% endif %}{%endfor%}
+                  {{ch_meal}}{% for m in all %}{% if ch_meal.meal_id == m.0.id %} {% if m.0.special %} * {% endif %} {% if m.2 %} <sup>b</sup> {% endif %} {% endif %}{%endfor%}
                     {% for m in all %}{% if ch_meal.meal_id == m.0.id %} {% if m.1.1 %}<sup class="fas fa-hourglass-start" ></sup>{% endif %} {% endif %}{%endfor%}
                   {% else %}
                   ------
@@ -86,6 +86,7 @@
                 <small  style="cursor:pointer;" data-toggle="modal" data-target="#extrasModal">
                   <i class="editExtras" id="editExtrasSmall_{{ch_meal.id}}">
                     {{ch_meal.extras}}{% if ch_meal.extras.has_short_expiry %} <sup class="fas fa-hourglass-start" ></sup>{% endif %}
+                    {% if ch_meal.extras.is_high_carb %} <sup>b</sup> {% endif %}
                   <input type="hidden" id="clicked_position_meal_{{ch_meal.id}}" value="{{ch_meal}}">
                   <input type="hidden" id="clicked_position_extras_{{ch_meal.id}}" value="{{ch_meal.extras}}">
                     {% for option, meals in all_meals_in_option_dict.items %}{% for meal in meals %}{% if meal.0 == ch_meal.extras%}
@@ -107,7 +108,7 @@
                       <select class="form-control" name="to_update" id="toUpdate_{{ch_meal.id}}">
                         <option value="">BRAK POSIŁKU</option>
                         {% for m in all %}
-                          <option {% if ch_meal.meal_id == m.0.id %}selected="true"{% endif %} value="{{m.0.id}}">{{m.0}} | {{m.1.0}} kcal{% if m.0.special %} ** {% endif %} </option>
+                          <option {% if ch_meal.meal_id == m.0.id %}selected="true"{% endif %} value="{{m.0.id}}">{{m.0}} | {{m.1.0}} kcal{% if m.0.special %} ** {% endif %} {% if m.2 %} | B {% endif %} </option>
                         {% endfor %}
                       </select>
                     </form>
@@ -187,7 +188,7 @@
               {{option}}
             </option>
             {% for meal in meals %}
-            <option value="{{meal.0.id}}">{{meal.0.name}} | {{meal.1.0}} kcal </option>
+            <option value="{{meal.0.id}}">{{meal.0.name}} | {{meal.1.0}} kcal {% if meal.2 %}| B {% endif %} </option>
             {% endfor %}
           </select>
         </form>

@@ -107,7 +107,7 @@ def meals(request, current=1):
         for meal in meals_in_option:
             all_meals.append(meal.id)
             calories_sum = 0
-            all_meals_in_option.append([meal, calories_sum])
+            all_meals_in_option.append([meal, calories_sum, meal.is_high_carb])
         all_meals_in_option_dict[option] = all_meals_in_option
     sql = """
     SELECT
