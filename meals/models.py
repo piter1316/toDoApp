@@ -2,6 +2,7 @@ import math
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import Sum, F, FloatField, Case, When, Value
 
 
 class MealOption(models.Model):
@@ -33,11 +34,20 @@ class Meal(models.Model):
 
     @property
     def is_high_carb(self):
-        meal_ingredients = MealIngredient.objects.filter(meal_id=self.id)
-        prot_check = [(ingr.kcal, ingr.protein) for ingr in meal_ingredients]
-        kcal_sum = sum([item[0] for item in prot_check])
-        prot_sum = sum([item[1] for item in prot_check])
-        return prot_sum * 4 >= (kcal_sum * 0.28) if (prot_sum != 0 or kcal_sum != 0) else 0
+        meal_ingredients = (
+            MealIngredient.objects
+            .filter(meal_id=self.id)
+            .select_related('ingredient_id')
+            .annotate(
+                kcal=F('ingredient_id__calories_per_100_gram') * F('quantity') / 100,
+                protein=F('ingredient_id__protein_per_100_gram') * F('quantity') / 100
+            )
+        )
+        total_kcal = meal_ingredients.aggregate(total_kcal=Sum('kcal', output_field=FloatField()))['total_kcal'] or 0
+        total_protein = meal_ingredients.aggregate(total_protein=Sum('protein', output_field=FloatField()))[
+                            'total_protein'] or 0
+
+        return total_protein * 4 >= (total_kcal * 0.28) if (total_protein != 0 or total_kcal != 0) else False
 
 
 class ProductDivision(models.Model):
