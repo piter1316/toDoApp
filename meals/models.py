@@ -37,7 +37,7 @@ class Meal(models.Model):
         prot_check = [(ingr.kcal, ingr.protein) for ingr in meal_ingredients]
         kcal_sum = sum([item[0] for item in prot_check])
         prot_sum = sum([item[1] for item in prot_check])
-        return prot_sum * 4 >= (kcal_sum * 0.28)
+        return prot_sum * 4 >= (kcal_sum * 0.28) if (prot_sum != 0 or kcal_sum != 0) else 0
 
 
 class ProductDivision(models.Model):
