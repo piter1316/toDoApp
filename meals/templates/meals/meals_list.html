@@ -76,7 +76,7 @@
               <td  class="px-0"{%for ch_meal, all in meal.items%} id="td_{{ch_meal.id}}" {% endfor %}  >{%for ch_meal, all in meal.items%}
                 <div class="" style="cursor:pointer;" id="dropdownMeal_{{ch_meal.id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   {% if ch_meal.meal_id %}
-                  {{ch_meal}}{% for m in all %}{% if ch_meal.meal_id == m.0.id %} {% if m.0.special %} * {% endif %} {% if m.2 %} <sup>b</sup> {% endif %} {% endif %}{%endfor%}
+                  {{ch_meal}}{% for m in all %}{% if ch_meal.meal_id == m.0.id %} {% if m.0.special %} * {% endif %} {% if m.1.2 %} <sup>b</sup> {% endif %} {% endif %}{%endfor%}
                     {% for m in all %}{% if ch_meal.meal_id == m.0.id %} {% if m.1.1 %}<sup class="fas fa-hourglass-start" ></sup>{% endif %} {% endif %}{%endfor%}
                   {% else %}
                   ------
@@ -108,7 +108,8 @@
                       <select class="form-control" name="to_update" id="toUpdate_{{ch_meal.id}}">
                         <option value="">BRAK POSIŁKU</option>
                         {% for m in all %}
-                          <option {% if ch_meal.meal_id == m.0.id %}selected="true"{% endif %} value="{{m.0.id}}">{{m.0}} | {{m.1.0}} kcal{% if m.0.special %} ** {% endif %} {% if m.2 %} | B {% endif %} </option>
+                        <option>{{m.1.2}}</option>
+                          <option {% if ch_meal.meal_id == m.0.id %}selected="true"{% endif %} value="{{m.0.id}}">{{m.0}} | {{m.1.0}} kcal{% if m.0.special %} ** {% endif %} {% if m.1.2 %} | B {% endif %} </option>
                         {% endfor %}
                       </select>
                     </form>
@@ -188,7 +189,7 @@
               {{option}}
             </option>
             {% for meal in meals %}
-            <option value="{{meal.0.id}}">{{meal.0.name}} | {{meal.1.0}} kcal {% if meal.2 %}| B {% endif %} </option>
+            <option value="{{meal.0.id}}">{{meal.0.name}} | {{meal.1.0}} kcal {% if meal.1.2 %}| B {% endif %} </option>
             {% endfor %}
           </select>
         </form>

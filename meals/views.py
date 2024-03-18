@@ -107,7 +107,7 @@ def meals(request, current=1):
         for meal in meals_in_option:
             all_meals.append(meal.id)
             calories_sum = 0
-            all_meals_in_option.append([meal, calories_sum, meal.is_high_carb])
+            all_meals_in_option.append([meal, calories_sum, ])
         all_meals_in_option_dict[option] = all_meals_in_option
     sql = """
     SELECT
@@ -132,6 +132,7 @@ def meals(request, current=1):
         meal_ingredients_dict[meal] = ingredients_for_meal
     for meal, ingredients in meal_ingredients_dict.items():
         kcal = []
+        prot = []
         short_expiry = []
 
         for ingredient in ingredients:
@@ -139,10 +140,12 @@ def meals(request, current=1):
                 short_expiry.append(1)
 
             kcal.append((ingredient.calories_per_100_gram * ingredient.quantity / 100))
+            prot.append((ingredient.protein_per_100_gram * ingredient.quantity / 100))
+            is_high_carb = float(sum(prot)) * 4 >= (float(sum(kcal)) * 0.28)
         for option, meals_in_option in all_meals_in_option_dict.items():
             for m in meals_in_option:
                 if m[0].id == meal:
-                    m[1] = [round(sum(kcal)), short_expiry]
+                    m[1] = [round(sum(kcal)), short_expiry, is_high_carb]
     day_meal_option_meal_list = []
     # table
     for item in meals_list:
