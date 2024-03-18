@@ -31,6 +31,14 @@ class Meal(models.Model):
         short_expiry_check = [ingr.ingredient_id.short_expiry for ingr in meal_ingredients]
         return True in short_expiry_check
 
+    @property
+    def is_high_carb(self):
+        meal_ingredients = MealIngredient.objects.filter(meal_id=self.id)
+        prot_check = [(ingr.kcal, ingr.protein) for ingr in meal_ingredients]
+        kcal_sum = sum([item[0] for item in prot_check])
+        prot_sum = sum([item[1] for item in prot_check])
+        return prot_sum * 4 >= (kcal_sum * 0.28)
+
 
 class ProductDivision(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=None, null=True)
@@ -95,6 +103,8 @@ class MealIngredient(models.Model):
     @property
     def carb(self):
         return math.ceil(self.ingredient_id.carbohydrates_per_100_gram * self.quantity / 100)
+
+
 
 
 class MealsList(models.Model):

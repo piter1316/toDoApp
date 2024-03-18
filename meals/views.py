@@ -338,7 +338,7 @@ def edit_meals(request):
                 protein += (ingr.quantity / 100) * int(ingr.ingredient_id.protein_per_100_gram)
                 fat += (ingr.quantity / 100) * int(ingr.ingredient_id.fat_per_100_gram)
                 carbohydrates += (ingr.quantity / 100) * int(ingr.ingredient_id.carbohydrates_per_100_gram)
-            meals.append([meal_tmp, [round(calories), round(protein), round(fat), round(carbohydrates)]])
+            meals.append([meal_tmp, [round(calories), round(protein), round(fat), round(carbohydrates),meal_tmp.is_high_carb]])
         meals_options_dict[meals_options[i]] = meals
 
     context = {
