@@ -5,6 +5,15 @@ from django.db import models
 from django.db.models import Sum, F, FloatField, Case, When, Value
 
 
+def is_hi_protein(total_kcal, total_protein):
+    if total_protein != 0 or total_kcal != 0:
+        percent_of_prot = round((total_protein * 4)/total_kcal * 100, 2)
+        if total_protein * 4 >= (total_kcal * 0.28):
+            return 'B', f'Bardzo wysoka zawartość białka ({percent_of_prot}%)'
+        if (total_kcal * 0.25) <= total_protein * 4 < (total_kcal * 0.28):
+            return 'b', f'wysoka zawartość białka ({percent_of_prot}%)'
+
+
 class MealOption(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     meal_option = models.TextField(max_length=15)
@@ -47,7 +56,7 @@ class Meal(models.Model):
         total_protein = meal_ingredients.aggregate(total_protein=Sum('protein', output_field=FloatField()))[
                             'total_protein'] or 0
 
-        return total_protein * 4 >= (total_kcal * 0.28) if (total_protein != 0 or total_kcal != 0) else False
+        return is_hi_protein(total_kcal, total_protein)
 
 
 class ProductDivision(models.Model):
@@ -113,8 +122,6 @@ class MealIngredient(models.Model):
     @property
     def carb(self):
         return math.ceil(self.ingredient_id.carbohydrates_per_100_gram * self.quantity / 100)
-
-
 
 
 class MealsList(models.Model):

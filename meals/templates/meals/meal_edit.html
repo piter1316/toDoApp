@@ -13,7 +13,7 @@
             <div class="card-header text-center py-0 px-1" id="card-header">
               <div id="edit_panel">
                 <p id="option_name" class="lead mb-0" style="cursor:pointer;" title="Kliknj i edtyuj">
-                  {{meal.0.name|upper}} {%if meal.0.special%} * {% endif %} {%if meal.0.is_high_carb%} <sup><b>b</b></sup> {% endif %}<br>
+                  {{meal.0.name|upper}} {%if meal.0.special%} * {% endif %} {%if meal.0.is_high_carb %} <sup><b>{{meal.0.is_high_carb.0}}</b></sup> {% endif %}<br>
                   <small>{{calories}} <sup>kcal</sup> </small> |
                   <small>{{protein}}g <sup>białko</sup></small> |
                   <small>{{fat}}g <sup>tłuszcz</sup></small> |
@@ -35,7 +35,7 @@
             <ul class="list-group list-group-flush" id="ingredients_list">
               <li class="list-group-item p-0 mx-1 d-flex justify-content-between" id="ingr">
                 <small>Składniki:</small>
-                {%if meal.0.is_high_carb%}<small> # wysoka zawartość białka</small> {% endif %}
+                {%if meal.0.is_high_carb %}<small> # {{meal.0.is_high_carb.1}}</small> {% endif %}
               </li>
               {% for ingredient in ingredients %}
               <li class="list-group-item d-flex justify-content-between align-items-center py-0 px-1 default" id="li_{{ingredient.id}}">

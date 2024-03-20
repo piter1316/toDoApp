@@ -11,7 +11,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 
 from meals.forms import MealForm, IngredientForm, MealOptionForm
-from meals.models import MealOption, Meal, Ingredient, MealsList, Week, Unit, MealIngredient, Shop, ProductDivision
+from meals.models import MealOption, Meal, Ingredient, MealsList, Week, Unit, MealIngredient, Shop, ProductDivision, is_hi_protein
 from shopping.models import ShoppingList, Products
 
 
@@ -141,11 +141,11 @@ def meals(request, current=1):
 
             kcal.append((ingredient.calories_per_100_gram * ingredient.quantity / 100))
             prot.append((ingredient.protein_per_100_gram * ingredient.quantity / 100))
-            is_high_carb = float(sum(prot)) * 4 >= (float(sum(kcal)) * 0.28)
+            _is_high_prot = is_hi_protein(float(sum(kcal)), float(sum(prot)))
         for option, meals_in_option in all_meals_in_option_dict.items():
             for m in meals_in_option:
                 if m[0].id == meal:
-                    m[1] = [round(sum(kcal)), short_expiry, is_high_carb]
+                    m[1] = [round(sum(kcal)), short_expiry, _is_high_prot]
     day_meal_option_meal_list = []
     # table
     for item in meals_list:
@@ -341,8 +341,8 @@ def edit_meals(request):
                 protein += (ingr.quantity / 100) * int(ingr.ingredient_id.protein_per_100_gram)
                 fat += (ingr.quantity / 100) * int(ingr.ingredient_id.fat_per_100_gram)
                 carbohydrates += (ingr.quantity / 100) * int(ingr.ingredient_id.carbohydrates_per_100_gram)
-            is_high_carb = float(protein) * 4 >= (float(calories) * 0.28)
-            meals.append([meal_tmp, [round(calories), round(protein), round(fat), round(carbohydrates), is_high_carb]])
+            _is_high_prot = is_hi_protein(float(calories), float(protein))
+            meals.append([meal_tmp, [round(calories), round(protein), round(fat), round(carbohydrates), _is_high_prot]])
         meals_options_dict[meals_options[i]] = meals
 
     context = {
