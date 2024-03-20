@@ -440,3 +440,31 @@ $('body').on('click','#v-pills-tab a',function(e){
   tab_panes[i].classList.remove("active");
   }
 });
+
+
+$('body').on('change','input[name=only_hi_protein_in_select]',function(){
+  var select = $("select[name='to_update']");
+  var options = select.find("option");
+  var extrasSelect = $("select[name='extras_select']");
+  var extrasOptions = extrasSelect.find("option");
+  if ($(this).is(':checked')) {
+    options.each(function() {
+      var optionText = $(this).text();
+      if (!(optionText.includes("| B") || optionText.includes("| b"))) {
+        console.log(this)
+        $(this).hide();
+      }
+    });
+    extrasOptions.each(function() {
+      var optionText = $(this).text();
+      if (!(optionText.includes("| B") || optionText.includes("| b"))) {
+        console.log(this)
+        $(this).hide();
+      }
+    });
+    } else {
+  options.show();
+  extrasOptions.show();
+  }
+})
+

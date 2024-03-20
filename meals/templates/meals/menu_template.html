@@ -26,6 +26,10 @@
           Wyczyść jadłospis
         </a>
         <a class="btn btn-block btn-dark btn-sm" href="{% url 'meals:index' 0 %}">Wyświetl poprzedni jadłospis</a>
+        <label>
+        <input name="only_hi_protein_in_select" id="only_hi_protein_in_select" type="checkbox">
+          pokaż tylko wysokobałkowe
+        </label>
       {% endif %}
     {% endif %}
   </div>
