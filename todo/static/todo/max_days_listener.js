@@ -467,4 +467,97 @@ $('body').on('change','input[name=only_hi_protein_in_select]',function(){
   extrasOptions.show();
   }
 })
+function refreshOnMealChange(form_id, thToRefresh, checkbox, data){
+  $('#modalTitleSpan_' + form_id).replaceWith($('#modalTitleSpan_' + form_id, data));
+  $('#dropdownMeal_'+form_id).replaceWith($('#dropdownMeal_' + form_id,data));
+  $('#dropdownMenu_'+form_id).removeClass('show');
+  $('#span_'+form_id).replaceWith($('#span_' + form_id,data));
+  $('#b-t-w').replaceWith($('#b-t-w',data));
+  $('#mobileAverageContainer').replaceWith($('#mobileAverageContainer',data));
+  $('#tr_'+form_id).replaceWith($('#tr_'+form_id,data));
+  $('#editExtrasSmall_'+form_id).replaceWith($('#editExtrasSmall_'+form_id,data));
+  $('#' + thToRefresh.id).replaceWith($('#' + thToRefresh.id, data));
+  var tdToRefresh = thToRefresh.id.replace('th', 'td')
+  var trToRefresh = thToRefresh.id.replace('th', 'tr').replace('div_', '')
+  $('#' + trToRefresh).replaceWith($('#' + trToRefresh,data));
+  $('#' + trToRefresh).replaceWith($('#' + trToRefresh,data));
+  $(checkbox).fadeOut();
+  $(checkbox).prop('checked', true);
+}
+
+$('body').on('change','select[name="to_update"]',function(e){
+    e.preventDefault();
+    var id = e.target.id
+    var form_id = id.split('_')[1]
+    var newMealOptionId = $('#form_'+ form_id + ' #toUpdate_' + form_id).val();
+    var newMealOptionText = $('#toUpdate_' + form_id + ' option[value="' + newMealOptionId +'"]').text();
+    if(newMealOptionText.includes('|')){
+      var newMealOptionName = newMealOptionText.split('|')[0]
+    } else{
+      var newMealOptionName = '------'
+    }
+    $('#dropdownMeal_'+form_id).text(newMealOptionName);
+    var rows = $('input[name=day]');
+    for (let i = 0; i < rows.length; i++) {
+      var row = rows[i]
+      if (row.value.includes(form_id)){
+        var thToRefresh = row.parentNode
+        var checkboxCheck = $(row);
+        if($(checkboxCheck).is(':checked')){
+        var checkbox = row;
+        }
+        }
+    }
+    $.ajax({
+      type:'POST',
+      url:'/mealsList/1/update',
+      data:{
+        record_id:$('#form_'+ form_id + ' input[name="record_id"]').val(),
+        to_update:$('#form_'+ form_id + ' #toUpdate_' + form_id).val(),
+        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+      },
+      success: function(data){
+        refreshOnMealChange(form_id, thToRefresh, checkbox, data)
+      }
+    });
+  });
+
+//  $('body').on('change','select[name="to_update"]',function(e){
+//    e.preventDefault();
+//    var id = e.target.id
+//    var form_id = id.split('_')[1]
+//    var newMealOptionId = $('#form_'+ form_id + ' #toUpdate_' + form_id).val();
+//    var newMealOptionText = $('#toUpdate_' + form_id + ' option[value="' + newMealOptionId +'"]').text();
+//    if(newMealOptionText.includes('|')){
+//      var newMealOptionName = newMealOptionText.split('|')[0]
+//    } else{
+//      var newMealOptionName = '------'
+//    }
+//    $('#dropdownMeal_'+form_id).text(newMealOptionName);
+//    var rows = $('input[name=day]');
+//    for (let i = 0; i < rows.length; i++) {
+//      var row = rows[i]
+//      if (row.value.includes(form_id)){
+//        var thToRefresh = row.parentNode
+//        var checkboxCheck = $(row);
+//        if($(checkboxCheck).is(':checked')){
+//        var checkbox = row;
+//        }
+//        }
+//    }
+//    $.ajax({
+//      type:'POST',
+//      url:'/mealsList/1/edit_extras',
+//      data:{
+//        record_id:$('#form_'+ form_id + ' input[name="record_id"]').val(),
+//        to_update:$('#form_'+ form_id + ' #toUpdate_' + form_id).val(),
+//        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+//      },
+//      success: function(data){
+//        refreshOnMealChange(form_id, thToRefresh, checkbox, data)
+//      }
+//    });
+//  });
+
+
 
