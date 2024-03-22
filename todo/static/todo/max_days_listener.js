@@ -495,7 +495,7 @@ function refreshOnMealChange(form_id, thToRefresh, checkbox, data){
   var trToRefresh = thToRefresh.id.replace('th', 'tr').replace('div_', '')
   $('#' + trToRefresh).replaceWith($('#' + trToRefresh,data));
   $('#' + trToRefresh).replaceWith($('#' + trToRefresh,data));
-//  $('#editExtras_' + form_id).replaceWith($('#editExtras_' + form_id,data));
+  $('#editExtras_' + form_id).replaceWith($('#editExtras_' + form_id,data));
   $(checkbox).fadeOut();
   $(checkbox).prop('checked', true);
 
@@ -504,9 +504,13 @@ function refreshOnMealChange(form_id, thToRefresh, checkbox, data){
 function refreshModal(form_id, opt_id, data){
 $('#extrasSelect_'+ opt_id).val($('#extrasSelect_'+ opt_id + ' option:first').val());
 $('#dismiss_extras_modal').click();
-console.log()
-$('#td_' + form_id).replaceWith($('#td_' + form_id,data));
-//$('#extrasModal').hide()
+if ($('#editExtrasSmall_' + form_id).length) {
+        ;
+    } else {
+        $('#td_' + form_id).append($('#editExtrasSmallWrap_' + form_id,data));
+    }
+
+
 }
 
 $('body').on('change','select[name="to_update"]',function(e){
@@ -589,5 +593,41 @@ $('body').on('change','select[name="to_update"]',function(e){
     });
   });
 
+  $('body').on('click','#delete_extras',function(e){
+    e.preventDefault();
+    var form_id = $('input[name="meals_list_position"]').val()
+    var _id = e.target.id
+    var opt_id = _id.split('_')[1]
+    var newMealOptionId = $('#form_'+ form_id + ' #toUpdate_' + form_id).val();
+    var newMealOptionText = $('#toUpdateExtras_' + form_id + ' option[value="' + newMealOptionId +'"]').text();
+    if(newMealOptionText.includes('|')){
+      var newMealOptionName = newMealOptionText.split('|')[0]
+    } else{
+      var newMealOptionName = '------'
+    }
+    $('#dropdownMeal_'+form_id).text(newMealOptionName);
+    var rows = $('input[name=day]');
+    for (let i = 0; i < rows.length; i++) {
+      var row = rows[i]
+      if (row.value.includes(form_id)){
+        var thToRefresh = row.parentNode
+        var checkboxCheck = $(row);
+        if($(checkboxCheck).is(':checked')){
+        var checkbox = row;
+        }
+        }
+    }
+    var option = $('#option_id').val();
+    $.ajax({
+      type:'GET',
+      url:e.target.href,
+      data:{},
+
+      success: function(data){
+        refreshOnMealChange(form_id, thToRefresh, checkbox, data)
+        refreshModal(form_id, opt_id, data)
+      }
+    });
+  });
 
 

@@ -83,7 +83,7 @@
                   {% endif %}
                 </div>
                 {% if ch_meal.extras %}
-                <small  style="cursor:pointer;" data-toggle="modal" data-target="#extrasModal">
+                <small  style="cursor:pointer;" data-toggle="modal" data-target="#extrasModal" id="editExtrasSmallWrap_{{ch_meal.id}}">
                   <i class="editExtras" id="editExtrasSmall_{{ch_meal.id}}">
                     {{ch_meal.extras}}{% if ch_meal.extras.has_short_expiry %} <sup class="fas fa-hourglass-start" ></sup>{% endif %}
                     {% if ch_meal.extras.is_high_carb %} <sup>{{ch_meal.extras.is_high_carb.0}}</sup> {% endif %}
