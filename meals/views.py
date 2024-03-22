@@ -519,7 +519,6 @@ def generate_meals_list(request):
 def update_meals_list(request):
     record_id = request.POST['record_id']
     to_update = request.POST['to_update']
-
     MealsList.objects.filter(pk=int(record_id)).update(meal_id=to_update)
     return redirect('/mealsList/1')
 

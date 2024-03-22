@@ -199,6 +199,22 @@ $(document).ready(function(){
       group.each(function () {
               $(this).attr("value", num_id);
          });
+      var form_group = $('form[name="editExtras"]');
+      form_group.each(function () {
+              $(this).attr("id", 'toUpdateExtras_' + num_id);
+         });
+
+//      var select_group = $('select[name="extras_select"]');
+//      select_group.each(function () {
+//              $(this).attr("id", 'extrasSelect_' + num_id);
+//         });
+      var modal_group = $('.extrasModal');
+      modal_group.each(function () {
+              $(this).attr("id", 'extrasModal_' + num_id);
+         });
+
+
+
       $('#extrasModalTitleSpan').text($('#clicked_position_meal_'+ num_id).val());
       var base_url = $('#base_delete_url').val()
       $('#delete_extras').attr('href', base_url + num_id)
@@ -451,14 +467,12 @@ $('body').on('change','input[name=only_hi_protein_in_select]',function(){
     options.each(function() {
       var optionText = $(this).text();
       if (!(optionText.includes("| B") || optionText.includes("| b"))) {
-        console.log(this)
         $(this).hide();
       }
     });
     extrasOptions.each(function() {
       var optionText = $(this).text();
       if (!(optionText.includes("| B") || optionText.includes("| b"))) {
-        console.log(this)
         $(this).hide();
       }
     });
@@ -481,8 +495,15 @@ function refreshOnMealChange(form_id, thToRefresh, checkbox, data){
   var trToRefresh = thToRefresh.id.replace('th', 'tr').replace('div_', '')
   $('#' + trToRefresh).replaceWith($('#' + trToRefresh,data));
   $('#' + trToRefresh).replaceWith($('#' + trToRefresh,data));
+//  $('#editExtras_' + form_id).replaceWith($('#editExtras_' + form_id,data));
   $(checkbox).fadeOut();
   $(checkbox).prop('checked', true);
+
+}
+
+function refreshModal(form_id, opt_id){
+$('#extrasSelect_'+ opt_id).val($('#extrasSelect_'+ opt_id + ' option:first').val());
+//$('#extrasModal').hide()
 }
 
 $('body').on('change','select[name="to_update"]',function(e){
@@ -508,6 +529,7 @@ $('body').on('change','select[name="to_update"]',function(e){
         }
         }
     }
+
     $.ajax({
       type:'POST',
       url:'/mealsList/1/update',
@@ -522,42 +544,47 @@ $('body').on('change','select[name="to_update"]',function(e){
     });
   });
 
-//  $('body').on('change','select[name="to_update"]',function(e){
-//    e.preventDefault();
-//    var id = e.target.id
-//    var form_id = id.split('_')[1]
-//    var newMealOptionId = $('#form_'+ form_id + ' #toUpdate_' + form_id).val();
-//    var newMealOptionText = $('#toUpdate_' + form_id + ' option[value="' + newMealOptionId +'"]').text();
-//    if(newMealOptionText.includes('|')){
-//      var newMealOptionName = newMealOptionText.split('|')[0]
-//    } else{
-//      var newMealOptionName = '------'
-//    }
-//    $('#dropdownMeal_'+form_id).text(newMealOptionName);
-//    var rows = $('input[name=day]');
-//    for (let i = 0; i < rows.length; i++) {
-//      var row = rows[i]
-//      if (row.value.includes(form_id)){
-//        var thToRefresh = row.parentNode
-//        var checkboxCheck = $(row);
-//        if($(checkboxCheck).is(':checked')){
-//        var checkbox = row;
-//        }
-//        }
-//    }
-//    $.ajax({
-//      type:'POST',
-//      url:'/mealsList/1/edit_extras',
-//      data:{
-//        record_id:$('#form_'+ form_id + ' input[name="record_id"]').val(),
-//        to_update:$('#form_'+ form_id + ' #toUpdate_' + form_id).val(),
-//        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
-//      },
-//      success: function(data){
-//        refreshOnMealChange(form_id, thToRefresh, checkbox, data)
-//      }
-//    });
-//  });
+  $('body').on('change','select[name="extras_select"]',function(e){
+    e.preventDefault();
+    var form_id = $('input[name="meals_list_position"]').val()
+    var _id = e.target.id
+    var opt_id = _id.split('_')[1]
+    var newMealOptionId = $('#form_'+ form_id + ' #toUpdate_' + form_id).val();
+    var newMealOptionText = $('#toUpdateExtras_' + form_id + ' option[value="' + newMealOptionId +'"]').text();
+    if(newMealOptionText.includes('|')){
+      var newMealOptionName = newMealOptionText.split('|')[0]
+    } else{
+      var newMealOptionName = '------'
+    }
+    $('#dropdownMeal_'+form_id).text(newMealOptionName);
+    var rows = $('input[name=day]');
+    for (let i = 0; i < rows.length; i++) {
+      var row = rows[i]
+      if (row.value.includes(form_id)){
+        var thToRefresh = row.parentNode
+        var checkboxCheck = $(row);
+        if($(checkboxCheck).is(':checked')){
+        var checkbox = row;
+        }
+        }
+    }
+    var option = $('#option_id').val();
+    console.log(option)
+    $.ajax({
+      type:'POST',
+      url:'/mealsList/1/edit_extras/',
+      data:{
+        meals_list_position:$('#toUpdateExtras_'+ form_id + ' input[name="meals_list_position"]').val(),
+        extras_select:$('#extrasSelect_'+ opt_id).val(),
+        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+      },
+
+      success: function(data){
+        refreshOnMealChange(form_id, thToRefresh, checkbox, data)
+        refreshModal(form_id, opt_id)
+      }
+    });
+  });
 
 
 

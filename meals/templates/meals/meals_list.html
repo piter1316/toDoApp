@@ -161,12 +161,12 @@
 </div>
 <div class="modal fade" id="extrasModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered no_print" role="document">
-    <div class="modal-content">
+    <div class="modal-content extrasModal">
       <div class="modal-header">
         <h5 class="modal-title" id="extrasMmodalTitle">
           Dodatki dla: <span id="extrasModalTitleSpan">-------</span>
         </h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="dismiss_extras_modal">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -180,10 +180,11 @@
         </div>
         <div id="current_change_div" style="display:none;">Zmień:</div>
         {% for option, meals in all_meals_in_option_dict.items %}
-        <form method="post" action="{% url 'meals:edit_extras' %}">{% csrf_token %}
+        <form method="post" action="{% url 'meals:edit_extras' %}" name="editExtras" id="editExtras_{{option.id}}" >{% csrf_token %}
           <input type="hidden" id="" name="meals_list_position" value="">
           <input type="hidden" id="current_meal_id" value="">
-          <select onchange="this.form.submit()" class="form-control mt-1" name="extras_select">
+          <input type="hidden" id="option_id" value="">
+          <select onchange="" class="form-control mt-1" name="extras_select" id="extrasSelect_{{option.id}}">
             <option>
               {{option}}
             </option>
