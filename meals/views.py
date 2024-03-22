@@ -540,15 +540,8 @@ def edit_meal_ingredients(request, meal_id):
         recipe_rows = len(meal[0].recipe.split('\n'))
     else:
         recipe_rows = 1
-    calories = 0
-    protein = 0
-    fat = 0
-    carbohydrates = 0
-    for ingr in ingredients:
-        calories += (ingr.quantity) / 100 * int(ingr.ingredient_id.calories_per_100_gram)
-        protein += (ingr.quantity) / 100 * int(ingr.ingredient_id.protein_per_100_gram)
-        fat += (ingr.quantity) / 100 * int(ingr.ingredient_id.fat_per_100_gram)
-        carbohydrates += (ingr.quantity) / 100 * int(ingr.ingredient_id.carbohydrates_per_100_gram)
+    macro = meal[0].macro
+
     context = {
         'meal': meal,
         'ingredients': ingredients,
@@ -556,10 +549,10 @@ def edit_meal_ingredients(request, meal_id):
         'recipe_rows': recipe_rows,
         'user_ingredients': user_ingredients,
         'user_shops': user_shops,
-        'calories': round(calories),
-        'protein': round(protein),
-        'fat': round(fat),
-        'carbohydrates': round(carbohydrates)
+        'calories': round(macro.get('kcal')),
+        'protein': round(macro.get('protein')),
+        'fat': round(macro.get('fat')),
+        'carbohydrates': round(macro.get('carb'))
     }
     return render(request, 'meals/meal_edit.html', context)
 

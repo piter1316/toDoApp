@@ -42,20 +42,31 @@ class Meal(models.Model):
         return True in short_expiry_check
 
     @property
-    def is_high_carb(self):
+    def macro(self):
         meal_ingredients = (
             MealIngredient.objects
             .filter(meal_id=self.id)
             .select_related('ingredient_id')
             .annotate(
                 kcal=F('ingredient_id__calories_per_100_gram') * F('quantity') / 100,
-                protein=F('ingredient_id__protein_per_100_gram') * F('quantity') / 100
+                protein=F('ingredient_id__protein_per_100_gram') * F('quantity') / 100,
+                fat=F('ingredient_id__fat_per_100_gram') * F('quantity') / 100,
+                carb=F('ingredient_id__carbohydrates_per_100_gram') * F('quantity') / 100,
             )
         )
         total_kcal = meal_ingredients.aggregate(total_kcal=Sum('kcal', output_field=FloatField()))['total_kcal'] or 0
         total_protein = meal_ingredients.aggregate(total_protein=Sum('protein', output_field=FloatField()))[
                             'total_protein'] or 0
+        total_fat = meal_ingredients.aggregate(total_fat=Sum('fat', output_field=FloatField()))[
+                            'total_fat'] or 0
+        total_carbohydrates = meal_ingredients.aggregate(total_carbohydrates=Sum('carb', output_field=FloatField()))[
+                        'total_carbohydrates'] or 0
+        return {'kcal': total_kcal, 'protein': total_protein, 'fat': total_fat, 'carb': total_carbohydrates}
 
+    @property
+    def is_high_carb(self):
+        total_kcal = self.macro.get('kcal') or 0
+        total_protein = self.macro.get('protein') or 0
         return is_hi_protein(total_kcal, total_protein)
 
 
