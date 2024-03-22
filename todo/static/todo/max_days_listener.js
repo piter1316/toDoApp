@@ -501,8 +501,11 @@ function refreshOnMealChange(form_id, thToRefresh, checkbox, data){
 
 }
 
-function refreshModal(form_id, opt_id){
+function refreshModal(form_id, opt_id, data){
 $('#extrasSelect_'+ opt_id).val($('#extrasSelect_'+ opt_id + ' option:first').val());
+$('#dismiss_extras_modal').click();
+console.log()
+$('#td_' + form_id).replaceWith($('#td_' + form_id,data));
 //$('#extrasModal').hide()
 }
 
@@ -581,7 +584,7 @@ $('body').on('change','select[name="to_update"]',function(e){
 
       success: function(data){
         refreshOnMealChange(form_id, thToRefresh, checkbox, data)
-        refreshModal(form_id, opt_id)
+        refreshModal(form_id, opt_id, data)
       }
     });
   });
