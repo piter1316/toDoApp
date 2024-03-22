@@ -150,8 +150,10 @@ def delete_all(request):
 def home(request):
     if request.user.is_authenticated:
         all_to_do_count = get_all_to_do(request.user)
-        meal_options = MealsList.objects.filter(user=request.user).values('meal_option_id').distinct()
-        meals = MealsList.objects.select_related('meal').filter(user=request.user, )
+        meal_options = MealsList.objects.filter(user=request.user, current=1).order_by(
+        'meal_option__position').values(
+        'meal_option__meal_option', 'meal_option_id').distinct()
+        meals = MealsList.objects.select_related('meal').filter(user=request.user, current=1)
         cars_owned = Car.objects.filter(user=request.user, sold=0)
         cars_sold = Car.objects.filter(user=request.user, sold=1)
         receipts = Receipt.objects.filter(user=request.user)

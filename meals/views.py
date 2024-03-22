@@ -11,8 +11,68 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 
 from meals.forms import MealForm, IngredientForm, MealOptionForm
-from meals.models import MealOption, Meal, Ingredient, MealsList, Week, Unit, MealIngredient, Shop, ProductDivision, is_hi_protein
+from meals.models import MealOption, Meal, Ingredient, MealsList, Week, Unit, MealIngredient, Shop, ProductDivision, \
+    is_hi_protein
 from shopping.models import ShoppingList, Products
+
+
+def average_for_whole_list(meals_list, generated_user_meals_options, user, current, meal_ingredients_dict):
+    all_meals = meals_list
+    meal_options = generated_user_meals_options
+    meals = MealsList.objects.select_related('meal').filter(user=user, current=current)
+    ingredients_total = []
+    tmp_extra_total = []
+    calories_total = 0
+    protein_total = 0
+    fat_total = 0
+    carb_total = 0
+    calories = 0
+    protein = 0
+    fat = 0
+    carb = 0
+
+    for meal in meals:
+        if meal.meal_id:
+            ingredients_total = meal_ingredients_dict[meal.meal_id]
+            if meal.extras:
+                ingredients_total.extend(meal_ingredients_dict[meal.extras.id])
+                tmp_extra_total = meal_ingredients_dict[meal.extras.id]
+        else:
+            ingredients_total = []
+            if meal.extras:
+                ingredients_total.extend(meal_ingredients_dict[meal.extras.id])
+                tmp_extra_total = meal_ingredients_dict[meal.extras.id]
+
+        for ingr in ingredients_total:
+            calories += (ingr.quantity / 100) * int(ingr.calories_per_100_gram)
+            protein += (ingr.quantity / 100) * int(ingr.protein_per_100_gram)
+            fat += (ingr.quantity / 100) * int(ingr.fat_per_100_gram)
+            carb += (ingr.quantity / 100) * int(ingr.carbohydrates_per_100_gram)
+            calories_total += calories
+            protein_total += protein
+            fat_total += fat
+            carb_total += carb
+            calories = 0
+            protein = 0
+            fat = 0
+            carb = 0
+        for item in tmp_extra_total:
+            if item in ingredients_total:
+                ingredients_total.remove(item)
+
+    try:
+        meals_list_length = int(len(all_meals) / len(meal_options))
+        average_clories_per_day = int(calories_total / meals_list_length)
+        average_protein_per_day = int(protein_total / meals_list_length)
+        average_fat_per_day = int(fat_total / meals_list_length)
+        average_carb_per_day = int(carb_total / meals_list_length)
+    except ZeroDivisionError:
+        meals_list_length = 0
+        average_clories_per_day = 0
+        average_protein_per_day = 0
+        average_carb_per_day = 0
+        average_fat_per_day = 0
+    return average_clories_per_day, average_protein_per_day, average_carb_per_day, average_fat_per_day
 
 
 def get_today():
@@ -236,61 +296,8 @@ def meals(request, current=1):
         option_meals_dict[meal_option] = option_meals_list
 
     # average calories for whole mealsList
-    all_meals = meals_list
-    meal_options = generated_user_meals_options
-    meals = MealsList.objects.select_related('meal').filter(user=request.user, current=current)
-    ingredients_total = []
-    tmp_extra_total = []
-    calories_total = 0
-    protein_total = 0
-    fat_total = 0
-    carb_total = 0
-    calories = 0
-    protein = 0
-    fat = 0
-    carb = 0
-
-    for meal in meals:
-        if meal.meal_id:
-            ingredients_total = meal_ingredients_dict[meal.meal_id]
-            if meal.extras:
-                ingredients_total.extend(meal_ingredients_dict[meal.extras.id])
-                tmp_extra_total = meal_ingredients_dict[meal.extras.id]
-        else:
-            ingredients_total = []
-            if meal.extras:
-                ingredients_total.extend(meal_ingredients_dict[meal.extras.id])
-                tmp_extra_total = meal_ingredients_dict[meal.extras.id]
-
-        for ingr in ingredients_total:
-            calories += (ingr.quantity / 100) * int(ingr.calories_per_100_gram)
-            protein += (ingr.quantity / 100) * int(ingr.protein_per_100_gram)
-            fat += (ingr.quantity / 100) * int(ingr.fat_per_100_gram)
-            carb += (ingr.quantity / 100) * int(ingr.carbohydrates_per_100_gram)
-            calories_total += calories
-            protein_total += protein
-            fat_total += fat
-            carb_total += carb
-            calories = 0
-            protein = 0
-            fat = 0
-            carb = 0
-        for item in tmp_extra_total:
-            if item in ingredients_total:
-                ingredients_total.remove(item)
-
-    try:
-        meals_list_length = int(len(all_meals) / len(meal_options))
-        average_clories_per_day = int(calories_total / meals_list_length)
-        average_protein_per_day = int(protein_total / meals_list_length)
-        average_fat_per_day = int(fat_total / meals_list_length)
-        average_carb_per_day = int(carb_total / meals_list_length)
-    except ZeroDivisionError:
-        meals_list_length = 0
-        average_clories_per_day = 0
-        average_protein_per_day = 0
-        average_carb_per_day = 0
-        average_fat_per_day = 0
+    average_clories_per_day, average_protein_per_day, average_carb_per_day, average_fat_per_day = average_for_whole_list(
+        meals_list, generated_user_meals_options, request.user, current, meal_ingredients_dict)
     context = {
         'meals_list': meals_list,
         'user_meals_options': user_meals_options,
