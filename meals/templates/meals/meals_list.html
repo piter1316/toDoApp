@@ -160,9 +160,9 @@
   </div>
 </div>
 <div class="modal fade" id="extrasModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered no_print" role="document">
+  <div class="modal-dialog modal-lg  no_print" role="document">
     <div class="modal-content extrasModal">
-      <div class="modal-header">
+      <div class="modal-header py-1">
         <h5 class="modal-title" id="extrasMmodalTitle">
           Dodatki dla: <span id="extrasModalTitleSpan">-------</span>
         </h5>
@@ -170,7 +170,7 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body pt-0">
+      <div class="modal-body py-0">
         <span id="add_extras_span" class="text-center">Dodaj z posiłku:</span>
         <div class="text-left">
           <small id="current_extra_small" style="display:none;">Aktualny dodatek :
@@ -193,12 +193,12 @@
             {% endfor %}
           </select>
         </form>
-        <hr>
+        <hr class="m-2">
         {% endfor %}
-        <a id="delete_extras" style="display:none;" href="{%url 'meals:delete_extras' ' ' %}" class="btn btn-block btn-danger text-light"></a>
+        <a id="delete_extras" style="display:none;" href="{%url 'meals:delete_extras' ' ' %}" class="btn btn-block btn-danger text-light mb-1"></a>
         <input id="base_delete_url" type="hidden" value="{%url 'meals:delete_extras' ' ' %}">
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer p-2">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
         <!--                      <button type="button" class="btn btn-primary">Zapisz</button>-->
       </div>
