@@ -90,6 +90,9 @@
         </button>
         <div class="dropdown-menu text-center p-2">
           <div class="mb-1"><span class="font-weight-bold">{{user}}</span></div>
+          <a href="{% url 'meals:copy_data' %}" class="btn btn-block" onclick="return confirm('Uwaga wersja testowa!!!')">
+            <small>Kopiuj dane**</small>
+          </a>
           <div class="mb-1"><a class="btn btn-secondary btn-block" href="{% url 'accounts:change_password' %}"><i class="fas fa-key mr-2"></i>Zmień hasło</a></div>
           <div>
             <form class="text-center logout-link"  action="{% url 'accounts:logout' %}" method="post">

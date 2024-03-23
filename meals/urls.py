@@ -15,6 +15,7 @@ urlpatterns = [
     path('mealsList/1/edit_extras/', views.edit_extras, name='edit_extras'),
     path('mealsList/1/delete_extras/<meals_list_id>', views.delete_extras, name='delete_extras'),
     path('mealsEdit', views.edit_meals, name='edit_meals'),
+    path('mealsEdit/copy_data', views.copy_data, name='copy_data'),
     path('ingredientsEdit', views.edit_ingredients, name='edit_ingredients'),
     path('ingredientsEdit/addShop', views.add_shop, name='add_shop'),
     path('ingredientsEdit/deleteShop/<shop_id>', views.delete_shop, name='delete_shop'),

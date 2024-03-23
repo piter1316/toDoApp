@@ -5,6 +5,7 @@ import pytz
 from django.contrib import messages
 
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 # Create your views here.
@@ -976,3 +977,36 @@ def generate_shopping_list_for_meal(request, meal_id):
             new_list_position_list.append(new_list_position)
         Products.objects.bulk_create(new_list_position_list)
     return redirect('shopping:shopping_list_index')
+
+
+def copy_data(request):
+    master_user_id = 3
+
+    print(request.user.id, master_user_id)
+    master_user_options = MealOption.objects.filter(user_id=master_user_id)
+    for option in master_user_options:
+        option.pk = None
+        option.user_id = request.user.id
+        option.save()
+    master_user_ingredients = Ingredient.objects.filter(user_id=master_user_id)
+    for ingr in master_user_ingredients:
+        ingr.pk = None
+        ingr.user_id = request.user.id
+        ingr.save()
+    master_user_meals = Meal.objects.filter(user_id=master_user_id)
+    for meal in master_user_meals:
+        master_option_name = meal.meal_option.meal_option
+        new_option = MealOption.objects.filter(user_id=request.user.id, meal_option=master_option_name)[0]
+        master_meal_ingr = MealIngredient.objects.filter(meal_id=meal.pk)
+        meal.pk = None
+        meal.user_id = request.user.id
+        meal.meal_option = new_option
+        meal.save()
+
+        for ingr in master_meal_ingr:
+            new_ingr = Ingredient.objects.filter(user_id=request.user.id, name=ingr.ingredient_id.name)[0]
+            new_meal_ingredient = MealIngredient(meal_id=meal, ingredient_id=new_ingr, quantity=ingr.quantity)
+            new_meal_ingredient.save()
+
+
+    return redirect('meals:edit_meals')
