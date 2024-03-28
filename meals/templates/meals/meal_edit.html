@@ -19,16 +19,31 @@
                   <small>{{fat}}g <sup>tłuszcz</sup></small> |
                   <small>{{carbohydrates}}g <sup>węglowodany</sup></small>
                 </p>
-                <form id="new_meal_option_name" style="display:none;"
-                      action="{% url 'meals:update_meal_name' meal.0.id %}" method="post">{% csrf_token %}
-                  <div class="input-group">
-                    <input class="form-control" name="new_meal_name" id="new_meal_name" type="text" value="{{meal.0.name}}">
-                  </div>
-                  <label class="my-2" for="edit_special"><input class="" type="checkbox" name="edit_special"
-                                                                id="edit_special" {%if meal.0.special%}checked{% endif %}>Danie
-                    specjalne</label>
-                  <button class="btn btn-sm btn-secondary btn-block" type="submit">Zmień</button>
-                </form>
+                <div id="new_meal_option_name" style="display:none;">
+                  <hr class="m-1">
+                  <form name="edit" action="{% url 'meals:update_meal_name' meal.0.id %}" method="post">{% csrf_token %}
+                    <div class="form-row">
+                      <div class="col">
+                        <input class="form-control" name="new_meal_name" id="new_meal_name" type="text" value="{{meal.0.name}}">
+                      </div>
+                      <div class="col">
+                        <label class="my-2" for="edit_special"><input class="" type="checkbox" name="edit_special"
+                                                                  id="edit_special" {%if meal.0.special%}checked{% endif %}>Danie
+                      specjalne</label>
+                      </div>
+                      <div class="col"><button class="btn btn-secondary btn-block" type="submit" name="edit" >Zmień</button></div>
+                    </div>
+                      <hr class="m-1">
+                  </form>
+                </div>
+                <div class="mb-1" id="meal_copy_div" style="display:none;">
+                  <form method="post" name="copy" action="{% url 'meals:copy_meal' meal.0.id %}" class="d-flex justify-content-between">
+                    {% csrf_token %}
+                    <input type="text" class="form-control" placeholder="nowa nazwa po skopiowaniu" name="copy_name">
+                    <button class="btn btn-secondary" type="submit" name="copy_submit">Kopiuj</button>
+                  </form>
+                </div>
+
               </div>
             </div>
 

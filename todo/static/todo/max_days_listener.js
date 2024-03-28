@@ -283,6 +283,7 @@ $(document).ready(function(){
 
   $('body').on('click', '#option_name', function(e){
     $('#new_meal_option_name').toggle(600);
+    $('#meal_copy_div').toggle(600);
   });
 
 

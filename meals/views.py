@@ -976,3 +976,8 @@ def generate_shopping_list_for_meal(request, meal_id):
             new_list_position_list.append(new_list_position)
         Products.objects.bulk_create(new_list_position_list)
     return redirect('shopping:shopping_list_index')
+
+
+def copy_meal(request, meal_id):
+    print('copy')
+    return HttpResponse(1)
