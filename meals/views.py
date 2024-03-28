@@ -981,7 +981,8 @@ def generate_shopping_list_for_meal(request, meal_id):
 def copy_meal(request, meal_id):
     meal_ingredients = MealIngredient.objects.filter(meal_id=meal_id)
     current_meal = Meal.objects.get(pk=meal_id)
-    new_meal = Meal(user=request.user, meal_option = current_meal.meal_option, name=request.POST.get('copy_name'), recipe= current_meal.recipe)
+    new_meal = Meal(user=request.user, meal_option=current_meal.meal_option, name=request.POST.get('copy_name'),
+                    recipe=current_meal.recipe)
     new_meal.save()
     for ingr in meal_ingredients:
         new_meal_ingredient = MealIngredient(meal_id=new_meal, ingredient_id=ingr.ingredient_id, quantity=ingr.quantity)
