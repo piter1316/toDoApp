@@ -23,8 +23,8 @@
                   {% if not current %}style="color: gray !important; opacity: 0.7;"{% endif %}>
             <thead id="meals_list_head" class="thead-dark">
             <tr class="text-center text-light">
-              <th nowrap class="px-auto py-0 text-center" scope="col" id="b-t-w">
-                <small class="d-none d-xl-table-cell" id="b-t-w-small">
+              <th nowrap class="px-auto py-0 text-center d-none d-xl-table-cell" scope="col" id="b-t-w">
+                <small class="d-none d-xl-inline id="b-t-w-small">
                 Średnio: {{average_clories_per_day}} kcal<br>
                 {{average_protein_per_day}}g<sup>b<span class="no_print">iałko</span></sup> |
                   {{average_fat_per_day}}g<sup>t<span class="no_print">łuszcze</span></sup> |
@@ -45,6 +45,8 @@
             {% with day_as_list=day|split %}
              <tr class="d-xl-none no_print {% if today_to_template|date:"Y-m-d" == day_as_list.1 %} bg-secondary text-light {% endif %}" id="tr_{{day}}">
                 <td  class="text-center" colspan="6" id="div_td_{{day}}">
+                                    <input style="" type="checkbox" name="day" class="checkbox" value="{% for meal in meals %}{% for ml in meal%}{{ml.id}},{% endfor %}{% endfor %}">
+
                   <b>{{day_as_list.0}} | {{day_as_list.1}} : {{item.1.0}} kcal</b><br>
                   <small class="">
                     {{item.1.1}}g <sup>białko</sup>|
@@ -56,10 +58,10 @@
             </tr>
             {% with day_as_list=day|split %}
             <tr style="position:relative" class="text-center {% if today_to_template|date:"Y-m-d" == day_as_list.1 %} bg-secondary text-light {% endif %}" >
-              <th nowrap class="text-left pl-1 pr-0" id="th_{{day}}">
+              <th nowrap class="text-left pl-1 pr-0 d-none d-xl-block" id="th_{{day}}">
                 <div id="div_th_{{day}}">
-                  <input style="text-align: center;vertical-align: middle;" type="checkbox" name="day" class="checkbox my-auto mr-1" value="{% for meal in meals %}{% for ml in meal%}{{ml.id}},{% endfor %}{% endfor %}">
                   <span class="d-none d-xl-inline">
+                  <input style="text-align: center;vertical-align: middle;" type="checkbox" name="day" class="checkbox my-auto mr-1" value="{% for meal in meals %}{% for ml in meal%}{{ml.id}},{% endfor %}{% endfor %}">
                     <small>
                       <b>{{day_as_list.0}} | <small>{{day_as_list.1}}</small>: {{item.1.0}} <sup>kcal</sup></b><br>
                     </small>
