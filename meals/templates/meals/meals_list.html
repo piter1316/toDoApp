@@ -60,8 +60,8 @@
             <tr style="position:relative" class="text-center {% if today_to_template|date:"Y-m-d" == day_as_list.1 %} bg-secondary text-light {% endif %}" >
               <th nowrap class="text-left pl-1 pr-0 d-none d-xl-block" id="th_{{day}}">
                 <div id="div_th_{{day}}">
-                  <span class="d-none d-xl-inline">
                   <input style="text-align: center;vertical-align: middle;" type="checkbox" name="day" class="checkbox my-auto mr-1" value="{% for meal in meals %}{% for ml in meal%}{{ml.id}},{% endfor %}{% endfor %}">
+                  <span class="d-none d-xl-inline">
                     <small>
                       <b>{{day_as_list.0}} | <small>{{day_as_list.1}}</small>: {{item.1.0}} <sup>kcal</sup></b><br>
                     </small>
