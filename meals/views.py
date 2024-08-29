@@ -26,10 +26,14 @@ def average_for_whole_list(meals_list, generated_user_meals_options, user, curre
     protein_total = 0
     fat_total = 0
     carb_total = 0
+    vegies_total = 0
+    fruits_total = 0
     calories = 0
     protein = 0
     fat = 0
     carb = 0
+    vegies = 0
+    fruits = 0
 
     for meal in meals:
         if meal.meal_id:
@@ -44,6 +48,10 @@ def average_for_whole_list(meals_list, generated_user_meals_options, user, curre
                 tmp_extra_total = meal_ingredients_dict[meal.extras.id]
 
         for ingr in ingredients_total:
+            if 'warzywa' in ingr.ingredient_id.division.division_name.lower() and ingr.name != 'ziemniaki':
+                vegies += ingr.quantity
+            if 'owoce' in ingr.ingredient_id.division.division_name.lower():
+                fruits += ingr.quantity
             calories += (ingr.quantity / 100) * int(ingr.calories_per_100_gram)
             protein += (ingr.quantity / 100) * int(ingr.protein_per_100_gram)
             fat += (ingr.quantity / 100) * int(ingr.fat_per_100_gram)
@@ -52,10 +60,15 @@ def average_for_whole_list(meals_list, generated_user_meals_options, user, curre
             protein_total += protein
             fat_total += fat
             carb_total += carb
+            vegies_total += vegies
+            fruits_total += fruits
             calories = 0
             protein = 0
             fat = 0
             carb = 0
+            vegies = 0
+            fruits = 0
+
         for item in tmp_extra_total:
             if item in ingredients_total:
                 ingredients_total.remove(item)
@@ -66,13 +79,15 @@ def average_for_whole_list(meals_list, generated_user_meals_options, user, curre
         average_protein_per_day = int(protein_total / meals_list_length)
         average_fat_per_day = int(fat_total / meals_list_length)
         average_carb_per_day = int(carb_total / meals_list_length)
+        average_vegies_per_day = int(vegies_total / meals_list_length)
+        average_fruits_per_day = int(fruits_total / meals_list_length)
     except ZeroDivisionError:
         meals_list_length = 0
         average_clories_per_day = 0
         average_protein_per_day = 0
         average_carb_per_day = 0
         average_fat_per_day = 0
-    return average_clories_per_day, average_protein_per_day, average_carb_per_day, average_fat_per_day
+    return average_clories_per_day, average_protein_per_day, average_carb_per_day, average_fat_per_day, average_vegies_per_day, average_fruits_per_day
 
 
 def get_today():
@@ -224,6 +239,8 @@ def meals(request, current=1):
         meal_protein = []
         meal_fat = []
         meal_carbohydrates = []
+        meal_vegies = []
+        meal_fruits = []
 
         for meal in meals_on_day:
             if day == meal.day:
@@ -232,6 +249,8 @@ def meals(request, current=1):
                 protein = 0
                 fat = 0
                 carbohydrates = 0
+                vegies = 0
+                fruits = 0
                 ingredients_list = []
                 tmp_extra = []
                 if meal.meal_id:
@@ -247,6 +266,10 @@ def meals(request, current=1):
                         calories = 0
 
                 for ingr in ingredients_list:
+                    if 'warzywa' in ingr.ingredient_id.division.division_name.lower() and ingr.name != 'ziemniaki':
+                        vegies += ingr.quantity
+                    if 'owoce' in ingr.ingredient_id.division.division_name.lower():
+                        fruits += ingr.quantity
                     calories += (ingr.quantity / 100) * int(ingr.calories_per_100_gram)
                     protein += (ingr.quantity / 100) * int(ingr.protein_per_100_gram)
                     fat += (ingr.quantity / 100) * int(ingr.fat_per_100_gram)
@@ -255,10 +278,14 @@ def meals(request, current=1):
                     meal_protein.append(round(protein, 0))
                     meal_fat.append(round(fat, 0))
                     meal_carbohydrates.append(round(carbohydrates, 0))
+                    meal_vegies.append(round(vegies, 0))
+                    meal_fruits.append(round(fruits, 0))
                     calories = 0
                     protein = 0
                     fat = 0
                     carbohydrates = 0
+                    vegies = 0
+                    fruits = 0
                 meals.append(meal.meal_id)
                 day_meals_list.append({meal: all_meals_in_option_dict.get(meal.meal_option)})
                 for item in tmp_extra:
@@ -268,7 +295,7 @@ def meals(request, current=1):
         day_meal_option_meal_list.append(
             [{day: day_meals_list},
              [round(sum(meal_ingredients)), round(sum(meal_protein)), round(sum(meal_fat)),
-              round(sum(meal_carbohydrates))]])
+              round(sum(meal_carbohydrates))], sum(meal_vegies), sum(meal_fruits)])
     maximum_no_of_days_to_generate = get_maximum_no_of_days(request)
     maximum_no_of_days_to_generate_no_repeat = get_maximum_no_of_days_no_repeat(request)
     first_day_input_list = {}
@@ -296,7 +323,7 @@ def meals(request, current=1):
         option_meals_dict[meal_option] = option_meals_list
 
     # average calories for whole mealsList
-    average_clories_per_day, average_protein_per_day, average_carb_per_day, average_fat_per_day = average_for_whole_list(
+    average_clories_per_day, average_protein_per_day, average_carb_per_day, average_fat_per_day, average_vegies_per_day, average_fruits_per_day = average_for_whole_list(
         meals_list, generated_user_meals_options, request.user, current, meal_ingredients_dict)
     context = {
         'meals_list': meals_list,
@@ -312,6 +339,8 @@ def meals(request, current=1):
         'average_protein_per_day': average_protein_per_day,
         'average_fat_per_day': average_fat_per_day,
         'average_carb_per_day': average_carb_per_day,
+        'average_vegies_per_day': average_vegies_per_day,
+        'average_fruits_per_day': average_fruits_per_day,
         'current': int(current),
         'all_meals_in_option_dict': all_meals_in_option_dict,
         'today_to_template': today_to_template,
