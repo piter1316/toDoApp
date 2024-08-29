@@ -7,7 +7,7 @@ from django.db.models import Sum, F, FloatField, Case, When, Value
 
 def is_hi_protein(total_kcal, total_protein):
     if total_protein != 0 or total_kcal != 0:
-        percent_of_prot = round((total_protein * 4)/total_kcal * 100, 2)
+        percent_of_prot = round((total_protein * 4) / total_kcal * 100, 2)
         if total_protein * 4 >= (total_kcal * 0.28):
             return 'B', f'Bardzo wysoka zawartość białka ({percent_of_prot}%)'
         if (total_kcal * 0.25) <= total_protein * 4 < (total_kcal * 0.28):
@@ -43,31 +43,35 @@ class Meal(models.Model):
 
     @property
     def macro(self):
+        meals_prep = MealIngredient.objects.filter(meal_id=self.id).select_related('ingredient_id')
         meal_ingredients = (
-            MealIngredient.objects
-            .filter(meal_id=self.id)
-            .select_related('ingredient_id')
-            .annotate(
+            meals_prep.annotate(
                 kcal=F('ingredient_id__calories_per_100_gram') * F('quantity') / 100,
                 protein=F('ingredient_id__protein_per_100_gram') * F('quantity') / 100,
                 fat=F('ingredient_id__fat_per_100_gram') * F('quantity') / 100,
                 carb=F('ingredient_id__carbohydrates_per_100_gram') * F('quantity') / 100,
+
             )
         )
+        total_vegies = 0
+        total_fruits = 0
+        for m in meals_prep:
+            if 'warzywa' in m.ingredient_id.division.division_name.lower() and m.ingredient_id.name.lower() != 'ziemniaki':
+                total_vegies += m.quantity
+            if 'owoce' in m.ingredient_id.division.division_name.lower():
+                total_fruits += m.quantity
+
         total_kcal = meal_ingredients.aggregate(total_kcal=Sum('kcal', output_field=FloatField()))['total_kcal'] or 0
         total_protein = meal_ingredients.aggregate(total_protein=Sum('protein', output_field=FloatField()))[
                             'total_protein'] or 0
         total_fat = meal_ingredients.aggregate(total_fat=Sum('fat', output_field=FloatField()))[
-                            'total_fat'] or 0
+                        'total_fat'] or 0
         total_carbohydrates = meal_ingredients.aggregate(total_carbohydrates=Sum('carb', output_field=FloatField()))[
-                        'total_carbohydrates'] or 0
-        return {'kcal': total_kcal, 'protein': total_protein, 'fat': total_fat, 'carb': total_carbohydrates}
+                                  'total_carbohydrates'] or 0
 
-    @property
-    def is_high_carb(self):
-        total_kcal = self.macro.get('kcal') or 0
-        total_protein = self.macro.get('protein') or 0
-        return is_hi_protein(total_kcal, total_protein)
+        return {'kcal': total_kcal, 'protein': total_protein, 'fat': total_fat, 'carb': total_carbohydrates,
+                'is_hi_protein': is_hi_protein(total_kcal, total_protein), 'total_vegies': total_vegies,
+                'total_fruits': total_fruits}
 
 
 class ProductDivision(models.Model):
