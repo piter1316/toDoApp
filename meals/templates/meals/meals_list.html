@@ -8,7 +8,7 @@
         <input type="hidden" id="maximum_no_of_days_to_generate_default" value="{{maximum_no_of_days_to_generate_default}}">
   <div class="row no-gutters">
     {% include 'meals/menu.html' %}
-    <div class="col-12 col-md-8 col-xl-10 px-0 px-md-2">
+    <div class="col-12 col-md-8 col-xl-10 px-0">
       {% if meals_list %}
       <div class="alert alert-secondary text-center p-1 mb-1 d-xl-none" id="mobileAverageContainer">
         <small id="mobileAverage">
@@ -21,8 +21,8 @@
           </b>
         </small>
       </div>
-        <div class="table-responsive-sm shadow " id="meals_list" >
-          <table  class="table table-light table-striped" id="table"
+        <div class="table-responsive-sm shadow mb-0" id="meals_list" >
+          <table  class="table table-light table-striped mb-0" id="table"
                   {% if not current %}style="color: gray !important; opacity: 0.7;"{% endif %}>
             <thead id="meals_list_head" class="thead-dark">
             <tr class="text-center text-light">
