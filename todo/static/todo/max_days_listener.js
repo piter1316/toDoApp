@@ -383,7 +383,7 @@ setInterval(function(){
   if (current_time != time_now[3]){
     time_now.pop()
     time_now.push(current_time)
-    $('.time_now_').replaceWith("<small class='w-100 text-center time_now_'>"+time_now.join(' ')+"</small>");
+    $('.time_now_').replaceWith("<small class='w-100 text-center time_now_ mb-1'>"+time_now.join(' ')+"</small>");
   }
 }, 1000);
 

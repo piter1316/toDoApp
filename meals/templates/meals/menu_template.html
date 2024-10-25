@@ -1,41 +1,48 @@
 
   <div class="menu_ul nav" id="menu_ul">
-    <small class="w-100 text-center time_now_">{{today}}</small>
+    <small class="w-100 text-center time_now_ mb-1">{{today}}</small>
     <div class="btn-group w-100 mb-1" role="group">
-      <a type="button" class="btn btn-outline-light btn-sm w-45" href="{% url 'meals:edit_meals' %}">Posiłki</a>
-      <a type="button" class="btn btn-outline-light btn-sm w-55" href="{% url 'meals:edit_ingredients' %}">Składniki/Sklepy</a>
+      <a type="button" class="btn btn-outline-dark btn-sm w-45" href="{% url 'meals:edit_meals' %}">Posiłki</a>
+      <a type="button" class="btn btn-outline-dark btn-sm w-55" href="{% url 'meals:edit_ingredients' %}">Składniki/Sklepy</a>
+    </div>
+    <div  class="w-100">
+      <hr class="bg-dark my-1">
     </div>
     {% if in_meals_list %}
-      <a type="button" class="text-decoration-none text-light w-100" data-toggle="modal" data-target="#newMealsListModal">
+      <a type="button" class="text-decoration-none text-dark w-100" data-toggle="modal" data-target="#newMealsListModal">
         <i class="fas fa-plus mr-1"></i>Generuj nowy jadłospis
-        <hr class="bg-light my-1">
+        <hr class="bg-dark my-1">
       </a>
       {% if meals_list %}
-        <a role="button" class="text-decoration-none text-light w-100" data-toggle="modal" data-target="#generateShoppingListsModal" style="cursor:pointer;">
+        <a role="button" class="text-decoration-none text   w-100" data-toggle="modal" data-target="#generateShoppingListsModal" style="cursor:pointer;">
         <i class="fas fa-shopping-cart mr-1"></i>Generuj listy zakupów
-          <hr class="bg-light my-1">
+          <hr class="bg-dark my-1">
         </a>
-        <span onclick="createPDF()" role="button" class="text-light w-100" style="cursor:pointer;">
+        <span onclick="createPDF()" role="button" class=" w-100" style="cursor:pointer;">
           <i class="fas fa-print mr-1"></i>Drukuj jadłospis
+          <hr class="bg-dark my-1">c
         </span>
-        <a href="{% url 'meals:purge_meals_list' %}" class="mt-1 text-decoration-none text-light w-100" onclick="return confirm('Wyczyścić jadłospis?')">
+        <a href="{% url 'meals:purge_meals_list' %}" class="mt-1 text-decoration-none text-dark  w-100" onclick="return confirm('Wyczyścić jadłospis?')">
           <i class="fas fa-eraser mr-1"></i>Wyczyść jadłospis
-          <hr class="bg-light my-1">
+          <hr class="bg-dark my-1">
         </a>
-        <a class="text-decoration-none text-light w-100" href="{% url 'meals:index' 0 %}">
+        <a class="text-decoration-none text-dark w-100" href="{% url 'meals:index' 0 %}">
           <i class="fas fa-backward mr-1"></i>Wyświetl poprzedni jadłospis
-          <hr class="bg-light my-1">
+          <hr class="bg-dark my-1">
         </a>
-        <label>
-        <input name="only_hi_protein_in_select" id="only_hi_protein_in_select" type="checkbox">
-          pokaż tylko wysokobałkowe
-        </label>
-         <form action="{% url 'meals:delete_selected_days' %}" class="deleteSelectedDays my-1 w-100"  id="deleteSelectedDays" method="POST">{% csrf_token %}
+        <form action="{% url 'meals:delete_selected_days' %}" class="deleteSelectedDays my-1 w-100"  id="deleteSelectedDays" method="POST">{% csrf_token %}
           {% for item in day_meal_option_meal_list %}{% for day, meals in item.0.items %}{% for meal in meals %}{% for ml in meal%}
             <input type="checkbox"  style="display:none;" value="{{ml.id}}" class="mealsListPosition_{{ml.id}}" name="mealsListPosition">{% endfor %}
           {% endfor %}{% endfor %}{% endfor %}
-          <button type="submit" class="btn btn-outline-light btn-sm btn-block mt-1 deleteSelectedDaysButton" disabled  >Usuń zaznaczone dni</button>
+          <button type="submit" class="btn  py-0 px-0 text-left border-0  btn-block deleteSelectedDaysButton" disabled  >
+            <i class="fas fa-trash mr-1"></i>Usuń zaznaczone dni</button>
+           <hr class="bg-dark my-1">
         </form>
+        <label style="cursor:pointer;">
+        <input name="only_hi_protein_in_select" id="only_hi_protein_in_select" type="checkbox">
+          pokaż tylko wysokobałkowe
+        </label>
+
       {% endif %}
     {% endif %}
   </div>
