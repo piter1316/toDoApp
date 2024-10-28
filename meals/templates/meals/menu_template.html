@@ -1,9 +1,21 @@
 
   <div class="menu_ul nav" id="menu_ul">
-    <small class="w-100 text-center time_now_ mb-1">{{today}}</small>
-    <div class="btn-group w-100 mb-1" role="group">
-      <a type="button" class="btn btn-outline-dark btn-sm w-45" href="{% url 'meals:edit_meals' %}">Posiłki</a>
-      <a type="button" class="btn btn-outline-dark btn-sm w-55" href="{% url 'meals:edit_ingredients' %}">Składniki/Sklepy</a>
+    <div class="card border-0 bg-light" >
+      <div class="row no-gutters align-items-center">
+        <div class="col-3">
+          <div class="card-img mr-1">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z"/></svg>
+          </div>
+        </div>
+        <div class="col-9 pl-1">
+          <div class="card-body bg-light p-0 border-0">
+            <div class="">
+              <a type="button" class="text-decoration-none text-dark w-100" href="{% url 'meals:edit_meals' %}">Posiłki</a>
+              <a type="button" class="text-decoration-none text-dark w-100" href="{% url 'meals:edit_ingredients' %}">Składniki/Sklepy</a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <div  class="w-100">
       <hr class="bg-dark my-1">
@@ -34,16 +46,19 @@
           {% for item in day_meal_option_meal_list %}{% for day, meals in item.0.items %}{% for meal in meals %}{% for ml in meal%}
             <input type="checkbox"  style="display:none;" value="{{ml.id}}" class="mealsListPosition_{{ml.id}}" name="mealsListPosition">{% endfor %}
           {% endfor %}{% endfor %}{% endfor %}
-          <button type="submit" class="btn  py-0 px-0 text-left border-0  btn-block deleteSelectedDaysButton" disabled  >
-            <i class="fas fa-trash mr-1"></i>Usuń zaznaczone dni</button>
-           <hr class="bg-dark my-1">
+          <button type="submit" class="btn  py-0 px-0 text-left border-0  btn-block deleteSelectedDaysButton" disabled >
+            <i class="fas fa-trash mr-1"></i>Usuń zaznaczone dni
+          </button>
+          <hr class="bg-dark my-1">
         </form>
-        <label style="cursor:pointer;">
-        <input name="only_hi_protein_in_select" id="only_hi_protein_in_select" type="checkbox">
+        <label style="cursor:pointer;" class="w-100">
+        <input name="only_hi_protein_in_select" id="only_hi_protein_in_select" type="checkbox" class="checkbox">
           pokaż tylko wysokobałkowe
+          <hr class="bg-dark my-1">
         </label>
 
       {% endif %}
     {% endif %}
+    <small class="w-100 text-left time_now_ mb-1 font-italic font-weight-light">{{today}}</small>
   </div>
 <!--  <script>$(document).ready(function(){})</script>-->
