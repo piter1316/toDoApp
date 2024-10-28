@@ -2,31 +2,6 @@
 {% load l10n %}
 {% block body %}
 <div class="container-fluid mt-2">
-  <div class="container px-1">
-    <div class="jumbotron shadow p-1 mb-1">
-        <h3 class="text-center">MOJE LISTY ZAKUPÓW<a href="{% url 'shopping:edit_check_list' %}" class="fas fa-cogs ml-3 text-dark"></a></h3>
-      <hr class="my-2">
-      <div class="form-row">
-        <div class="col-12 {% if shopping_lists %}col-md-8{% endif %}">
-          <button type="button" class="btn btn-primary btn-block mb-1 mb-md-0" data-toggle="modal"
-                  data-target="#addNewList">
-            Dodaj nową
-          </button>
-        </div>
-        <div class="col-12 col-md-4">
-          <div class="btn-group btn-block {% if shopping_lists %}{%else%}d-none{% endif %}" role="group">
-            <button type="button" class="btn btn-secondary " onclick="printAllShoppingLists()"><i class="fas fa-print"></i> </button>
-            <button type="button" class="btn btn-secondary" data-toggle="modal" data-target=".bd-checklist-modal-lg"><i class="fas fa-check-double"></i> </button>
-            <a onclick="return confirm('Usunąć wszystkie listy zakupów?')"
-             href="{% url 'shopping:delete_all_shopping_lists' %}"
-             class="btn btn-warning  ">
-            Usuń wszyskie
-          </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
   <div class="modal fade bd-checklist-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
@@ -38,7 +13,6 @@
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
-
             <div class="card-body">
               <div class="form-row">
               {% for checkitem in checklist %}
@@ -65,6 +39,31 @@
   </div>
   {% if shopping_lists %}
   <div class="row d-flex justify-content-center">
+    <div class="col-12 px-1 px-md-2">
+      <div class="jumbotron shadow p-1 mb-1">
+          <h3 class="text-center">MOJE LISTY ZAKUPÓW<a href="{% url 'shopping:edit_check_list' %}" class="fas fa-cogs ml-3 text-dark"></a></h3>
+        <hr class="my-2">
+        <div class="form-row">
+          <div class="col-12 {% if shopping_lists %}col-md-8{% endif %}">
+            <button type="button" class="btn btn-primary btn-block mb-1 mb-md-0" data-toggle="modal"
+                    data-target="#addNewList">
+              Dodaj nową
+            </button>
+          </div>
+          <div class="col-12 col-md-4">
+            <div class="btn-group btn-block {% if shopping_lists %}{%else%}d-none{% endif %}" role="group">
+              <button type="button" class="btn btn-secondary " onclick="printAllShoppingLists()"><i class="fas fa-print"></i> </button>
+              <button type="button" class="btn btn-secondary" data-toggle="modal" data-target=".bd-checklist-modal-lg"><i class="fas fa-check-double"></i> </button>
+              <a onclick="return confirm('Usunąć wszystkie listy zakupów?')"
+               href="{% url 'shopping:delete_all_shopping_lists' %}"
+               class="btn btn-warning  ">
+              Usuń wszyskie
+            </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     {% for shop, products in shopping_lists.items %}
     <div class="col-12 col-md-6 col-lg-4 col-xl-3 mb-3 px-1 px-md-2">
       <div class="card shadow" id="{{shop}}">
