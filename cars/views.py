@@ -55,6 +55,13 @@ def cars_home(request):
 
 @login_required(login_url='/accounts/login')
 def car_details(request, car_id):
+    total_fuel = 0
+    total_km = 0
+    lowest_average = 0
+    highest_average = 0
+    total_fuel_cost = 0
+    month_average = 0
+    km_month_average = 0
     car = Car.objects.filter(pk=car_id, user=request.user)
     form = CarForm(request.POST, request.FILES)
     car_fuel_fill_list = Fuel.objects.filter(car_id=car_id).order_by('-date')
@@ -73,16 +80,18 @@ def car_details(request, car_id):
         averages_list.append(round(fuel.liters/fuel.kilometers * 100, 2))
         fuel_cost_list.append(fuel.liters * float(fuel.fuel_price))
         dates_list.append(fuel.date)
+    if car_fuel_fill_list:
+        first_last_fuel_time_interval = max(dates_list) - min(dates_list)
+        first_last_fuel_time_interval_months = first_last_fuel_time_interval.days / 31
+        total_fuel = round(sum(total_fuel_list), 2)
+        total_km = round(sum(total_km_list), 2)
+        total_fuel_cost = round(sum(fuel_cost_list), 2)
+        lowest_average = min(averages_list)
+        highest_average = max(averages_list)
+        if first_last_fuel_time_interval_months:
+            month_average = round(total_fuel_cost / first_last_fuel_time_interval_months, 2)
+            km_month_average = round(total_km / first_last_fuel_time_interval_months, 2)
 
-    first_last_fuel_time_interval = max(dates_list) - min(dates_list)
-    first_last_fuel_time_interval_months = first_last_fuel_time_interval.days / 31
-    total_fuel = round(sum(total_fuel_list), 2)
-    total_km = round(sum(total_km_list), 2)
-    total_fuel_cost = round(sum(fuel_cost_list), 2)
-    lowest_average = min(averages_list)
-    highest_average = max(averages_list)
-    month_average = round(total_fuel_cost / first_last_fuel_time_interval_months, 2)
-    km_month_average = round(total_km / first_last_fuel_time_interval_months, 2)
     try:
         average_consumption = round(total_fuel / total_km * 100, 2)
     except ZeroDivisionError:
