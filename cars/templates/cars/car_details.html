@@ -198,23 +198,14 @@
         {% endif %}
       </div>
       </div>
-
     </div>
-    <div class="tab-pane fade p-2 info {% if active_tab == 'info' %} show active{% endif %}" id="info" role="tabpanel"
+    <div class="tab-pane fade p-0  p-md-2 info {% if active_tab == 'info' %} show active{% endif %}" id="info" role="tabpanel"
          aria-labelledby="info-tab">
-      <div class="container">
+      <div class="container p-0">
         <div class="card mb-3 mx-auto p-1"  >
-          <div class="row no-gutters">
-            <div class="col-md-4 d-flex align-items-center">
+
               {% for detail in car %}
-                {% if detail.image %}
-                <img class="card-img-top" style="width:100%;" src="{{detail.image.url}}" alt="{{detail}}">
-                {% else %}
-                <img class="card-img-top mx-auto" style="width:100%;" src="{% static 'todo/img/car-solid.svg'%}"
-                     alt="{{detail}}">
-                {% endif %}
-            </div>
-            <div class="col-md-8">
+            <div class="">
               <div class="card-body">
               <h5 class="card-title mb-0 text-center">{{detail.name}}</h5>
             </div>
@@ -372,7 +363,6 @@
             </li>
             </ul>
           </div>
-            </div>
           </div>
         </div>
     </div>
