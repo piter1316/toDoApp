@@ -97,13 +97,13 @@
     <div class="tab-pane fade service show active" id="macro">
       <div style="overflow-y:scroll; height:80vh;">
         <table class="table table-light table-striped table-hover table-fixed ">
-          <thead class="thead-dark text-center">
+          <thead class="thead-dark text-center sticky-top">
           <tr>
             <th class="px-0">
               <button class="btn btn-sm btn-outline-light p-1 p-md-2" data-toggle="modal" data-target="#addIngredientModal"><i
                   class="fas fa-plus"></i></button>
             </th>
-            <th class="align-items-center px-0">
+            <th class="align-items-center p-0">
               <span class="">Składnik</span>
             </th>
             <th class="p-0">kcal/100g<br>btw</th>
@@ -115,9 +115,9 @@
           {% for ingredient in user_ingredients %}
           <tr>
             <td class="p-0 text-center">
-              <a class="fas fa-edit text-dark" href="{% url 'meals:edit_ingredient_index' ingredient.id %}"></a>
+              <a class="fas fa-edit text-dark px-1" href="{% url 'meals:edit_ingredient_index' ingredient.id %}"></a>
               <a onclick="return confirm('Czy napewno usunąć składnik?')"
-                 href="{% url 'meals:delete_ingr' ingredient.id %}" class="fas fa-minus-circle text-secondary"></a>
+                 href="{% url 'meals:delete_ingr' ingredient.id %}" class="fas fa-minus-circle text-secondary px-1"></a>
             </td>
             <td>
               {{ingredient}}{% if ingredient.short_expiry %}

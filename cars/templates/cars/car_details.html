@@ -35,7 +35,7 @@
         {% for detail in car %}
         <form method="post" action="{% url 'cars:add_fuel_fill' detail.pk  %}" id="add_fuel_fill">{% csrf_token %}
           <table class="table table-bordered bg-light table-sm table-striped mb-0" id="filling_table">
-            <thead class="bg-secondary text-center text-light">
+            <thead class="bg-secondary text-center text-light sticky-top">
             <tr>
               <th scope="col" class="d-none d-md-table-cell">Lp.</th>
               <th scope="col">Data</th>
@@ -114,7 +114,7 @@
       </div>
 
       <table class="d-none d-lg-table table table-bordered bg-light table-sm table-striped mb-0">
-        <thead class="bg-secondary text-center text-light">
+        <thead class="bg-secondary text-center text-light sticky-top">
         <tr>
           <td>Lp.</td>
           <td>Data</td>
