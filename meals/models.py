@@ -113,6 +113,10 @@ class Ingredient(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def meals_with_ingredient(self):
+        return MealIngredient.objects.filter(ingredient_id=self.pk).select_related('meal_id')
+
 
 class MealIngredient(models.Model):
     meal_id = models.ForeignKey(Meal, on_delete=models.CASCADE)

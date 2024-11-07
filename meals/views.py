@@ -824,7 +824,7 @@ def edit_ingredient_index(request, ingr_id):
         'user_shops': Shop.objects.filter(user=request.user.id),
         'return_url': return_url,
         'user_divisions': ProductDivision.objects.filter(user=request.user).order_by('-priority'),
-
+        'meals_with_ingredient': ingredient.meals_with_ingredient,
     }
 
     return render(request, 'meals/ingredient_edit.html', context)
