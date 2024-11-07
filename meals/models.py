@@ -2,7 +2,9 @@ import math
 
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models import Sum, F, FloatField, Case, When, Value
+from django.db.models import Sum, F, FloatField
+
+VEGIES_OUT = ('ziemniaki', 'passata pomidorowa', 'tofu', 'przecier pomidorowy')
 
 
 def is_hi_protein(total_kcal, total_protein):
@@ -56,7 +58,8 @@ class Meal(models.Model):
         total_vegies = 0
         total_fruits = 0
         for m in meals_prep:
-            if 'warzywa' in m.ingredient_id.division.division_name.lower() and m.ingredient_id.name.lower() != 'ziemniaki':
+            if ('warzywa' in m.ingredient_id.division.division_name.lower() and
+                    m.ingredient_id.name.lower() not in VEGIES_OUT):
                 total_vegies += m.quantity
             if 'owoce' in m.ingredient_id.division.division_name.lower():
                 total_fruits += m.quantity

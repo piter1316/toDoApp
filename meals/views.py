@@ -12,7 +12,7 @@ from django.views.decorators.http import require_POST
 
 from meals.forms import MealForm, IngredientForm, MealOptionForm
 from meals.models import MealOption, Meal, Ingredient, MealsList, Week, Unit, MealIngredient, Shop, ProductDivision, \
-    is_hi_protein
+    is_hi_protein, VEGIES_OUT
 from shopping.models import ShoppingList, Products
 
 
@@ -48,7 +48,7 @@ def average_for_whole_list(meals_list, generated_user_meals_options, user, curre
                 tmp_extra_total = meal_ingredients_dict[meal.extras.id]
 
         for ingr in ingredients_total:
-            if 'warzywa' in ingr.ingredient_id.division.division_name.lower() and ingr.name != 'ziemniaki':
+            if 'warzywa' in ingr.ingredient_id.division.division_name.lower() and ingr.name.lower() not in VEGIES_OUT:
                 vegies += ingr.quantity
             if 'owoce' in ingr.ingredient_id.division.division_name.lower():
                 fruits += ingr.quantity
@@ -266,7 +266,8 @@ def meals(request, current=1):
                         calories = 0
 
                 for ingr in ingredients_list:
-                    if 'warzywa' in ingr.ingredient_id.division.division_name.lower() and ingr.name != 'ziemniaki':
+                    if ('warzywa' in ingr.ingredient_id.division.division_name.lower()
+                            and ingr.name.lower() not in VEGIES_OUT):
                         vegies += ingr.quantity
                     if 'owoce' in ingr.ingredient_id.division.division_name.lower():
                         fruits += ingr.quantity
