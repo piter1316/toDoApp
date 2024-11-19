@@ -34,6 +34,8 @@ def average_for_whole_list(meals_list, generated_user_meals_options, user, curre
     carb = 0
     vegies = 0
     fruits = 0
+    average_vegies_per_day = 0
+    average_fruits_per_day = 0
 
     for meal in meals:
         if meal.meal_id:
@@ -87,7 +89,8 @@ def average_for_whole_list(meals_list, generated_user_meals_options, user, curre
         average_protein_per_day = 0
         average_carb_per_day = 0
         average_fat_per_day = 0
-    return average_clories_per_day, average_protein_per_day, average_carb_per_day, average_fat_per_day, average_vegies_per_day, average_fruits_per_day
+    return (average_clories_per_day, average_protein_per_day, average_carb_per_day, average_fat_per_day,
+            average_vegies_per_day, average_fruits_per_day)
 
 
 def get_today():
