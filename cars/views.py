@@ -1,5 +1,6 @@
 import json
 import os
+from datetime import datetime
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -53,6 +54,48 @@ def cars_home(request):
     return render(request, 'cars/home.html', context)
 
 
+def get_stats_data(j_dict):
+    years = sorted(list(set([entry.get('fields').get('date').split('-')[0] for entry in j_dict])), reverse=True)
+    current_year = str(datetime.today().year)
+    current_month = datetime.today().month
+    stats_calendar = {}
+    months_txt = {
+        '01': 'Styczeń', '02': 'Luty', '03': 'Marzec', '04': 'Kwiecień',
+        '05': 'Maj', '06': 'Czerwiec', '07': 'Lipiec', '08': 'Sierpień',
+        '09': 'Wrzesień', '10': 'Październik', '11': 'Listopad', '12': 'Grudzień',
+    }
+    for year in years:
+        max_month = current_month if year == current_year else 12
+        stats_calendar[year] = {f"{month:02d}": {'data': [], 'summary': []} for month in range(1, max_month + 1)}
+    for year in years:
+        for entry in j_dict:
+            if entry.get('fields').get('date').startswith(year):
+                month = entry.get('fields').get('date').split('-')[1]
+                stats_calendar[year][month]['data'].append(entry)
+    for month_data in stats_calendar.values():
+        for month, content in month_data.items():
+            total_liters = 0.0
+            total_cost = 0.0
+
+            for record in content['data']:
+                liters = record['fields']['liters']
+                price = float(record['fields']['fuel_price'])
+                total_liters += liters
+                total_cost += liters * price
+            content['summary'] = [
+                round(total_liters, 2),
+                round(total_cost, 2),
+                months_txt[month]
+            ]
+    for year_data in stats_calendar.values():
+        for month_data in year_data.values():
+            for entry in month_data['data']:
+                liters = entry['fields']['liters']
+                price = float(entry['fields']['fuel_price'])
+                entry['fields']['cost'] = round(liters * price, 2)
+    return stats_calendar
+
+
 @login_required(login_url='/accounts/login')
 def car_details(request, car_id):
     total_fuel = 0
@@ -102,6 +145,7 @@ def car_details(request, car_id):
     except IndexError:
         last_service = ''
 
+    stats_data = get_stats_data(json.loads(chart_dates))
     context = {
         'car': car,
         'form': form,
@@ -119,6 +163,7 @@ def car_details(request, car_id):
         'total_fuel': total_fuel,
         'total_km': total_km,
         'km_month_average': km_month_average,
+        'stats_data': stats_data,
     }
     return render(request, 'cars/car_details.html', context)
 
