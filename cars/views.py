@@ -66,7 +66,7 @@ def get_stats_data(j_dict):
     }
     for year in years:
         max_month = current_month if year == current_year else 12
-        stats_calendar[year] = {f"{month:02d}": {'data': [], 'summary': []} for month in range(1, max_month + 1)}
+        stats_calendar[year] = {f"{month:02d}": {'data': [], 'summary': []} for month in range(max_month, 0, -1)}
     for year in years:
         for entry in j_dict:
             if entry.get('fields').get('date').startswith(year):
