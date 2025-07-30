@@ -979,15 +979,17 @@ def generate_shopping_list_for_meal(request, meal_id):
                     new_shopping_list.save()
                     new_product = Products(product_name=position.get('ingredient'), quantity=position.get('quantity'),
                                            shopping_list_id_id=new_shopping_list.id,
-                                           unit_id=position.get('unit'), division_id=position.get('division')).save()
+                                           unit_id=position.get('unit'), division_id=position.get('division'))
+                    new_product.save()
                     existing_shopping_lists[new_shopping_list.id] = new_shopping_list.name
                     shopping_list_positions_dict[new_shopping_list.name] = Products.objects.filter(
                         product_name=position.get('ingredient'), shopping_list_id__name=new_shopping_list.name)
             else:
+                shop_to_alter_id = next(k for k, v in existing_shopping_lists.items() if v == shop_to_alter)
                 if str(position.get('ingredient')) in [str(item.product_name) for item in
                                                        shopping_list_positions_dict.get(shop_to_alter)]:
                     product_to_alter = Products.objects.filter(product_name=str(position.get('ingredient')),
-                                                               shopping_list_id_id__name=shop_to_alter)[0]
+                                                               shopping_list_id_id=shop_to_alter_id)[0]
                     product_to_alter.quantity = round(product_to_alter.quantity + float(position.get('quantity')), 2)
                     product_to_alter.save()
                 else:
@@ -996,7 +998,8 @@ def generate_shopping_list_for_meal(request, meal_id):
                             shop_to_alter = k
                     new_product = Products(product_name=position.get('ingredient'), quantity=position.get('quantity'),
                                            shopping_list_id_id=shop_to_alter,
-                                           unit_id=position.get('unit'), division_id=position.get('division')).save()
+                                           unit_id=position.get('unit'), division_id=position.get('division'))
+                    new_product.save()
     else:
         new_shopping_list = ShoppingList(user_id=request.user, name=meal_name, generated=1)
         new_shopping_list.save()
