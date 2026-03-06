@@ -150,6 +150,26 @@
               </div>
             </div>
           </div>
+          <div class="col-12 col-xl-6 mb-1">
+            <div class="card shadow" style="height:100%;">
+              <div class="card-header bg-secondary text-light text-center">
+                <img src="{% static 'todo/img/vault-solid.svg' %}" height="45">
+              </div>
+              <div class="card-body">
+                <ul>
+                  {% if weapons_count %}
+                  <li>Jednostki broni: {{ weapons_count }}</li>
+                  <li>Amunicja w szafie: {{ total_ammo_qty }} szt.</li>
+                  {% else %}
+                  <li>Szafa jest pusta!</li>
+                  {% endif %}
+                </ul>
+              </div>
+              <div class="mx-5 mb-2">
+                <a href="{% url 'gunsafe:gunsafe_home' %}"  class="btn btn-secondary btn-block">Przejdź</a>
+              </div>
+            </div>
+          </div>
             </div>
           </div>
         </div>

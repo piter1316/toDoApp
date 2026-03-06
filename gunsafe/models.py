@@ -29,6 +29,14 @@ class Weapon(models.Model):
     def __str__(self):
         return f"{self.name} ({self.serial_no})"
 
+    @property
+    def last_shooting(self):
+        return self.shootings.order_by('-date').first()
+
+    @property
+    def last_cleaning(self):
+        return self.cleanings.order_by('-date').first()
+
 
 class Magazine(models.Model):
     weapon = models.ForeignKey(Weapon, on_delete=models.CASCADE, related_name='magazines')
@@ -67,9 +75,10 @@ class Accessory(models.Model):
 
 
 class AmmoSafe(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ammo_inventory')
     caliber = models.ForeignKey(Caliber, on_delete=models.CASCADE)
     manufacturer = models.CharField(max_length=100, blank=True, null=True)
     qty = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return f"{self.caliber.name} - {self.qty} rds ({self.manufacturer or 'N/A'})"
+        return f"{self.user.username} - {self.caliber.name} - {self.qty} rds ({self.manufacturer or 'N/A'})"

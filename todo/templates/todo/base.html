@@ -33,7 +33,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
   <script src="{% static 'todo/bootstrap4-toggle.min.js' %}"></script>
   <script src="{% static 'todo/jquery.formset.js' %}"></script>
-  <![endif]-->
+  {% block extra_head %}{% endblock %}
 </head>
 <body>
 <div class="sticky-top">

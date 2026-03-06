@@ -13,6 +13,7 @@ from cars.models import Car
 from receipts.models import Receipt
 from meals.models import MealsList, MealIngredient, Meal, Ingredient
 from shopping.models import ShoppingList, Products
+from gunsafe.models import Weapon, AmmoSafe
 from .forms import TodoForm
 from .models import Todo, TodoTodostep, ToDoMain
 
@@ -229,6 +230,12 @@ def home(request):
         for product in shopping_lists:
             for item in Products.objects.filter(shopping_list_id=product, bought=False):
                 products_to_buy_counter += 1
+        
+        # Gunsafe data
+        weapons = Weapon.objects.filter(user=request.user)
+        ammo_inventory = AmmoSafe.objects.filter(user=request.user)
+        total_ammo_qty = sum(ammo.qty for ammo in ammo_inventory)
+
         distinct_meals = []
         for meal in meals:
             if meal.current:
@@ -255,6 +262,8 @@ def home(request):
             'todays_meals': todays_meals,
             'today': today,
             'receipts': receipts_dict,
+            'weapons_count': weapons.count(),
+            'total_ammo_qty': total_ammo_qty,
         }
     else:
         context = {}
