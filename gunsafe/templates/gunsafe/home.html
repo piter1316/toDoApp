@@ -1,0 +1,580 @@
+{% extends 'gunsafe/base.html' %}
+{% block body %}
+{% load static %}
+
+<div class="container-fluid mt-1 mt-md-2">
+    <div class="row mb-2 mb-md-2">
+        <div class="col-md-8">
+            <h3 class="text-white"><i class="fas fa-vault mr-2"></i>Moja Szafa z Bronią</h3>
+        </div>
+        <div class="col-md-4 text-md-right mt-2 mt-md-0">
+            <button class="btn btn-light btn-block d-md-inline-block w-md-auto" data-toggle="modal" data-target="#addWeaponModal">
+                <i class="fas fa-plus mr-1"></i> Dodaj Broń
+            </button>
+        </div>
+    </div>
+
+    <!-- Weapons Grid -->
+    <div class="row mx-n1 mx-md-0">
+        {% for weapon in weapons %}
+        <div class="col-md-6 col-lg-4 px-1 px-md-3 mb-2 mb-md-4">
+            <div class="card bg-dark text-white h-100 border-secondary shadow">
+                <div class="card-header border-secondary d-flex justify-content-between p-2 p-md-3">
+                    <h5 class="mb-0">
+                        <a href="{% url 'gunsafe:weapon_details' weapon.id %}" class="text-white text-decoration-none">
+                            {{ weapon.name }}
+                        </a>
+                    </h5>
+                    <div>
+                        <button class="btn btn-xs btn-outline-secondary mr-2" data-toggle="modal" data-target="#editWeaponModal{{ weapon.id }}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <i class="fas {{ weapon.weapon_type.icon|default:'fa-gun' }} text-secondary"></i>
+                    </div>
+                </div>
+                <div class="card-body p-2 p-md-3">
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            <small class="d-block text-muted">Kaliber</small>
+                            {% for cal in weapon.calibers.all %}
+                            <span class="badge badge-light">{{ cal.name }}</span>
+                            {% empty %}
+                            <span class="badge badge-light">N/A</span>
+                            {% endfor %}
+                        </div>
+                        <div class="col-6">
+                            <small class="d-block text-muted">Licznik (całk. / ost. czysz.)</small>
+                            <span class="badge badge-light">{{ weapon.total_rounds_fired }} szt.</span> /
+                            <span class="badge {% if weapon.rounds_since_cleaning > 200 %}badge-danger{% elif weapon.rounds_since_cleaning > 100 %}badge-warning{% else %}badge-info{% endif %}">{{ weapon.rounds_since_cleaning }} szt.</span>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            <small class="d-block text-muted">Typ akcji</small>
+                            <span class="badge badge-light">{{ weapon.action|default:"N/A" }}</span>
+                        </div>
+                        <div class="col-6">
+                            <small class="d-block text-muted">Nr seryjny</small>
+                            <span class="badge badge-light">{{ weapon.serial_no|default:"N/A" }}</span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            <small class="d-block text-muted">Ost. strzelanie</small>
+                            <span class="badge badge-light">{{ weapon.last_shooting.date|date:"d.m.Y"|default:"---" }}</span>
+                        </div>
+                        <div class="col-6">
+                            <small class="d-block text-muted">Ost. czyszczenie</small>
+                            <span class="badge badge-light">{{ weapon.last_cleaning.date|date:"d.m.Y"|default:"---" }}</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-1">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">Akcesoria:</small>
+                            <button class="btn btn-xs btn-outline-secondary" data-toggle="modal" data-target="#addAccessoryModal{{ weapon.id }}"><i class="fas fa-plus"></i></button>
+                        </div>
+                        {% for acc in weapon.accessories.all %}
+                        <span class="badge badge-dark border border-secondary mr-1" title="{{ acc.description }}">{{ acc.accessory_name }}</span>
+                        {% empty %}
+                        <small class="text-secondary font-italic">Brak</small>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-1">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">Magazynki:</small>
+                            <button class="btn btn-xs btn-outline-secondary" data-toggle="modal" data-target="#addMagazineModal{{ weapon.id }}"><i class="fas fa-plus"></i></button>
+                        </div>
+                        {% for mag in weapon.magazines.all %}
+                        <span class="badge badge-secondary mr-1">{{ mag.capacity }} rd</span>
+                        {% empty %}
+                        <small class="text-secondary font-italic">Brak</small>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="card-footer border-secondary bg-transparent d-flex justify-content-between p-2 p-md-3">
+                    <button class="btn btn-sm btn-outline-light" data-toggle="modal" data-target="#cleaningModal{{ weapon.id }}">
+                        <i class="fas fa-soap mr-1"></i> Czyszczenie
+                    </button>
+                    <button class="btn btn-sm btn-outline-light" data-toggle="modal" data-target="#shootingModal{{ weapon.id }}">
+                        <i class="fas fa-bullseye mr-1"></i> Strzelanie
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Weapon Modal -->
+        <div class="modal fade" id="editWeaponModal{{ weapon.id }}" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content bg-dark text-white">
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="edit_weapon">
+                        <input type="hidden" name="weapon_id" value="{{ weapon.id }}">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Edytuj broń: {{ weapon.name }}</h5>
+                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Nazwa broni (Model i Marka)</label>
+                                <input type="text" name="name" class="form-control" value="{{ weapon.name }}" required>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label>Typ broni</label>
+                                    <select name="weapon_type" class="form-control">
+                                        <option value="">---</option>
+                                        {% for wt in weapon_types %}
+                                        <option value="{{ wt.id }}" {% if weapon.weapon_type_id == wt.id %}selected{% endif %}>{{ wt.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label>Kaliber</label>
+                                    <select name="caliber" class="form-control" multiple>
+                                        {% for cal in calibers %}
+                                        <option value="{{ cal.id }}" {% if cal in weapon.calibers.all %}selected{% endif %}>{{ cal.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <small class="form-text text-muted">Przytrzymaj Ctrl, aby wybrać kilka.</small>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Nr seryjny</label>
+                                <input type="text" name="serial_no" class="form-control" value="{{ weapon.serial_no|default:'' }}">
+                            </div>
+                            <div class="form-group">
+                                <label>Typ akcji</label>
+                                <input type="text" name="action_type" class="form-control" value="{{ weapon.action|default:'' }}" placeholder="np. Striker-fired, Semi-auto">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-light">Zapisz zmiany</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shooting Modal -->
+        <div class="modal fade" id="shootingModal{{ weapon.id }}" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content bg-dark text-white">
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="add_shooting">
+                        <input type="hidden" name="weapon_id" value="{{ weapon.id }}">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Zapisz strzelanie: {{ weapon.name }}</h5>
+                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Ilość wystrzelonych naboi</label>
+                                <input type="number" name="rounds" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Data</label>
+                                <input type="date" name="date" class="form-control" value="{{ today|date:'Y-m-d' }}">
+                            </div>
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input type="checkbox" class="custom-control-input" id="useSafeAmmo{{ weapon.id }}" name="use_safe_ammo" checked onchange="toggleAmmoSelect({{ weapon.id }})">
+                                <label class="custom-control-label" for="useSafeAmmo{{ weapon.id }}">Zdejmij ze stanu amunicji w szafie</label>
+                            </div>
+
+                            <div class="form-group" id="ammoSelectDiv{{ weapon.id }}">
+                                <label>Wybierz amunicję</label>
+                                <select name="ammo_id" class="form-control">
+                                    {% for ammo in ammo_inventory %}
+                                        {% if ammo.caliber in weapon.calibers.all %}
+                                            <option value="{{ ammo.id }}">{{ ammo.caliber.name }}: {{ ammo.manufacturer|default:"Nieznany" }} - {{ ammo.typ|default:"" }} ({{ ammo.qty }} szt.)</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-secondary">Zapisz</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cleaning Modal -->
+        <div class="modal fade" id="cleaningModal{{ weapon.id }}" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content bg-dark text-white">
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="add_cleaning">
+                        <input type="hidden" name="weapon_id" value="{{ weapon.id }}">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Zapisz czyszczenie: {{ weapon.name }}</h5>
+                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Data</label>
+                                <input type="date" name="date" class="form-control" value="{{ today|date:'Y-m-d' }}">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-light">Zapisz</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Magazine Modal -->
+        <div class="modal fade" id="addMagazineModal{{ weapon.id }}" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content bg-dark text-white">
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="add_magazine">
+                        <input type="hidden" name="weapon_id" value="{{ weapon.id }}">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Dodaj magazynek: {{ weapon.name }}</h5>
+                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Pojemność (rds)</label>
+                                <input type="number" name="capacity" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Producent</label>
+                                <input type="text" name="manufacturer" class="form-control" placeholder="np. Magpul, Mec-Gar">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-secondary">Dodaj</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Accessory Modal -->
+        <div class="modal fade" id="addAccessoryModal{{ weapon.id }}" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content bg-dark text-white">
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="add_accessory">
+                        <input type="hidden" name="weapon_id" value="{{ weapon.id }}">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Dodaj akcesorium: {{ weapon.name }}</h5>
+                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Nazwa akcesorium</label>
+                                <input type="text" name="accessory_name" class="form-control" placeholder="np. Kolimator Holosun" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Opis</label>
+                                <textarea name="description" class="form-control" rows="2"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Data zakupu</label>
+                                <input type="date" name="date_bought" class="form-control">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-secondary">Dodaj</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center mt-5 text-white">
+            <h4>Brak broni w bazie. Kliknij "Dodaj Broń", aby zacząć.</h4>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Ammo Inventory Section -->
+    <div class="card bg-dark text-white mb-2 mb-md-4 border-secondary">
+        <div class="card-header border-secondary d-flex flex-wrap justify-content-between align-items-center p-2 p-md-3">
+            <div class="d-flex flex-wrap align-items-center">
+                <h5 class="mb-0 mr-3"><i class="fas fa-box mr-2 text-light"></i>Stan Amunicji</h5>
+                {% if ammo_by_caliber %}
+                    {% for item in ammo_by_caliber %}
+                    <span class="badge badge-outline-light border border-secondary p-1 mr-1 my-1" style="font-size: 0.75rem;">
+                        {{ item.caliber__name }}: <span class="text-info font-weight-bold">{{ item.total_qty }}</span>
+                    </span>
+                    {% endfor %}
+                    <span class="badge badge-info border border-secondary p-1 my-1" style="font-size: 0.75rem;">
+                        Suma: <span class="font-weight-bold">{{ total_ammo }}</span>
+                    </span>
+                {% endif %}
+            </div>
+            <button class="btn btn-sm btn-outline-light" data-toggle="modal" data-target="#addAmmoModal">
+                <i class="fas fa-cart-plus mr-1"></i> Dodaj amunicję
+            </button>
+        </div>
+        <div class="card-body p-2 p-md-3">
+
+            <div class="row mx-n1">
+                {% for ammo in ammo_inventory %}
+                <div class="col-6 col-md-3 px-1 mb-2">
+                    <div class="p-1 p-md-2 border border-secondary rounded bg-secondary shadow-sm h-100">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap">
+                            <strong class="small font-weight-bold">{{ ammo.caliber.name }}</strong>
+                            <span class="badge badge-dark p-1" style="font-size: 0.8rem;">{{ ammo.qty }} szt.</span>
+                        </div>
+                        <div style="font-size: 0.75rem;" class="text-light">
+                            {{ ammo.manufacturer|default:"N/A" }}
+                            {% if ammo.typ %} - {{ ammo.typ }}{% endif %}
+                            {% if ammo.grain %} - {{ ammo.grain }} gr{% endif %}
+                        </div>
+                        <div class="mt-1 d-flex">
+                             <button class="btn btn-xs btn-outline-light py-0 px-1" data-toggle="modal" data-target="#correctAmmoModal{{ ammo.id }}">
+                                <i class="fas fa-edit"></i>
+                             </button>
+                             <button class="btn btn-xs btn-outline-dark py-0 px-1 ml-1" data-toggle="modal" data-target="#deleteAmmoModal{{ ammo.id }}">
+                                <i class="fas fa-trash"></i>
+                             </button>
+                        </div>
+                    </div>
+
+                    <!-- Modal Korekta Amunicji -->
+                    <div class="modal fade" id="correctAmmoModal{{ ammo.id }}" tabindex="-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content bg-dark text-white">
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="ammo_correction">
+                                    <input type="hidden" name="ammo_id" value="{{ ammo.id }}">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Korekta: {{ ammo.caliber.name }} ({{ ammo.manufacturer|default:"N/A" }}{% if ammo.typ %} - {{ ammo.typ }}{% endif %}{% if ammo.grain %} - {{ ammo.grain }} gr{% endif %})</h5>
+                                        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <label>Zmiana ilości (np. -50 dla użyczenia, 50 dla znaleziska)</label>
+                                            <input type="number" name="qty" class="form-control" required>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-secondary">Zapisz zmianę</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal Usuwanie Amunicji -->
+                    <div class="modal fade" id="deleteAmmoModal{{ ammo.id }}" tabindex="-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content bg-dark text-white">
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="delete_ammo">
+                                    <input type="hidden" name="ammo_id" value="{{ ammo.id }}">
+                                    <div class="modal-header border-danger">
+                                        <h5 class="modal-title">Usuń wpis amunicji</h5>
+                                        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Czy na pewno chcesz usunąć wpis dla <strong>{{ ammo.caliber.name }}</strong> ({{ ammo.manufacturer|default:"N/A" }}{% if ammo.typ %} - {{ ammo.typ }}{% endif %}{% if ammo.grain %} - {{ ammo.grain }} gr{% endif %})?
+                                        <br>
+                                        <small class="text-danger">Tej operacji nie można cofnąć.</small>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuluj</button>
+                                        <button type="submit" class="btn btn-danger">Usuń</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center text-muted">Brak amunicji w szafie.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Weapon Modal -->
+<div class="modal fade" id="addWeaponModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content bg-dark text-white">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add_weapon">
+                <div class="modal-header">
+                    <h5 class="modal-title">Dodaj nową broń</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Nazwa broni (Model i Marka)</label>
+                        <input type="text" name="name" class="form-control" placeholder="np. Glock 19X" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>Typ broni</label>
+                            <select name="weapon_type" class="form-control">
+                                <option value="">---</option>
+                                {% for wt in weapon_types %}
+                                <option value="{{ wt.id }}">{{ wt.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Kaliber</label>
+                            <select name="caliber" class="form-control" multiple>
+                                {% for cal in calibers %}
+                                <option value="{{ cal.id }}">{{ cal.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <small class="form-text text-muted">Przytrzymaj Ctrl, aby wybrać kilka.</small>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Nr seryjny</label>
+                        <input type="text" name="serial_no" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Typ akcji</label>
+                        <input type="text" name="action_type" class="form-control" placeholder="np. Striker-fired, Semi-auto">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-light">Dodaj do szafy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Ammo Modal -->
+<div class="modal fade" id="addAmmoModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content bg-dark text-white">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add_ammo">
+                <div class="modal-header">
+                    <h5 class="modal-title">Zakup amunicji</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Kaliber</label>
+                        <select name="caliber_id" class="form-control" required>
+                            {% for cal in calibers %}
+                            <option value="{{ cal.id }}">{{ cal.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Producent</label>
+                        <input type="text" name="manufacturer" class="form-control" placeholder="np. S&B, Magtech">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-8">
+                            <label>Typ amunicji</label>
+                            <input type="text" name="typ" class="form-control" placeholder="np. FMJ, HP">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label>Grain</label>
+                            <input type="number" name="grain" class="form-control" placeholder="np. 124">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Ilość (szt.)</label>
+                        <input type="number" name="qty" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-secondary">Zapisz zakup</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    @media (max-width: 767.98px) {
+        .w-md-auto {
+            width: 100% !important;
+        }
+        .container-fluid {
+            padding-left: 5px !important;
+            padding-right: 5px !important;
+        }
+        .card-body {
+            padding: 0.5rem !important;
+        }
+        .card-header, .card-footer {
+            padding: 0.5rem !important;
+        }
+        h2 {
+            font-size: 1.5rem;
+        }
+        h5 {
+            font-size: 1.1rem;
+        }
+    }
+    .btn-xs {
+        padding: 1px 5px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 3px;
+    }
+    body {
+        background-color: #1a1a1a !important;
+    }
+</style>
+
+{% endblock %}
+
+<script>
+function toggleAmmoSelect(weaponId) {
+    var checkBox = document.getElementById("useSafeAmmo" + weaponId);
+    var ammoDiv = document.getElementById("ammoSelectDiv" + weaponId);
+    if (checkBox && ammoDiv) {
+        if (checkBox.checked == true){
+            ammoDiv.style.display = "block";
+        } else {
+            ammoDiv.style.display = "none";
+        }
+    }
+}
+
+// Inicjalizacja dla wszystkich broni na home
+document.addEventListener("DOMContentLoaded", function() {
+    {% for weapon in weapons %}
+    toggleAmmoSelect({{ weapon.id }});
+    {% endfor %}
+});
+</script>

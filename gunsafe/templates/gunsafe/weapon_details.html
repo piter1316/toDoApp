@@ -1,0 +1,748 @@
+{% extends 'gunsafe/base.html' %}
+{% block body %}
+<div class="container mt-4 text-white">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2><i class="fas fa-gun mr-2"></i>{{ weapon.name }}</h2>
+        </div>
+        <div class="col-md-4 text-md-right">
+            <a href="{% url 'gunsafe:gunsafe_home' %}" class="btn btn-outline-light">
+                <i class="fas fa-arrow-left mr-1"></i> Powrót do szafy
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Informacje o broni -->
+        <div class="col-md-4 mb-4">
+            <div class="card bg-dark border-secondary shadow h-100">
+                <div class="card-header border-secondary d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Dane techniczne</h5>
+                    <div>
+                        <button class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#editWeaponModal">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger ml-1" data-toggle="modal" data-target="#deleteWeaponModal">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush bg-transparent">
+                        <li class="list-group-item bg-transparent border-secondary d-flex justify-content-between">
+                            <span class="text-muted">Typ broni:</span>
+                            <span>{{ weapon.weapon_type.name|default:"N/A" }}</span>
+                        </li>
+                        <li class="list-group-item bg-transparent border-secondary d-flex justify-content-between">
+                            <span class="text-muted">Kaliber:</span>
+                            <span>
+                                {% for cal in weapon.calibers.all %}
+                                {{ cal.name }}{% if not forloop.last %}, {% endif %}
+                                {% empty %}
+                                N/A
+                                {% endfor %}
+                            </span>
+                        </li>
+                        <li class="list-group-item bg-transparent border-secondary d-flex justify-content-between">
+                            <span class="text-muted">Nr seryjny:</span>
+                            <span>{{ weapon.serial_no|default:"N/A" }}</span>
+                        </li>
+                        <li class="list-group-item bg-transparent border-secondary d-flex justify-content-between">
+                            <span class="text-muted">Akcja:</span>
+                            <span>{{ weapon.action|default:"N/A" }}</span>
+                        </li>
+                        <li class="list-group-item bg-transparent border-secondary d-flex justify-content-between">
+                            <span class="text-muted">Nalot (całk. / ost. czysz.):</span>
+                            <span>
+                                <span class="badge badge-secondary">{{ weapon.total_rounds_fired }} szt.</span> /
+                                <span class="badge {% if weapon.rounds_since_cleaning > 200 %}badge-danger{% elif weapon.rounds_since_cleaning > 100 %}badge-warning{% else %}badge-info{% endif %}">{{ weapon.rounds_since_cleaning }} szt.</span>
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Akcesoria i Magazynki -->
+        <div class="col-md-8 mb-4">
+            <div class="row">
+                <div class="col-md-6 mb-4 mb-md-0">
+                    <div class="card bg-dark border-secondary shadow h-100">
+                        <div class="card-header border-secondary d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Akcesoria</h5>
+                            <button class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#addAccessoryModal">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group list-group-flush bg-transparent">
+                                {% for acc in weapon.accessories.all %}
+                                <div class="list-group-item bg-transparent border-secondary px-0">
+                                    <div class="d-flex justify-content-between">
+                                        <h6 class="mb-1 text-light">{{ acc.accessory_name }}</h6>
+                                        <div>
+                                            <button class="btn btn-xs btn-outline-secondary mr-1" data-toggle="modal" data-target="#editAccessoryModal{{ acc.id }}">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-xs btn-outline-danger" data-toggle="modal" data-target="#deleteAccessoryModal{{ acc.id }}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <p class="mb-1 small text-muted">{{ acc.description|default:"" }}</p>
+                                    {% if acc.date_bought %}
+                                    <small class="text-secondary">Kupiono: {{ acc.date_bought|date:"d.m.Y" }}</small>
+                                    {% endif %}
+                                </div>
+                                {% empty %}
+                                <p class="text-muted font-italic">Brak akcesoriów</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card bg-dark border-secondary shadow h-100">
+                        <div class="card-header border-secondary d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Magazynki</h5>
+                            <button class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#addMagazineModal">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group list-group-flush bg-transparent">
+                                {% for mag in weapon.magazines.all %}
+                                <div class="list-group-item bg-transparent border-secondary px-0 d-flex justify-content-between align-items-center">
+                                    <span>{{ mag.manufacturer|default:"Producent nieznany" }} ({{ mag.capacity }} rd)</span>
+                                    <div>
+                                        <button class="btn btn-xs btn-outline-secondary mr-1" data-toggle="modal" data-target="#editMagazineModal{{ mag.id }}">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-xs btn-outline-danger" data-toggle="modal" data-target="#deleteMagazineModal{{ mag.id }}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <p class="text-muted font-italic">Brak magazynków</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Tabela strzelań -->
+        <div class="col-md-6 mb-4">
+            <div class="card bg-dark border-secondary shadow">
+                <div class="card-header border-secondary bg-transparent d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-light"><i class="fas fa-bullseye mr-2"></i>Historia strzelań</h5>
+                    <button class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#addShootingModal">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover mb-0">
+                            <thead>
+                                <tr class="text-muted">
+                                    <th>Data</th>
+                                    <th>Amunicja</th>
+                                    <th class="text-right">Ilość</th>
+                                    <th class="text-right">Akcje</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for shoot in shootings %}
+                                <tr>
+                                    <td>{{ shoot.date|date:"d.m.Y" }}</td>
+                                    <td>
+                                        {% if shoot.ammo_safe %}
+                                            <small>
+                                                {{ shoot.ammo_safe.manufacturer|default:"" }} 
+                                                {{ shoot.ammo_safe.typ|default:"" }}
+                                                {% if shoot.ammo_safe.grain %}{{ shoot.ammo_safe.grain }}gr{% endif %}
+                                            </small>
+                                        {% elif shoot.ammo_info %}
+                                            <small>{{ shoot.ammo_info }}</small>
+                                        {% else %}
+                                            <span class="text-muted small">---</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-right font-weight-bold">{{ shoot.rounds }}</td>
+                                    <td class="text-right">
+                                        <button class="btn btn-xs btn-outline-secondary mr-1" data-toggle="modal" data-target="#editShootingModal{{ shoot.id }}">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-xs btn-outline-danger" data-toggle="modal" data-target="#deleteShootingModal{{ shoot.id }}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted font-italic">Brak wpisów</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabela czyszczeń -->
+        <div class="col-md-6 mb-4">
+            <div class="card bg-dark border-secondary shadow">
+                <div class="card-header border-secondary bg-transparent d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-light"><i class="fas fa-soap mr-2"></i>Historia czyszczenia</h5>
+                    <button class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#addCleaningModal">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover mb-0">
+                            <thead>
+                                <tr class="text-muted">
+                                    <th>Data</th>
+                                    <th>Status</th>
+                                    <th class="text-right">Akcje</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cleaning in cleanings %}
+                                <tr>
+                                    <td>{{ cleaning.date|date:"d.m.Y" }}</td>
+                                    <td><span class="badge badge-secondary">Wyczyszczona</span></td>
+                                    <td class="text-right">
+                                        <button class="btn btn-xs btn-outline-secondary mr-1" data-toggle="modal" data-target="#editCleaningModal{{ cleaning.id }}">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-xs btn-outline-danger" data-toggle="modal" data-target="#deleteCleaningModal{{ cleaning.id }}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted font-italic">Brak wpisów</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Weapon Details Modal -->
+<div class="modal fade" id="editWeaponModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content bg-dark text-white">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="edit_weapon_details">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edytuj dane techniczne</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Nazwa broni (Model i Marka)</label>
+                        <input type="text" name="name" class="form-control" value="{{ weapon.name }}" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>Typ broni</label>
+                            <select name="weapon_type" class="form-control">
+                                <option value="">---</option>
+                                {% for wt in weapon_types %}
+                                <option value="{{ wt.id }}" {% if weapon.weapon_type_id == wt.id %}selected{% endif %}>{{ wt.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Kaliber</label>
+                            <select name="caliber" class="form-control" multiple>
+                                {% for cal in calibers %}
+                                <option value="{{ cal.id }}" {% if cal in weapon.calibers.all %}selected{% endif %}>{{ cal.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <small class="form-text text-muted">Przytrzymaj Ctrl, aby wybrać kilka.</small>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Nr seryjny</label>
+                        <input type="text" name="serial_no" class="form-control" value="{{ weapon.serial_no|default:'' }}">
+                    </div>
+                    <div class="form-group">
+                        <label>Typ akcji</label>
+                        <input type="text" name="action_type" class="form-control" value="{{ weapon.action|default:'' }}">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-light">Zapisz zmiany</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Shooting Modal -->
+<div class="modal fade" id="addShootingModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content bg-dark text-white">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add_shooting">
+                <input type="hidden" name="weapon_id" value="{{ weapon.id }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Dodaj strzelanie</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Ilość wystrzelonych naboi</label>
+                        <input type="number" name="rounds" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Data</label>
+                        <input type="date" name="date" class="form-control" value="{{ today|date:'Y-m-d' }}">
+                    </div>
+                    <div class="custom-control custom-checkbox mb-3">
+                        <input type="checkbox" class="custom-control-input" id="useSafeAmmo" name="use_safe_ammo" checked onchange="toggleAmmoSelect()">
+                        <label class="custom-control-label" for="useSafeAmmo">Zdejmij ze stanu amunicji w szafie</label>
+                    </div>
+
+                    <div class="form-group" id="ammoSelectDiv">
+                        <label>Wybierz amunicję</label>
+                        <select name="ammo_id" class="form-control">
+                            {% for ammo in ammo_inventory %}
+                                <option value="{{ ammo.id }}">{{ ammo.caliber.name }}: {{ ammo.manufacturer|default:"Nieznany" }} - {{ ammo.typ|default:"" }} ({{ ammo.qty }} szt.)</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-secondary">Zapisz</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Cleaning Modal -->
+<div class="modal fade" id="addCleaningModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content bg-dark text-white">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add_cleaning">
+                <input type="hidden" name="weapon_id" value="{{ weapon.id }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Dodaj czyszczenie</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Data</label>
+                        <input type="date" name="date" class="form-control" value="{{ today|date:'Y-m-d' }}">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-light">Zapisz</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Magazine Modal -->
+<div class="modal fade" id="addMagazineModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content bg-dark text-white">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add_magazine">
+                <input type="hidden" name="weapon_id" value="{{ weapon.id }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Dodaj magazynek</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Pojemność (rds)</label>
+                        <input type="number" name="capacity" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Producent</label>
+                        <input type="text" name="manufacturer" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-secondary">Dodaj</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Accessory Modal -->
+<div class="modal fade" id="addAccessoryModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content bg-dark text-white">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add_accessory">
+                <input type="hidden" name="weapon_id" value="{{ weapon.id }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Dodaj akcesorium</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Nazwa akcesorium</label>
+                        <input type="text" name="accessory_name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Opis</label>
+                        <textarea name="description" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Data zakupu</label>
+                        <input type="date" name="date_bought" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-secondary">Dodaj</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modale edycji i usuwania dla elementów list -->
+{% for acc in weapon.accessories.all %}
+<div class="modal fade" id="editAccessoryModal{{ acc.id }}" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content bg-dark text-white">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="edit_accessory">
+                <input type="hidden" name="accessory_id" value="{{ acc.id }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edytuj akcesorium</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Nazwa akcesorium</label>
+                        <input type="text" name="accessory_name" class="form-control" value="{{ acc.accessory_name }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Opis</label>
+                        <textarea name="description" class="form-control" rows="2">{{ acc.description }}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Data zakupu</label>
+                        <input type="date" name="date_bought" class="form-control" value="{{ acc.date_bought|date:'Y-m-d' }}">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-light">Zapisz</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="deleteAccessoryModal{{ acc.id }}" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content bg-dark text-white">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="delete_accessory">
+                <input type="hidden" name="accessory_id" value="{{ acc.id }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Usuń akcesorium</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Czy na pewno chcesz usunąć akcesorium <strong>{{ acc.accessory_name }}</strong>?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuluj</button>
+                    <button type="submit" class="btn btn-danger">Usuń</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% for mag in weapon.magazines.all %}
+<div class="modal fade" id="editMagazineModal{{ mag.id }}" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content bg-dark text-white">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="edit_magazine">
+                <input type="hidden" name="magazine_id" value="{{ mag.id }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edytuj magazynek</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Pojemność (rds)</label>
+                        <input type="number" name="capacity" class="form-control" value="{{ mag.capacity }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Producent</label>
+                        <input type="text" name="manufacturer" class="form-control" value="{{ mag.manufacturer|default:'' }}">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-light">Zapisz</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="deleteMagazineModal{{ mag.id }}" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content bg-dark text-white">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="delete_magazine">
+                <input type="hidden" name="magazine_id" value="{{ mag.id }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Usuń magazynek</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Czy na pewno chcesz usunąć magazynek <strong>{{ mag.manufacturer|default:"N/A" }}</strong>?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuluj</button>
+                    <button type="submit" class="btn btn-danger">Usuń</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% for shoot in shootings %}
+<div class="modal fade" id="editShootingModal{{ shoot.id }}" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content bg-dark text-white">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="edit_shooting">
+                <input type="hidden" name="shooting_id" value="{{ shoot.id }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edytuj wpis strzelania</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Ilość wystrzelonych naboi</label>
+                        <input type="number" name="rounds" class="form-control" value="{{ shoot.rounds }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Data</label>
+                        <input type="date" name="date" class="form-control" value="{{ shoot.date|date:'Y-m-d' }}">
+                    </div>
+
+                    <div class="custom-control custom-checkbox mb-3">
+                        <input type="checkbox" class="custom-control-input" id="useSafeAmmoEdit{{ shoot.id }}" name="use_safe_ammo" {% if shoot.ammo_safe %}checked{% endif %} onchange="toggleAmmoSelectEdit({{ shoot.id }})">
+                        <label class="custom-control-label" for="useSafeAmmoEdit{{ shoot.id }}">Zdejmij ze stanu amunicji w szafie</label>
+                        {% if not shoot.ammo_safe and shoot.ammo_info %}
+                            <br><small class="text-info">Poprzednio: {{ shoot.ammo_info }} (Wpis z szafy usunięty)</small>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group" id="ammoSelectDivEdit{{ shoot.id }}" style="{% if not shoot.ammo_safe %}display: none;{% endif %}">
+                        <label>Wybierz amunicję</label>
+                        <select name="ammo_id" class="form-control">
+                            {% for ammo in ammo_inventory %}
+                                <option value="{{ ammo.id }}" {% if shoot.ammo_safe_id == ammo.id %}selected{% endif %}>{{ ammo.caliber.name }}: {{ ammo.manufacturer|default:"Nieznany" }} - {{ ammo.typ|default:"" }} ({{ ammo.qty }} szt.)</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-light">Zapisz</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="deleteShootingModal{{ shoot.id }}" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content bg-dark text-white">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="delete_shooting">
+                <input type="hidden" name="shooting_id" value="{{ shoot.id }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Usuń wpis strzelania</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Czy na pewno chcesz usunąć ten wpis strzelania ({{ shoot.rounds }} szt., {{ shoot.date|date:"d.m.Y" }})?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuluj</button>
+                    <button type="submit" class="btn btn-danger">Usuń</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% for cleaning in cleanings %}
+<div class="modal fade" id="editCleaningModal{{ cleaning.id }}" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content bg-dark text-white">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="edit_cleaning">
+                <input type="hidden" name="cleaning_id" value="{{ cleaning.id }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edytuj wpis czyszczenia</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Data</label>
+                        <input type="date" name="date" class="form-control" value="{{ cleaning.date|date:'Y-m-d' }}">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-light">Zapisz</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="deleteCleaningModal{{ cleaning.id }}" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content bg-dark text-white">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="delete_cleaning">
+                <input type="hidden" name="cleaning_id" value="{{ cleaning.id }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Usuń wpis czyszczenia</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Czy na pewno chcesz usunąć ten wpis czyszczenia ({{ cleaning.date|date:"d.m.Y" }})?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuluj</button>
+                    <button type="submit" class="btn btn-danger">Usuń</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+<div class="modal fade" id="deleteWeaponModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content bg-dark text-white">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="delete_weapon">
+                <div class="modal-header">
+                    <h5 class="modal-title">Usuń broń</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body text-left">
+                    <p>Czy na pewno chcesz usunąć broń <strong>{{ weapon.name }}</strong>?</p>
+                    <p class="text-danger small"><i class="fas fa-exclamation-triangle mr-1"></i> Ta operacja jest nieodwracalna. Wszystkie powiązane dane (strzelania, czyszczenia, magazynki, akcesoria) zostaną również usunięte.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuluj</button>
+                    <button type="submit" class="btn btn-danger">Usuń broń</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .btn-xs {
+        padding: 1px 5px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 3px;
+    }
+</style>
+{% endblock %}
+
+<script>
+function toggleAmmoSelect() {
+    var checkBox = document.getElementById("useSafeAmmo");
+    var ammoDiv = document.getElementById("ammoSelectDiv");
+    if (checkBox && ammoDiv) {
+        if (checkBox.checked == true){
+            ammoDiv.style.display = "block";
+        } else {
+            ammoDiv.style.display = "none";
+        }
+    }
+}
+
+function toggleAmmoSelectEdit(shootId) {
+    var checkBox = document.getElementById("useSafeAmmoEdit" + shootId);
+    var ammoDiv = document.getElementById("ammoSelectDivEdit" + shootId);
+    if (checkBox && ammoDiv) {
+        if (checkBox.checked == true){
+            ammoDiv.style.display = "block";
+        } else {
+            ammoDiv.style.display = "none";
+        }
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    toggleAmmoSelect();
+});
+</script>
