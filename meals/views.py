@@ -168,6 +168,7 @@ def meals(request, current=1):
     today_to_template = get_today().date()
     start = time.time()
     in_meals_list = True
+    _is_high_prot = False
     user_meals_options = MealOption.objects.filter(user=request.user, is_taken_to_generation=1).order_by('position')
     generated_user_meals_options = MealsList.objects.filter(user=request.user, current=current).order_by(
         'meal_option__position').values(
