@@ -35,7 +35,13 @@
                         </li>
                         <li class="list-group-item bg-transparent border-secondary d-flex justify-content-between">
                             <span class="text-muted">Kaliber:</span>
-                            <span>{{ weapon.caliber.name|default:"N/A" }}</span>
+                            <span>
+                                {% for cal in weapon.calibers.all %}
+                                {{ cal.name }}{% if not forloop.last %}, {% endif %}
+                                {% empty %}
+                                N/A
+                                {% endfor %}
+                            </span>
                         </li>
                         <li class="list-group-item bg-transparent border-secondary d-flex justify-content-between">
                             <span class="text-muted">Nr seryjny:</span>
@@ -141,6 +147,7 @@
                             <thead>
                                 <tr class="text-muted">
                                     <th>Data</th>
+                                    <th>Amunicja</th>
                                     <th class="text-right">Ilość</th>
                                     <th class="text-right">Akcje</th>
                                 </tr>
@@ -149,6 +156,17 @@
                                 {% for shoot in shootings %}
                                 <tr>
                                     <td>{{ shoot.date|date:"d.m.Y" }}</td>
+                                    <td>
+                                        {% if shoot.ammo_safe %}
+                                            <small>
+                                                {{ shoot.ammo_safe.manufacturer|default:"" }} 
+                                                {{ shoot.ammo_safe.typ|default:"" }}
+                                                {% if shoot.ammo_safe.grain %}{{ shoot.ammo_safe.grain }}gr{% endif %}
+                                            </small>
+                                        {% else %}
+                                            <span class="text-muted small">---</span>
+                                        {% endif %}
+                                    </td>
                                     <td class="text-right font-weight-bold">{{ shoot.rounds }}</td>
                                     <td class="text-right">
                                         <button class="btn btn-xs btn-outline-secondary mr-1" data-toggle="modal" data-target="#editShootingModal{{ shoot.id }}">
@@ -161,7 +179,7 @@
                                 </tr>
                                 {% empty %}
                                 <tr>
-                                    <td colspan="3" class="text-center text-muted font-italic">Brak wpisów</td>
+                                    <td colspan="4" class="text-center text-muted font-italic">Brak wpisów</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -248,12 +266,12 @@
                         </div>
                         <div class="form-group col-md-6">
                             <label>Kaliber</label>
-                            <select name="caliber" class="form-control">
-                                <option value="">---</option>
+                            <select name="caliber" class="form-control" multiple>
                                 {% for cal in calibers %}
-                                <option value="{{ cal.id }}" {% if weapon.caliber_id == cal.id %}selected{% endif %}>{{ cal.name }}</option>
+                                <option value="{{ cal.id }}" {% if cal in weapon.calibers.all %}selected{% endif %}>{{ cal.name }}</option>
                                 {% endfor %}
                             </select>
+                            <small class="form-text text-muted">Przytrzymaj Ctrl, aby wybrać kilka.</small>
                         </div>
                     </div>
                     <div class="form-group">
@@ -296,9 +314,18 @@
                         <label>Data</label>
                         <input type="date" name="date" class="form-control" value="{{ today|date:'Y-m-d' }}">
                     </div>
-                    <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" id="useSafeAmmo" name="use_safe_ammo" checked>
+                    <div class="custom-control custom-checkbox mb-3">
+                        <input type="checkbox" class="custom-control-input" id="useSafeAmmo" name="use_safe_ammo" checked onchange="toggleAmmoSelect()">
                         <label class="custom-control-label" for="useSafeAmmo">Zdejmij ze stanu amunicji w szafie</label>
+                    </div>
+
+                    <div class="form-group" id="ammoSelectDiv">
+                        <label>Wybierz amunicję</label>
+                        <select name="ammo_id" class="form-control">
+                            {% for ammo in ammo_inventory %}
+                                <option value="{{ ammo.id }}">{{ ammo.caliber.name }}: {{ ammo.manufacturer|default:"Nieznany" }} - {{ ammo.typ|default:"" }} ({{ ammo.qty }} szt.)</option>
+                            {% endfor %}
+                        </select>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -547,6 +574,20 @@
                         <label>Data</label>
                         <input type="date" name="date" class="form-control" value="{{ shoot.date|date:'Y-m-d' }}">
                     </div>
+
+                    <div class="custom-control custom-checkbox mb-3">
+                        <input type="checkbox" class="custom-control-input" id="useSafeAmmoEdit{{ shoot.id }}" name="use_safe_ammo" {% if shoot.ammo_safe %}checked{% endif %} onchange="toggleAmmoSelectEdit({{ shoot.id }})">
+                        <label class="custom-control-label" for="useSafeAmmoEdit{{ shoot.id }}">Zdejmij ze stanu amunicji w szafie</label>
+                    </div>
+
+                    <div class="form-group" id="ammoSelectDivEdit{{ shoot.id }}" style="{% if not shoot.ammo_safe %}display: none;{% endif %}">
+                        <label>Wybierz amunicję</label>
+                        <select name="ammo_id" class="form-control">
+                            {% for ammo in ammo_inventory %}
+                                <option value="{{ ammo.id }}" {% if shoot.ammo_safe_id == ammo.id %}selected{% endif %}>{{ ammo.caliber.name }}: {{ ammo.manufacturer|default:"Nieznany" }} - {{ ammo.typ|default:"" }} ({{ ammo.qty }} szt.)</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-light">Zapisz</button>
@@ -667,3 +708,33 @@
     }
 </style>
 {% endblock %}
+
+<script>
+function toggleAmmoSelect() {
+    var checkBox = document.getElementById("useSafeAmmo");
+    var ammoDiv = document.getElementById("ammoSelectDiv");
+    if (checkBox && ammoDiv) {
+        if (checkBox.checked == true){
+            ammoDiv.style.display = "block";
+        } else {
+            ammoDiv.style.display = "none";
+        }
+    }
+}
+
+function toggleAmmoSelectEdit(shootId) {
+    var checkBox = document.getElementById("useSafeAmmoEdit" + shootId);
+    var ammoDiv = document.getElementById("ammoSelectDivEdit" + shootId);
+    if (checkBox && ammoDiv) {
+        if (checkBox.checked == true){
+            ammoDiv.style.display = "block";
+        } else {
+            ammoDiv.style.display = "none";
+        }
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    toggleAmmoSelect();
+});
+</script>

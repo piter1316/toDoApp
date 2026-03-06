@@ -13,18 +13,19 @@ def gunsafe_home(request):
         if action == 'add_weapon':
             name = request.POST.get('name')
             type_id = request.POST.get('weapon_type')
-            caliber_id = request.POST.get('caliber')
+            caliber_ids = request.POST.getlist('caliber')
             serial_no = request.POST.get('serial_no')
             action_type = request.POST.get('action_type')
             
-            Weapon.objects.create(
+            weapon = Weapon.objects.create(
                 user=request.user,
                 name=name,
                 weapon_type_id=type_id if type_id else None,
-                caliber_id=caliber_id if caliber_id else None,
                 serial_no=serial_no,
                 action=action_type
             )
+            if caliber_ids:
+                weapon.calibers.set(caliber_ids)
 
         elif action == 'edit_weapon':
             weapon_id = request.POST.get('weapon_id')
@@ -33,8 +34,8 @@ def gunsafe_home(request):
             weapon.name = request.POST.get('name')
             type_id = request.POST.get('weapon_type')
             weapon.weapon_type_id = type_id if type_id else None
-            caliber_id = request.POST.get('caliber')
-            weapon.caliber_id = caliber_id if caliber_id else None
+            caliber_ids = request.POST.getlist('caliber')
+            weapon.calibers.set(caliber_ids)
             weapon.serial_no = request.POST.get('serial_no')
             weapon.action = request.POST.get('action_type')
             weapon.save()
@@ -44,6 +45,7 @@ def gunsafe_home(request):
             rounds = int(request.POST.get('rounds', 0))
             shooting_date = request.POST.get('date') or date.today()
             use_safe_ammo = request.POST.get('use_safe_ammo') == 'on'
+            ammo_id = request.POST.get('ammo_id')
             
             weapon = get_object_or_404(Weapon, id=weapon_id, user=request.user)
             Shooting.objects.create(weapon=weapon, rounds=rounds, date=shooting_date)
@@ -51,9 +53,14 @@ def gunsafe_home(request):
             weapon.total_rounds_fired += rounds
             weapon.save()
             
-            if use_safe_ammo and weapon.caliber:
-                # Odejmij od amunicji w szafie (najpierw od dowolnej dostępnej tego kalibru)
-                ammo = AmmoSafe.objects.filter(user=request.user, caliber=weapon.caliber).first()
+            if use_safe_ammo and weapon.calibers.exists():
+                # Odejmij od amunicji w szafie
+                if ammo_id:
+                    ammo = AmmoSafe.objects.filter(id=ammo_id, user=request.user).first()
+                else:
+                    # Fallback do pierwszej dostępnej (jeśli id nie przekazano)
+                    ammo = AmmoSafe.objects.filter(user=request.user, caliber__in=weapon.calibers.all()).first()
+                
                 if ammo:
                     ammo.qty = max(0, ammo.qty - rounds)
                     ammo.save()
@@ -67,12 +74,16 @@ def gunsafe_home(request):
         elif action == 'add_ammo':
             caliber_id = request.POST.get('caliber_id')
             manufacturer = request.POST.get('manufacturer')
+            typ = request.POST.get('typ')
+            grain = request.POST.get('grain')
             qty = int(request.POST.get('qty', 0))
             
             ammo, created = AmmoSafe.objects.get_or_create(
                 user=request.user,
                 caliber_id=caliber_id,
                 manufacturer=manufacturer,
+                typ=typ,
+                grain=grain if grain else None,
                 defaults={'qty': qty}
             )
             if not created:
@@ -108,16 +119,24 @@ def gunsafe_home(request):
 
         return redirect('gunsafe:gunsafe_home')
 
-    weapons = Weapon.objects.filter(user=request.user).select_related('weapon_type', 'caliber').prefetch_related('magazines', 'accessories', 'shootings', 'cleanings')
+    weapons = Weapon.objects.filter(user=request.user).select_related('weapon_type').prefetch_related('calibers', 'magazines', 'accessories', 'shootings', 'cleanings')
     ammo_inventory = AmmoSafe.objects.filter(user=request.user).select_related('caliber')
     weapon_types = WeaponType.objects.all()
     calibers = Caliber.objects.all()
+
+    # Sumy po kalibrze
+    ammo_by_caliber = AmmoSafe.objects.filter(user=request.user).values('caliber__name').annotate(total_qty=Sum('qty')).order_by('caliber__name')
+    
+    # Całkowita suma wszystkich pocisków
+    total_ammo = ammo_inventory.aggregate(Sum('qty'))['qty__sum'] or 0
 
     context = {
         'weapons': weapons,
         'ammo_inventory': ammo_inventory,
         'weapon_types': weapon_types,
         'calibers': calibers,
+        'ammo_by_caliber': ammo_by_caliber,
+        'total_ammo': total_ammo,
         'today': date.today(),
     }
     return render(request, 'gunsafe/home.html', context)
@@ -133,7 +152,8 @@ def weapon_details(request, weapon_id):
         if action == 'edit_weapon_details':
             weapon.name = request.POST.get('name')
             weapon.weapon_type_id = request.POST.get('weapon_type') or None
-            weapon.caliber_id = request.POST.get('caliber') or None
+            caliber_ids = request.POST.getlist('caliber')
+            weapon.calibers.set(caliber_ids)
             weapon.serial_no = request.POST.get('serial_no')
             weapon.action = request.POST.get('action_type')
             weapon.save()
@@ -142,9 +162,33 @@ def weapon_details(request, weapon_id):
             shooting_id = request.POST.get('shooting_id')
             shooting = get_object_or_404(Shooting, id=shooting_id, weapon=weapon)
             old_rounds = shooting.rounds
+            old_ammo_safe = shooting.ammo_safe
+            
             new_rounds = int(request.POST.get('rounds', 0))
+            use_safe_ammo = request.POST.get('use_safe_ammo') == 'on'
+            new_ammo_id = request.POST.get('ammo_id')
+            
+            # Koryguj stany amunicji
+            # 1. Zwróć starą amunicję, jeśli była
+            if old_ammo_safe:
+                old_ammo_safe.qty += old_rounds
+                old_ammo_safe.save()
+            
+            # 2. Pobierz nową amunicję, jeśli zaznaczono
+            new_ammo_safe = None
+            if use_safe_ammo and weapon.calibers.exists():
+                if new_ammo_id:
+                    new_ammo_safe = AmmoSafe.objects.filter(id=new_ammo_id, user=request.user).first()
+                else:
+                    new_ammo_safe = AmmoSafe.objects.filter(user=request.user, caliber__in=weapon.calibers.all()).first()
+                
+                if new_ammo_safe:
+                    new_ammo_safe.qty = max(0, new_ammo_safe.qty - new_rounds)
+                    new_ammo_safe.save()
+
             shooting.rounds = new_rounds
             shooting.date = request.POST.get('date') or date.today()
+            shooting.ammo_safe = new_ammo_safe
             shooting.save()
 
             weapon.total_rounds_fired = weapon.total_rounds_fired - old_rounds + new_rounds
@@ -153,6 +197,12 @@ def weapon_details(request, weapon_id):
         elif action == 'delete_shooting':
             shooting_id = request.POST.get('shooting_id')
             shooting = get_object_or_404(Shooting, id=shooting_id, weapon=weapon)
+            
+            # Zwróć amunicję do szafy, jeśli była powiązana
+            if shooting.ammo_safe:
+                shooting.ammo_safe.qty += shooting.rounds
+                shooting.ammo_safe.save()
+            
             weapon.total_rounds_fired -= shooting.rounds
             weapon.save()
             shooting.delete()
@@ -197,14 +247,22 @@ def weapon_details(request, weapon_id):
             rounds = int(request.POST.get('rounds', 0))
             shooting_date = request.POST.get('date') or date.today()
             use_safe_ammo = request.POST.get('use_safe_ammo') == 'on'
-            Shooting.objects.create(weapon=weapon, rounds=rounds, date=shooting_date)
+            ammo_id = request.POST.get('ammo_id')
+            ammo_safe = None
+
+            if use_safe_ammo and weapon.calibers.exists():
+                if ammo_id:
+                    ammo_safe = AmmoSafe.objects.filter(id=ammo_id, user=request.user).first()
+                else:
+                    ammo_safe = AmmoSafe.objects.filter(user=request.user, caliber__in=weapon.calibers.all()).first()
+                
+                if ammo_safe:
+                    ammo_safe.qty = max(0, ammo_safe.qty - rounds)
+                    ammo_safe.save()
+
+            Shooting.objects.create(weapon=weapon, rounds=rounds, date=shooting_date, ammo_safe=ammo_safe)
             weapon.total_rounds_fired += rounds
             weapon.save()
-            if use_safe_ammo and weapon.caliber:
-                ammo = AmmoSafe.objects.filter(user=request.user, caliber=weapon.caliber).first()
-                if ammo:
-                    ammo.qty = max(0, ammo.qty - rounds)
-                    ammo.save()
 
         elif action == 'add_cleaning':
             cleaning_date = request.POST.get('date') or date.today()
@@ -227,7 +285,7 @@ def weapon_details(request, weapon_id):
 
         return redirect('gunsafe:weapon_details', weapon_id=weapon.id)
 
-    shootings = weapon.shootings.all().order_by('-date')
+    shootings = weapon.shootings.select_related('ammo_safe').all().order_by('-date')
     cleanings = weapon.cleanings.all().order_by('-date')
     weapon_types = WeaponType.objects.all()
     calibers = Caliber.objects.all()
@@ -238,6 +296,7 @@ def weapon_details(request, weapon_id):
         'cleanings': cleanings,
         'weapon_types': weapon_types,
         'calibers': calibers,
+        'ammo_inventory': AmmoSafe.objects.filter(user=request.user, caliber__in=weapon.calibers.all()),
         'today': date.today(),
     }
     return render(request, 'gunsafe/weapon_details.html', context)

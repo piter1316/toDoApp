@@ -2,12 +2,12 @@
 {% block body %}
 {% load static %}
 
-<div class="container-fluid mt-4">
-    <div class="row mb-4">
+<div class="container-fluid mt-1 mt-md-2">
+    <div class="row mb-2 mb-md-2">
         <div class="col-md-8">
-            <h2 class="text-white"><i class="fas fa-vault mr-2"></i>Moja Szafa z Bronią</h2>
+            <h3 class="text-white"><i class="fas fa-vault mr-2"></i>Moja Szafa z Bronią</h3>
         </div>
-        <div class="col-md-4 text-md-right mt-3 mt-md-0">
+        <div class="col-md-4 text-md-right mt-2 mt-md-0">
             <button class="btn btn-light btn-block d-md-inline-block w-md-auto" data-toggle="modal" data-target="#addWeaponModal">
                 <i class="fas fa-plus mr-1"></i> Dodaj Broń
             </button>
@@ -15,11 +15,11 @@
     </div>
 
     <!-- Weapons Grid -->
-    <div class="row">
+    <div class="row mx-n1 mx-md-0">
         {% for weapon in weapons %}
-        <div class="col-md-6 col-lg-4 mb-4">
+        <div class="col-md-6 col-lg-4 px-1 px-md-3 mb-2 mb-md-4">
             <div class="card bg-dark text-white h-100 border-secondary shadow">
-                <div class="card-header border-secondary d-flex justify-content-between">
+                <div class="card-header border-secondary d-flex justify-content-between p-2 p-md-3">
                     <h5 class="mb-0">
                         <a href="{% url 'gunsafe:weapon_details' weapon.id %}" class="text-white text-decoration-none">
                             {{ weapon.name }}
@@ -32,40 +32,44 @@
                         <i class="fas {{ weapon.weapon_type.icon|default:'fa-gun' }} text-secondary"></i>
                     </div>
                 </div>
-                <div class="card-body">
-                    <div class="row mb-3">
+                <div class="card-body p-2 p-md-3">
+                    <div class="row mb-2">
                         <div class="col-6">
-                            <small class="d-block">Kaliber</small>
-                            <span class="badge badge-light">{{ weapon.caliber.name|default:"N/A" }}</span>
+                            <small class="d-block text-muted">Kaliber</small>
+                            {% for cal in weapon.calibers.all %}
+                            <span class="badge badge-light">{{ cal.name }}</span>
+                            {% empty %}
+                            <span class="badge badge-light">N/A</span>
+                            {% endfor %}
                         </div>
                         <div class="col-6">
-                            <small class="d-block">Licznik</small>
+                            <small class="d-block text-muted">Licznik</small>
                             <span class="badge badge-light">{{ weapon.total_rounds_fired }} szt.</span>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row mb-2">
                         <div class="col-6">
-                            <small class="d-block">Typ akcji</small>
+                            <small class="d-block text-muted">Typ akcji</small>
                             <span class="badge badge-light">{{ weapon.action|default:"N/A" }}</span>
                         </div>
                         <div class="col-6">
-                            <small class="d-block">Nr seryjny</small>
+                            <small class="d-block text-muted">Nr seryjny</small>
                             <span class="badge badge-light">{{ weapon.serial_no|default:"N/A" }}</span>
                         </div>
                     </div>
 
-                    <div class="row mb-3">
+                    <div class="row mb-2">
                         <div class="col-6">
-                            <small class="d-block">Ost. strzelanie</small>
+                            <small class="d-block text-muted">Ost. strzelanie</small>
                             <span class="badge badge-light">{{ weapon.last_shooting.date|date:"d.m.Y"|default:"---" }}</span>
                         </div>
                         <div class="col-6">
-                            <small class="d-block">Ost. czyszczenie</small>
+                            <small class="d-block text-muted">Ost. czyszczenie</small>
                             <span class="badge badge-light">{{ weapon.last_cleaning.date|date:"d.m.Y"|default:"---" }}</span>
                         </div>
                     </div>
 
-                    <div class="mb-2">
+                    <div class="mb-1">
                         <div class="d-flex justify-content-between align-items-center">
                             <small class="text-muted">Akcesoria:</small>
                             <button class="btn btn-xs btn-outline-secondary" data-toggle="modal" data-target="#addAccessoryModal{{ weapon.id }}"><i class="fas fa-plus"></i></button>
@@ -77,7 +81,7 @@
                         {% endfor %}
                     </div>
 
-                    <div class="mb-2">
+                    <div class="mb-1">
                         <div class="d-flex justify-content-between align-items-center">
                             <small class="text-muted">Magazynki:</small>
                             <button class="btn btn-xs btn-outline-secondary" data-toggle="modal" data-target="#addMagazineModal{{ weapon.id }}"><i class="fas fa-plus"></i></button>
@@ -89,7 +93,7 @@
                         {% endfor %}
                     </div>
                 </div>
-                <div class="card-footer border-secondary bg-transparent d-flex justify-content-between">
+                <div class="card-footer border-secondary bg-transparent d-flex justify-content-between p-2 p-md-3">
                     <button class="btn btn-sm btn-outline-light" data-toggle="modal" data-target="#cleaningModal{{ weapon.id }}">
                         <i class="fas fa-soap mr-1"></i> Czyszczenie
                     </button>
@@ -131,12 +135,12 @@
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label>Kaliber</label>
-                                    <select name="caliber" class="form-control">
-                                        <option value="">---</option>
+                                    <select name="caliber" class="form-control" multiple>
                                         {% for cal in calibers %}
-                                        <option value="{{ cal.id }}" {% if weapon.caliber_id == cal.id %}selected{% endif %}>{{ cal.name }}</option>
+                                        <option value="{{ cal.id }}" {% if cal in weapon.calibers.all %}selected{% endif %}>{{ cal.name }}</option>
                                         {% endfor %}
                                     </select>
+                                    <small class="form-text text-muted">Przytrzymaj Ctrl, aby wybrać kilka.</small>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -179,9 +183,20 @@
                                 <label>Data</label>
                                 <input type="date" name="date" class="form-control" value="{{ today|date:'Y-m-d' }}">
                             </div>
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="useSafeAmmo{{ weapon.id }}" name="use_safe_ammo" checked>
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input type="checkbox" class="custom-control-input" id="useSafeAmmo{{ weapon.id }}" name="use_safe_ammo" checked onchange="toggleAmmoSelect({{ weapon.id }})">
                                 <label class="custom-control-label" for="useSafeAmmo{{ weapon.id }}">Zdejmij ze stanu amunicji w szafie</label>
+                            </div>
+
+                            <div class="form-group" id="ammoSelectDiv{{ weapon.id }}">
+                                <label>Wybierz amunicję</label>
+                                <select name="ammo_id" class="form-control">
+                                    {% for ammo in ammo_inventory %}
+                                        {% if ammo.caliber in weapon.calibers.all %}
+                                            <option value="{{ ammo.id }}">{{ ammo.caliber.name }}: {{ ammo.manufacturer|default:"Nieznany" }} - {{ ammo.typ|default:"" }} ({{ ammo.qty }} szt.)</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -295,26 +310,43 @@
     </div>
 
     <!-- Ammo Inventory Section -->
-    <div class="card bg-dark text-white mb-4 border-secondary">
-        <div class="card-header border-secondary d-flex justify-content-between align-items-center">
-            <h5 class="mb-0"><i class="fas fa-box mr-2 text-light"></i>Stan Amunicji</h5>
+    <div class="card bg-dark text-white mb-2 mb-md-4 border-secondary">
+        <div class="card-header border-secondary d-flex flex-wrap justify-content-between align-items-center p-2 p-md-3">
+            <div class="d-flex flex-wrap align-items-center">
+                <h5 class="mb-0 mr-3"><i class="fas fa-box mr-2 text-light"></i>Stan Amunicji</h5>
+                {% if ammo_by_caliber %}
+                    {% for item in ammo_by_caliber %}
+                    <span class="badge badge-outline-light border border-secondary p-1 mr-1 my-1" style="font-size: 0.75rem;">
+                        {{ item.caliber__name }}: <span class="text-info font-weight-bold">{{ item.total_qty }}</span>
+                    </span>
+                    {% endfor %}
+                    <span class="badge badge-info border border-secondary p-1 my-1" style="font-size: 0.75rem;">
+                        Suma: <span class="font-weight-bold">{{ total_ammo }}</span>
+                    </span>
+                {% endif %}
+            </div>
             <button class="btn btn-sm btn-outline-light" data-toggle="modal" data-target="#addAmmoModal">
                 <i class="fas fa-cart-plus mr-1"></i> Dodaj amunicję
             </button>
         </div>
-        <div class="card-body">
-            <div class="row">
+        <div class="card-body p-2 p-md-3">
+
+            <div class="row mx-n1">
                 {% for ammo in ammo_inventory %}
-                <div class="col-md-3 mb-2">
-                    <div class="p-2 border border-secondary rounded bg-secondary shadow-sm">
-                        <div class="d-flex justify-content-between">
-                            <strong>{{ ammo.caliber.name }}</strong>
-                            <span class="badge badge-dark">{{ ammo.qty }} szt.</span>
+                <div class="col-6 col-md-3 px-1 mb-2">
+                    <div class="p-1 p-md-2 border border-secondary rounded bg-secondary shadow-sm h-100">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap">
+                            <strong class="small font-weight-bold">{{ ammo.caliber.name }}</strong>
+                            <span class="badge badge-dark p-1" style="font-size: 0.8rem;">{{ ammo.qty }} szt.</span>
                         </div>
-                        <div class="small text-light">{{ ammo.manufacturer|default:"N/A" }}</div>
-                        <div class="mt-2">
+                        <div style="font-size: 0.75rem;" class="text-light">
+                            {{ ammo.manufacturer|default:"N/A" }}
+                            {% if ammo.typ %} - {{ ammo.typ }}{% endif %}
+                            {% if ammo.grain %} - {{ ammo.grain }} gr{% endif %}
+                        </div>
+                        <div class="mt-1 d-flex">
                              <button class="btn btn-xs btn-outline-light py-0 px-1" data-toggle="modal" data-target="#correctAmmoModal{{ ammo.id }}">
-                                <i class="fas fa-edit"></i> korekta
+                                <i class="fas fa-edit"></i>
                              </button>
                              <button class="btn btn-xs btn-outline-dark py-0 px-1 ml-1" data-toggle="modal" data-target="#deleteAmmoModal{{ ammo.id }}">
                                 <i class="fas fa-trash"></i>
@@ -331,7 +363,7 @@
                                     <input type="hidden" name="action" value="ammo_correction">
                                     <input type="hidden" name="ammo_id" value="{{ ammo.id }}">
                                     <div class="modal-header">
-                                        <h5 class="modal-title">Korekta: {{ ammo.caliber.name }}</h5>
+                                        <h5 class="modal-title">Korekta: {{ ammo.caliber.name }} ({{ ammo.manufacturer|default:"N/A" }}{% if ammo.typ %} - {{ ammo.typ }}{% endif %}{% if ammo.grain %} - {{ ammo.grain }} gr{% endif %})</h5>
                                         <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
                                         </button>
@@ -365,7 +397,7 @@
                                         </button>
                                     </div>
                                     <div class="modal-body">
-                                        Czy na pewno chcesz usunąć wpis dla <strong>{{ ammo.caliber.name }}</strong> ({{ ammo.manufacturer|default:"N/A" }})?
+                                        Czy na pewno chcesz usunąć wpis dla <strong>{{ ammo.caliber.name }}</strong> ({{ ammo.manufacturer|default:"N/A" }}{% if ammo.typ %} - {{ ammo.typ }}{% endif %}{% if ammo.grain %} - {{ ammo.grain }} gr{% endif %})?
                                         <br>
                                         <small class="text-danger">Tej operacji nie można cofnąć.</small>
                                     </div>
@@ -416,12 +448,12 @@
                         </div>
                         <div class="form-group col-md-6">
                             <label>Kaliber</label>
-                            <select name="caliber" class="form-control">
-                                <option value="">---</option>
+                            <select name="caliber" class="form-control" multiple>
                                 {% for cal in calibers %}
                                 <option value="{{ cal.id }}">{{ cal.name }}</option>
                                 {% endfor %}
                             </select>
+                            <small class="form-text text-muted">Przytrzymaj Ctrl, aby wybrać kilka.</small>
                         </div>
                     </div>
                     <div class="form-group">
@@ -467,6 +499,16 @@
                         <label>Producent</label>
                         <input type="text" name="manufacturer" class="form-control" placeholder="np. S&B, Magtech">
                     </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-8">
+                            <label>Typ amunicji</label>
+                            <input type="text" name="typ" class="form-control" placeholder="np. FMJ, HP">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label>Grain</label>
+                            <input type="number" name="grain" class="form-control" placeholder="np. 124">
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label>Ilość (szt.)</label>
                         <input type="number" name="qty" class="form-control" required>
@@ -485,6 +527,22 @@
         .w-md-auto {
             width: 100% !important;
         }
+        .container-fluid {
+            padding-left: 5px !important;
+            padding-right: 5px !important;
+        }
+        .card-body {
+            padding: 0.5rem !important;
+        }
+        .card-header, .card-footer {
+            padding: 0.5rem !important;
+        }
+        h2 {
+            font-size: 1.5rem;
+        }
+        h5 {
+            font-size: 1.1rem;
+        }
     }
     .btn-xs {
         padding: 1px 5px;
@@ -498,3 +556,24 @@
 </style>
 
 {% endblock %}
+
+<script>
+function toggleAmmoSelect(weaponId) {
+    var checkBox = document.getElementById("useSafeAmmo" + weaponId);
+    var ammoDiv = document.getElementById("ammoSelectDiv" + weaponId);
+    if (checkBox && ammoDiv) {
+        if (checkBox.checked == true){
+            ammoDiv.style.display = "block";
+        } else {
+            ammoDiv.style.display = "none";
+        }
+    }
+}
+
+// Inicjalizacja dla wszystkich broni na home
+document.addEventListener("DOMContentLoaded", function() {
+    {% for weapon in weapons %}
+    toggleAmmoSelect({{ weapon.id }});
+    {% endfor %}
+});
+</script>
