@@ -168,172 +168,184 @@ def meals(request, current=1):
     today_to_template = get_today().date()
     start = time.time()
     in_meals_list = True
-    user_meals_options = MealOption.objects.filter(user=request.user, is_taken_to_generation=1).order_by('position')
-    generated_user_meals_options = MealsList.objects.filter(user=request.user, current=current).order_by(
+    
+    current = int(current)
+    user = request.user
+    
+    # Pobieramy opcje posiłków
+    all_user_meals_options = MealOption.objects.filter(user=user).order_by('position')
+    user_meals_options = all_user_meals_options.filter(is_taken_to_generation=1)
+    
+    # Pobieramy aktualną listę posiłków (MealsList)
+    meals_list = MealsList.objects.filter(user=user, current=current).select_related('meal', 'meal_option', 'extras')
+    
+    if not meals_list.exists():
+        context = {
+            'meals_list': meals_list,
+            'current': current,
+            'today': get_today(),
+        }
+        return render(request, 'meals/meals_list.html', context)
+
+    # Pobieramy unikalne opcje posiłków z aktualnej listy (dla nagłówków tabeli)
+    generated_user_meals_options = MealsList.objects.filter(user=user, current=current).order_by(
         'meal_option__position').values(
         'meal_option__meal_option', 'meal_option_id').distinct()
-    all_user_meals_options = MealOption.objects.filter(user=request.user).order_by('position')
-    meals_list = MealsList.objects.all().filter(user=request.user, current=current)
-    days = []
-    all_meals_in_option_dict = {}
-    all_meals = []
-    for option in all_user_meals_options:
-        meals_in_option = Meal.objects.filter(meal_option_id=option, user=request.user).order_by(
-            'name')
-        calories = 0
-        all_meals_in_option = []
-        for meal in meals_in_option:
-            all_meals.append(meal.id)
-            calories_sum = 0
-            all_meals_in_option.append([meal, calories_sum, ])
-        all_meals_in_option_dict[option] = all_meals_in_option
-    sql = """
-    SELECT
-        *
-    FROM
-        `meals_mealingredient`
-    INNER JOIN `meals_ingredient` ON (
-        `meals_mealingredient`.`ingredient_id_id` = `meals_ingredient`.`id`
+
+    # Optymalne pobranie wszystkich posiłków użytkownika z ich składnikami
+    all_meals_qs = Meal.objects.filter(user=user).prefetch_related(
+        'mealingredient_set__ingredient_id__division'
     )
-    WHERE
-        `meal_id_id` IN {}
-        """.format(str(all_meals).replace('[', '(').replace(']', ')'))
-    all_ingredients = MealIngredient.objects.raw(sql)
-
-    meal_ingredients_dict = {}
-    for meal in all_meals:
-        ingredients_for_meal = []
-        for ingredient in all_ingredients:
-            if meal == ingredient.meal_id_id:
-                ingredients_for_meal.append(ingredient)
-
-        meal_ingredients_dict[meal] = ingredients_for_meal
-    for meal, ingredients in meal_ingredients_dict.items():
-        kcal = []
-        prot = []
+    
+    # Słownik makroskładników dla wszystkich posiłków
+    meal_macros = {}
+    for meal in all_meals_qs:
+        kcal = 0
+        prot = 0
+        fat = 0
+        carb = 0
+        vegies = 0
+        fruits = 0
         short_expiry = []
-
-        for ingredient in ingredients:
-            if ingredient.short_expiry:
+        
+        for mi in meal.mealingredient_set.all():
+            ingr = mi.ingredient_id
+            q = mi.quantity
+            if ingr.short_expiry:
                 short_expiry.append(1)
+            
+            # Obliczenia
+            kcal += (ingr.calories_per_100_gram * q / 100)
+            prot += (ingr.protein_per_100_gram * q / 100)
+            fat += (ingr.fat_per_100_gram * q / 100)
+            carb += (ingr.carbohydrates_per_100_gram * q / 100)
+            
+            div_name = ingr.division.division_name.lower()
+            if 'warzywa' in div_name and ingr.name.lower() not in VEGIES_OUT:
+                vegies += q
+            if 'owoce' in div_name:
+                fruits += q
+        
+        is_hi_prot = is_hi_protein(float(kcal), float(prot))
+        meal_macros[meal.id] = {
+            'kcal': round(kcal),
+            'prot': round(prot),
+            'fat': round(fat),
+            'carb': round(carb),
+            'vegies': round(vegies),
+            'fruits': round(fruits),
+            'short_expiry': short_expiry,
+            'is_hi_protein': is_hi_prot,
+            'obj': meal
+        }
 
-            kcal.append((ingredient.calories_per_100_gram * ingredient.quantity / 100))
-            prot.append((ingredient.protein_per_100_gram * ingredient.quantity / 100))
-            _is_high_prot = is_hi_protein(float(sum(kcal)), float(sum(prot)))
-        for option, meals_in_option in all_meals_in_option_dict.items():
-            for m in meals_in_option:
-                if m[0].id == meal:
-                    m[1] = [round(sum(kcal)), short_expiry, _is_high_prot]
-    day_meal_option_meal_list = []
-    # table
+    # Budujemy all_meals_in_option_dict dla dropdownów (wybór posiłku)
+    meals_by_option = {}
+    for m_id, m_data in meal_macros.items():
+        opt_id = m_data['obj'].meal_option_id
+        if opt_id not in meals_by_option:
+            meals_by_option[opt_id] = []
+        meals_by_option[opt_id].append([m_data['obj'], [m_data['kcal'], m_data['short_expiry'], m_data['is_hi_protein']]])
+
+    all_meals_in_option_dict = {}
+    for option in all_user_meals_options:
+        meals_in_opt = meals_by_option.get(option.id, [])
+        # Sortujemy alfabetycznie po nazwie
+        meals_in_opt.sort(key=lambda x: x[0].name)
+        all_meals_in_option_dict[option] = meals_in_opt
+
+    # Budujemy strukturę tabeli (dni i posiłki)
+    days = []
     for item in meals_list:
-        while item.day not in days:
+        if item.day not in days:
             days.append(item.day)
-    day_calories = []
-    meals_on_day = MealsList.objects.select_related('meal').filter(user=request.user, current=current,
-                                                                   day__in=days).order_by('meal_option__position')
+    
+    day_meal_option_meal_list = []
+    
+    # Statystyki całościowe dla średniej
+    total_list_kcal = 0
+    total_list_prot = 0
+    total_list_fat = 0
+    total_list_carb = 0
+    total_list_vegies = 0
+    total_list_fruits = 0
+    
     for day in days:
-        # meals_on_day = MealsList.objects.select_related('meal').filter(user=request.user, current=current, day=day).order_by(
-        #     'meal_option__position')
-
         day_meals_list = []
-        meals = []
-        meal_ingredients = []
-        meal_protein = []
-        meal_fat = []
-        meal_carbohydrates = []
-        meal_vegies = []
-        meal_fruits = []
+        day_kcal = 0
+        day_prot = 0
+        day_fat = 0
+        day_carb = 0
+        day_vegies = 0
+        day_fruits = 0
+        
+        # Posiłki w danym dniu (z posortowanej listy meals_list)
+        meals_on_day = [m for m in meals_list if m.day == day]
+        # meals_on_day są już posortowane po meal_option__position dzięki order_by w QuerySet
+        
+        for ml_item in meals_on_day:
+            m_id = ml_item.meal_id
+            e_id = ml_item.extras_id
+            
+            # Dane posiłku głównego
+            m_macro = meal_macros.get(m_id, {'kcal':0, 'prot':0, 'fat':0, 'carb':0, 'vegies':0, 'fruits':0})
+            # Dane dodatku
+            e_macro = meal_macros.get(e_id, {'kcal':0, 'prot':0, 'fat':0, 'carb':0, 'vegies':0, 'fruits':0})
+            
+            day_kcal += m_macro['kcal'] + e_macro['kcal']
+            day_prot += m_macro['prot'] + e_macro['prot']
+            day_fat += m_macro['fat'] + e_macro['fat']
+            day_carb += m_macro['carb'] + e_macro['carb']
+            day_vegies += m_macro['vegies'] + e_macro['vegies']
+            day_fruits += m_macro['fruits'] + e_macro['fruits']
+            
+            # Dodajemy do listy posiłków dnia w formacie oczekiwanym przez template
+            day_meals_list.append({ml_item: all_meals_in_option_dict.get(ml_item.meal_option)})
 
-        for meal in meals_on_day:
-            if day == meal.day:
-                all_meals_to_select = []
-                calories = 0
-                protein = 0
-                fat = 0
-                carbohydrates = 0
-                vegies = 0
-                fruits = 0
-                ingredients_list = []
-                tmp_extra = []
-                if meal.meal_id:
-                    ingredients_list = meal_ingredients_dict[meal.meal_id]
-                    if meal.extras:
-                        ingredients_list.extend(meal_ingredients_dict[meal.extras.id])
-                        tmp_extra = meal_ingredients_dict[meal.extras.id]
-                else:
-                    if meal.extras:
-                        ingredients_list.extend(meal_ingredients_dict[meal.extras.id])
-                        tmp_extra = meal_ingredients_dict[meal.extras.id]
-                    else:
-                        calories = 0
+        day_meal_option_meal_list.append([
+            {day: day_meals_list},
+            [round(day_kcal), round(day_prot), round(day_fat), round(day_carb)],
+            round(day_vegies),
+            round(day_fruits)
+        ])
+        
+        total_list_kcal += day_kcal
+        total_list_prot += day_prot
+        total_list_fat += day_fat
+        total_list_carb += day_carb
+        total_list_vegies += day_vegies
+        total_list_fruits += day_fruits
 
-                for ingr in ingredients_list:
-                    if ('warzywa' in ingr.ingredient_id.division.division_name.lower()
-                            and ingr.name.lower() not in VEGIES_OUT):
-                        vegies += ingr.quantity
-                    if 'owoce' in ingr.ingredient_id.division.division_name.lower():
-                        fruits += ingr.quantity
-                    calories += (ingr.quantity / 100) * int(ingr.calories_per_100_gram)
-                    protein += (ingr.quantity / 100) * int(ingr.protein_per_100_gram)
-                    fat += (ingr.quantity / 100) * int(ingr.fat_per_100_gram)
-                    carbohydrates += (ingr.quantity / 100) * int(ingr.carbohydrates_per_100_gram)
-                    meal_ingredients.append(round(calories, 0))
-                    meal_protein.append(round(protein, 0))
-                    meal_fat.append(round(fat, 0))
-                    meal_carbohydrates.append(round(carbohydrates, 0))
-                    meal_vegies.append(round(vegies, 0))
-                    meal_fruits.append(round(fruits, 0))
-                    calories = 0
-                    protein = 0
-                    fat = 0
-                    carbohydrates = 0
-                    vegies = 0
-                    fruits = 0
-                meals.append(meal.meal_id)
-                day_meals_list.append({meal: all_meals_in_option_dict.get(meal.meal_option)})
-                for item in tmp_extra:
-                    if item in ingredients_list:
-                        ingredients_list.remove(item)
-        day_calories.append({day: [round(sum(meal_ingredients), 0)]})
-        day_meal_option_meal_list.append(
-            [{day: day_meals_list},
-             [round(sum(meal_ingredients)), round(sum(meal_protein)), round(sum(meal_fat)),
-              round(sum(meal_carbohydrates))], sum(meal_vegies), sum(meal_fruits)])
+    # Obliczanie średnich
+    no_of_days = len(days) if days else 1
+    average_clories_per_day = round(total_list_kcal / no_of_days)
+    average_protein_per_day = round(total_list_prot / no_of_days)
+    average_fat_per_day = round(total_list_fat / no_of_days)
+    average_carb_per_day = round(total_list_carb / no_of_days)
+    average_vegies_per_day = round(total_list_vegies / no_of_days)
+    average_fruits_per_day = round(total_list_fruits / no_of_days)
+
+    # Pozostałe dane do contextu
     maximum_no_of_days_to_generate = get_maximum_no_of_days(request)
     maximum_no_of_days_to_generate_no_repeat = get_maximum_no_of_days_no_repeat(request)
+    
     first_day_input_list = {}
     days_of_the_week = Week.objects.all()
     today_weekday = get_today().weekday()
     dates_counter = 0
     for i in range(today_weekday, today_weekday + 7):
-        if i > 6:
-            first_day_input_list[days_of_the_week[i - 7]] = (get_today() + datetime.timedelta(days=dates_counter),
-                                                             days_of_the_week.filter(
-                                                                 day_of_the_week=days_of_the_week[i - 7]))
-        else:
-            first_day_input_list[days_of_the_week[i]] = (get_today() + datetime.timedelta(days=dates_counter),
-                                                         days_of_the_week.filter(day_of_the_week=days_of_the_week[i]))
+        idx = i if i <= 6 else i - 7
+        first_day_input_list[days_of_the_week[idx]] = (
+            get_today() + datetime.timedelta(days=dates_counter),
+            days_of_the_week.filter(day_of_the_week=days_of_the_week[idx])
+        )
         dates_counter += 1
-    option_meals_dict = {}
-    user_meals_options_select = []
-    for option in user_meals_options_select:
-        option_meals_list = []
-        meals_in_option = Meal.objects.select_related('meal_option_id').filter(meal_option=option['meal_option_id'],
-                                                                               user=request.user)
-        meal_option = option
-        for meal in meals_in_option:
-            option_meals_list.append(meal)
-        option_meals_dict[meal_option] = option_meals_list
 
-    # average calories for whole mealsList
-    average_clories_per_day, average_protein_per_day, average_carb_per_day, average_fat_per_day, average_vegies_per_day, average_fruits_per_day = average_for_whole_list(
-        meals_list, generated_user_meals_options, request.user, current, meal_ingredients_dict)
     context = {
         'meals_list': meals_list,
         'user_meals_options': user_meals_options,
         'generated_user_meals_options': generated_user_meals_options,
-        'day_meal_option_meal_list': day_meal_option_meal_list,  # dictionary to build table in template
+        'day_meal_option_meal_list': day_meal_option_meal_list,
         'maximum_no_of_days_to_generate': maximum_no_of_days_to_generate,
         'maximum_no_of_days_to_generate_default': maximum_no_of_days_to_generate * 2,
         'in_meals_list': in_meals_list,
@@ -345,12 +357,11 @@ def meals(request, current=1):
         'average_carb_per_day': average_carb_per_day,
         'average_vegies_per_day': average_vegies_per_day,
         'average_fruits_per_day': average_fruits_per_day,
-        'current': int(current),
+        'current': current,
         'all_meals_in_option_dict': all_meals_in_option_dict,
         'today_to_template': today_to_template,
         'today': get_today(),
     }
-    end = time.time()
     return render(request, 'meals/meals_list.html', context)
 
 
@@ -359,32 +370,52 @@ def edit_meals(request):
     form = MealForm(request.POST)
     form_ingredient = IngredientForm(request.POST)
     form_meal_option = MealOptionForm(request.POST)
-    meals_options = MealOption.objects.filter(user=request.user).order_by('position')
-    meals_options_dict = {}
+    user = request.user
+    
+    # Pobieramy opcje posiłków i jednostki
+    meals_options = MealOption.objects.filter(user=user).order_by('position')
     units = Unit.objects.all()
-    for i in range(len(meals_options)):
-        meals = []
-        meals_in_meals_options = MealIngredient.objects.select_related('meal_id').select_related(
-            'ingredient_id').filter(meal_id__meal_option=meals_options[i]).order_by('meal_id__name')
-        meals_tmp = Meal.objects.filter(meal_option=meals_options[i]).order_by('name')
-        for meal_tmp in meals_tmp:
-            ingredients = []
-            for meal in meals_in_meals_options:
-                if meal_tmp == meal.meal_id:
-                    ingredients.append(meal)
-            calories = 0
-            protein = 0
-            fat = 0
-            carbohydrates = 0
-            for ingr in ingredients:
-                calories += (ingr.quantity) / 100 * int(ingr.ingredient_id.calories_per_100_gram)
-                protein += (ingr.quantity / 100) * int(ingr.ingredient_id.protein_per_100_gram)
-                fat += (ingr.quantity / 100) * int(ingr.ingredient_id.fat_per_100_gram)
-                carbohydrates += (ingr.quantity / 100) * int(ingr.ingredient_id.carbohydrates_per_100_gram)
-            _is_high_prot = is_hi_protein(float(calories), float(protein))
-            meals.append([meal_tmp, [round(calories), round(protein), round(fat), round(carbohydrates), _is_high_prot]])
-        meals_options_dict[meals_options[i]] = meals
-
+    
+    # Optymalne pobranie wszystkich posiłków użytkownika z ich składnikami
+    all_meals_qs = Meal.objects.filter(user=user).prefetch_related(
+        'mealingredient_set__ingredient_id__division'
+    ).order_by('name')
+    
+    # Słownik posiłków zgrupowany po ID opcji
+    meals_by_option_id = {}
+    
+    for meal in all_meals_qs:
+        kcal = 0
+        prot = 0
+        fat = 0
+        carb = 0
+        
+        # Obliczamy makroskładniki dla posiłku
+        for mi in meal.mealingredient_set.all():
+            ingr = mi.ingredient_id
+            q = mi.quantity
+            kcal += (ingr.calories_per_100_gram * q / 100)
+            prot += (ingr.protein_per_100_gram * q / 100)
+            fat += (ingr.fat_per_100_gram * q / 100)
+            carb += (ingr.carbohydrates_per_100_gram * q / 100)
+            
+        _is_high_prot = is_hi_protein(float(kcal), float(prot))
+        
+        opt_id = meal.meal_option_id
+        if opt_id not in meals_by_option_id:
+            meals_by_option_id[opt_id] = []
+        
+        # Format danych: [meal_obj, [kcal, prot, fat, carb, hi_prot_flag]]
+        meals_by_option_id[opt_id].append([
+            meal, 
+            [round(kcal), round(prot), round(fat), round(carb), _is_high_prot]
+        ])
+    
+    # Budujemy finalny słownik dla template'u zachowując kolejność opcji
+    meals_options_dict = {}
+    for option in meals_options:
+        meals_options_dict[option] = meals_by_option_id.get(option.id, [])
+    
     context = {
         'form': form,
         'meals_options_dict': meals_options_dict,
@@ -741,7 +772,7 @@ def delete_selected_days(request):
 
 
 def edit_ingredients(request):
-    user_ingredients = Ingredient.objects.filter(user=request.user).order_by('name')
+    user_ingredients = Ingredient.objects.filter(user=request.user).select_related('shop').order_by('name')
     user_shops = Shop.objects.filter(user=request.user.id)
     user_divisions = ProductDivision.objects.filter(user=request.user).order_by('-priority')
     form = IngredientForm()

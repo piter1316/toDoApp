@@ -27,7 +27,7 @@
             <thead id="meals_list_head" class="thead-dark">
             <tr class="text-center text-light">
               <th nowrap class="px-auto py-0 text-center d-none d-xl-table-cell" scope="col" id="b-t-w">
-                <small class="d-none d-xl-inline id="b-t-w-small">
+                <small class="d-none d-xl-inline" id="b-t-w-small">
                 Średnio: {{average_clories_per_day}} kcal<br>
                 {{average_protein_per_day}}g<sup>b<span class="no_print">iałko</span></sup> |
                 {{average_fat_per_day}}g<sup>t<span class="no_print">łuszcze</span></sup> |
@@ -48,7 +48,7 @@
             {% for item in day_meal_option_meal_list %}
             {% for day, meals in item.0.items %}
             {% with day_as_list=day|split %}
-             <tr class="d-xl-none no_print {% if today_to_template|date:"Y-m-d" == day_as_list.1 %} bg-secondary text-light {% endif %}" id="tr_{{day}}">
+             <tr class="d-xl-none no_print {% if today_to_template|date:'Y-m-d' == day_as_list.1 %} bg-secondary text-light {% endif %}" id="tr_{{day}}">
                 <td  class="text-center" colspan="6" id="div_td_{{day}}">
                                     <input style="" type="checkbox" name="day" class="checkbox" value="{% for meal in meals %}{% for ml in meal%}{{ml.id}},{% endfor %}{% endfor %}">
 
@@ -64,7 +64,7 @@
                 {% endwith %}
             </tr>
             {% with day_as_list=day|split %}
-            <tr style="position:relative" class="text-center {% if today_to_template|date:"Y-m-d" == day_as_list.1 %} bg-secondary text-light {% endif %}" >
+            <tr style="position:relative" class="text-center {% if today_to_template|date:'Y-m-d' == day_as_list.1 %} bg-secondary text-light {% endif %}" >
               <th nowrap class="text-left pl-1 pr-0 d-none d-xl-block" id="th_{{day}}">
                 <div id="div_th_{{day}}">
                   <input style="text-align: center;vertical-align: middle;" type="checkbox" name="day" class="checkbox my-auto mr-1" value="{% for meal in meals %}{% for ml in meal%}{{ml.id}},{% endfor %}{% endfor %}">
