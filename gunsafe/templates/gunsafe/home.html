@@ -43,8 +43,9 @@
                             {% endfor %}
                         </div>
                         <div class="col-6">
-                            <small class="d-block text-muted">Licznik</small>
-                            <span class="badge badge-light">{{ weapon.total_rounds_fired }} szt.</span>
+                            <small class="d-block text-muted">Licznik (całk. / ost. czysz.)</small>
+                            <span class="badge badge-light">{{ weapon.total_rounds_fired }} szt.</span> /
+                            <span class="badge {% if weapon.rounds_since_cleaning > 200 %}badge-danger{% elif weapon.rounds_since_cleaning > 100 %}badge-warning{% else %}badge-info{% endif %}">{{ weapon.rounds_since_cleaning }} szt.</span>
                         </div>
                     </div>
                     <div class="row mb-2">

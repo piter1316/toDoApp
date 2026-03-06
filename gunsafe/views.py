@@ -46,24 +46,36 @@ def gunsafe_home(request):
             shooting_date = request.POST.get('date') or date.today()
             use_safe_ammo = request.POST.get('use_safe_ammo') == 'on'
             ammo_id = request.POST.get('ammo_id')
+            ammo_safe = None
             
             weapon = get_object_or_404(Weapon, id=weapon_id, user=request.user)
-            Shooting.objects.create(weapon=weapon, rounds=rounds, date=shooting_date)
-            
-            weapon.total_rounds_fired += rounds
-            weapon.save()
             
             if use_safe_ammo and weapon.calibers.exists():
                 # Odejmij od amunicji w szafie
                 if ammo_id:
-                    ammo = AmmoSafe.objects.filter(id=ammo_id, user=request.user).first()
+                    ammo_safe = AmmoSafe.objects.filter(id=ammo_id, user=request.user).first()
                 else:
                     # Fallback do pierwszej dostępnej (jeśli id nie przekazano)
-                    ammo = AmmoSafe.objects.filter(user=request.user, caliber__in=weapon.calibers.all()).first()
+                    ammo_safe = AmmoSafe.objects.filter(user=request.user, caliber__in=weapon.calibers.all()).first()
                 
-                if ammo:
-                    ammo.qty = max(0, ammo.qty - rounds)
-                    ammo.save()
+                if ammo_safe:
+                    ammo_safe.qty = max(0, ammo_safe.qty - rounds)
+                    ammo_safe.save()
+
+            ammo_info = ""
+            if ammo_safe:
+                parts = [
+                    ammo_safe.caliber.name,
+                    ammo_safe.manufacturer or "",
+                    ammo_safe.typ or "",
+                    f"{ammo_safe.grain}gr" if ammo_safe.grain else ""
+                ]
+                ammo_info = " ".join([p for p in parts if p]).strip()
+
+            Shooting.objects.create(weapon=weapon, rounds=rounds, date=shooting_date, ammo_safe=ammo_safe, ammo_info=ammo_info)
+            
+            weapon.total_rounds_fired += rounds
+            weapon.save()
 
         elif action == 'add_cleaning':
             weapon_id = request.POST.get('weapon_id')
@@ -120,9 +132,18 @@ def gunsafe_home(request):
         return redirect('gunsafe:gunsafe_home')
 
     weapons = Weapon.objects.filter(user=request.user).select_related('weapon_type').prefetch_related('calibers', 'magazines', 'accessories', 'shootings', 'cleanings')
-    ammo_inventory = AmmoSafe.objects.filter(user=request.user).select_related('caliber')
-    weapon_types = WeaponType.objects.all()
-    calibers = Caliber.objects.all()
+    
+    for weapon in weapons:
+        last_cleaning = weapon.last_cleaning
+        if last_cleaning:
+            rounds_since_cleaning = weapon.shootings.filter(date__gt=last_cleaning.date).aggregate(Sum('rounds'))['rounds__sum'] or 0
+        else:
+            rounds_since_cleaning = weapon.total_rounds_fired
+        weapon.rounds_since_cleaning = rounds_since_cleaning
+
+    ammo_inventory = AmmoSafe.objects.filter(user=request.user).select_related('caliber').order_by('caliber__name', 'manufacturer', 'typ', 'grain')
+    weapon_types = WeaponType.objects.all().order_by('name')
+    calibers = Caliber.objects.all().order_by('name')
 
     # Sumy po kalibrze
     ammo_by_caliber = AmmoSafe.objects.filter(user=request.user).values('caliber__name').annotate(total_qty=Sum('qty')).order_by('caliber__name')
@@ -186,9 +207,26 @@ def weapon_details(request, weapon_id):
                     new_ammo_safe.qty = max(0, new_ammo_safe.qty - new_rounds)
                     new_ammo_safe.save()
 
+            ammo_info = ""
+            if new_ammo_safe:
+                parts = [
+                    new_ammo_safe.caliber.name,
+                    new_ammo_safe.manufacturer or "",
+                    new_ammo_safe.typ or "",
+                    f"{new_ammo_safe.grain}gr" if new_ammo_safe.grain else ""
+                ]
+                ammo_info = " ".join([p for p in parts if p]).strip()
+            elif old_ammo_safe and not use_safe_ammo:
+                # Jeśli wcześniej była amunicja, a teraz nie chcemy zdejmować ze stanu,
+                # to zachowujemy stary opis jeśli istniał, lub czyścimy?
+                # User pewnie chce zachować info o tym co strzelał.
+                ammo_info = shooting.ammo_info
+
             shooting.rounds = new_rounds
             shooting.date = request.POST.get('date') or date.today()
             shooting.ammo_safe = new_ammo_safe
+            if ammo_info:
+                shooting.ammo_info = ammo_info
             shooting.save()
 
             weapon.total_rounds_fired = weapon.total_rounds_fired - old_rounds + new_rounds
@@ -260,7 +298,17 @@ def weapon_details(request, weapon_id):
                     ammo_safe.qty = max(0, ammo_safe.qty - rounds)
                     ammo_safe.save()
 
-            Shooting.objects.create(weapon=weapon, rounds=rounds, date=shooting_date, ammo_safe=ammo_safe)
+            ammo_info = ""
+            if ammo_safe:
+                parts = [
+                    ammo_safe.caliber.name,
+                    ammo_safe.manufacturer or "",
+                    ammo_safe.typ or "",
+                    f"{ammo_safe.grain}gr" if ammo_safe.grain else ""
+                ]
+                ammo_info = " ".join([p for p in parts if p]).strip()
+
+            Shooting.objects.create(weapon=weapon, rounds=rounds, date=shooting_date, ammo_safe=ammo_safe, ammo_info=ammo_info)
             weapon.total_rounds_fired += rounds
             weapon.save()
 
@@ -287,8 +335,15 @@ def weapon_details(request, weapon_id):
 
     shootings = weapon.shootings.select_related('ammo_safe').all().order_by('-date')
     cleanings = weapon.cleanings.all().order_by('-date')
-    weapon_types = WeaponType.objects.all()
-    calibers = Caliber.objects.all()
+    weapon_types = WeaponType.objects.all().order_by('name')
+    calibers = Caliber.objects.all().order_by('name')
+
+    last_cleaning = weapon.last_cleaning
+    if last_cleaning:
+        rounds_since_cleaning = weapon.shootings.filter(date__gt=last_cleaning.date).aggregate(Sum('rounds'))['rounds__sum'] or 0
+    else:
+        rounds_since_cleaning = weapon.total_rounds_fired
+    weapon.rounds_since_cleaning = rounds_since_cleaning
 
     context = {
         'weapon': weapon,
@@ -296,7 +351,7 @@ def weapon_details(request, weapon_id):
         'cleanings': cleanings,
         'weapon_types': weapon_types,
         'calibers': calibers,
-        'ammo_inventory': AmmoSafe.objects.filter(user=request.user, caliber__in=weapon.calibers.all()),
+        'ammo_inventory': AmmoSafe.objects.filter(user=request.user, caliber__in=weapon.calibers.all()).order_by('caliber__name', 'manufacturer', 'typ', 'grain'),
         'today': date.today(),
     }
     return render(request, 'gunsafe/weapon_details.html', context)

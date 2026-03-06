@@ -52,6 +52,7 @@ class Shooting(models.Model):
     date = models.DateField()
     rounds = models.PositiveIntegerField()
     ammo_safe = models.ForeignKey('AmmoSafe', on_delete=models.SET_NULL, null=True, blank=True, related_name='shootings')
+    ammo_info = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return f"{self.date} - {self.rounds} rds ({self.weapon.name})"
