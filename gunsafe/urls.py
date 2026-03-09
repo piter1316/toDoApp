@@ -7,5 +7,7 @@ urlpatterns = [
     path('gunsafe/archive', views.gunsafe_archive, name='gunsafe_archive'),
     path('gunsafe/weapon/<int:weapon_id>', views.weapon_details, name='weapon_details'),
     path('gunsafe/archive/weapon/<int:weapon_id>', views.archived_weapon_details, name='archived_weapon_details'),
+    path('gunsafe/timer', views.shooting_timer, name='shooting_timer'),
+    path('gunsafe/timer/save', views.save_timer_result, name='save_timer_result'),
 ]
 

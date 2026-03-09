@@ -1,8 +1,9 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Weapon, WeaponType, Caliber, Magazine, Accessory, AmmoSafe, Shooting, Cleaning
+from .models import Weapon, WeaponType, Caliber, Magazine, Accessory, AmmoSafe, Shooting, Cleaning, ShootingDrill, ShootingTimerResult
 from django.db.models import Sum
 from datetime import date
+from django.http import JsonResponse
 
 
 @login_required(login_url='/accounts/login')
@@ -416,3 +417,84 @@ def archived_weapon_details(request, weapon_id):
         'is_archive': True,
     }
     return render(request, 'gunsafe/archived_weapon_details.html', context)
+
+
+@login_required(login_url='/accounts/login')
+def shooting_timer(request):
+    weapons = Weapon.objects.filter(user=request.user, is_sold=False).order_by('name')
+    drills = ShootingDrill.objects.all().order_by('name')
+    
+    # Pobierz amunicję użytkownika do wyboru przy zapisie do historii
+    ammo_inventory = AmmoSafe.objects.filter(user=request.user).select_related('caliber').order_by('caliber__name')
+    
+    # Pobierz ostatnie wyniki
+    last_results = ShootingTimerResult.objects.filter(user=request.user).order_by('-date')[:10]
+    
+    return render(request, 'gunsafe/timer.html', {
+        'weapons': weapons,
+        'drills': drills,
+        'last_results': last_results,
+        'ammo_inventory': ammo_inventory,
+    })
+
+
+@login_required(login_url='/accounts/login')
+def save_timer_result(request):
+    if request.method == 'POST':
+        weapon_id = request.POST.get('weapon_id')
+        drill_id = request.POST.get('drill_id')
+        total_time = request.POST.get('total_time')
+        splits = request.POST.get('splits')
+        shots_count = request.POST.get('shots_count')
+        notes = request.POST.get('notes', '')
+        
+        if not weapon_id or not total_time or not shots_count:
+            return JsonResponse({'status': 'error', 'message': 'Brakujące dane'}, status=400)
+
+        weapon = get_object_or_404(Weapon, id=weapon_id, user=request.user)
+        drill = ShootingDrill.objects.filter(id=drill_id).first() if drill_id and drill_id != "" else None
+        
+        result = ShootingTimerResult.objects.create(
+            user=request.user,
+            weapon=weapon,
+            drill=drill,
+            total_time=float(total_time),
+            splits=splits,
+            shots_count=int(shots_count),
+            notes=notes
+        )
+        
+        # Opcjonalnie: Zapisz do historii strzelań i odejmij amunicję
+        if request.POST.get('add_to_history') == 'true':
+            ammo_id = request.POST.get('ammo_id')
+            rounds = int(shots_count)
+            ammo_safe = None
+            
+            if ammo_id:
+                ammo_safe = AmmoSafe.objects.filter(id=ammo_id, user=request.user).first()
+                if ammo_safe:
+                    ammo_safe.qty = max(0, ammo_safe.qty - rounds)
+                    ammo_safe.save()
+            
+            ammo_info = ""
+            if ammo_safe:
+                parts = [
+                    ammo_safe.caliber.name,
+                    ammo_safe.manufacturer or "",
+                    ammo_safe.typ or "",
+                    f"{ammo_safe.grain}gr" if ammo_safe.grain else ""
+                ]
+                ammo_info = " ".join([p for p in parts if p]).strip()
+
+            Shooting.objects.create(
+                weapon=weapon, 
+                rounds=rounds, 
+                date=date.today(), 
+                ammo_safe=ammo_safe, 
+                ammo_info=f"Timer: {drill.name if drill else 'Sesja'} | {ammo_info}".strip()
+            )
+            weapon.total_rounds_fired += rounds
+            weapon.save()
+
+        return JsonResponse({'status': 'success', 'result_id': result.id})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=400)

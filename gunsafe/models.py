@@ -99,3 +99,31 @@ class AmmoSafe(models.Model):
         if extra:
             return f"{' - '.join(parts)} ({', '.join(extra)})"
         return f"{' - '.join(parts)}"
+
+
+class ShootingDrill(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    required_shots = models.PositiveIntegerField(default=0, help_text="0 oznacza dowolną liczbę")
+    default_par_time = models.FloatField(null=True, blank=True, help_text="Czas graniczny w sekundach")
+
+    def __str__(self):
+        return self.name
+
+
+class ShootingTimerResult(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    weapon = models.ForeignKey(Weapon, on_delete=models.CASCADE, related_name='timer_results')
+    drill = models.ForeignKey(ShootingDrill, on_delete=models.SET_NULL, null=True, blank=True, related_name='results')
+    date = models.DateTimeField(auto_now_add=True)
+    total_time = models.FloatField()
+    splits = models.TextField()  # Przechowywane jako ciąg znaków rozdzielony przecinkami (np. "1.20,0.25,0.30")
+    shots_count = models.PositiveIntegerField()
+    notes = models.TextField(blank=True)
+
+    def __str__(self):
+        drill_name = self.drill.name if self.drill else "Dowolne"
+        return f"{self.date.strftime('%Y-%m-%d %H:%M')} - {drill_name} ({self.weapon.name})"
+
+    def get_splits_list(self):
+        return [float(s) for s in self.splits.split(',') if s]
