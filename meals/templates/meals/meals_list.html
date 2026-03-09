@@ -26,10 +26,10 @@
    #meals_list tbody tr {
       display: flex;
       flex-direction: column;
-      margin-bottom: 25px;
+      margin-bottom: 8px;
       background-color: #ffffff;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      border-radius: 10px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
       border: 1px solid #e1e5e8;
       /* overflow: hidden removed to prevent dropdown clipping */
   }
@@ -38,9 +38,9 @@
   @media (min-width: 1200px) {
       #meals_list tbody tr {
           display: grid;
-          grid-template-columns: 200px repeat(auto-fit, minmax(180px, 1fr));
-          gap: 15px;
-          padding: 15px;
+          grid-template-columns: 140px repeat(auto-fit, minmax(130px, 1fr));
+          gap: 6px;
+          padding: 6px;
           align-items: stretch;
       }
   }
@@ -50,10 +50,10 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: 15px;
+      padding: 4px 10px;
       background-color: #f8f9fa;
       border-right: 1px solid #eee;
-      border-bottom: 2px solid #eee;
+      border-bottom: 1px solid #eee;
   }
   @media (min-width: 1200px) {
       #meals_list tbody th {
@@ -65,7 +65,7 @@
   /* Morphing Table Cells (Meals) */
   #meals_list tbody td {
       display: block;
-      padding: 15px;
+      padding: 4px 6px;
       border: none;
       position: relative;
   }
@@ -107,15 +107,15 @@
   /* Macro pill styling */
   .macro-badge {
       display: inline-block;
-      min-width: 40px;
+      min-width: 32px;
       text-align: center;
-      padding: 2px 6px;
-      font-size: 0.75rem;
+      padding: 1px 4px;
+      font-size: 0.7rem;
       font-weight: bold;
       color: #555;
       background-color: #f4f6f8;
-      border-radius: 12px;
-      margin: 2px;
+      border-radius: 8px;
+      margin: 1px;
       border: 1px solid #e1e5e8;
   }
   
@@ -137,6 +137,13 @@
   td.dropdown {
       position: relative !important;
   }
+  
+  /* Compact Desktop Typography */
+  @media (min-width: 1200px) {
+      h5 { font-size: 1rem !important; }
+      h4 { font-size: 1.15rem !important; }
+      .macro-badge { min-width: 28px; font-size: 0.65rem; }
+  }
 </style>
 {% endblock %}
 
@@ -149,15 +156,15 @@
     {% include 'meals/menu.html' %}
     <div class="col-12 col-md-8 col-xl-10 px-0">
       {% if meals_list %}
-      <div class="alert alert-light text-center p-3 mb-4 rounded shadow-sm border border-secondary" id="mobileAverageContainer">
-        <h6 class="font-weight-bold text-muted mb-2">Średnio na dzień</h6>
+      <div class="alert alert-light text-center p-2 mb-2 rounded shadow-sm border border-secondary" id="mobileAverageContainer">
+        <h6 class="font-weight-bold text-muted mb-1" style="font-size: 0.85rem;">Średnio na dzień</h6>
         <div id="mobileAverage" class="d-flex flex-wrap justify-content-center">
-          <span class="badge badge-pill badge-light border border-secondary mx-1 mb-1 p-2 font-weight-bold text-dark" style="font-size: 0.9rem;">{{average_clories_per_day}} kcal</span>
-          <span class="badge badge-pill badge-light border border-secondary mx-1 mb-1 p-2 text-muted">{{average_protein_per_day}}g <small>białko</small></span>
-          <span class="badge badge-pill badge-light border border-secondary text-muted mx-1 mb-1 p-2">{{average_fat_per_day}}g <small>tłuszcze</small></span>
-          <span class="badge badge-pill badge-light border border-secondary text-muted mx-1 mb-1 p-2">{{average_carb_per_day}}g <small>węgle</small></span>
-          <span class="badge badge-pill badge-light border border-secondary text-muted mx-1 mb-1 p-2">{{average_vegies_per_day}}g <i class="fas fa-solid fa-carrot text-secondary"></i></span>
-          <span class="badge badge-pill badge-light border border-secondary text-muted mx-1 mb-1 p-2">{{average_fruits_per_day}}g <i class="fas fa-apple-alt text-secondary"></i></span>
+          <span class="badge badge-pill badge-light border border-secondary mx-1 mb-1 px-3 py-1 font-weight-bold text-dark" style="font-size: 0.85rem;">{{average_clories_per_day}} kcal</span>
+          <span class="badge badge-pill badge-light border border-secondary mx-1 mb-1 px-3 py-1 text-muted">{{average_protein_per_day}}g <small>białko</small></span>
+          <span class="badge badge-pill badge-light border border-secondary text-muted mx-1 mb-1 px-3 py-1">{{average_fat_per_day}}g <small>tłuszcze</small></span>
+          <span class="badge badge-pill badge-light border border-secondary text-muted mx-1 mb-1 px-3 py-1">{{average_carb_per_day}}g <small>węgle</small></span>
+          <span class="badge badge-pill badge-light border border-secondary text-muted mx-1 mb-1 px-3 py-1">{{average_vegies_per_day}}g <i class="fas fa-solid fa-carrot text-secondary"></i></span>
+          <span class="badge badge-pill badge-light border border-secondary text-muted mx-1 mb-1 px-3 py-1">{{average_fruits_per_day}}g <i class="fas fa-apple-alt text-secondary"></i></span>
         </div>
       </div>
         <div class="mb-5" id="meals_list" >
@@ -197,7 +204,7 @@
                     <input style="transform: scale(1.5);" type="checkbox" name="day" class="checkbox" value="{% for meal in meals %}{% for ml in meal%}{{ml.id}},{% endfor %}{% endfor %}">
                   </div>
                   
-                  <h4 class="text-primary font-weight-bold mb-2">{{item.1.0}} <small class="text-muted">kcal</small></h4>
+                  <h4 class="text-primary font-weight-bold mb-1" style="font-size: 1.25rem;">{{item.1.0}} <small class="text-muted" style="font-size: 0.8rem;">kcal</small></h4>
                   
                   <div class="d-flex justify-content-center flex-wrap px-2">
                     <span class="macro-badge" data-toggle="tooltip" title="Białko">{{item.1.1}}g <small>B</small></span>
@@ -220,9 +227,9 @@
                   </div>
                   
                   <span class="d-none d-xl-inline">
-                    <div class="mb-3 text-center">
-                        <h4 class="text-primary font-weight-bold mb-0">{{item.1.0}}</h4>
-                        <small class="text-muted text-uppercase tracking-wide">KCAL</small>
+                    <div class="mb-2 text-center">
+                        <h4 class="text-primary font-weight-bold mb-0" style="font-size: 1.3rem;">{{item.1.0}}</h4>
+                        <small class="text-muted text-uppercase tracking-wide" style="font-size: 0.7rem;">KCAL</small>
                     </div>
                     
                     <div class="d-flex justify-content-between flex-wrap text-center">
@@ -315,7 +322,7 @@
               </td>
               {% endfor %}
             </tr>
-            <tr class="p-1 m-1 no_print"><td class="p-0" colspan="6"><hr class="m-1"></td></tr>
+            <tr class="no_print"><td class="p-0" colspan="6"><div style="height: 2px;"></div></td></tr>
             {% endfor %}
             {% endfor %}
             </tbody>
@@ -389,17 +396,20 @@
 
 <script>
     function scrollToToday() {
-        var todayCard = $('.today-highlight-card').first();
+        // Target ONLY the visible highlight card (desktop/mobile toggle)
+        var todayCard = $('.today-highlight-card:visible').first();
         if (todayCard.length) {
-            $('html, body').animate({
-                scrollTop: todayCard.offset().top - 100
-            }, 600);
+            var offset = todayCard.offset().top - 70;
+            window.scrollTo({
+                top: offset,
+                behavior: 'smooth'
+            });
         }
     }
 
     $(document).ready(function() {
-        // Delay scroll slightly to ensure layout is stable
-        setTimeout(scrollToToday, 400);
+        // Trigger after layout settles
+        setTimeout(scrollToToday, 600);
     });
 </script>
 {% endblock %}
