@@ -1,0 +1,191 @@
+{% extends 'gunsafe/base.html' %}
+{% block body %}
+<div class="container mt-4 text-white opacity-75" style="filter: grayscale(0.5);">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="text-muted"><i class="fas fa-archive mr-2"></i>{{ weapon.name }} (Archiwum)</h2>
+        </div>
+        <div class="col-md-4 text-md-right">
+            <a href="{% url 'gunsafe:gunsafe_archive' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left mr-1"></i> Powrót do archiwum
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Informacje o broni -->
+        <div class="col-md-4 mb-4">
+            <div class="card bg-dark border-secondary shadow h-100">
+                <div class="card-header border-secondary d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-muted">Dane techniczne</h5>
+                    <span class="badge badge-danger">SPRZEDANA</span>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush bg-transparent">
+                        <li class="list-group-item bg-transparent border-secondary d-flex justify-content-between">
+                            <span class="text-muted">Typ broni:</span>
+                            <span class="text-muted">{{ weapon.weapon_type.name|default:"N/A" }}</span>
+                        </li>
+                        <li class="list-group-item bg-transparent border-secondary d-flex justify-content-between">
+                            <span class="text-muted">Kaliber:</span>
+                            <span class="text-muted">
+                                {% for cal in weapon.calibers.all %}
+                                {{ cal.name }}{% if not forloop.last %}, {% endif %}
+                                {% empty %}
+                                N/A
+                                {% endfor %}
+                            </span>
+                        </li>
+                        <li class="list-group-item bg-transparent border-secondary d-flex justify-content-between">
+                            <span class="text-muted">Nr seryjny:</span>
+                            <span class="text-muted">{{ weapon.serial_no|default:"N/A" }}</span>
+                        </li>
+                        <li class="list-group-item bg-transparent border-secondary d-flex justify-content-between">
+                            <span class="text-muted">Akcja:</span>
+                            <span class="text-muted">{{ weapon.action|default:"N/A" }}</span>
+                        </li>
+                        <li class="list-group-item bg-transparent border-secondary d-flex justify-content-between">
+                            <span class="text-muted">Nalot całkowity:</span>
+                            <span>
+                                <span class="badge badge-secondary">{{ weapon.total_rounds_fired }} szt.</span>
+                            </span>
+                        </li>
+                        <li class="list-group-item bg-transparent border-secondary d-flex justify-content-between">
+                            <span class="text-muted">Data zakupu:</span>
+                            <span class="text-muted">{{ weapon.purchase_date|date:"d.m.Y"|default:"---" }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Akcesoria i Magazynki -->
+        <div class="col-md-8 mb-4">
+            <div class="row">
+                <div class="col-md-6 mb-4 mb-md-0">
+                    <div class="card bg-dark border-secondary shadow h-100">
+                        <div class="card-header border-secondary">
+                            <h5 class="mb-0 text-muted">Akcesoria</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group list-group-flush bg-transparent">
+                                {% for acc in weapon.accessories.all %}
+                                <div class="list-group-item bg-transparent border-secondary px-0">
+                                    <h6 class="mb-1 text-muted">{{ acc.accessory_name }}</h6>
+                                    <p class="mb-1 small text-muted">{{ acc.description|default:"" }}</p>
+                                    {% if acc.date_bought %}
+                                    <small class="text-secondary">Kupiono: {{ acc.date_bought|date:"d.m.Y" }}</small>
+                                    {% endif %}
+                                </div>
+                                {% empty %}
+                                <p class="text-muted font-italic small">Brak akcesoriów</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card bg-dark border-secondary shadow h-100">
+                        <div class="card-header border-secondary">
+                            <h5 class="mb-0 text-muted">Magazynki</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group list-group-flush bg-transparent">
+                                {% for mag in weapon.magazines.all %}
+                                <div class="list-group-item bg-transparent border-secondary px-0 text-muted">
+                                    <span>{{ mag.manufacturer|default:"Producent nieznany" }} ({{ mag.capacity }} rd)</span>
+                                </div>
+                                {% empty %}
+                                <p class="text-muted font-italic small">Brak magazynków</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Tabela strzelań -->
+        <div class="col-md-6 mb-4">
+            <div class="card bg-dark border-secondary shadow">
+                <div class="card-header border-secondary bg-transparent">
+                    <h5 class="mb-0 text-muted"><i class="fas fa-bullseye mr-2"></i>Historia strzelań</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover mb-0">
+                            <thead>
+                                <tr class="text-muted">
+                                    <th>Data</th>
+                                    <th>Amunicja</th>
+                                    <th class="text-right">Ilość</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for shoot in shootings %}
+                                <tr class="text-muted">
+                                    <td>{{ shoot.date|date:"d.m.Y" }}</td>
+                                    <td>
+                                        {% if shoot.ammo_safe %}
+                                            <small>
+                                                {{ shoot.ammo_safe.manufacturer|default:"" }} 
+                                                {{ shoot.ammo_safe.typ|default:"" }}
+                                                {% if shoot.ammo_safe.grain %}{{ shoot.ammo_safe.grain }}gr{% endif %}
+                                            </small>
+                                        {% elif shoot.ammo_info %}
+                                            <small>{{ shoot.ammo_info }}</small>
+                                        {% else %}
+                                            <span class="text-muted small">---</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-right font-weight-bold">{{ shoot.rounds }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted font-italic">Brak wpisów</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabela czyszczeń -->
+        <div class="col-md-6 mb-4">
+            <div class="card bg-dark border-secondary shadow">
+                <div class="card-header border-secondary bg-transparent">
+                    <h5 class="mb-0 text-muted"><i class="fas fa-soap mr-2"></i>Historia czyszczenia</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover mb-0">
+                            <thead>
+                                <tr class="text-muted">
+                                    <th>Data</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cleaning in cleanings %}
+                                <tr class="text-muted">
+                                    <td>{{ cleaning.date|date:"d.m.Y" }}</td>
+                                    <td><span class="badge badge-secondary">Wyczyszczona</span></td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="2" class="text-center text-muted font-italic">Brak wpisów</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

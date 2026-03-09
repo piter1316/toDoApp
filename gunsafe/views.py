@@ -195,6 +195,9 @@ def gunsafe_archive(request):
 def weapon_details(request, weapon_id):
     weapon = get_object_or_404(Weapon, id=weapon_id, user=request.user)
 
+    if weapon.is_sold and request.method == 'GET':
+        return redirect('gunsafe:archived_weapon_details', weapon_id=weapon.id)
+
     if request.method == 'POST':
         action = request.POST.get('action')
 
@@ -385,3 +388,31 @@ def weapon_details(request, weapon_id):
         'today': date.today(),
     }
     return render(request, 'gunsafe/weapon_details.html', context)
+
+
+@login_required(login_url='/accounts/login')
+def archived_weapon_details(request, weapon_id):
+    weapon = get_object_or_404(Weapon, id=weapon_id, user=request.user, is_sold=True)
+
+    shootings = weapon.shootings.select_related('ammo_safe').all().order_by('-date')
+    cleanings = weapon.cleanings.all().order_by('-date')
+    weapon_types = WeaponType.objects.all().order_by('name')
+    calibers = Caliber.objects.all().order_by('name')
+
+    last_cleaning = weapon.last_cleaning
+    if last_cleaning:
+        rounds_since_cleaning = weapon.shootings.filter(date__gt=last_cleaning.date).aggregate(Sum('rounds'))['rounds__sum'] or 0
+    else:
+        rounds_since_cleaning = weapon.total_rounds_fired
+    weapon.rounds_since_cleaning = rounds_since_cleaning
+
+    context = {
+        'weapon': weapon,
+        'shootings': shootings,
+        'cleanings': cleanings,
+        'weapon_types': weapon_types,
+        'calibers': calibers,
+        'today': date.today(),
+        'is_archive': True,
+    }
+    return render(request, 'gunsafe/archived_weapon_details.html', context)
