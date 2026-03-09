@@ -50,12 +50,12 @@
         <li class="nav-item">
           <a class="nav-link" href="{% url 'todo:index' %}">To do</a>
         </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="jadlospis" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Jadłospis
+        <li class="nav-item dropdown d-flex align-items-center flex-wrap">
+          <a class="nav-link flex-grow-1 flex-lg-grow-0 pr-2" href="{% url 'meals:index' 1 %}">Jadłospis</a>
+          <a class="nav-link dropdown-toggle dropdown-toggle-split" href="#" id="jadlospis" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            &nbsp;<span class="sr-only">Rozwiń menu</span>
           </a>
           <div class="dropdown-menu mb-1" aria-labelledby="jadlospis">
-            <a class="dropdown-item" href="{% url 'meals:index' 1 %}">Jadłospis</a>
             <a class="dropdown-item" href="{% url 'meals:edit_meals' %}">Posiłki</a>
             <a class="dropdown-item" href="{% url 'meals:edit_ingredients' %}">Składniki/Sklepy</a>
           </div>
