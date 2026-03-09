@@ -484,34 +484,23 @@ $('body').on('change','input[name=only_hi_protein_in_select]',function(){
 })
 function refreshOnMealChange(form_id, thToRefresh, checkbox, data){
   $('#modalTitleSpan_' + form_id).replaceWith($('#modalTitleSpan_' + form_id, data));
-  $('#dropdownMeal_'+form_id).replaceWith($('#dropdownMeal_' + form_id,data));
-  $('#dropdownMenu_'+form_id).removeClass('show');
-  $('#span_'+form_id).replaceWith($('#span_' + form_id,data));
-  $('#b-t-w').replaceWith($('#b-t-w',data));
-  $('#mobileAverageContainer').replaceWith($('#mobileAverageContainer',data));
-  $('#tr_'+form_id).replaceWith($('#tr_'+form_id,data));
-  $('#editExtrasSmall_'+form_id).replaceWith($('#editExtrasSmall_'+form_id,data));
-  $('#' + thToRefresh.id).replaceWith($('#' + thToRefresh.id, data));
-  var tdToRefresh = thToRefresh.id.replace('th', 'td')
-  var trToRefresh = thToRefresh.id.replace('th', 'tr').replace('div_', '')
-  $('#' + trToRefresh).replaceWith($('#' + trToRefresh,data));
-  $('#' + trToRefresh).replaceWith($('#' + trToRefresh,data));
-  $('#editExtras_' + form_id).replaceWith($('#editExtras_' + form_id,data));
+  $('#td_' + form_id).replaceWith($('#td_' + form_id, data));
+  $('#b-t-w').replaceWith($('#b-t-w', data));
+  $('#mobileAverageContainer').replaceWith($('#mobileAverageContainer', data));
+  
+  if (thToRefresh) {
+    $('#' + thToRefresh.id).replaceWith($('#' + thToRefresh.id, data));
+    var trToRefresh = thToRefresh.id.replace('th', 'tr').replace('div_', '');
+    $('#' + trToRefresh).replaceWith($('#' + trToRefresh, data));
+  }
+  
   $(checkbox).fadeOut();
   $(checkbox).prop('checked', true);
-
 }
 
 function refreshModal(form_id, opt_id, data){
-$('#extrasSelect_'+ opt_id).val($('#extrasSelect_'+ opt_id + ' option:first').val());
-$('#dismiss_extras_modal').click();
-if ($('#editExtrasSmall_' + form_id).length) {
-        ;
-    } else {
-        $('#td_' + form_id).append($('#editExtrasSmallWrap_' + form_id,data));
-    }
-
-
+  $('#extrasSelect_'+ opt_id).val($('#extrasSelect_'+ opt_id + ' option:first').val());
+  $('#dismiss_extras_modal').click();
 }
 
 $('body').on('change','select[name="to_update"]',function(e){
@@ -527,15 +516,21 @@ $('body').on('change','select[name="to_update"]',function(e){
     }
     $('#dropdownMeal_'+form_id).text(newMealOptionName);
     var rows = $('input[name=day]');
+    var thToRefresh = null;
+    var checkbox = null;
     for (let i = 0; i < rows.length; i++) {
       var row = rows[i]
       if (row.value.includes(form_id)){
-        var thToRefresh = row.parentNode
+        thToRefresh = $(row).closest('th')[0] || $(row).closest('tr').find('th')[0];
+        if(!thToRefresh && $(row).closest('td').length > 0) {
+            var tr = $(row).closest('tr');
+            thToRefresh = tr.prev().find('th')[0] || tr.next().find('th')[0] || tr.find('th')[0];
+        }
         var checkboxCheck = $(row);
         if($(checkboxCheck).is(':checked')){
-        var checkbox = row;
+          checkbox = row;
         }
-        }
+      }
     }
 
     $.ajax({
@@ -566,15 +561,21 @@ $('body').on('change','select[name="to_update"]',function(e){
     }
     $('#dropdownMeal_'+form_id).text(newMealOptionName);
     var rows = $('input[name=day]');
+    var thToRefresh = null;
+    var checkbox = null;
     for (let i = 0; i < rows.length; i++) {
       var row = rows[i]
       if (row.value.includes(form_id)){
-        var thToRefresh = row.parentNode
+        thToRefresh = $(row).closest('th')[0] || $(row).closest('tr').find('th')[0];
+        if(!thToRefresh && $(row).closest('td').length > 0) {
+            var tr = $(row).closest('tr');
+            thToRefresh = tr.prev().find('th')[0] || tr.next().find('th')[0] || tr.find('th')[0];
+        }
         var checkboxCheck = $(row);
         if($(checkboxCheck).is(':checked')){
-        var checkbox = row;
+          checkbox = row;
         }
-        }
+      }
     }
     var option = $('#option_id').val();
     console.log(option)
@@ -608,15 +609,21 @@ $('body').on('change','select[name="to_update"]',function(e){
     }
     $('#dropdownMeal_'+form_id).text(newMealOptionName);
     var rows = $('input[name=day]');
+    var thToRefresh = null;
+    var checkbox = null;
     for (let i = 0; i < rows.length; i++) {
       var row = rows[i]
       if (row.value.includes(form_id)){
-        var thToRefresh = row.parentNode
+        thToRefresh = $(row).closest('th')[0] || $(row).closest('tr').find('th')[0];
+        if(!thToRefresh && $(row).closest('td').length > 0) {
+            var tr = $(row).closest('tr');
+            thToRefresh = tr.prev().find('th')[0] || tr.next().find('th')[0] || tr.find('th')[0];
+        }
         var checkboxCheck = $(row);
         if($(checkboxCheck).is(':checked')){
-        var checkbox = row;
+          checkbox = row;
         }
-        }
+      }
     }
     var option = $('#option_id').val();
     $.ajax({

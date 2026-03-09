@@ -1,30 +1,170 @@
 {% extends 'todo/base.html' %}
 
+{% block extra_head %}
+<!-- New Card-based Layout CSS applied strictly to table primitives -->
+<style>
+  body {
+      background-color: #f4f7f6 !important;
+      color: #333 !important;
+  }
+  
+  /* Morphing Table into block/grid elements */
+  #meals_list table, #meals_list tbody {
+      display: block;
+      width: 100%;
+      background: transparent;
+      border: none !important;
+      position: relative;
+  }
+  
+  /* Hide the old repetitive table headers completely on mobile/desktop, we'll rely on icons/pill badges */
+  #meals_list thead {
+      display: none;
+  }
+
+  /* Each Row becomes a distinct Day Card */
+   #meals_list tbody tr {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 25px;
+      background-color: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e1e5e8;
+      /* overflow: hidden removed to prevent dropdown clipping */
+  }
+  
+  /* Desktop Layout: Instead of stacked column, spread meal cards in a CSS Grid */
+  @media (min-width: 1200px) {
+      #meals_list tbody tr {
+          display: grid;
+          grid-template-columns: 200px repeat(auto-fit, minmax(180px, 1fr));
+          gap: 15px;
+          padding: 15px;
+          align-items: stretch;
+      }
+  }
+
+  /* Morphing Table Cells (Day Info / Headers) */
+  #meals_list tbody th {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border-right: 1px solid #eee;
+      border-bottom: 2px solid #eee;
+  }
+  @media (min-width: 1200px) {
+      #meals_list tbody th {
+          border-bottom: none;
+          border-radius: 12px;
+      }
+  }
+
+  /* Morphing Table Cells (Meals) */
+  #meals_list tbody td {
+      display: block;
+      padding: 15px;
+      border: none;
+      position: relative;
+  }
+  
+  @media (min-width: 1200px) {
+      #meals_list tbody td {
+          background-color: #fcfdfd;
+          border-radius: 12px;
+          border: 1px solid #eef1f3;
+          transition: transform 0.2s, box-shadow 0.2s;
+      }
+      #meals_list tbody td:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+      }
+  }
+
+  /* Current Day Highlight */
+  .today-highlight-card {
+      border: 2px solid #007bff !important;
+      box-shadow: 0 0 15px rgba(0, 123, 255, 0.2) !important;
+      position: relative;
+  }
+  .today-highlight-card::before {
+      content: 'DZIŚ';
+      position: absolute;
+      top: 0;
+      right: 15px;
+      background-color: #007bff;
+      color: white;
+      padding: 2px 8px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 8px;
+      z-index: 100;
+  }
+
+  /* Macro pill styling */
+  .macro-badge {
+      display: inline-block;
+      min-width: 40px;
+      text-align: center;
+      padding: 2px 6px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      color: #555;
+      background-color: #f4f6f8;
+      border-radius: 12px;
+      margin: 2px;
+      border: 1px solid #e1e5e8;
+  }
+  
+  /* Forms and Modals Restored to light elegance */
+  .dropdown-menu-modern {
+      background-color: #ffffff;
+      border: 1px solid #e1e5e8;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      border-radius: 12px;
+      padding: 10px;
+      z-index: 2000 !important;
+      max-width: 90vw;
+      width: auto !important;
+      min-width: 260px;
+      color: #333;
+  }
+  
+  /* Ensure parent td doesn't clip or overlap wrongly */
+  td.dropdown {
+      position: relative !important;
+  }
+</style>
+{% endblock %}
 
 {% block body %}
 {% load split %}
 <div class="container-fluid p-0 mt-0 mt-md-2">
 <input type="hidden" id="maximum_no_of_days_to_generate_no_repeat" value="{{maximum_no_of_days_to_generate_no_repeat}}">
-        <input type="hidden" id="maximum_no_of_days_to_generate_default" value="{{maximum_no_of_days_to_generate_default}}">
+<input type="hidden" id="maximum_no_of_days_to_generate_default" value="{{maximum_no_of_days_to_generate_default}}">
   <div class="row no-gutters">
     {% include 'meals/menu.html' %}
     <div class="col-12 col-md-8 col-xl-10 px-0">
       {% if meals_list %}
-      <div class="alert alert-secondary text-center p-1 mb-1 d-xl-none" id="mobileAverageContainer">
-        <small id="mobileAverage">
-          <b>Średnio: {{average_clories_per_day}} kcal |
-          {{average_protein_per_day}}g<sup>białko</sup> |
-          {{average_fat_per_day}}g<sup>tłuszcze</sup> |
-          {{average_carb_per_day}}g<sup>węglowodany</sup> |
-          {{average_vegies_per_day}}g<sup><i class="fas fa-solid fa-carrot"></i></sup> |
-          {{average_fruits_per_day}}g<sup><i class="fas fa-apple-alt"></i></sup>
-          </b>
-        </small>
+      <div class="alert alert-light text-center p-3 mb-4 rounded shadow-sm border border-secondary" id="mobileAverageContainer">
+        <h6 class="font-weight-bold text-muted mb-2">Średnio na dzień</h6>
+        <div id="mobileAverage" class="d-flex flex-wrap justify-content-center">
+          <span class="badge badge-pill badge-light border border-secondary mx-1 mb-1 p-2 font-weight-bold text-dark" style="font-size: 0.9rem;">{{average_clories_per_day}} kcal</span>
+          <span class="badge badge-pill badge-light border border-secondary mx-1 mb-1 p-2 text-muted">{{average_protein_per_day}}g <small>białko</small></span>
+          <span class="badge badge-pill badge-light border border-secondary text-muted mx-1 mb-1 p-2">{{average_fat_per_day}}g <small>tłuszcze</small></span>
+          <span class="badge badge-pill badge-light border border-secondary text-muted mx-1 mb-1 p-2">{{average_carb_per_day}}g <small>węgle</small></span>
+          <span class="badge badge-pill badge-light border border-secondary text-muted mx-1 mb-1 p-2">{{average_vegies_per_day}}g <i class="fas fa-solid fa-carrot text-secondary"></i></span>
+          <span class="badge badge-pill badge-light border border-secondary text-muted mx-1 mb-1 p-2">{{average_fruits_per_day}}g <i class="fas fa-apple-alt text-secondary"></i></span>
+        </div>
       </div>
-        <div class="table-responsive-sm shadow mb-0" id="meals_list" >
-          <table  class="table table-light table-striped mb-0" id="table"
+        <div class="mb-5" id="meals_list" >
+          <!-- We keep table tags so JS doesn't crash, but CSS treats them as a block grid -->
+          <table class="w-100" id="table"
                   {% if not current %}style="color: gray !important; opacity: 0.7;"{% endif %}>
-            <thead id="meals_list_head" class="thead-dark">
+            <thead id="meals_list_head">
             <tr class="text-center text-light">
               <th nowrap class="px-auto py-0 text-center d-none d-xl-table-cell" scope="col" id="b-t-w">
                 <small class="d-none d-xl-inline" id="b-t-w-small">
@@ -47,57 +187,86 @@
             <tbody>
             {% for item in day_meal_option_meal_list %}
             {% for day, meals in item.0.items %}
+            
             {% with day_as_list=day|split %}
-             <tr class="d-xl-none no_print {% if today_to_template|date:'Y-m-d' == day_as_list.1 %} bg-secondary text-light {% endif %}" id="tr_{{day}}">
-                <td  class="text-center" colspan="6" id="div_td_{{day}}">
-                                    <input style="" type="checkbox" name="day" class="checkbox" value="{% for meal in meals %}{% for ml in meal%}{{ml.id}},{% endfor %}{% endfor %}">
-
-                  <b>{{day_as_list.0}} | {{day_as_list.1}} : {{item.1.0}} kcal</b><br>
-                  <small class="">
-                    {{item.1.1}}g <sup>białko</sup>|
-                    {{item.1.2}}g <sup>tłuszcze</sup>|
-                    {{item.1.3}}g <sup>węglowodany</sup>|
-                    {{item.2}}g <sup><i class="fas fa-solid fa-carrot"></i></sup>|
-                    {{item.3}}g <sup><i class="fas fa-apple-alt"></i></sup>
-                  </small>
+            
+             <tr class="d-xl-none no_print {% if today_to_template|date:'Y-m-d' == day_as_list.1 %} today-highlight-card {% endif %}" id="tr_{{day}}">
+                <td class="text-center bg-light border-bottom mb-2 pb-3" colspan="6" id="div_td_{{day}}">
+                  <div class="d-flex justify-content-between align-items-center mb-2 px-3 pt-2">
+                    <h5 class="font-weight-bold mb-0 text-dark">{{day_as_list.0}} <small class="text-muted">{{day_as_list.1}}</small></h5>
+                    <input style="transform: scale(1.5);" type="checkbox" name="day" class="checkbox" value="{% for meal in meals %}{% for ml in meal%}{{ml.id}},{% endfor %}{% endfor %}">
+                  </div>
+                  
+                  <h4 class="text-primary font-weight-bold mb-2">{{item.1.0}} <small class="text-muted">kcal</small></h4>
+                  
+                  <div class="d-flex justify-content-center flex-wrap px-2">
+                    <span class="macro-badge" data-toggle="tooltip" title="Białko">{{item.1.1}}g <small>B</small></span>
+                    <span class="macro-badge" data-toggle="tooltip" title="Tłuszcze">{{item.1.2}}g <small>T</small></span>
+                    <span class="macro-badge" data-toggle="tooltip" title="Węglowodany">{{item.1.3}}g <small>W</small></span>
+                    <span class="macro-badge"><i class="fas fa-solid fa-carrot text-secondary"></i> {{item.2}}g</span>
+                    <span class="macro-badge"><i class="fas fa-apple-alt text-secondary"></i> {{item.3}}g</span>
+                  </div>
                 </td>
-                {% endwith %}
+               {% endwith %}
             </tr>
+
             {% with day_as_list=day|split %}
-            <tr style="position:relative" class="text-center {% if today_to_template|date:'Y-m-d' == day_as_list.1 %} bg-secondary text-light {% endif %}" >
-              <th nowrap class="text-left pl-1 pr-0 d-none d-xl-block" id="th_{{day}}">
-                <div id="div_th_{{day}}">
-                  <input style="text-align: center;vertical-align: middle;" type="checkbox" name="day" class="checkbox my-auto mr-1" value="{% for meal in meals %}{% for ml in meal%}{{ml.id}},{% endfor %}{% endfor %}">
+            <tr style="position:relative" class="text-center {% if today_to_template|date:'Y-m-d' == day_as_list.1 %} today-highlight-card {% endif %}" >
+              <th nowrap class="text-left d-none d-xl-flex" id="th_{{day}}">
+                <div id="div_th_{{day}}" class="w-100">
+                  <div class="d-flex justify-content-between mb-3 w-100 pb-2 border-bottom">
+                    <h5 class="font-weight-bold mb-0 text-dark">{{day_as_list.0}} <br> <small class="text-muted font-weight-normal">{{day_as_list.1}}</small></h5>
+                    <input style="transform: scale(1.3); margin-top: 5px;" type="checkbox" name="day" class="checkbox my-0" value="{% for meal in meals %}{% for ml in meal%}{{ml.id}},{% endfor %}{% endfor %}">
+                  </div>
+                  
                   <span class="d-none d-xl-inline">
-                    <small>
-                      <b>{{day_as_list.0}} | <small>{{day_as_list.1}}</small>: {{item.1.0}} <sup>kcal</sup></b><br>
-                    </small>
-                    <small>
-                      {{item.1.1}}g <sup class="no_print">białko</sup>|
-                      {{item.1.2}}g <sup class="no_print">tłuszcze</sup>|
-                      {{item.1.3}}g <sup class="no_print">węglowodany</sup>|
-                      {{item.2}}g <sup><i class="fas fa-solid fa-carrot"></i></sup>|
-                    {{item.3}}g <sup><i class="fas fa-apple-alt"></i></sup>
-                    </small>
+                    <div class="mb-3 text-center">
+                        <h4 class="text-primary font-weight-bold mb-0">{{item.1.0}}</h4>
+                        <small class="text-muted text-uppercase tracking-wide">KCAL</small>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between flex-wrap text-center">
+                      <div class="px-1"><span class="macro-badge d-block w-100 mb-1 px-2">{{item.1.1}}g</span><small class="text-muted" style="font-size: 0.65rem;">BIAŁKO</small></div>
+                      <div class="px-1"><span class="macro-badge d-block w-100 mb-1 px-2">{{item.1.2}}g</span><small class="text-muted" style="font-size: 0.65rem;">TŁUSZCZE</small></div>
+                      <div class="px-1"><span class="macro-badge d-block w-100 mb-1 px-2">{{item.1.3}}g</span><small class="text-muted" style="font-size: 0.65rem;">WĘGLE</small></div>
+                    </div>
+                    
+                    <div class="mt-3 text-center text-muted">
+                        <div class="d-inline-block mx-2"><i class="fas fa-solid fa-carrot text-secondary mb-1 d-block"></i> <small class="font-weight-bold">{{item.2}}g</small></div>
+                        <div class="d-inline-block mx-2"><i class="fas fa-apple-alt text-secondary mb-1 d-block"></i> <small class="font-weight-bold">{{item.3}}g</small></div>
+                    </div>
                   </span>
                 </div>
                 {% endwith %}
               </th>
               {% for meal in meals %}
-              <td  class="px-0"{%for ch_meal, all in meal.items%} id="td_{{ch_meal.id}}" {% endfor %}  >{%for ch_meal, all in meal.items%}
-                <div class="" style="cursor:pointer;" id="dropdownMeal_{{ch_meal.id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <td class="px-2 px-xl-0 d-flex flex-column justify-content-between h-100 border-bottom border-xl-0 mb-3 mb-xl-0 dropdown" {%for ch_meal, all in meal.items%} id="td_{{ch_meal.id}}" {% endfor %}  >{%for ch_meal, all in meal.items%}
+                
+                <!-- Display generic meal position wrapper icon/badge -->
+                <div class="mb-2 text-left d-flex justify-content-between align-items-center">
+                    <small class="text-uppercase text-muted font-weight-bold tracking-wide" style="font-size: 0.65rem;">
+                        <i class="fas fa-utensils mr-1"></i> {{ch_meal.meal_option.meal_option|default:"Posiłek"}}
+                    </small>
+                    {% for m in all %}{% if ch_meal.meal_id == m.0.id %} {% if m.1.2 %} <span class="badge badge-light text-muted border shadow-sm">{{m.1.2.0}}kcal</span> {% endif %} {% endif %}{%endfor%}
+                </div>
+                
+                <!-- Inner Meal Content -->
+                <div class="font-weight-bold text-dark w-100 text-left mb-2 px-1" style="cursor:pointer; font-size: 0.95rem; line-height: 1.2;" id="dropdownMeal_{{ch_meal.id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   {% if ch_meal.meal_id %}
-                  {{ch_meal}}{% for m in all %}{% if ch_meal.meal_id == m.0.id %} {% if m.0.special %} * {% endif %} {% if m.1.2 %} <sup>{{m.1.2.0}}</sup> {% endif %} {% endif %}{%endfor%}
-                    {% for m in all %}{% if ch_meal.meal_id == m.0.id %} {% if m.1.1 %}<sup class="fas fa-hourglass-start" ></sup>{% endif %} {% endif %}{%endfor%}
+                  {{ch_meal}}{% for m in all %}{% if ch_meal.meal_id == m.0.id %} {% if m.0.special %} <span class="text-danger">*</span> {% endif %} {% endif %}{%endfor%}
+                    {% for m in all %}{% if ch_meal.meal_id == m.0.id %} {% if m.1.1 %}<sup class="fas fa-hourglass-start text-warning ml-1" ></sup>{% endif %} {% endif %}{%endfor%}
                   {% else %}
-                  ------
+                  <span class="text-muted font-italic font-weight-normal">Brak zaplanowanego...</span>
                   {% endif %}
                 </div>
+                
+                <!-- Extras Area -->
+                <div class="text-left mt-auto px-1 w-100">
                 {% if ch_meal.extras %}
-                <small  style="cursor:pointer;" data-toggle="modal" data-target="#extrasModal" id="editExtrasSmallWrap_{{ch_meal.id}}">
-                  <i class="editExtras" id="editExtrasSmall_{{ch_meal.id}}">
-                    {{ch_meal.extras}}{% if ch_meal.extras.has_short_expiry %} <sup class="fas fa-hourglass-start" ></sup>{% endif %}
-                    {% if ch_meal.extras.is_high_carb %} <sup>{{ch_meal.extras.is_high_carb.0}}</sup> {% endif %}
+                <small class="d-inline-block px-2 py-1 bg-light rounded text-muted border w-100" style="cursor:pointer; font-size: 0.75rem;" data-toggle="modal" data-target="#extrasModal" id="editExtrasSmallWrap_{{ch_meal.id}}">
+                  <i class="editExtras font-weight-bold" id="editExtrasSmall_{{ch_meal.id}}">
+                    <i class="fas fa-plus-circle text-info mr-1"></i> {{ch_meal.extras}}{% if ch_meal.extras.has_short_expiry %} <sup class="fas fa-hourglass-start text-warning ml-1" ></sup>{% endif %}
+                    {% if ch_meal.extras.is_high_carb %} <sup class="text-danger">{{ch_meal.extras.is_high_carb.0}}</sup> {% endif %}
                   <input type="hidden" id="clicked_position_meal_{{ch_meal.id}}" value="{{ch_meal}}">
                   <input type="hidden" id="clicked_position_extras_{{ch_meal.id}}" value="{{ch_meal.extras}}">
                     {% for option, meals in all_meals_in_option_dict.items %}{% for meal in meals %}{% if meal.0 == ch_meal.extras%}
@@ -107,17 +276,19 @@
                   </i>
                 </small>
                 {% endif %}
-<!--                make it one-->
-                <div  class="dropdown-menu dropup p-0 ml-2" id="dropdownMenu_{{ch_meal.id}}">
+                </div>
+                
+<!--                Dropdown Actions-->
+                <div  class="dropdown-menu dropdown-menu-modern dropup p-3 ml-2 w-100" style="min-width: 280px;" id="dropdownMenu_{{ch_meal.id}}">
                   {% if current %}
                   <div class=" mx-auto mb-1">
-                    <small>Zmiana posiłku:</small>
+                    <small class="text-muted font-weight-bold text-uppercase d-block mb-2">Zmiana posiłku:</small>
                     <form id="form_{{ch_meal.id}}" action="{% url 'meals:update_meals_list' %}" method="post" class="form stopPropagation">{% csrf_token %}
                       <input type="hidden" name="record_id" value="{{ch_meal.id}}">
                       <input type="hidden" name="meal_option_id" value="{{ch_meal.meal_option_id}}">
                       <input type="hidden" name="meal_id" value="{{ch_meal.meal_id}}">
-                      <select class="form-control" name="to_update" id="toUpdate_{{ch_meal.id}}">
-                        <option value="">BRAK POSIŁKU</option>
+                      <select class="form-control form-control-sm mb-3 shadow-sm" name="to_update" id="toUpdate_{{ch_meal.id}}">
+                        <option value="">-- WYCZYŚĆ POSIŁEK --</option>
                         {% for m in all %}
                           <option {% if ch_meal.meal_id == m.0.id %}selected="true"{% endif %} value="{{m.0.id}}">{{m.0}} | {{m.1.0}} kcal{% if m.0.special %} ** {% endif %} {% if m.1.2 %} | {{m.1.2.0}} {% endif %} </option>
                         {% endfor %}
@@ -152,16 +323,16 @@
         </div>
       {% else %}
       {% if current %}
-      <div class="alert alert-info" role="alert">
-        <p class="text-center lead">
-          Brak wygenerowanego jadłospisu kliknij
-          <a href="#" class="alert-link" data-toggle="modal" data-target="#newMealsListModal">Generuj nowy jadłospis</a>
+      <div class="alert alert-secondary mt-3 shadow-sm rounded" role="alert">
+        <p class="text-center lead mb-0">
+          Brak wygenerowanego jadłospisu, kliknij
+          <a href="#" class="alert-link text-info" data-toggle="modal" data-target="#newMealsListModal">Generuj nowy jadłospis</a>
           aby wygenerować nowy.
         </p>
       </div>
       {% else %}
-      <div class="alert alert-dark" role="alert">
-        <p class="text-center lead">
+      <div class="alert alert-secondary mt-3 shadow-sm rounded" role="alert">
+        <p class="text-center lead mb-0">
           Brak poprzedniego jadłospisu!
         </p>
       </div>
@@ -171,31 +342,31 @@
   </div>
 </div>
 <div class="modal fade" id="extrasModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-  <div class="modal-dialog modal-lg  no_print" role="document">
-    <div class="modal-content extrasModal">
-      <div class="modal-header py-1">
-        <h5 class="modal-title" id="extrasMmodalTitle">
-          Dodatki dla: <span id="extrasModalTitleSpan">-------</span>
+  <div class="modal-dialog modal-lg modal-dialog-centered no_print" role="document">
+    <div class="modal-content extrasModal shadow-lg border-0" style="border-radius: 12px;">
+      <div class="modal-header py-3 bg-light border-bottom">
+        <h5 class="modal-title font-weight-bold text-dark" id="extrasMmodalTitle">
+          Dodatki dla: <span id="extrasModalTitleSpan" class="text-primary">-------</span>
         </h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="dismiss_extras_modal">
+        <button type="button" class="close text-dark" data-dismiss="modal" aria-label="Close" id="dismiss_extras_modal">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body py-0">
-        <span id="add_extras_span" class="text-center">Dodaj z posiłku:</span>
+      <div class="modal-body py-3">
+        <span id="add_extras_span" class="text-center text-muted font-weight-bold text-uppercase tracking-wide d-block mb-2" style="font-size: 0.8rem;">Dodaj z posiłku:</span>
         <div class="text-left">
-          <small id="current_extra_small" style="display:none;">Aktualny dodatek :
-            <a id="current_extras" class="text-dark" href="#">
+          <small id="current_extra_small" style="display:none;" class="text-muted">Aktualny dodatek :
+            <a id="current_extras" class="text-primary font-weight-bold" href="#">
             </a>
           </small>
         </div>
-        <div id="current_change_div" style="display:none;">Zmień:</div>
+        <div id="current_change_div" style="display:none;" class="text-muted mt-2 mb-1 font-weight-bold">Zmień:</div>
         {% for option, meals in all_meals_in_option_dict.items %}
         <form method="post" action="{% url 'meals:edit_extras' %}" name="editExtras" id="editExtras_{{option.id}}" >{% csrf_token %}
           <input type="hidden" id="" name="meals_list_position" value="">
           <input type="hidden" id="current_meal_id" value="">
           <input type="hidden" id="option_id" value="">
-          <select onchange="" class="form-control mt-1" name="extras_select" id="extrasSelect_{{option.id}}">
+          <select onchange="" class="form-control form-control-sm mt-2 shadow-sm" name="extras_select" id="extrasSelect_{{option.id}}">
             <option>
               {{option}}
             </option>
@@ -204,17 +375,31 @@
             {% endfor %}
           </select>
         </form>
-        <hr class="m-2">
+        <hr class="m-3 border-light">
         {% endfor %}
-        <a id="delete_extras" style="display:none;" href="{%url 'meals:delete_extras' ' ' %}" class="btn btn-block btn-danger text-light mb-1"></a>
+        <a id="delete_extras" style="display:none;" href="{%url 'meals:delete_extras' ' ' %}" class="btn btn-block btn-outline-danger font-weight-bold mb-2 mt-3 shadow-sm"></a>
         <input id="base_delete_url" type="hidden" value="{%url 'meals:delete_extras' ' ' %}">
       </div>
-      <div class="modal-footer p-2">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
-        <!--                      <button type="button" class="btn btn-primary">Zapisz</button>-->
+      <div class="modal-footer p-3 bg-light border-top">
+        <button type="button" class="btn btn-secondary shadow-sm px-4 font-weight-bold" data-dismiss="modal">ZAMKNIJ</button>
       </div>
     </div>
   </div>
 </div>
 
+<script>
+    function scrollToToday() {
+        var todayCard = $('.today-highlight-card').first();
+        if (todayCard.length) {
+            $('html, body').animate({
+                scrollTop: todayCard.offset().top - 100
+            }, 600);
+        }
+    }
+
+    $(document).ready(function() {
+        // Delay scroll slightly to ensure layout is stable
+        setTimeout(scrollToToday, 400);
+    });
+</script>
 {% endblock %}
