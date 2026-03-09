@@ -29,41 +29,193 @@ body {
 .list-group-item{
     color: black;
 }
+
+/* Główny kontener nawigacji z wyższym z-index by być nad nagłówkami tabel sticky-top (1020) */
+.navbar-main-container {
+    z-index: 1030;
+}
+
+/* Global navbar link hover colors - no blue */
+.navbar-nav .nav-link:hover, 
+.navbar-nav .dropdown-item:hover {
+    color: #000 !important;
+}
+
 /* The side navigation menu */
-.sidenav {
-  width: 0; /* 0 width - change this with JavaScript */
-  position: fixed; /* Stay in place */
-  z-index: 3; /* Stay on top */
+@media (max-width: 991.98px) {
+    .navbar-offcanvas {
+        position: fixed;
+        top: 0;
+        left: -280px;
+        width: 280px;
+        height: 100vh;
+        background-color: #ffffff !important;
+        z-index: 1050;
+        transition: left 0.3s ease-in-out;
+        padding: 1rem 0; /* Changed padding to allow full-width links */
+        display: block !important;
+        overflow-y: auto;
+        box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    }
+    .navbar-offcanvas.show {
+        left: 0;
+    }
+    .navbar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 1025;
+        display: none;
+    }
+    .navbar-overlay.show {
+        display: block;
+    }
+    .navbar-nav {
+        text-align: left !important;
+    }
+    .navbar-nav .nav-link {
+        color: #000 !important;
+        font-weight: 500;
+        opacity: 1 !important;
+        padding: 12px 20px;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        position: relative;
+    }
+    .navbar-nav .nav-link:hover {
+        background-color: #f8f9fa;
+        color: #000 !important;
+    }
+    .navbar-offcanvas .dropdown-menu {
+        border: none;
+        background-color: #f1f1f1;
+        margin: 0;
+        padding: 0;
+        box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .navbar-offcanvas .dropdown-item {
+        padding: 12px 30px;
+        color: #000 !important;
+        font-weight: 500;
+        border-bottom: 1px solid rgba(0,0,0,0.03);
+    }
+    .navbar-offcanvas .dropdown-item:hover {
+        background-color: #e9ecef;
+        color: #000 !important;
+    }
+    .navbar-offcanvas .dropdown-toggle::after {
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        margin-top: 0;
+        border-top: 0.4em solid;
+        border-right: 0.4em solid transparent;
+        border-bottom: 0;
+        border-left: 0.4em solid transparent;
+    }
+    .navbar-offcanvas .dropdown-toggle-split::after {
+        margin-left: 0;
+    }
+    .close-sidebar {
+        display: block !important;
+        text-align: right;
+        font-size: 1.5rem;
+        cursor: pointer;
+        margin-bottom: 1rem;
+    }
 
-  left: 0;
-  overflow-x: hidden; /* Disable horizontal scroll */
-  padding-top: 60px; /* Place content 60px from the top */
-  transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
-
+    /* Modern user button for mobile */
+    .user-profile-mobile {
+        margin-top: 2rem;
+        padding: 0 20px;
+        margin-bottom: 2rem;
+    }
+    .user-profile-mobile .btn-user-modern {
+        border-radius: 50px;
+        padding: 10px 20px;
+        background: #fff;
+        border: 1px solid #dee2e6;
+        color: #333;
+        font-weight: 600;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        transition: all 0.2s;
+    }
+    .user-profile-mobile .btn-user-modern:active, 
+    .user-profile-mobile .btn-user-modern:focus {
+        background: #f8f9fa;
+        box-shadow: none;
+        outline: none;
+    }
+    .user-profile-mobile .dropdown-menu {
+        width: calc(100% - 40px);
+        margin-left: 20px;
+        border: 1px solid #dee2e6;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        border-radius: 12px;
+    }
 }
 
-
-/* Position and style the close button (top right corner) */
-.sidenav .closebtn {
-
-  font-size: 36px;
-
-}
-
-/* Style page content - use this if you want to push the page content to the right when you open the side navigation */
-#main {
-  transition: margin-left .5s;
-  padding: 20px;
-}
-
-/* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
-@media screen and (max-height: 450px) {
-  .sidenav {padding-top: 15px;}
-  .sidenav a {font-size: 18px;}
+@media (min-width: 992px) {
+    .close-sidebar {
+        display: none !important;
+    }
 }
 
 .pointer {
   cursor:pointer;
+}
+
+/* Modern hamburger for mobile */
+.modern-hamburger {
+    border: none !important;
+    background: transparent !important;
+    color: #333;
+    padding: 8px 10px;
+    font-size: 1.5rem;
+    outline: none !important;
+    box-shadow: none !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modern-hamburger:active {
+    opacity: 0.7;
+}
+
+/* Modern desktop user button */
+.btn-user-modern-desktop {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    color: #333;
+    padding: 9px 20px;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: all 0.2s;
+    cursor: pointer;
+    outline: none !important;
+}
+
+.btn-user-modern-desktop:hover {
+    background: #f8f9fa;
+    color: #000;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.btn-user-modern-desktop::after {
+    display: none !important;
 }
 
 .custom-file-input ~ .custom-file-label::after {
