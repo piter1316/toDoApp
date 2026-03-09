@@ -1,0 +1,451 @@
+{% extends 'gunsafe/base.html' %}
+{% block body %}
+<div class="container mt-2 mt-md-4 text-white text-center">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3><i class="fas fa-stopwatch mr-2 text-warning"></i>Timer Strzelecki</h3>
+        <a href="{% url 'gunsafe:gunsafe_home' %}" class="btn btn-outline-light btn-sm">
+            <i class="fas fa-arrow-left"></i> Wróć
+        </a>
+    </div>
+
+    <!-- Panel Sterowania -->
+    <div class="card bg-dark border-secondary shadow mb-4 p-3 p-md-4">
+        <div id="timer-display" class="display-1 font-weight-bold mb-2" style="font-family: 'Oswald', sans-serif; color: #00ff00; text-shadow: 0 0 10px rgba(0,255,0,0.5);">0.00</div>
+        <div id="status-label" class="h5 text-muted mb-4 uppercase">Gotowy</div>
+        
+        <div class="row justify-content-center mb-4">
+            <div class="col-6 col-md-4">
+                <button id="start-btn" class="btn btn-success btn-lg btn-block py-3 shadow-lg">
+                    <i class="fas fa-play mr-2"></i>START
+                </button>
+            </div>
+            <div class="col-6 col-md-4">
+                <button id="stop-btn" class="btn btn-danger btn-lg btn-block py-3 shadow-lg" disabled>
+                    <i class="fas fa-stop mr-2"></i>STOP
+                </button>
+            </div>
+        </div>
+
+        <div class="row text-left">
+            <div class="col-md-4 mb-3">
+                <label class="small text-muted">Czułość mikrofonu</label>
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-microphone-slash mr-2 small"></i>
+                    <input type="range" class="custom-range" id="sensitivity" min="1" max="100" value="70">
+                    <i class="fas fa-microphone ml-2 small"></i>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="small text-muted">Opóźnienie startu</label>
+                <select id="delay-type" class="form-control bg-secondary text-white border-0">
+                    <option value="3">Stałe (3s)</option>
+                    <option value="random">Losowe (2-5s)</option>
+                    <option value="0">Natychmiast</option>
+                </select>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="small text-muted">Par Time (sekundy)</label>
+                <input type="number" id="par-time" class="form-control bg-secondary text-white border-0" placeholder="Brak" step="0.1" min="0">
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Tabela Splitów -->
+        <div class="col-md-6 mb-4">
+            <div class="card bg-dark border-secondary shadow h-100">
+                <div class="card-header border-secondary bg-transparent d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-list-ol mr-2 text-info"></i>Splity</h5>
+                    <span id="shot-count-badge" class="badge badge-info">Strzałów: 0</span>
+                </div>
+                <div class="card-body p-0" style="max-height: 400px; overflow-y: auto;">
+                    <table class="table table-dark table-hover mb-0" id="splits-table">
+                        <thead class="text-muted small">
+                            <tr>
+                                <th>#</th>
+                                <th>Czas</th>
+                                <th>Split</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="3" class="text-center text-muted font-italic py-4">Brak zarejestrowanych strzałów</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Zapis Wyniku -->
+        <div class="col-md-6 mb-4">
+            <div class="card bg-dark border-secondary shadow h-100" id="save-card" style="opacity: 0.5; pointer-events: none;">
+                <div class="card-header border-secondary bg-transparent">
+                    <h5 class="mb-0"><i class="fas fa-save mr-2 text-primary"></i>Zapisz trening</h5>
+                </div>
+                <div class="card-body text-left">
+                    <form id="save-result-form">
+                        <div class="form-group">
+                            <label class="small text-muted">Broń</label>
+                            <select id="save-weapon" class="form-control bg-secondary text-white border-0" required>
+                                {% for w in weapons %}
+                                <option value="{{ w.id }}">{{ w.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="small text-muted">Ćwiczenie (opcjonalnie)</label>
+                            <select id="save-drill" class="form-control bg-secondary text-white border-0">
+                                <option value="">--- Dowolne / Brak ---</option>
+                                {% for d in drills %}
+                                <option value="{{ d.id }}" data-par="{{ d.default_par_time|default:'' }}">{{ d.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="custom-control custom-checkbox mb-3">
+                            <input type="checkbox" class="custom-control-input" id="add-to-history" name="add_to_history">
+                            <label class="custom-control-label" for="add-to-history">Dodaj do historii strzelań broni</label>
+                        </div>
+
+                        <div id="ammo-select-container" style="display: none;">
+                            <div class="form-group">
+                                <label class="small text-muted">Wybierz amunicję do odpisania</label>
+                                <select id="save-ammo" class="form-control bg-secondary text-white border-0">
+                                    <option value="">--- Nie odpisuj ---</option>
+                                    {% for ammo in ammo_inventory %}
+                                    <option value="{{ ammo.id }}">{{ ammo.caliber.name }}: {{ ammo.manufacturer|default:"" }} ({{ ammo.qty }} szt.)</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="small text-muted">Notatki</label>
+                            <textarea id="save-notes" class="form-control bg-secondary text-white border-0" rows="2"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block shadow mt-4 py-2">
+                            <i class="fas fa-check-circle mr-2"></i>ZAPISZ WYNIK
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ostatnie wyniki -->
+    {% if last_results %}
+    <div class="card bg-dark border-secondary shadow mb-5">
+        <div class="card-header border-secondary bg-transparent text-left">
+            <h5 class="mb-0 text-muted">Ostatnie wyniki</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-dark table-sm table-hover mb-0 small">
+                    <thead>
+                        <tr class="text-muted">
+                            <th>Data</th>
+                            <th>Broń</th>
+                            <th>Ćwiczenie</th>
+                            <th>Strzały</th>
+                            <th>Czas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for res in last_results %}
+                        <tr>
+                            <td>{{ res.date|date:"d.m H:i" }}</td>
+                            <td>{{ res.weapon.name }}</td>
+                            <td>{{ res.drill.name|default:"---" }}</td>
+                            <td>{{ res.shots_count }}</td>
+                            <td class="font-weight-bold">{{ res.total_time|stringformat:".2f" }}s</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Audio elements for beeps -->
+<audio id="start-beep" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
+<audio id="end-beep" src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg"></audio>
+
+<script>
+    let audioCtx;
+    let analyser;
+    let dataArray;
+    let isRunning = false;
+    let shots = [];
+    let startTime = 0;
+    let rafId;
+    let parTimeTimeout;
+
+    const display = document.getElementById('timer-display');
+    const statusLabel = document.getElementById('status-label');
+    const startBtn = document.getElementById('start-btn');
+    const stopBtn = document.getElementById('stop-btn');
+    const splitsTable = document.getElementById('splits-table').getElementsByTagName('tbody')[0];
+    const shotCountBadge = document.getElementById('shot-count-badge');
+    const saveCard = document.getElementById('save-card');
+
+    // Initialize Audio
+    async function initAudio() {
+        if (!audioCtx) {
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        echoCancellation: false,
+                        noiseSuppression: false,
+                        autoGainControl: false
+                    } 
+                });
+                const source = audioCtx.createMediaStreamSource(stream);
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 256;
+                source.connect(analyser);
+                dataArray = new Uint8Array(analyser.frequencyBinCount);
+            } catch (err) {
+                alert('Błąd dostępu do mikrofonu: ' + err);
+                return false;
+            }
+        }
+        if (audioCtx.state === 'suspended') {
+            await audioCtx.resume();
+        }
+        return true;
+    }
+
+    startBtn.addEventListener('click', async () => {
+        if (!await initAudio()) return;
+
+        startBtn.disabled = true;
+        saveCard.style.opacity = '0.5';
+        saveCard.style.pointerEvents = 'none';
+        shots = [];
+        updateSplitsTable();
+        
+        const delayType = document.getElementById('delay-type').value;
+        let delay = parseFloat(delayType);
+        if (delayType === 'random') {
+            delay = 2 + Math.random() * 3; // 2-5s
+        }
+
+        statusLabel.innerText = 'CZEKAJ...';
+        statusLabel.classList.remove('text-muted');
+        statusLabel.classList.add('text-warning');
+        display.innerText = '0.00';
+        display.style.color = '#ffc107';
+
+        setTimeout(() => {
+            playStartBeep();
+            startTimer();
+        }, delay * 1000);
+    });
+
+    stopBtn.addEventListener('click', () => {
+        stopTimer();
+    });
+
+    function playStartBeep() {
+        // High frequency beep
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        oscillator.type = 'square';
+        oscillator.frequency.setValueAtTime(1000, audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 0.3);
+    }
+
+    function playEndBeep() {
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(500, audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 0.6);
+    }
+
+    function startTimer() {
+        isRunning = true;
+        startTime = audioCtx.currentTime;
+        statusLabel.innerText = 'STRZELAJ!';
+        statusLabel.classList.remove('text-warning');
+        statusLabel.classList.add('text-danger');
+        display.style.color = '#00ff00';
+        stopBtn.disabled = false;
+
+        const parTimeValue = parseFloat(document.getElementById('par-time').value);
+        if (parTimeValue > 0) {
+            parTimeTimeout = setTimeout(() => {
+                if (isRunning) {
+                    playEndBeep();
+                    statusLabel.innerText = 'CZAS MINĄŁ (PAR)';
+                }
+            }, parTimeValue * 1000);
+        }
+
+        requestAnimationFrame(updateTimer);
+        detectShot();
+    }
+
+    function stopTimer() {
+        isRunning = false;
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+        statusLabel.innerText = 'ZAKOŃCZONO';
+        statusLabel.classList.remove('text-danger');
+        statusLabel.classList.add('text-muted');
+        cancelAnimationFrame(rafId);
+        clearTimeout(parTimeTimeout);
+
+        if (shots.length > 0) {
+            saveCard.style.opacity = '1';
+            saveCard.style.pointerEvents = 'auto';
+        }
+    }
+
+    function updateTimer() {
+        if (!isRunning) return;
+        const now = audioCtx.currentTime - startTime;
+        display.innerText = now.toFixed(2);
+        rafId = requestAnimationFrame(updateTimer);
+    }
+
+    function detectShot() {
+        if (!isRunning) return;
+        
+        analyser.getByteTimeDomainData(dataArray);
+        
+        let maxVal = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+            const val = Math.abs(dataArray[i] - 128);
+            if (val > maxVal) maxVal = val;
+        }
+
+        // Sensitivity 1-100 mapped to threshold 127-1
+        const sensitivity = parseInt(document.getElementById('sensitivity').value);
+        const threshold = 128 - (sensitivity * 1.25); 
+
+        if (maxVal > threshold) {
+            const now = audioCtx.currentTime - startTime;
+            // Debounce 100ms
+            if (shots.length === 0 || (now - shots[shots.length - 1]) > 0.1) {
+                registerShot(now);
+                visualFlash();
+            }
+        }
+        
+        if (isRunning) {
+            requestAnimationFrame(detectShot);
+        }
+    }
+
+    function registerShot(time) {
+        shots.push(time);
+        display.innerText = time.toFixed(2);
+        updateSplitsTable();
+        shotCountBadge.innerText = 'Strzałów: ' + shots.length;
+    }
+
+    function visualFlash() {
+        const originalColor = display.style.color;
+        display.style.color = '#ffffff';
+        setTimeout(() => {
+            if (isRunning) display.style.color = '#00ff00';
+            else display.style.color = originalColor;
+        }, 50);
+    }
+
+    function updateSplitsTable() {
+        if (shots.length === 0) {
+            splitsTable.innerHTML = '<tr><td colspan="3" class="text-center text-muted font-italic py-4">Brak zarejestrowanych strzałów</td></tr>';
+            return;
+        }
+
+        let html = '';
+        for (let i = 0; i < shots.length; i++) {
+            const time = shots[i];
+            const split = i === 0 ? time : (time - shots[i - 1]);
+            html += `<tr>
+                <td>${i + 1}</td>
+                <td>${time.toFixed(2)}s</td>
+                <td class="text-info font-weight-bold">${split.toFixed(2)}s</td>
+            </tr>`;
+        }
+        splitsTable.innerHTML = html;
+        // Scroll to bottom
+        const parent = splitsTable.parentElement.parentElement;
+        parent.scrollTop = parent.scrollHeight;
+    }
+
+    // Ammo container toggle
+    document.getElementById('add-to-history').addEventListener('change', function() {
+        document.getElementById('ammo-select-container').style.display = this.checked ? 'block' : 'none';
+    });
+
+    // Drill selection - auto fill par time
+    document.getElementById('save-drill').addEventListener('change', function() {
+        const selected = this.options[this.selectedIndex];
+        const par = selected.getAttribute('data-par');
+        if (par) {
+            document.getElementById('par-time').value = par;
+        }
+    });
+
+    // Save Result
+    document.getElementById('save-result-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const data = {
+            weapon_id: document.getElementById('save-weapon').value,
+            drill_id: document.getElementById('save-drill').value,
+            total_time: shots[shots.length - 1],
+            splits: shots.join(','),
+            shots_count: shots.length,
+            notes: document.getElementById('save-notes').value,
+            add_to_history: document.getElementById('add-to-history').checked,
+            ammo_id: document.getElementById('save-ammo').value,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+        };
+
+        fetch('{% url "gunsafe:save_timer_result" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: new URLSearchParams(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert('Wynik zapisany pomyślnie!');
+                window.location.reload();
+            } else {
+                alert('Błąd: ' + data.message);
+            }
+        })
+        .catch(err => alert('Błąd sieci: ' + err));
+    });
+</script>
+
+<style>
+    .display-1 { font-size: 5rem; }
+    @media (max-width: 576px) {
+        .display-1 { font-size: 3.5rem; }
+    }
+    .badge-info { background-color: #17a2b8; }
+    .table-dark { background-color: #1a1a1a; }
+    .uppercase { text-transform: uppercase; letter-spacing: 2px; }
+</style>
+{% endblock %}
