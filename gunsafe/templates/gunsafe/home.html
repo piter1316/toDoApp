@@ -8,9 +8,14 @@
             <h3 class="text-white"><i class="fas fa-vault mr-2"></i>Moja Szafa z Bronią</h3>
         </div>
         <div class="col-md-4 text-md-right mt-2 mt-md-0">
-            <button class="btn btn-light btn-block d-md-inline-block w-md-auto" data-toggle="modal" data-target="#addWeaponModal">
-                <i class="fas fa-plus mr-1"></i> Dodaj Broń
-            </button>
+            <div class="btn-group d-flex d-md-inline-flex w-100 w-md-auto" role="group">
+                <a href="{% url 'gunsafe:gunsafe_archive' %}" class="btn btn-outline-light w-100">
+                    <i class="fas fa-archive mr-1"></i> Archiwum
+                </a>
+                <button class="btn btn-light w-100" data-toggle="modal" data-target="#addWeaponModal">
+                    <i class="fas fa-plus mr-1"></i> Dodaj Broń
+                </button>
+            </div>
         </div>
     </div>
 
@@ -19,7 +24,7 @@
         {% for weapon in weapons %}
         <div class="col-md-6 col-lg-4 px-1 px-md-3 mb-2 mb-md-4">
             <div class="card bg-dark text-white h-100 border-secondary shadow">
-                <div class="card-header border-secondary d-flex justify-content-between p-2 p-md-3">
+                <div class="card-header border-secondary d-flex justify-content-between p-2">
                     <h5 class="mb-0">
                         <a href="{% url 'gunsafe:weapon_details' weapon.id %}" class="text-white text-decoration-none">
                             {{ weapon.name }}
@@ -70,6 +75,13 @@
                         </div>
                     </div>
 
+                    <div class="row mb-2">
+                        <div class="col-12">
+                            <small class="d-block text-muted">Data zakupu</small>
+                            <span class="badge badge-light">{{ weapon.purchase_date|date:"d.m.Y"|default:"---" }}</span>
+                        </div>
+                    </div>
+
                     <div class="mb-1">
                         <div class="d-flex justify-content-between align-items-center">
                             <small class="text-muted">Akcesoria:</small>
@@ -94,7 +106,7 @@
                         {% endfor %}
                     </div>
                 </div>
-                <div class="card-footer border-secondary bg-transparent d-flex justify-content-between p-2 p-md-3">
+                <div class="card-footer border-secondary bg-transparent d-flex justify-content-between p-2">
                     <button class="btn btn-sm btn-outline-light" data-toggle="modal" data-target="#cleaningModal{{ weapon.id }}">
                         <i class="fas fa-soap mr-1"></i> Czyszczenie
                     </button>
@@ -151,6 +163,14 @@
                             <div class="form-group">
                                 <label>Typ akcji</label>
                                 <input type="text" name="action_type" class="form-control" value="{{ weapon.action|default:'' }}" placeholder="np. Striker-fired, Semi-auto">
+                            </div>
+                            <div class="form-group">
+                                <label>Data zakupu</label>
+                                <input type="date" name="purchase_date" class="form-control" value="{{ weapon.purchase_date|date:'Y-m-d' }}">
+                            </div>
+                            <div class="form-group form-check">
+                                <input type="checkbox" name="is_sold" class="form-check-input" id="isSoldCheck{{ weapon.id }}" {% if weapon.is_sold %}checked{% endif %}>
+                                <label class="form-check-label" for="isSoldCheck{{ weapon.id }}">Broń sprzedana (przenieś do archiwum)</label>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -312,7 +332,7 @@
 
     <!-- Ammo Inventory Section -->
     <div class="card bg-dark text-white mb-2 mb-md-4 border-secondary">
-        <div class="card-header border-secondary d-flex flex-wrap justify-content-between align-items-center p-2 p-md-3">
+        <div class="card-header border-secondary d-flex flex-wrap justify-content-between align-items-center p-2">
             <div class="d-flex flex-wrap align-items-center">
                 <h5 class="mb-0 mr-3"><i class="fas fa-box mr-2 text-light"></i>Stan Amunicji</h5>
                 {% if ammo_by_caliber %}
@@ -334,7 +354,7 @@
 
             <div class="row mx-n1">
                 {% for ammo in ammo_inventory %}
-                <div class="col-6 col-md-3 px-1 mb-2">
+                <div class="col-12 col-sm-6 col-md-3 px-1 mb-2">
                     <div class="p-1 p-md-2 border border-secondary rounded bg-secondary shadow-sm h-100">
                         <div class="d-flex justify-content-between align-items-center flex-wrap">
                             <strong class="small font-weight-bold">{{ ammo.caliber.name }}</strong>
@@ -464,6 +484,10 @@
                     <div class="form-group">
                         <label>Typ akcji</label>
                         <input type="text" name="action_type" class="form-control" placeholder="np. Striker-fired, Semi-auto">
+                    </div>
+                    <div class="form-group">
+                        <label>Data zakupu</label>
+                        <input type="date" name="purchase_date" class="form-control">
                     </div>
                 </div>
                 <div class="modal-footer">

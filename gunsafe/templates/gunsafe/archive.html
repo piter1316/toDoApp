@@ -1,0 +1,162 @@
+{% extends 'gunsafe/base.html' %}
+{% block body %}
+{% load static %}
+
+<div class="container-fluid mt-1 mt-md-2">
+    <div class="row mb-2 mb-md-2">
+        <div class="col-md-8">
+            <h3 class="text-white text-muted"><i class="fas fa-archive mr-2"></i>Archiwum Broni (Sprzedane)</h3>
+        </div>
+        <div class="col-md-4 text-md-right mt-2 mt-md-0">
+            <a href="{% url 'gunsafe:gunsafe_home' %}" class="btn btn-outline-light d-md-inline-block w-md-auto">
+                <i class="fas fa-arrow-left mr-1"></i> Powrót do Szafy
+            </a>
+        </div>
+    </div>
+
+    <!-- Weapons Grid -->
+    <div class="row mx-n1 mx-md-0">
+        {% for weapon in weapons %}
+        <div class="col-md-6 col-lg-4 px-1 px-md-3 mb-2 mb-md-4">
+            <div class="card bg-dark text-white h-100 border-secondary shadow opacity-75" style="filter: grayscale(0.5);">
+                <div class="card-header border-secondary d-flex justify-content-between p-2">
+                    <h5 class="mb-0">
+                        <span class="text-muted">{{ weapon.name }}</span>
+                    </h5>
+                    <div>
+                        <button class="btn btn-xs btn-outline-secondary mr-2" data-toggle="modal" data-target="#editWeaponModal{{ weapon.id }}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <i class="fas {{ weapon.weapon_type.icon|default:'fa-gun' }} text-secondary"></i>
+                    </div>
+                </div>
+                <div class="card-body p-2 p-md-3 text-muted">
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            <small class="d-block text-muted">Kaliber</small>
+                            {% for cal in weapon.calibers.all %}
+                            <span class="badge badge-secondary">{{ cal.name }}</span>
+                            {% empty %}
+                            <span class="badge badge-secondary">N/A</span>
+                            {% endfor %}
+                        </div>
+                        <div class="col-6">
+                            <small class="d-block text-muted">Licznik (całkowity)</small>
+                            <span class="badge badge-secondary">{{ weapon.total_rounds_fired }} szt.</span>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            <small class="d-block text-muted">Typ akcji</small>
+                            <span class="badge badge-secondary">{{ weapon.action|default:"N/A" }}</span>
+                        </div>
+                        <div class="col-6">
+                            <small class="d-block text-muted">Nr seryjny</small>
+                            <span class="badge badge-secondary">{{ weapon.serial_no|default:"N/A" }}</span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            <small class="d-block text-muted">Ost. strzelanie</small>
+                            <span class="badge badge-secondary">{{ weapon.last_shooting.date|date:"d.m.Y"|default:"---" }}</span>
+                        </div>
+                        <div class="col-6">
+                            <small class="d-block text-muted">Ost. czyszczenie</small>
+                            <span class="badge badge-secondary">{{ weapon.last_cleaning.date|date:"d.m.Y"|default:"---" }}</span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-12">
+                            <small class="d-block text-muted">Data zakupu</small>
+                            <span class="badge badge-secondary">{{ weapon.purchase_date|date:"d.m.Y"|default:"---" }}</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-1">
+                        <small class="text-muted">Akcesoria:</small>
+                        {% for acc in weapon.accessories.all %}
+                        <span class="badge badge-dark border border-secondary mr-1" title="{{ acc.description }}">{{ acc.accessory_name }}</span>
+                        {% empty %}
+                        <small class="text-secondary font-italic">Brak</small>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="card-footer border-secondary bg-transparent p-2 text-center">
+                    <span class="badge badge-danger">SPRZEDANA</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Weapon Modal (Archive version) -->
+        <div class="modal fade" id="editWeaponModal{{ weapon.id }}" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content bg-dark text-white">
+                    <form method="post" action="{% url 'gunsafe:gunsafe_home' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="edit_weapon">
+                        <input type="hidden" name="weapon_id" value="{{ weapon.id }}">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Edytuj broń: {{ weapon.name }}</h5>
+                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Nazwa broni</label>
+                                <input type="text" name="name" class="form-control" value="{{ weapon.name }}" required>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label>Typ broni</label>
+                                    <select name="weapon_type" class="form-control">
+                                        <option value="">---</option>
+                                        {% for wt in weapon_types %}
+                                        <option value="{{ wt.id }}" {% if weapon.weapon_type_id == wt.id %}selected{% endif %}>{{ wt.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label>Kaliber</label>
+                                    <select name="caliber" class="form-control" multiple>
+                                        {% for cal in calibers %}
+                                        <option value="{{ cal.id }}" {% if cal in weapon.calibers.all %}selected{% endif %}>{{ cal.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <small class="form-text text-muted">Przytrzymaj Ctrl, aby wybrać kilka.</small>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Nr seryjny</label>
+                                <input type="text" name="serial_no" class="form-control" value="{{ weapon.serial_no|default:'' }}">
+                            </div>
+                            <div class="form-group">
+                                <label>Typ akcji</label>
+                                <input type="text" name="action_type" class="form-control" value="{{ weapon.action|default:'' }}" placeholder="np. Striker-fired, Semi-auto">
+                            </div>
+                            <div class="form-group">
+                                <label>Data zakupu</label>
+                                <input type="date" name="purchase_date" class="form-control" value="{{ weapon.purchase_date|date:'Y-m-d' }}">
+                            </div>
+                            <div class="form-group form-check">
+                                <input type="checkbox" name="is_sold" class="form-check-input" id="isSoldCheck{{ weapon.id }}" {% if weapon.is_sold %}checked{% endif %}>
+                                <label class="form-check-label" for="isSoldCheck{{ weapon.id }}">Broń sprzedana (przenieś do archiwum)</label>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-light">Zapisz zmiany</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center mt-5 text-white text-muted">
+            <h4>Brak sprzedanej broni w archiwum.</h4>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

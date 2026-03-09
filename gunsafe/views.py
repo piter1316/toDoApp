@@ -22,7 +22,8 @@ def gunsafe_home(request):
                 name=name,
                 weapon_type_id=type_id if type_id else None,
                 serial_no=serial_no,
-                action=action_type
+                action=action_type,
+                purchase_date=request.POST.get('purchase_date') or None
             )
             if caliber_ids:
                 weapon.calibers.set(caliber_ids)
@@ -38,6 +39,8 @@ def gunsafe_home(request):
             weapon.calibers.set(caliber_ids)
             weapon.serial_no = request.POST.get('serial_no')
             weapon.action = request.POST.get('action_type')
+            weapon.purchase_date = request.POST.get('purchase_date') or None
+            weapon.is_sold = request.POST.get('is_sold') == 'on'
             weapon.save()
 
         elif action == 'add_shooting':
@@ -131,7 +134,7 @@ def gunsafe_home(request):
 
         return redirect('gunsafe:gunsafe_home')
 
-    weapons = Weapon.objects.filter(user=request.user).select_related('weapon_type').prefetch_related('calibers', 'magazines', 'accessories', 'shootings', 'cleanings')
+    weapons = Weapon.objects.filter(user=request.user, is_sold=False).select_related('weapon_type').prefetch_related('calibers', 'magazines', 'accessories', 'shootings', 'cleanings')
     
     for weapon in weapons:
         last_cleaning = weapon.last_cleaning
@@ -164,6 +167,31 @@ def gunsafe_home(request):
     
 
 @login_required(login_url='/accounts/login')
+def gunsafe_archive(request):
+    weapons = Weapon.objects.filter(user=request.user, is_sold=True).select_related('weapon_type').prefetch_related('calibers', 'magazines', 'accessories', 'shootings', 'cleanings')
+    
+    for weapon in weapons:
+        last_cleaning = weapon.last_cleaning
+        if last_cleaning:
+            rounds_since_cleaning = weapon.shootings.filter(date__gt=last_cleaning.date).aggregate(Sum('rounds'))['rounds__sum'] or 0
+        else:
+            rounds_since_cleaning = weapon.total_rounds_fired
+        weapon.rounds_since_cleaning = rounds_since_cleaning
+
+    weapon_types = WeaponType.objects.all().order_by('name')
+    calibers = Caliber.objects.all().order_by('name')
+
+    context = {
+        'weapons': weapons,
+        'weapon_types': weapon_types,
+        'calibers': calibers,
+        'today': date.today(),
+        'is_archive': True,
+    }
+    return render(request, 'gunsafe/archive.html', context)
+    
+
+@login_required(login_url='/accounts/login')
 def weapon_details(request, weapon_id):
     weapon = get_object_or_404(Weapon, id=weapon_id, user=request.user)
 
@@ -177,6 +205,8 @@ def weapon_details(request, weapon_id):
             weapon.calibers.set(caliber_ids)
             weapon.serial_no = request.POST.get('serial_no')
             weapon.action = request.POST.get('action_type')
+            weapon.purchase_date = request.POST.get('purchase_date') or None
+            weapon.is_sold = request.POST.get('is_sold') == 'on'
             weapon.save()
 
         elif action == 'edit_shooting':
