@@ -483,6 +483,7 @@ $('body').on('change','input[name=only_hi_protein_in_select]',function(){
   }
 })
 function refreshOnMealChange(form_id, thToRefresh, checkbox, data){
+  $('.stack-top').removeClass('stack-top'); // Clear stuck elevation classes
   $('#modalTitleSpan_' + form_id).replaceWith($('#modalTitleSpan_' + form_id, data));
   $('#td_' + form_id).replaceWith($('#td_' + form_id, data));
   $('#b-t-w').replaceWith($('#b-t-w', data));
@@ -512,7 +513,7 @@ $('body').on('change','select[name="to_update"]',function(e){
     if(newMealOptionText.includes('|')){
       var newMealOptionName = newMealOptionText.split('|')[0]
     } else{
-      var newMealOptionName = '------'
+      var newMealOptionName = '-----------------------'
     }
     $('#dropdownMeal_'+form_id).text(newMealOptionName);
     var rows = $('input[name=day]');

@@ -31,7 +31,8 @@
       border-radius: 10px;
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
       border: 1px solid #e1e5e8;
-      /* overflow: hidden removed to prevent dropdown clipping */
+      position: relative; /* Base for stacking context */
+      z-index: 1;
   }
   
   /* Desktop Layout: Instead of stacked column, spread meal cards in a CSS Grid */
@@ -44,6 +45,11 @@
           padding: 6px;
           align-items: stretch;
       }
+  }
+
+  /* Row Hover Elevation: Prevents cards in Row A from being hidden under Row B during hover */
+  #meals_list tbody tr:hover {
+      z-index: 5;
   }
 
   /* Morphing Table Cells (Day Info / Headers) */
@@ -86,10 +92,12 @@
           border: 1px solid #eef1f3;
           transition: transform 0.2s, box-shadow 0.2s;
           min-width: 120px; /* Prevent too much squishing */
+          z-index: 1;
       }
       #meals_list tbody td:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+          transform: translateY(-4px);
+          box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
+          z-index: 100; /* Ensure hovered card is above its neighbors */
       }
   }
 
@@ -130,7 +138,7 @@
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
       border-radius: 12px;
       padding: 10px;
-      z-index: 2000 !important;
+      z-index: 4000 !important; /* Must be higher than .stack-top (3000) */
       max-width: 90vw;
       width: auto !important;
       min-width: 260px;
@@ -145,7 +153,7 @@
 
   /* Dynamic Stacking Context Elevation */
   .stack-top {
-      z-index: 1050 !important; /* Higher than other cards */
+      z-index: 3000 !important; /* Extremely high to stay on top of everything */
       position: relative !important;
   }
   
@@ -279,18 +287,18 @@
                 <div class="font-weight-bold text-dark w-100 text-left mb-2 px-1" style="cursor:pointer; font-size: 0.95rem; line-height: 1.2;" id="dropdownMeal_{{ch_meal.id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   {% if ch_meal.meal_id %}
                   {{ch_meal}}{% for m in all %}{% if ch_meal.meal_id == m.0.id %} {% if m.0.special %} <span class="text-danger">*</span> {% endif %} {% endif %}{%endfor%}
-                    {% for m in all %}{% if ch_meal.meal_id == m.0.id %} {% if m.1.1 %}<sup class="fas fa-hourglass-start text-warning ml-1" ></sup>{% endif %} {% endif %}{%endfor%}
+                    {% for m in all %}{% if ch_meal.meal_id == m.0.id %} {% if m.1.1 %}<sup class="fas fa-hourglass-start text-dark ml-1" ></sup>{% endif %} {% endif %}{%endfor%}
                   {% else %}
-                  <span class="text-muted font-italic font-weight-normal">Brak zaplanowanego...</span>
+                  <span class="text-muted font-italic font-weight-normal">-----------------------</span>
                   {% endif %}
                 </div>
                 
                 <!-- Extras Area -->
                 <div class="text-left mt-auto px-1 w-100">
                 {% if ch_meal.extras %}
-                <small class="d-inline-block px-2 py-1 bg-light rounded text-muted border w-100" style="cursor:pointer; font-size: 0.75rem;" data-toggle="modal" data-target="#extrasModal" id="editExtrasSmallWrap_{{ch_meal.id}}">
+                <small class="px-2 py-1 text-muted w-100" style="cursor:pointer; font-size: 0.75rem;" data-toggle="modal" data-target="#extrasModal" id="editExtrasSmallWrap_{{ch_meal.id}}">
                   <i class="editExtras font-weight-bold" id="editExtrasSmall_{{ch_meal.id}}">
-                    <i class="fas fa-plus-circle text-info mr-1"></i> {{ch_meal.extras}}{% if ch_meal.extras.has_short_expiry %} <sup class="fas fa-hourglass-start text-warning ml-1" ></sup>{% endif %}
+                    {{ch_meal.extras}}{% if ch_meal.extras.has_short_expiry %} <sup class="fas fa-hourglass-start text-warning ml-1" ></sup>{% endif %}
                     {% if ch_meal.extras.is_high_carb %} <sup class="text-danger">{{ch_meal.extras.is_high_carb.0}}</sup> {% endif %}
                   <input type="hidden" id="clicked_position_meal_{{ch_meal.id}}" value="{{ch_meal}}">
                   <input type="hidden" id="clicked_position_extras_{{ch_meal.id}}" value="{{ch_meal.extras}}">
@@ -429,13 +437,14 @@
         // Universal scroll trigger
         setTimeout(scrollToToday, 600);
 
-        // Dropdown Stacking Fix: Elevate active row/cell to prevents clipping
-        $('.dropdown').on('show.bs.dropdown', function () {
+        // Dropdown Stacking Fix: Elevate active row/cell using delegation for AJAX support
+        $(document).on('show.bs.dropdown', '.dropdown', function () {
+            $('.stack-top').removeClass('stack-top'); // Clear any stuck values
             $(this).closest('tr').addClass('stack-top');
             $(this).addClass('stack-top');
         });
 
-        $('.dropdown').on('hide.bs.dropdown', function () {
+        $(document).on('hide.bs.dropdown', '.dropdown', function () {
             $(this).closest('tr').removeClass('stack-top');
             $(this).removeClass('stack-top');
         });
