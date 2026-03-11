@@ -155,6 +155,7 @@ def home(request):
         'meal_option__position').values(
         'meal_option__meal_option', 'meal_option_id').distinct()
         meals = MealsList.objects.select_related('meal').filter(user=request.user, current=1)
+        meals_all = MealsList.objects.select_related('meal').filter(user=request.user)
         cars_owned = Car.objects.filter(user=request.user, sold=0)
         cars_sold = Car.objects.filter(user=request.user, sold=1)
         receipts = Receipt.objects.filter(user=request.user)
@@ -178,12 +179,13 @@ def home(request):
         day_fat = 0
         day_carb = 0
 
-        for meal in meals:
+        for meal in meals_all:
             try:
                 if meal.day.split('_')[1] == str(today):
                     todays_meals.append(meal)
             except:
                 pass
+
 
             ingredients = list(MealIngredient.objects.select_related('ingredient_id').filter(meal_id=meal.meal_id))
             if meal.extras:
