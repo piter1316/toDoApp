@@ -2,345 +2,596 @@
 
 {% load l10n %}
 {% load divide %}
+
+{% block extra_head %}
+<style>
+  body { background-color: #f4f7f6 !important; }
+  .macro-badge {
+    display: inline-block;
+    min-width: 32px;
+    text-align: center;
+    padding: 2px 7px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #555;
+    background-color: #f4f6f8;
+    border-radius: 8px;
+    border: 1px solid #e1e5e8;
+    margin: 1px;
+  }
+  .macro-badge-kcal {
+    background-color: #343a40;
+    color: #fff !important;
+    border-color: #343a40;
+  }
+  .ingr-chevron { transition: transform .2s; }
+  .ingr-chevron.open { transform: rotate(180deg); }
+</style>
+{% endblock %}
+
 {% block body %}
 
 <div class="container-fluid py-2">
-  <div class="row">
-    <div class="container">
-      <div class="row">
-        <div class="col-12 col-xl-8 p-0 p-xl-1">
-          <div class="card shadow  p-0" style="" id="card">
-            <div class="card-header text-center py-0 px-1" id="card-header">
-              <div id="edit_panel">
-                <p id="option_name" class="lead mb-0" style="cursor:pointer;" title="Kliknj i edtyuj">
-                  {{meal.0.name|upper}} {%if meal.0.special%} * {% endif %} {%if meal.0.macro.is_hi_protein %} <sup><b>{{meal.0.macro.is_hi_protein.0}}</b></sup> {% endif %}<br>
-                  <small>{{calories}} <sup>kcal</sup> </small> |
-                  <small>{{protein}}g <sup>białko</sup></small> |
-                  <small>{{fat}}g <sup>tłuszcz</sup></small> |
-                  <small>{{carbohydrates}}g <sup>węglowodany</sup></small>
-                </p>
-                <div id="new_meal_option_name" style="display:none;">
-                  <hr class="m-1">
-                  <form name="edit" action="{% url 'meals:update_meal_name' meal.0.id %}" method="post">{% csrf_token %}
-                    <div class="form-row">
-                      <div class="col-sm-12 col-md-7">
-                        <input class="form-control" name="new_meal_name" id="new_meal_name" type="text" value="{{meal.0.name}}">
-                      </div>
-                      <div class="col-sm-12 col-md-2">
-                        <label class="my-2" for="edit_special"><input class="" type="checkbox" name="edit_special"
-                                                                  id="edit_special" {%if meal.0.special%}checked{% endif %}> Danie
-                      specjalne</label>
-                      </div>
-                      <div class="col-sm-12 col-md-3"><button class="btn btn-secondary btn-block" type="submit" name="edit" >Zmień</button></div>
-                    </div>
-                      <hr class="m-1">
-                  </form>
-                </div>
-                <div class="mb-1" id="meal_copy_div" style="display:none;">
-                  <form method="post" name="copy" action="{% url 'meals:copy_meal' meal.0.id %}" class="d-flex justify-content-between">
-                    {% csrf_token %}
-                    <input type="text" class="form-control" placeholder="nowa nazwa po skopiowaniu" name="copy_name" required value="{{meal.0.name}} v2">
-                    <button class="btn btn-secondary" type="submit" name="copy_submit">Kopiuj</button>
-                  </form>
-                </div>
+  <div class="row justify-content-center">
+    <div class="col-12 col-xl-8 px-1 px-md-2">
 
+      <!-- ══ HEADER CARD ══════════════════════════════════ -->
+      <div class="card shadow-sm mb-3" id="card"
+           style="border-radius:10px; border:1px solid #e1e5e8; overflow:hidden;">
+        <div class="card-header p-0" id="card-header"
+             style="background:#f8f9fa; border-bottom:1px solid #eee;">
+          <div id="edit_panel">
+
+            <!-- Title row -->
+            <div class="d-flex justify-content-between align-items-center px-3 py-2 flex-wrap"
+                 style="gap:6px;">
+              <p class="font-weight-bold mb-0 text-uppercase text-dark"
+                 style="font-size:1rem; letter-spacing:.02em;">
+                {{meal.0.name|upper}}
+                {% if meal.0.special %}<span class="text-danger ml-1">*</span>{% endif %}
+                {% if meal.0.macro.is_hi_protein %}
+                  <sup><b>{{meal.0.macro.is_hi_protein.0}}</b></sup>
+                {% endif %}
+              </p>
+              <div class="d-flex flex-wrap align-items-center" style="gap:4px;">
+                <span class="macro-badge macro-badge-kcal">{{calories}} kcal</span>
+                <span class="macro-badge">{{protein}}g <small>B</small></span>
+                <span class="macro-badge">{{fat}}g <small>T</small></span>
+                <span class="macro-badge">{{carbohydrates}}g <small>W</small></span>
+                <!-- Action buttons -->
+                <button type="button"
+                        class="btn btn-outline-secondary btn-sm ml-1"
+                        id="btn_toggle_name_edit"
+                        title="Zmień nazwę">
+                  <i class="fas fa-pen" style="font-size:.7rem;"></i>
+                </button>
+                <button type="button"
+                        class="btn btn-outline-secondary btn-sm"
+                        id="btn_toggle_copy"
+                        title="Kopiuj posiłek">
+                  <i class="fas fa-copy" style="font-size:.7rem;"></i>
+                </button>
               </div>
             </div>
 
-            <ul class="list-group list-group-flush" id="ingredients_list">
-              <li class="list-group-item p-0 mx-1 d-flex justify-content-between" id="ingr">
-                <small>Składniki:</small>
-                <small>
-                  {% if meal.0.macro.total_vegies %}<i class="fas fa-solid fa-carrot"></i> {{meal.0.macro.total_vegies}}{% endif %} {% if meal.0.macro.total_fruits %}<i class="fas fa-apple-alt"></i> {{meal.0.macro.total_fruits}}{% endif %}
-                  {% if meal.0.macro.is_hi_protein %} # {{meal.0.macro.is_hi_protein.1}}{% endif %}
-                </small>
-
-              </li>
-              {% for ingredient in ingredients %}
-              <li class="list-group-item d-flex justify-content-between align-items-center py-0 px-1 default" id="li_{{ingredient.id}}">
-                <span class="">
-                  <b>{{ingredient}}</b>
-                  <span class="no_print">
-                    {% if ingredient.ingredient_id.short_expiry %}
-                      <i class="fas fa-hourglass-start" ></i>
-                    {% endif %}
-                    <br>
-                    <small>{{ingredient.kcal}}kcal</small> |
-                    <small>{{ingredient.protein}}b</small> |
-                    <small>{{ingredient.fat}}t</small> |
-                    <small>{{ingredient.carb}}w</small>
-                  </span>
-                </span>
-                <span>
-                  <span class="py-2 font-weight-bold">{{ingredient.quantity}} g |</span>
-                  {% if ingredient.quantity|divide:ingredient.ingredient_id.weight_per_unit > 0 %}
-                  <span class="py-2 font-weight-bold no_print"> {{ ingredient.quantity |divide:ingredient.ingredient_id.weight_per_unit }} szt |</span>
-                  {% endif %}
-                  <span class="py-0 px-2 btn btn-dark dropdown-toggle dropdown-toggle-split dropdownMenuButton_" style="cursor:pointer;" id="dropdownMenuButton_{{ingredient.id }}">
-                  </span>
-                </span>
-              </li>
-              <li class="list-group-item  update_ingredient_ p-1" id="update_ingredient_{{ingredient.id }}" style="display:none;">
-                <form class="updateIngredient_ form" action="{% url 'meals:update_ingredient' meal.0.id ingredient.id  %}"
-                      method="post" id="updateIngredient_{{ingredient.id }}">{% csrf_token %}
-                  <div class="form-row mx-auto">
-                    <div class="col-6 pr-0">
-                      <input class="form-control" type="number" min="0" step="0.01" name="new_quantity" id="newQuantity_{{ingredient.id }}"
-                             value="{% localize off %}{{ingredient.quantity}}{% endlocalize %}">
-                    </div>
-                    <div class="col-6 pl-0">
-                      <select class="form-control" name="new_unit" id="newUnit_{{ingredient.id }}">
-                        <option value="2">g</option>
-                        <option disabled>-----</option>
-                        {% for unit in units %}
-                          <option value="{{unit.id}}">{{unit}}</option>
-                        {% endfor %}
-                      </select>
-                    </div>
-                    <div class="col-12 mb-1">
-                      <div class="btn-group btn-block">
-                      <button class="btn btn-secondary" type="submit">Zmień</button>
-                      <a id="deleteIngr_{{ingredient.id}}" href="{% url 'meals:delete_ingredient' meal.0.id  ingredient.id %}"
-                         class="delete_ingr_ btn btn-danger"><i class="far fa-trash-alt"></i></a>
-                    </div>
+            <!-- Edit name form — hidden by default -->
+            <div id="new_meal_option_name" style="display:none;"
+                 class="px-3 py-2 border-top">
+              <form id="form_edit_name"
+                    action="{% url 'meals:update_meal_name' meal.0.id %}"
+                    method="post">{% csrf_token %}
+                <div class="form-row align-items-center">
+                  <div class="col-sm-12 col-md-7 mb-1">
+                    <input class="form-control form-control-sm"
+                           name="new_meal_name"
+                           id="new_meal_name"
+                           type="text"
+                           value="{{meal.0.name}}">
                   </div>
-                  <div class="form-group row mb-0">
+                  <div class="col-sm-6 col-md-2 mb-1">
+                    <label class="mb-0 small" for="edit_special">
+                      <input type="checkbox"
+                             name="edit_special"
+                             id="edit_special"
+                             {% if meal.0.special %}checked{% endif %}> Specjalne
+                    </label>
                   </div>
-                </form>
-                <table class="table table-sm table-bordered mb-1">
-                    <tr>
-                      <td class="py-0"><small>% w posiłku:</small></td>
-                      <td class="text-right py-0">
-                        <SUP>kcal</SUP>&frasl;<sub>{% widthratio ingredient.kcal|divide:calories 1 100 %}%</sub> |
-                        <SUP>b</SUP>&frasl;<sub>{% widthratio ingredient.protein|divide:protein 1 100 %}%</sub> |
-                        <SUP>t</SUP>&frasl;<sub>{% widthratio ingredient.fat|divide:fat 1 100 %}%</sub> |
-                        <SUP>w</SUP>&frasl;<sub>{% widthratio ingredient.carb|divide:carbohydrates 1 100 %}%</sub>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td class="py-0"><small>Na 100g:</small></td>
-                      <td class="text-right py-0">
-                        <SUP>{{ingredient.ingredient_id.calories_per_100_gram}}</SUP>&frasl;<sub>kcal</sub>
-                        <SUP>{{ingredient.ingredient_id.protein_per_100_gram}}</SUP>&frasl;<sub>b</sub>
-                        <SUP>{{ingredient.ingredient_id.fat_per_100_gram}}</SUP>&frasl;<sub>t</sub>
-                        <SUP>{{ingredient.ingredient_id.carbohydrates_per_100_gram}}</SUP>&frasl;<sub>w</sub>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td class="py-0"><small>Sklep:</small></td>
-                      <td class="text-right py-0">
-                        {% if ingredient.ingredient_id.shop %}
-                          <span class="py-2 small no_print">{{ingredient.ingredient_id.shop}}</span>
-                        {% endif %}
-                      </td>
-                    </tr>
-                  </table>
-                  <a class="btn btn-sm btn-block btn-dark mb-1" href="{% url 'meals:edit_ingredient_index' ingredient.ingredient_id.id %}">Edycja produktu</a>
-              </li>
-              {% endfor %}
-            </ul>
-            <ul class="list-group list-group-flush">
-              <li class="list-group-item mt-2">
-                <div class="d-flex justify-content-between">
-                  <div class="btn-group mr-2" role="group" aria-label="First group">
-                    <button id="new_ingredient_form_toggle" type="button" class="btn btn-outline-secondary btn-sm ml-1">
-                      Opcje
-                    </button>
-                    <button id="print_meal_recipe" onclick="createPDFRecipe()" type="button" class="btn btn-outline-secondary btn-sm">
-                      <i class="fas fa-print"></i>
-                    </button>
-                    <button type="button" class="btn btn-dark btn-sm" style=" border-radius: 0px 5px 5px 0px !important;" data-toggle="modal" data-target="#shopping_list_modal">
-                      <i class="px-2 fas fa-shopping-cart"></i>
-                    </button>
-                    <button class="btn btn-block btn-outline-info btn-block btn-sm" id="addding_ingr_info" style="display:none">Zapisywanie...</button>
-                  </div>
-                  <div>
-                    <a class="btn btn-outline-dark btn-sm" href="{% url 'meals:index' %}" >jadłospis</a>
+                  <div class="col-sm-6 col-md-3 mb-1 d-flex" style="gap:4px;">
+                    <button class="btn btn-dark btn-sm flex-grow-1"
+                            type="submit">Zmień</button>
+                    <button type="button"
+                            class="btn btn-outline-secondary btn-sm"
+                            id="btn_close_name_edit">&times;</button>
                   </div>
                 </div>
+              </form>
+            </div>
 
-                <form style="display:none;" class="mt-2" action="{% url 'meals:add_ingredient' meal.0.id %}"
-                      method="post" id="new_ingredient_form">{% csrf_token %}
+            <!-- Copy form — hidden by default -->
+            <div id="meal_copy_div" style="display:none;"
+                 class="px-3 py-2 border-top">
+              <form method="post"
+                    name="copy"
+                    action="{% url 'meals:copy_meal' meal.0.id %}"
+                    class="d-flex" style="gap:6px;">
+                {% csrf_token %}
+                <input type="text"
+                       class="form-control form-control-sm"
+                       placeholder="nowa nazwa po skopiowaniu"
+                       name="copy_name"
+                       required
+                       value="{{meal.0.name}} v2">
+                <button class="btn btn-dark btn-sm"
+                        type="submit"
+                        name="copy_submit"
+                        style="white-space:nowrap;">Kopiuj</button>
+                <button type="button"
+                        class="btn btn-outline-secondary btn-sm"
+                        id="btn_close_copy">&times;</button>
+              </form>
+            </div>
 
-                  <small>Nowy składnik:</small>
-                  <div class="form-row mb-2">
-                    <select class="form-control" name="ingredient" id="select_ingredient">
-                      {% for ingredient in user_ingredients %}
-                      <option value="{{ingredient.id}}">{{ingredient}} | {{ingredient.calories_per_100_gram}} kcal/100g</option>
+          </div><!-- /edit_panel -->
+        </div><!-- /card-header -->
+
+        <!-- ══ INGREDIENTS LIST ═════════════════════════════ -->
+        <ul class="list-group list-group-flush" id="ingredients_list">
+
+          <!-- Sub-header -->
+          <li class="list-group-item px-3 py-1 d-flex justify-content-between align-items-center"
+              style="background:#f8f9fa; border-bottom:1px solid #eee;
+                     font-size:.73rem; color:#666; font-weight:600;
+                     text-transform:uppercase; letter-spacing:.04em;">
+            <span>Składniki</span>
+            <span>
+              {% if meal.0.macro.total_vegies %}
+                <span class="macro-badge">
+                  <i class="fas fa-carrot"></i> {{meal.0.macro.total_vegies}}g
+                </span>
+              {% endif %}
+              {% if meal.0.macro.total_fruits %}
+                <span class="macro-badge">
+                  <i class="fas fa-apple-alt"></i> {{meal.0.macro.total_fruits}}g
+                </span>
+              {% endif %}
+              {% if meal.0.macro.is_hi_protein %}
+                <span class="macro-badge"># {{meal.0.macro.is_hi_protein.1}}</span>
+              {% endif %}
+            </span>
+          </li>
+
+          {% for ingredient in ingredients %}
+
+          <!-- Ingredient display row -->
+          <li class="list-group-item d-flex justify-content-between align-items-center py-1 px-3 default"
+              id="li_{{ingredient.id}}">
+            <span>
+              <b>{{ingredient}}</b>
+              {% if ingredient.ingredient_id.short_expiry %}
+                <i class="fas fa-hourglass-start text-muted ml-1"
+                   style="font-size:.65rem;"></i>
+              {% endif %}
+              <br>
+              <small class="text-muted no_print">
+                {{ingredient.kcal}} kcal |
+                {{ingredient.protein}}g B |
+                {{ingredient.fat}}g T |
+                {{ingredient.carb}}g W
+              </small>
+            </span>
+            <span class="d-flex align-items-center" style="gap:6px;">
+              <span class="font-weight-bold small">{{ingredient.quantity}} g</span>
+              {% if ingredient.quantity|divide:ingredient.ingredient_id.weight_per_unit > 0 %}
+                <small class="text-muted no_print">
+                  / {{ ingredient.quantity|divide:ingredient.ingredient_id.weight_per_unit }} szt
+                </small>
+              {% endif %}
+              <button type="button"
+                      class="btn btn-dark btn-sm py-0 px-2 ingr-toggle-btn"
+                      id="dropdownMenuButton_{{ingredient.id}}"
+                      style="border-radius:6px;">
+                <i class="fas fa-chevron-down ingr-chevron"
+                   style="font-size:.6rem; pointer-events:none;"></i>
+              </button>
+            </span>
+          </li>
+
+          <!-- Ingredient expand panel -->
+          <li class="list-group-item update_ingredient_ p-0"
+              id="update_ingredient_{{ingredient.id}}"
+              style="display:none; background:#f8f9fa;">
+            <div class="px-3 py-2">
+              <form class="updateIngredient_ form"
+                    action="{% url 'meals:update_ingredient' meal.0.id ingredient.id %}"
+                    method="post"
+                    id="updateIngredient_{{ingredient.id}}">{% csrf_token %}
+                <div class="form-row align-items-center mb-2">
+                  <div class="col-5 pr-1">
+                    <input class="form-control form-control-sm"
+                           type="number" min="0" step="0.01"
+                           name="new_quantity"
+                           id="newQuantity_{{ingredient.id}}"
+                           value="{% localize off %}{{ingredient.quantity}}{% endlocalize %}">
+                  </div>
+                  <div class="col-7 pl-1">
+                    <select class="form-control form-control-sm"
+                            name="new_unit"
+                            id="newUnit_{{ingredient.id}}">
+                      <option value="2">g</option>
+                      <option disabled>─────</option>
+                      {% for unit in units %}
+                        <option value="{{unit.id}}">{{unit}}</option>
                       {% endfor %}
                     </select>
                   </div>
-                  <div class="form-row mb-2">
-                    <div class="input-group mb-3">
-                      <input class="form-control" type="number" step="0.01" min="0" placeholder="Ilość" name="quantity"
-                             value="1" id="quantity">
-                      <div class="input-group-append">
-                        <span class="" id="addon-quantity">
-                          <select class="form-control" name="unit" id="unit">
-                            {% for unit in units %}
-                            <option value="{{unit.id}}" {% if unit.id == 2%} selected {% endif %}>{{unit}}</option>
-                            {% endfor %}
-                          </select>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="form-row mb-2">
-                    <div class="col">
-                      <button class="btn btn-secondary btn-block" type="submit"><i class="fas fa-plus"></i> Składnik
-                      </button>
-                    </div>
-                  </div>
-                  <a class="btn btn-outline-secondary btn-block" href="{% url 'meals:edit_ingredients' %}">Zarządzaj składnikami</a>
-                  <div class="dropdown-divider"></div>
-                  <a onclick="return confirm('Usunąć {{meal.0}} i wszystkie składniki?')"
-                     href="{% url 'meals:delete_meal' meal.0.id  %}" class="btn btn-danger btn-block">Usuń
-                    {{meal.0.name}}</a>
-                </form>
-              </li>
-              <li class="list-group-item">
+                </div>
+                <div class="btn-group btn-block mb-2">
+                  <button class="btn btn-dark btn-sm" type="submit">Zmień</button>
+                  <a id="deleteIngr_{{ingredient.id}}"
+                     href="{% url 'meals:delete_ingredient' meal.0.id ingredient.id %}"
+                     class="delete_ingr_ btn btn-danger btn-sm">
+                    <i class="far fa-trash-alt"></i>
+                  </a>
+                </div>
+              </form>
 
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div class="col-12 col-xl-4  p-0 p-xl-1">
-          <div class="card shadow p-0 h-100" style="" id="update_recipe_container">
-            <div class="card-header text-center">
-              <p class="lead">Przepis</p>
+              <table class="table table-sm table-bordered mb-1" style="font-size:.72rem;">
+                <tr>
+                  <td class="py-0 text-muted">% w posiłku:</td>
+                  <td class="text-right py-0">
+                    <sup>kcal</sup>&frasl;<sub>{% widthratio ingredient.kcal|divide:calories 1 100 %}%</sub> |
+                    <sup>B</sup>&frasl;<sub>{% widthratio ingredient.protein|divide:protein 1 100 %}%</sub> |
+                    <sup>T</sup>&frasl;<sub>{% widthratio ingredient.fat|divide:fat 1 100 %}%</sub> |
+                    <sup>W</sup>&frasl;<sub>{% widthratio ingredient.carb|divide:carbohydrates 1 100 %}%</sub>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="py-0 text-muted">Na 100g:</td>
+                  <td class="text-right py-0">
+                    {{ingredient.ingredient_id.calories_per_100_gram}} kcal |
+                    {{ingredient.ingredient_id.protein_per_100_gram}}g B |
+                    {{ingredient.ingredient_id.fat_per_100_gram}}g T |
+                    {{ingredient.ingredient_id.carbohydrates_per_100_gram}}g W
+                  </td>
+                </tr>
+                {% if ingredient.ingredient_id.shop %}
+                <tr>
+                  <td class="py-0 text-muted">Sklep:</td>
+                  <td class="text-right py-0">{{ingredient.ingredient_id.shop}}</td>
+                </tr>
+                {% endif %}
+              </table>
+              <a class="btn btn-outline-secondary btn-sm btn-block"
+                 href="{% url 'meals:edit_ingredient_index' ingredient.ingredient_id.id %}">
+                Edycja produktu
+              </a>
             </div>
-            <div class="h-100">
-              <form action="{% url 'meals:add_recipe' meal.0.id %}" method="post" id="recipe_update" class="h-100 d-flex align-items-start flex-column"> {% csrf_token %}
-                <textarea name="update_recipe_textarea" id="update_recipe_textarea" class="form-control h-100"
-                          placeholder="{% if not meal.0.recipe %}Wprowadź przepis...{% endif %}"
-                          rows="{{recipe_rows}}"
-                          readonly>{% if meal.0.recipe %}{{meal.0.recipe}}{% endif %}</textarea>
-                <button id="allow_update_recipe" type="button" class="btn btn-block btn-secondary">Edytuj</button>
-                <button id="update_recipe" type="submit" class="btn btn-block btn-success mt-0 d-none">Zapisz</button>
+          </li>
+
+          {% endfor %}
+
+          <!-- ── Action bar ─────────────────────────────── -->
+          <li class="list-group-item py-2">
+            <div class="d-flex justify-content-between align-items-center flex-wrap"
+                 style="gap:6px;">
+              <div class="btn-group" role="group">
+                <button id="new_ingredient_form_toggle"
+                        type="button"
+                        class="btn btn-outline-secondary btn-sm">Opcje</button>
+                <button id="print_meal_recipe"
+                        onclick="createPDFRecipe()"
+                        type="button"
+                        class="btn btn-outline-secondary btn-sm">
+                  <i class="fas fa-print"></i>
+                </button>
+                <button type="button"
+                        class="btn btn-dark btn-sm"
+                        data-toggle="modal"
+                        data-target="#shopping_list_modal">
+                  <i class="fas fa-shopping-cart"></i>
+                </button>
+              </div>
+              <button class="btn btn-outline-secondary btn-sm"
+                      id="addding_ingr_info"
+                      style="display:none;">Zapisywanie…</button>
+              <a class="btn btn-outline-secondary btn-sm"
+                 href="{% url 'meals:index' %}">Jadłospis</a>
+            </div>
+
+            <!-- Add ingredient form -->
+            <div id="new_ingredient_form_wrapper" style="display:none;" class="mt-2">
+              <form action="{% url 'meals:add_ingredient' meal.0.id %}"
+                    method="post"
+                    id="new_ingredient_form">{% csrf_token %}
+                <small class="text-muted font-weight-bold text-uppercase d-block mb-1"
+                       style="font-size:.7rem; letter-spacing:.04em;">Nowy składnik:</small>
+                <div class="mb-2">
+                  <select class="form-control form-control-sm"
+                          name="ingredient"
+                          id="select_ingredient">
+                    {% for ingredient in user_ingredients %}
+                      <option value="{{ingredient.id}}">
+                        {{ingredient}} | {{ingredient.calories_per_100_gram}} kcal/100g
+                      </option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="input-group input-group-sm mb-2">
+                  <input class="form-control"
+                         type="number" step="0.01" min="0"
+                         placeholder="Ilość"
+                         name="quantity"
+                         value="1"
+                         id="quantity">
+                  <div class="input-group-append">
+                    <select class="form-control form-control-sm"
+                            name="unit"
+                            id="unit">
+                      {% for unit in units %}
+                        <option value="{{unit.id}}"
+                                {% if unit.id == 2 %}selected{% endif %}>
+                          {{unit}}
+                        </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+                <button class="btn btn-dark btn-block btn-sm mb-2"
+                        type="submit">
+                  <i class="fas fa-plus"></i> Dodaj składnik
+                </button>
+                <a class="btn btn-outline-secondary btn-block btn-sm mb-2"
+                   href="{% url 'meals:edit_ingredients' %}">
+                  Zarządzaj składnikami
+                </a>
+                <div class="dropdown-divider"></div>
+                <a onclick="return confirm('Usunąć {{meal.0}} i wszystkie składniki?')"
+                   href="{% url 'meals:delete_meal' meal.0.id %}"
+                   class="btn btn-danger btn-block btn-sm">
+                  Usuń {{meal.0.name}}
+                </a>
               </form>
             </div>
-          </div>
+          </li>
+
+          <li class="list-group-item py-1"></li>
+        </ul><!-- /ingredients_list -->
+
+      </div><!-- /card -->
+
+      <!-- ══ RECIPE CARD ════════════════════════════════ -->
+      <div class="card shadow-sm"
+           style="border-radius:10px; border:1px solid #e1e5e8; overflow:hidden;"
+           id="update_recipe_container">
+        <div class="card-header py-1 px-3"
+             style="background:#f8f9fa; border-bottom:1px solid #eee;
+                    font-size:.73rem; font-weight:700;
+                    text-transform:uppercase; letter-spacing:.04em; color:#555;">
+          Przepis
+        </div>
+        <div>
+          <form action="{% url 'meals:add_recipe' meal.0.id %}"
+                method="post"
+                id="recipe_update">{% csrf_token %}
+            <textarea name="update_recipe_textarea"
+                      id="update_recipe_textarea"
+                      class="form-control border-0 rounded-0"
+                      placeholder="{% if not meal.0.recipe %}Wprowadź przepis…{% endif %}"
+                      rows="{{recipe_rows}}"
+                      readonly
+                      style="resize:vertical; font-size:.85rem;">{% if meal.0.recipe %}{{meal.0.recipe}}{% endif %}</textarea>
+            <button id="allow_update_recipe"
+                    type="button"
+                    class="btn btn-outline-secondary btn-block btn-sm rounded-0">
+              Edytuj przepis
+            </button>
+            <button id="update_recipe"
+                    type="submit"
+                    class="btn btn-dark btn-block btn-sm rounded-0 d-none">
+              Zapisz przepis
+            </button>
+          </form>
         </div>
       </div>
-    </div>
-  </div>
-  <div class="modal fade" id="shopping_list_modal" tabindex="-1" role="dialog" aria-labelledby="shopping_list_modal_label" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-      <form method="post" action="{% url 'meals:generate_shopping_list_for_meal' meal.0.id %}" class="modal-content">{%csrf_token%}
-        <div class="modal-header">
-          <h5 class="modal-title" id="shopping_list_modal_label">Ilość porcji</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <input type="number" class="form-control" min="1" value="1" name="portions">
-          <label>
-            <input type="checkbox" class="" name="append_to_existing_shopping_lists">
-            Dodaj do istniejących list zakupów
-          </label>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Anuluj</button>
-          <button type="submit" class="btn btn-dark">Generuj</button>
-        </div>
-      </form>
-    </div>
-  </div>
-  <script type="text/javascript">
 
+    </div><!-- /col -->
+  </div><!-- /row -->
+</div><!-- /container-fluid -->
+
+
+<!-- ══ SHOPPING LIST MODAL ══════════════════════════════ -->
+<div class="modal fade" id="shopping_list_modal"
+     tabindex="-1" role="dialog"
+     aria-labelledby="shopping_list_modal_label" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <form method="post"
+          action="{% url 'meals:generate_shopping_list_for_meal' meal.0.id %}"
+          class="modal-content">{%csrf_token%}
+      <div class="modal-header py-2">
+        <h5 class="modal-title font-weight-bold" id="shopping_list_modal_label">
+          Ilość porcji
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="number" class="form-control" min="1" value="1" name="portions">
+        <label class="mt-2 d-flex align-items-center" style="gap:6px; font-size:.85rem;">
+          <input type="checkbox" name="append_to_existing_shopping_lists">
+          Dodaj do istniejących list zakupów
+        </label>
+      </div>
+      <div class="modal-footer py-2">
+        <button type="button"
+                class="btn btn-outline-secondary btn-sm"
+                data-dismiss="modal">Anuluj</button>
+        <button type="submit" class="btn btn-dark btn-sm">Generuj</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<!-- ══ JAVASCRIPT ════════════════════════════════════════ -->
+<script type="text/javascript">
+$(document).ready(function () {
+
+  /* ── helpers ──────────────────────────────────────────── */
   function reloadData(json) {
     $('#ingredients_list').replaceWith($('#ingredients_list', json));
-    //$('#card-header').load(document.URL + ' #edit_panel');
     $('#card-header').replaceWith($('#card-header', json));
   }
 
-  $('#new_ingredient_form').on('submit', function(e){
-    e.preventDefault();
-    $.ajax({
-      type:'POST',
-      url:'/mealsEdit/add_ingredient/' + {{meal.0.id}},
-      data:{
-        ingredient:$('#select_ingredient').val(),
-        quantity:$('#quantity').val(),
-        unit:$('#unit').val(),
-        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
-      },
-      success: function(json){
-        setTimeout (function() {
-         reloadData(json);
-      }, 200);
-      }
-    });
+  /* ── Name-edit panel ──────────────────────────────────── */
+  $(document).on('click', '#btn_toggle_name_edit', function (e) {
+    e.stopPropagation();
+    var panel = $('#new_meal_option_name');
+    var isOpen = panel.is(':visible');
+    // close both first
+    $('#new_meal_option_name').hide();
+    $('#meal_copy_div').hide();
+    if (!isOpen) { panel.slideDown(150); }
   });
-  $('body').on('submit','.updateIngredient_',function(e){
+
+  $(document).on('click', '#btn_close_name_edit', function (e) {
+    e.stopPropagation();
+    $('#new_meal_option_name').slideUp(150);
+  });
+
+  /* ── Copy panel ───────────────────────────────────────── */
+  $(document).on('click', '#btn_toggle_copy', function (e) {
+    e.stopPropagation();
+    var panel = $('#meal_copy_div');
+    var isOpen = panel.is(':visible');
+    $('#new_meal_option_name').hide();
+    $('#meal_copy_div').hide();
+    if (!isOpen) { panel.slideDown(150); }
+  });
+
+  $(document).on('click', '#btn_close_copy', function (e) {
+    e.stopPropagation();
+    $('#meal_copy_div').slideUp(150);
+  });
+
+  /* ── Options / add-ingredient panel ──────────────────── */
+  $(document).on('click', '#new_ingredient_form_toggle', function () {
+    $('#new_ingredient_form_wrapper').slideToggle(200);
+  });
+
+  /* ── Ingredient expand/collapse ─────────────────────── */
+  $(document).on('click', '.ingr-toggle-btn', function () {
+    var btn = $(this);
+    var id = btn.attr('id').replace('dropdownMenuButton_', '');
+    var panel = $('#update_ingredient_' + id);
+    var chevron = btn.find('.ingr-chevron');
+    var isOpen = panel.is(':visible');
+
+    // collapse all others
+    $('.update_ingredient_').not(panel).slideUp(150);
+    $('.ingr-chevron').not(chevron).removeClass('open');
+
+    if (isOpen) {
+      panel.slideUp(150);
+      chevron.removeClass('open');
+    } else {
+      panel.slideDown(150);
+      chevron.addClass('open');
+    }
+  });
+
+  /* ── Recipe edit toggle ───────────────────────────────── */
+  $(document).on('click', '#allow_update_recipe', function () {
+    $('#update_recipe_textarea').prop('readonly', false).focus();
+    $(this).addClass('d-none');
+    $('#update_recipe').removeClass('d-none');
+  });
+
+  /* ── Add ingredient (AJAX) ───────────────────────────── */
+  $(document).on('submit', '#new_ingredient_form', function (e) {
     e.preventDefault();
-    var id = e.target.id
-    var ingr_id = parseInt(id.split('_')[1])
     $.ajax({
-      type:'POST',
-      url:'/mealsEdit/update_ingredient/' + {{meal.0.id}} + '/' + ingr_id,
-      data:{
-        new_quantity:$('#newQuantity_'+ ingr_id).val(),
-        new_unit:$('#newUnit_' + ingr_id).val(),
-        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+      type: 'POST',
+      url: '/mealsEdit/add_ingredient/' + {{meal.0.id}},
+      data: {
+        ingredient: $('#select_ingredient').val(),
+        quantity:   $('#quantity').val(),
+        unit:       $('#unit').val(),
+        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').first().val(),
       },
-      success: function(json){
-        setTimeout (function() {
-          reloadData(json);
-      }, 200);
+      success: function (json) {
+        setTimeout(function () { reloadData(json); }, 200);
       }
     });
   });
 
-  $('body').on('submit','#recipe_update',function(e){
+  /* ── Update ingredient (AJAX) ────────────────────────── */
+  $(document).on('submit', '.updateIngredient_', function (e) {
+    e.preventDefault();
+    var ingr_id = parseInt(e.target.id.split('_')[1]);
+    $.ajax({
+      type: 'POST',
+      url: '/mealsEdit/update_ingredient/' + {{meal.0.id}} + '/' + ingr_id,
+      data: {
+        new_quantity: $('#newQuantity_' + ingr_id).val(),
+        new_unit:     $('#newUnit_' + ingr_id).val(),
+        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').first().val(),
+      },
+      success: function (json) {
+        setTimeout(function () { reloadData(json); }, 200);
+      }
+    });
+  });
+
+  /* ── Update recipe (AJAX) ────────────────────────────── */
+  $(document).on('submit', '#recipe_update', function (e) {
     e.preventDefault();
     $.ajax({
-      type:'POST',
-      url:'/mealsEdit/add_recipe/' + {{meal.0.id}},
-      data:{
-        update_recipe_textarea:$('#update_recipe_textarea').val(),
-        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+      type: 'POST',
+      url: '/mealsEdit/add_recipe/' + {{meal.0.id}},
+      data: {
+        update_recipe_textarea: $('#update_recipe_textarea').val(),
+        csrfmiddlewaretoken:    $('input[name=csrfmiddlewaretoken]').first().val(),
       },
-      success: function(json){
-        setTimeout (function() {
+      success: function (json) {
+        setTimeout(function () {
           $('#update_recipe_container').replaceWith($('#update_recipe_container', json));
-      }, 200);
+        }, 200);
       }
     });
   });
 
-  $('body').on('submit','#new_meal_option_name',function(e){
+  /* ── Update meal name (AJAX) ─────────────────────────── */
+  $(document).on('submit', '#form_edit_name', function (e) {
     e.preventDefault();
     $.ajax({
-      type:'POST',
-      url:'/mealsEdit/update_meal_name/' + {{meal.0.id}},
-      data:{
-        new_meal_name:$('#new_meal_name').val(),
-        edit_special:$('#edit_special').prop('checked'),
-        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+      type: 'POST',
+      url: '/mealsEdit/update_meal_name/' + {{meal.0.id}},
+      data: {
+        new_meal_name: $('#new_meal_name').val(),
+        edit_special:  $('#edit_special').prop('checked'),
+        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').first().val(),
       },
-      success: function(json){
-        setTimeout (function() {
+      success: function (json) {
+        setTimeout(function () {
           $('#card-header').replaceWith($('#card-header', json));
-      }, 200);
+        }, 200);
       }
     });
   });
 
-  $('body').on('click','.delete_ingr_',function(e){
+  /* ── Delete ingredient (AJAX) ────────────────────────── */
+  $(document).on('click', '.delete_ingr_', function (e) {
     e.preventDefault();
-    var id = e.target.id
-    var ingr_id = parseInt(id.split('_')[1])
+    var ingr_id = parseInt(this.id.split('_')[1]);
     $.ajax({
-      type:'GET',
-      url:'/mealsEdit/delete_ingredient/'+{{meal.0.id}} +'/'+ ingr_id,
-      data:{
-      },
-      success: function(json){
-        reloadData(json);
-      },
+      type: 'GET',
+      url: '/mealsEdit/delete_ingredient/' + {{meal.0.id}} + '/' + ingr_id,
+      success: function (json) { reloadData(json); }
     });
   });
-  </script>
-  {% endblock %}
+
+}); // end document.ready
+</script>
+
+{% endblock %}
