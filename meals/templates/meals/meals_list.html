@@ -6,6 +6,7 @@
   body {
       background-color: #f4f7f6 !important;
       color: #333 !important;
+      overflow-x: hidden !important; /* Critical to prevent horizontal scrollbars on mobile */
   }
   
   /* Morphing Table into block/grid elements */
@@ -139,10 +140,26 @@
       border-radius: 12px;
       padding: 10px;
       z-index: 4000 !important; /* Must be higher than .stack-top (3000) */
-      max-width: 90vw;
+      max-width: 95vw;
       width: auto !important;
-      min-width: 260px;
+      min-width: 280px;
       color: #333;
+      margin: 0 !important; /* Prevent margins from pushing it off-screen */
+  }
+
+  @media (max-width: 575.98px) {
+      .dropdown-menu-modern {
+          min-width: 260px;
+          max-width: 92vw;
+          /* Force centering on mobile and override Popper's calculations */
+          left: 50% !important;
+          right: auto !important;
+          transform: translate(-50%, 10px) !important;
+          margin: 0 !important;
+      }
+      .dropdown-menu-modern select {
+          max-width: 100% !important;
+      }
   }
   
   /* Ensure parent td doesn't clip or overlap wrongly */
@@ -284,7 +301,7 @@
                 </div>
                 
                 <!-- Inner Meal Content -->
-                <div class="font-weight-bold text-dark w-100 text-left mb-2 px-1" style="cursor:pointer; font-size: 0.95rem; line-height: 1.2;" id="dropdownMeal_{{ch_meal.id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <div class="font-weight-bold text-dark w-100 text-left mb-2 px-1" style="cursor:pointer; font-size: 0.95rem; line-height: 1.2;" id="dropdownMeal_{{ch_meal.id}}" data-toggle="dropdown" data-boundary="viewport" aria-haspopup="true" aria-expanded="false">
                   {% if ch_meal.meal_id %}
                   {{ch_meal}}{% for m in all %}{% if ch_meal.meal_id == m.0.id %} {% if m.0.special %} <span class="text-danger">*</span> {% endif %} {% endif %}{%endfor%}
                     {% for m in all %}{% if ch_meal.meal_id == m.0.id %} {% if m.1.1 %}<sup class="fas fa-hourglass-start text-dark ml-1" ></sup>{% endif %} {% endif %}{%endfor%}
@@ -312,7 +329,7 @@
                 </div>
                 
 <!--                Dropdown Actions-->
-                <div  class="dropdown-menu dropdown-menu-modern dropup p-3 ml-2 w-100" style="min-width: 280px;" id="dropdownMenu_{{ch_meal.id}}">
+                <div  class="dropdown-menu dropdown-menu-modern p-3" id="dropdownMenu_{{ch_meal.id}}">
                   {% if current %}
                   <div class=" mx-auto mb-1">
                     <small class="text-muted font-weight-bold text-uppercase d-block mb-2">Zmiana posiłku:</small>
@@ -320,7 +337,7 @@
                       <input type="hidden" name="record_id" value="{{ch_meal.id}}">
                       <input type="hidden" name="meal_option_id" value="{{ch_meal.meal_option_id}}">
                       <input type="hidden" name="meal_id" value="{{ch_meal.meal_id}}">
-                      <select class="form-control form-control-sm mb-3 shadow-sm" name="to_update" id="toUpdate_{{ch_meal.id}}">
+                      <select class="form-control form-control-sm mb-3 shadow-sm w-100" name="to_update" id="toUpdate_{{ch_meal.id}}" style="max-width: 100%;">
                         <option value="">-- WYCZYŚĆ POSIŁEK --</option>
                         {% for m in all %}
                           <option {% if ch_meal.meal_id == m.0.id %}selected="true"{% endif %} value="{{m.0.id}}">{{m.0}} | {{m.1.0}} kcal{% if m.0.special %} ** {% endif %} {% if m.1.2 %} | {{m.1.2.0}} {% endif %} </option>
