@@ -139,23 +139,24 @@
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
       border-radius: 12px;
       padding: 10px;
-      z-index: 4000 !important; /* Must be higher than .stack-top (3000) */
+      z-index: 4000 !important;
       max-width: 95vw;
-      width: auto !important;
-      min-width: 280px;
+      width: auto;
+      min-width: 260px;
       color: #333;
-      margin: 0 !important; /* Prevent margins from pushing it off-screen */
+      position: absolute !important;
+      top: 100% !important;
+      left: 0 !important;
+      transform: none !important; /* Lock vertical position to the meal cell */
   }
 
   @media (max-width: 575.98px) {
       .dropdown-menu-modern {
-          min-width: 260px;
-          max-width: 92vw;
-          /* Force centering on mobile and override Popper's calculations */
+          min-width: 240px;
+          max-width: 90vw;
+          /* Default start for small screens, JS will polish */
           left: 50% !important;
-          right: auto !important;
-          transform: translate(-50%, 10px) !important;
-          margin: 0 !important;
+          transform: translateX(-50%) !important;
       }
       .dropdown-menu-modern select {
           max-width: 100% !important;
@@ -179,6 +180,14 @@
       h5 { font-size: 1rem !important; }
       h4 { font-size: 1.15rem !important; }
       .macro-badge { min-width: 28px; font-size: 0.65rem; }
+  }
+
+  /* Fix: Main Navbar must always be above these meal dropdowns */
+  .navbar-main-container {
+      z-index: 5000 !important;
+  }
+  .navbar-offcanvas {
+      z-index: 5100 !important;
   }
 </style>
 {% endblock %}
@@ -301,7 +310,7 @@
                 </div>
                 
                 <!-- Inner Meal Content -->
-                <div class="font-weight-bold text-dark w-100 text-left mb-2 px-1" style="cursor:pointer; font-size: 0.95rem; line-height: 1.2;" id="dropdownMeal_{{ch_meal.id}}" data-toggle="dropdown" data-boundary="viewport" aria-haspopup="true" aria-expanded="false">
+                <div class="font-weight-bold text-dark w-100 text-left mb-2 px-1" style="cursor:pointer; font-size: 0.95rem; line-height: 1.2;" id="dropdownMeal_{{ch_meal.id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   {% if ch_meal.meal_id %}
                   {{ch_meal}}{% for m in all %}{% if ch_meal.meal_id == m.0.id %} {% if m.0.special %} <span class="text-danger">*</span> {% endif %} {% endif %}{%endfor%}
                     {% for m in all %}{% if ch_meal.meal_id == m.0.id %} {% if m.1.1 %}<sup class="fas fa-hourglass-start text-dark ml-1" ></sup>{% endif %} {% endif %}{%endfor%}
@@ -329,7 +338,7 @@
                 </div>
                 
 <!--                Dropdown Actions-->
-                <div  class="dropdown-menu dropdown-menu-modern p-3" id="dropdownMenu_{{ch_meal.id}}">
+                <div  class="dropdown-menu dropdown-menu-modern p-3 border border-dark shadow shadow-lg" id="dropdownMenu_{{ch_meal.id}}">
                   {% if current %}
                   <div class=" mx-auto mb-1">
                     <small class="text-muted font-weight-bold text-uppercase d-block mb-2">Zmiana posiłku:</small>
@@ -463,6 +472,33 @@
         $(document).on('hide.bs.dropdown', '.dropdown', function () {
             $(this).closest('tr').removeClass('stack-top');
             $(this).removeClass('stack-top');
+        });
+
+        // Smart Boundary Adjuster: Prevents dropdowns from going off-screen 
+        // without the "flicking/jumping" of native Popper.js
+        $(document).on('shown.bs.dropdown', '.dropdown', function () {
+            var $menu = $(this).find('.dropdown-menu-modern');
+            if (!$menu.length) return;
+            
+            // Reset to prevent cumulative offsets
+            $menu.css('margin-left', '0');
+            
+            var rect = $menu[0].getBoundingClientRect();
+            var viewportWidth = $(window).width();
+            var margin = 10; // Safety gap from screen edge
+            
+            // Check Right Overflow
+            if (rect.right > viewportWidth) {
+                var shiftRight = rect.right - viewportWidth + margin;
+                $menu.css('margin-left', -shiftRight + 'px');
+            }
+            
+            // Check Left Overflow
+            var updatedRect = $menu[0].getBoundingClientRect();
+            if (updatedRect.left < 0) {
+                var shiftLeft = -updatedRect.left + margin;
+                $menu.css('margin-left', shiftLeft + 'px');
+            }
         });
     });
 </script>
