@@ -1,4 +1,63 @@
 {% extends 'todo/base.html' %}
+
+{% block extra_head %}
+<style>
+  body {
+    background-color: #f4f7f6 !important;
+    overflow-x: hidden !important;
+  }
+  .macro-badge {
+    display: inline-block;
+    min-width: 36px;
+    text-align: center;
+    padding: 3px 9px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #555;
+    background-color: #f4f6f8;
+    border-radius: 8px;
+    border: 1px solid #e1e5e8;
+    margin: 1px;
+  }
+  .macro-badge-dark {
+    background-color: #343a40 !important;
+    color: #fff !important;
+    border-color: #343a40 !important;
+  }
+  .macro-badge-success {
+    background-color: #e8f5e9 !important;
+    color: #2e7d32 !important;
+    border-color: #c8e6c9 !important;
+  }
+  .macro-badge-danger {
+    background-color: #ffebee !important;
+    color: #c62828 !important;
+    border-color: #ffcdd2 !important;
+  }
+  .modern-card {
+    border-radius: 10px;
+    border: 1px solid #e1e5e8;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .card-header-modern {
+    background: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    padding: 10px 15px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: #555;
+  }
+  .list-group-item-modern {
+    border-color: #f1f1f1 !important;
+    padding: 8px 15px;
+  }
+</style>
+{% endblock %}
+
 {% block body %}
 {% load static %}
 {% load average_fuel_cons %}
@@ -241,172 +300,114 @@
       </div>
       </div>
     </div>
-    <div class="tab-pane fade p-0  p-md-2 info {% if active_tab == 'info' %} show active{% endif %}" id="info" role="tabpanel"
+    <div class="tab-pane fade p-0 p-md-3 info {% if active_tab == 'info' %} show active{% endif %}" id="info" role="tabpanel"
          aria-labelledby="info-tab">
-      <div class="container p-0">
-        <div class="card mb-3 mx-auto p-1"  >
-
-              {% for detail in car %}
-            <div class="">
-              <div class="card-body">
-              <h5 class="card-title mb-0 text-center">{{detail.name}}</h5>
+      <div class="row justify-content-center mx-0">
+        <div class="col-12 col-md-8 col-lg-6">
+          {% for detail in car %}
+            <!-- CAR INFO CARD -->
+            <div class="modern-card mb-3 shadow-sm">
+              <div class="card-header-modern text-center">
+                Informacje o pojeździe
+              </div>
+              <div class="card-body p-0">
+                <div class="text-center py-3 border-bottom bg-light">
+                  <h4 class="font-weight-bold mb-0 text-dark">{{detail.name}}</h4>
+                </div>
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item list-group-item-modern d-flex justify-content-between align-items-center">
+                    <span class="text-muted small font-weight-bold">MARKA</span>
+                    <span class="macro-badge macro-badge-dark">{{detail.make}}</span>
+                  </li>
+                  <li class="list-group-item list-group-item-modern d-flex justify-content-between align-items-center">
+                    <span class="text-muted small font-weight-bold">MODEL</span>
+                    <span class="macro-badge macro-badge-dark">{{detail.model}}</span>
+                  </li>
+                  <li class="list-group-item list-group-item-modern d-flex justify-content-between align-items-center">
+                    <span class="text-muted small font-weight-bold">ROK PRODUKCJI</span>
+                    <span class="macro-badge macro-badge-dark">{{detail.year}}</span>
+                  </li>
+                  <li class="list-group-item list-group-item-modern d-flex justify-content-between align-items-center">
+                    <span class="text-muted small font-weight-bold">SILNIK</span>
+                    <span class="macro-badge macro-badge-dark">{{detail.engine}}</span>
+                  </li>
+                  <li class="list-group-item list-group-item-modern d-flex justify-content-between align-items-center">
+                    <span class="text-muted small font-weight-bold">MOC</span>
+                    <span class="macro-badge macro-badge-dark">{{detail.power}} KM</span>
+                  </li>
+                  <li class="list-group-item list-group-item-modern d-flex justify-content-between align-items-center">
+                    <span class="text-muted small font-weight-bold">PRZEBIEG W DNIU ZAKUPU</span>
+                    <span class="macro-badge macro-badge-dark">{{detail.mileage}} KM</span>
+                  </li>
+                </ul>
+              </div>
+              <div class="card-footer bg-white border-0 px-4 pb-3">
+                <a class="btn btn-dark btn-block btn-sm shadow-sm" href="{% url 'cars:car_edit' detail.pk %}">
+                  <i class="fas fa-pen mr-2"></i> EDYTUJ POJAZD
+                </a>
+              </div>
             </div>
-            <div class="text-center">INFO:</div>
-            <ul class="list-group list-group-flush p-2 rounded border">
-              <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
-                <span>
-                  <span class="text-dark">Marka:</span>
-                </span>
-                <span>
-                  <h6 class="mb-0"><span class="badge badge-dark badge-pill">{{detail.make}}</span></h6>
-                </span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
-                <span>
-                  <span class="text-dark">Model:</span>
-                </span>
-                <span>
-                  <h6 class="mb-0"><span class="badge badge-dark badge-pill">{{detail.model}}</span></h6>
-                </span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
-                <span>
-                  <span class="text-dark">Rok produkcji:</span>
-                </span>
-                <span>
-                  <h6 class="mb-0"><span class="badge badge-dark badge-pill">{{detail.year}}</span></h6>
-                </span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
-                <span>
-                  <span class="text-dark">Silnik:</span>
-                </span>
-                <span>
-                  <h6 class="mb-0"><span class="badge badge-dark badge-pill">{{detail.engine}}</span></h6>
-                </span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
-                <span>
-                  <span class="text-dark">Moc:</span>
-                </span>
-                <span>
-                  <h6 class="mb-0"><span class="badge badge-dark badge-pill">{{detail.power}} KM</span></h6>
-                </span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
-                <span>
-                  <span class="text-dark">Przebieg w dn zakupu:</span>
-                </span>
-                <span>
-                  <h6 class="mb-0"><span class="badge badge-dark badge-pill">{{detail.mileage}} KM</span></h6>
-                </span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
-                <a class="btn btn-secondary btn-block btn-sm" href="{% url 'cars:car_edit' detail.pk %}">EDYCJA</a>
-              </li>
-            </ul>
-            <div class="text-center">STATYSTYKI:</div>
-            <ul class="list-group list-group-flush p-2 rounded border">
-              <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
-              <span>
-                <span class="text-dark">Ostatni serwis:</span>
-              </span>
-              <span>
-                <h6 class="mb-0">
-                  <span class="badge badge-dark badge-pill">
-                    {% if last_service %}
-                      {{last_service.date}} | {{last_service.mileage}} km
-                    {% else%}
-                      B/D
-                    {% endif %}
-                  </span>
-                </h6>
-              </span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
-              <span>
-                <span class="text-dark">Całkowity koszt serwisowania:</span>
-              </span>
-              <span>
-                <h6 class="mb-0">
-                  <span class="badge badge-dark badge-pill">
-                    {% if service_total_cost %}
-                      {{service_total_cost}} PLN
-                    {% else%}
-                      B/D
-                    {% endif %}
-                  </span>
-                </h6>
-              </span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
-              <span>
-                <span class="text-dark">Średnie zużycie paliwa:</span>
-              </span>
-              <span>
-                <h6 class="mb-0"><span class="badge badge-dark badge-pill" id="averageFuelConsumption">{{average_consumption}} l/100km</span></h6>
-              </span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
-              <span>
-                <span class="text-dark">Maksymalne zużycie paliwa:</span>
-              </span>
-              <span>
-                <h6 class="mb-0"><span class="badge badge-danger badge-pill" id="maxFuelConsumption">{{highest_average}} l/100km</span></h6>
-              </span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
-              <span>
-                <span class="text-dark">Minimalne zużycie paliwa:</span>
-              </span>
-              <span>
-                <h6 class="mb-0"><span class="badge badge-success badge-pill" id="minFuelConsumption">{{lowest_average}} l/100km</span></h6>
-              </span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
-              <span>
-                <span class="text-dark">Całkowity koszt paliwa:</span>
-              </span>
-              <span>
-                <h6 class="mb-0"><span class="badge badge-dark badge-pill" id="totalFuelCost">{{total_fuel_cost}} PLN</span></h6>
-              </span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
-              <span>
-                <span class="text-dark">KM/miesiąc:</span>
-              </span>
-              <span>
-                <h6 class="mb-0"><span class="badge badge-dark badge-pill" id="monthlyKilometers">{{km_month_average}}</span></h6>
-              </span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
-              <span>
-                <span class="text-dark">Miesięczny koszt paliwa:</span>
-              </span>
-              <span>
-                <h6 class="mb-0"><span class="badge badge-dark badge-pill" id="monthlyFuelCost">{{month_average}} PLN</span></h6>
-              </span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
-              <span>
-                <span class="text-dark">Suma litrów paliwa:</span>
-              </span>
-              <span>
-                <h6 class="mb-0"><span class="badge badge-dark badge-pill" id="totalFuelLiters">{{total_fuel}} L</span></h6>
-              </span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center py-md-1 bg-light">
-              <span>
-                <span class="text-dark">Suma kilometrów:</span>
-              </span>
-              <span>
-                <h6 class="mb-0"><span class="badge badge-dark badge-pill" id="totalKilometers">{{total_km}}</span></h6>
-              </span>
-            </li>
-            </ul>
-          </div>
-          </div>
+
+            <!-- STATISTICS CARD -->
+            <div class="modern-card mb-3 shadow-sm">
+              <div class="card-header-modern text-center">
+                Statystyki i Eksploatacja
+              </div>
+              <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item list-group-item-modern d-flex justify-content-between align-items-center">
+                    <span class="text-muted small font-weight-bold">OSTATNI SERWIS</span>
+                    <span class="text-right">
+                      {% if last_service %}
+                        <span class="macro-badge macro-badge-dark">{{last_service.date}}</span>
+                        <span class="macro-badge macro-badge-dark">{{last_service.mileage}} km</span>
+                      {% else %}
+                        <span class="text-muted italic">brak danych</span>
+                      {% endif %}
+                    </span>
+                  </li>
+                  <li class="list-group-item list-group-item-modern d-flex justify-content-between align-items-center">
+                    <span class="text-muted small font-weight-bold">KOSZT SERWISOWANIA</span>
+                    <span class="macro-badge macro-badge-dark">{% if service_total_cost %}{{service_total_cost}}{% else %}0{% endif %} PLN</span>
+                  </li>
+                  <li class="list-group-item list-group-item-modern d-flex justify-content-between align-items-center">
+                    <span class="text-muted small font-weight-bold">ŚREDNIE SPALANIE</span>
+                    <span class="macro-badge macro-badge-dark" id="averageFuelConsumption">{{average_consumption}} l/100km</span>
+                  </li>
+                  <li class="list-group-item list-group-item-modern d-flex justify-content-between align-items-center">
+                    <span class="text-muted small font-weight-bold">MAX SPALANIE</span>
+                    <span class="macro-badge macro-badge-danger" id="maxFuelConsumption">{{highest_average}} l/100km</span>
+                  </li>
+                  <li class="list-group-item list-group-item-modern d-flex justify-content-between align-items-center">
+                    <span class="text-muted small font-weight-bold">MIN SPALANIE</span>
+                    <span class="macro-badge macro-badge-success" id="minFuelConsumption">{{lowest_average}} l/100km</span>
+                  </li>
+                  <li class="list-group-item list-group-item-modern d-flex justify-content-between align-items-center">
+                    <span class="text-muted small font-weight-bold">KOSZT PALIWA (TOTAL)</span>
+                    <span class="macro-badge macro-badge-dark" id="totalFuelCost">{{total_fuel_cost}} PLN</span>
+                  </li>
+                  <li class="list-group-item list-group-item-modern d-flex justify-content-between align-items-center">
+                    <span class="text-muted small font-weight-bold">KOSZT PALIWA (MIESIĄC)</span>
+                    <span class="macro-badge macro-badge-dark" id="monthlyFuelCost">{{month_average}} PLN</span>
+                  </li>
+                  <li class="list-group-item list-group-item-modern d-flex justify-content-between align-items-center">
+                    <span class="text-muted small font-weight-bold">KM / MIESIĄC</span>
+                    <span class="macro-badge macro-badge-dark" id="monthlyKilometers">{{km_month_average}}</span>
+                  </li>
+                  <li class="list-group-item list-group-item-modern d-flex justify-content-between align-items-center">
+                    <span class="text-muted small font-weight-bold">SUMA LITRÓW</span>
+                    <span class="macro-badge macro-badge-dark" id="totalFuelLiters">{{total_fuel}} L</span>
+                  </li>
+                  <li class="list-group-item list-group-item-modern d-flex justify-content-between align-items-center">
+                    <span class="text-muted small font-weight-bold">SUMA KILOMETRÓW</span>
+                    <span class="macro-badge macro-badge-dark" id="totalKilometers">{{total_km}}</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          {% endfor %}
         </div>
+      </div>
     </div>
 
     <div class="tab-pane fade mx-auto col-lg-10 p-0"  id="chart"  role="tabpanel" aria-labelledby="chart-tab">
@@ -518,7 +519,7 @@
 
 
 </script>
-{% endfor %}
+
 <script type="text/javascript">
   $('body').on('click','.filling_',function(e){
     e.preventDefault();
