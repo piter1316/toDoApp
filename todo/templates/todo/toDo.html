@@ -4,12 +4,12 @@
   <div class="row mt-1">
     <div class="col-12 col-md-4 col-xl-3 px-1 px-md-2">
       <div class="form-row">
-        <div class="col"><a href="{% url 'todo:index' %}" class="list-group-item bg-dark text-light mb-0 mb-md-1">Aktualne</a></div>
-        <div class="col"><a href="{% url 'todo:index' %}?archive=1" class="list-group-item bg-dark text-light mb-0 mb-md-1">Archiwalne</a></div>
+        <div class="col"><a href="{% url 'todo:index' %}" class="list-group-item bg-dark text-light mb-1">Aktualne</a></div>
+        <div class="col"><a href="{% url 'todo:index' %}?archive=1" class="list-group-item bg-dark text-light mb-1">Archiwalne</a></div>
       </div>
       <div class="nav flex-column  nav-tabs" id="v-pills-tab" role="tablist" aria-orientation="vertical">
         {% for main, todos in todo_list.items %}
-        <a class="btn btn-secondary btn-sm mb-0 mb-md-1" id="v-pills-{{main.id}}-tab" data-toggle="pill" href="#v-pills-{{main.id}}" role="tab" aria-controls="v-pills-{{main.id}}" aria-selected="true">{{main.name}}</a>
+        <a class="btn btn-secondary btn-sm mb-0 mb-1" id="v-pills-{{main.id}}-tab" data-toggle="pill" href="#v-pills-{{main.id}}" role="tab" aria-controls="v-pills-{{main.id}}" aria-selected="true">{{main.name}}</a>
         {% endfor %}
     </div>
     <form action="{% url 'todo:add' %}" method="POST"  role="form" id="add_to_do_list">
