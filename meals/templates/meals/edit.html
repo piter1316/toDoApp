@@ -1,96 +1,188 @@
 {% extends 'todo/base.html' %}
 
+{% block extra_head %}
+<style>
+  body { background-color: #f4f7f6 !important; }
+  .macro-badge {
+    display: inline-block;
+    min-width: 32px;
+    text-align: center;
+    padding: 2px 7px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #555;
+    background-color: #f4f6f8;
+    border-radius: 8px;
+    border: 1px solid #e1e5e8;
+    margin: 1px;
+  }
+  .macro-badge-kcal {
+    background-color: #343a40;
+    color: #fff !important;
+    border-color: #343a40;
+  }
+  .card-option {
+    border-radius: 10px;
+    border: 1px solid #e1e5e8;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+  .card-option:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  }
+  .card-header-modern {
+    background: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+  .meal-item-link {
+    text-decoration: none !important;
+    color: inherit !important;
+    display: block;
+    transition: background 0.15s;
+  }
+  .meal-item-link:hover {
+    background-color: #f8f9fa;
+  }
+</style>
+{% endblock %}
 
 {% block body %}
 {% load l10n %}
-<div class="container-fluid py-2 mt-3">
-  <div class="row">
-    <div class="container-fluid">
-      <form class="input-group mb-3" method="POST" action="{% url 'meals:add_meal_option' %}">
+<div class="container-fluid py-3">
+  
+  <!-- Add Meal Option Form -->
+  <div class="row justify-content-center mb-4">
+    <div class="col-12 col-md-8 col-xl-6">
+      <form class="input-group shadow-sm" style="border-radius:8px; overflow:hidden;" method="POST" action="{% url 'meals:add_meal_option' %}">
         {% csrf_token %}
-        {{form_meal_option.meal_option}}
+        <input type="text" name="meal_option" class="form-control border-0" placeholder="Nazwa nowej sekcji (np. Śniadanie)" required>
         <div class="input-group-append">
-          <button class="btn btn-outline-secondary" type="submit">Dodaj</button>
+          <button class="btn btn-dark px-4" type="submit">Dodaj sekcję</button>
         </div>
-        <div class="input-group-append">
-<!--        <button class="btn btn-secondary" type="button">Zmień kolejność</button>-->
-      </div>
       </form>
-      <div class="row">
-      {% for meal_option, meals in meals_options_dict.items %}
-      <div class="col-12 col-md-6 col-xl-3 mb-2 p-0 p-md-1">
-        <ul class="list-group text-center rounded">
-          <li class="list-group-item d-flex justify-content-between align-items-center bg-secondary text-light rounded">
-            {{forloop.counter}}. {{meal_option|upper}}
-            <span class="dropdownMeal badge badge-pill fas fa-cog"
-                  style="cursor:pointer;"
-                  id="dropdownMeal_{{forloop.counter}}">
-            </span>
-          </li>
-          <li class="list-group-item p-0" style="display:none;" id="dropdownMealContent_{{forloop.counter}}">
-            <ul class="nav nav-tabs" id="mealOptionSettings" role="tablist">
-              <li class="nav-item">
-                <a class="nav-link active" id="addMeal-tab" data-toggle="tab" href="#addMeal_{{forloop.counter}}" role="tab" aria-controls="addMeal" aria-selected="true">Dodaj pozycję</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" id="editMealOption-tab" data-toggle="tab" href="#editMealOption_{{forloop.counter}}" role="tab" aria-controls="editMealOption" aria-selected="false">Edytuj</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" id="deteteMealOption-tab" data-toggle="tab" href="#deteteMealOption_{{forloop.counter}}" role="tab" aria-controls="deteteMealOption" aria-selected="false">Usuń</a>
-              </li>
-            </ul>
-            <div class="tab-content" id="myTabContent">
-              <div class="tab-pane fade show active" id="addMeal_{{forloop.counter}}" role="tabpanel" aria-labelledby="addMeal-tab">
-                <form class="p-2 mt-1 text-center" action="{% url 'meals:add_meal' meal_option.id %}" method="post" >
-                  {% csrf_token %}
-                  <div class="form-row">{{form.name}}</div>
+    </div>
+  </div>
 
-                  <div class="form-row"><label class="label mx-auto">{{form.special}} DANIE SPECJALNE</label></div>
-                  <button class="btn btn-outline-success btn-block" type="submit" id="add_sn">Dodaj danie</button>
-                </form>
-                <div class="dropdown-divider"></div>
-              </div>
-              <div class="tab-pane fade" id="editMealOption_{{forloop.counter}}" role="tabpanel" aria-labelledby="editMealOption-tab">
-                <form action="{% url 'meals:update_meal_option' meal_option.id %}" method="post" class="pb-0 px-2 pt-2 mt-1">{% csrf_token %}
-                  <input type="text" name="new_meal_option_name" class="form-control mb-1" value="{{meal_option}}">
-                  <label class="float-left">
-                  <input type="checkbox" name="is_taken_to_generation" class=""
-                         {% if meal_option.is_taken_to_generation %} checked {% endif %}>
-                    Uwzglęgnić przy generacji jadłospisu?
-                    </label>
-                  <button type="submit" class="btn btn-info btn-block mb-1">Zapisz zmiany</button>
-                </form>
-                <div class="dropdown-divider"></div>
-              </div>
-              <div class="tab-pane fade" id="deteteMealOption_{{forloop.counter}}" role="tabpanel" aria-labelledby="deteteMealOption-tab">
-                <a onclick="return confirm('Usunąć {{meal_option}} i wszystkie pozycje z listy?')" class="btn btn-danger btn-block mt-2" href="{% url 'meals:delete_meal_option' meal_option.id %}" id="">Usuń {{meal_option}}</a>
-                <div class="dropdown-divider"></div>
-              </div>
-            </div>
-          </li>
-          </li>
-          {% for meal in meals %}
-          <a href="{% url 'meals:edit_meal_ingredients' meal.0.id  %}" style="text-decoration:none;" title="{{meal.1.4.1}}">
-            <li class="list-group-item p-1 d-flex justify-content-between">
-              <span class="text-left">{{meal.0}}{% if meal.0.special %}*{% endif %}</span>
-              <span class="ml-1">
-                <span class="">
-                  <b>{{meal.1.0}}kcal</b> |
-                   <span style="{% if meal.1.4.0 == 'B' %}border-style: double;{% endif %}" class="{% if meal.1.4.0 == 'b' %}border border-dark {% endif %}{% if meal.1.4.0 == 'b' %}{% endif %} rounded"><SUP>{{meal.1.1}}</SUP>&frasl;<sub>b</sub></span> |
-                   <SUP>{{meal.1.2}}</SUP>&frasl;<sub>t</sub> |
-                   <SUP>{{meal.1.3}}</SUP>&frasl;<sub>w</sub>
-                </span>
-              </span>
+  <div class="row px-md-2">
+    {% for meal_option, meals in meals_options_dict.items %}
+    <div class="col-12 col-md-6 col-xl-3 mb-4">
+      <div class="card card-option shadow-sm h-100">
+        
+        <!-- Header with Settings Toggle -->
+        <div class="card-header-modern d-flex justify-content-between align-items-center">
+          <span>{{forloop.counter}}. {{meal_option}}</span>
+          <button type="button" 
+                  class="btn btn-outline-secondary btn-sm border-0 dropdownMealModern" 
+                  id="dropdownMeal_{{forloop.counter}}"
+                  style="padding: 2px 6px;">
+            <i class="fas fa-cog" style="pointer-events:none;"></i>
+          </button>
+        </div>
+
+        <!-- Settings Panel (Hidden) -->
+        <div id="dropdownMealContent_{{forloop.counter}}" style="display:none;" class="bg-light border-bottom">
+          <ul class="nav nav-pills nav-justified mb-0 p-1" style="font-size: 0.7rem;">
+            <li class="nav-item">
+              <a class="nav-link active py-1 px-1" id="addMeal-tab-{{forloop.counter}}" data-toggle="pill" href="#addMeal_{{forloop.counter}}" role="tab">Dodaj</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link py-1 px-1" id="editMealOption-tab-{{forloop.counter}}" data-toggle="pill" href="#editMealOption_{{forloop.counter}}" role="tab">Edytuj</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link py-1 px-1" id="deleteMealOption-tab-{{forloop.counter}}" data-toggle="pill" href="#deteteMealOption_{{forloop.counter}}" role="tab">Usuń</a>
+            </li>
+          </ul>
+          
+          <div class="tab-content p-2">
+            <!-- Add Meal -->
+            <div class="tab-pane fade show active" id="addMeal_{{forloop.counter}}" role="tabpanel">
+              <form action="{% url 'meals:add_meal' meal_option.id %}" method="post">
+                {% csrf_token %}
+                <input class="form-control form-control-sm mb-2" name="name" type="text" placeholder="Nazwa dania" required>
+                <div class="custom-control custom-checkbox mb-2">
+                  <input type="checkbox" class="custom-control-input" id="special_{{forloop.counter}}" name="special">
+                  <label class="custom-control-label small" for="special_{{forloop.counter}}">Danie specjalne</label>
+                </div>
+                <button class="btn btn-dark btn-sm btn-block" type="submit">Dodaj danie</button>
+              </form>
+            </div>
+            
+            <!-- Edit Option -->
+            <div class="tab-pane fade" id="editMealOption_{{forloop.counter}}" role="tabpanel">
+              <form action="{% url 'meals:update_meal_option' meal_option.id %}" method="post">
+                {% csrf_token %}
+                <input type="text" name="new_meal_option_name" class="form-control form-control-sm mb-2" value="{{meal_option}}">
+                <div class="custom-control custom-checkbox mb-2">
+                  <input type="checkbox" class="custom-control-input" id="gen_{{forloop.counter}}" name="is_taken_to_generation" {% if meal_option.is_taken_to_generation %}checked{% endif %}>
+                  <label class="custom-control-label small" for="gen_{{forloop.counter}}">Uwzględnij w generacji</label>
+                </div>
+                <button type="submit" class="btn btn-info btn-sm btn-block">Zapisz</button>
+              </form>
+            </div>
+            
+            <!-- Delete Option -->
+            <div class="tab-pane fade text-center" id="deteteMealOption_{{forloop.counter}}" role="tabpanel">
+              <p class="small text-muted mb-2">Czy na pewno usunąć całą sekcję?</p>
+              <a onclick="return confirm('Usunąć {{meal_option}} i wszystkie pozycje?')" 
+                 class="btn btn-danger btn-sm btn-block" 
+                 href="{% url 'meals:delete_meal_option' meal_option.id %}">Usuń sekcję</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Meals List -->
+        <div class="list-group list-group-flush">
+          {% for meal in meals %}
+          <a href="{% url 'meals:edit_meal_ingredients' meal.0.id %}" class="list-group-item list-group-item-action py-2 px-3 meal-item-link border-bottom">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span class="font-weight-bold" style="font-size:0.85rem;">
+                {{meal.0}}{% if meal.0.special %}<span class="text-danger ml-1">*</span>{% endif %}
+              </span>
+              <span class="macro-badge macro-badge-kcal" style="font-size:0.65rem;">{{meal.1.0}} <small>kcal</small></span>
+            </div>
+            <div class="d-flex" style="gap:2px;">
+              <span class="macro-badge" style="font-size:0.6rem;">{{meal.1.1}}g <small>B</small></span>
+              <span class="macro-badge" style="font-size:0.6rem;">{{meal.1.2}}g <small>T</small></span>
+              <span class="macro-badge" style="font-size:0.6rem;">{{meal.1.3}}g <small>W</small></span>
+            </div>
           </a>
+          {% empty %}
+          <div class="px-3 py-4 text-center text-muted small italic">
+            Brak dań w tej sekcji.
+          </div>
           {% endfor %}
-        </ul>
-      </div>
-      {% endfor %}
+        </div>
       </div>
     </div>
+    {% endfor %}
   </div>
 </div>
 
+<script>
+$(document).ready(function() {
+  // Przełączanie panelu ustawień (zastępuje stare dropdownMeal z max_days_listener.js jeśli tamto sprawiało problemy)
+  // Używamy delegacji zdarzeń dla pewności
+  $(document).on('click', '.dropdownMealModern', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var id = $(this).attr('id').split('_')[1];
+    var $target = $('#dropdownMealContent_' + id);
+    
+    // Zwijamy inne otwarte panele w tej samej kolumnie/widoku (opcjonalnie)
+    $('[id^="dropdownMealContent_"]').not($target).slideUp(200);
+    
+    $target.slideToggle(200);
+  });
 
-{% endblock %}
+  // Blokowanie bąbelkowania dla kliknięć w samym panelu ustawień
+  $(document).on('click', '[id^="dropdownMealContent_"]', function(e) {
+    e.stopPropagation();
+  });
+});
+</script>
+{% endblock %}
