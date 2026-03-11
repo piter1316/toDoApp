@@ -67,6 +67,15 @@
     border: 2px double #343a40 !important;
     font-weight: 800;
   }
+  /* Custom tight gutters (half the standard 30px) */
+  .row-tight {
+    margin-right: -7.5px;
+    margin-left: -7.5px;
+  }
+  .col-tight {
+    padding-right: 7.5px;
+    padding-left: 7.5px;
+  }
 </style>
 {% endblock %}
 
@@ -79,17 +88,17 @@
     <div class="col-12 col-md-8 col-xl-6">
       <form class="input-group shadow-sm" style="border-radius:8px; overflow:hidden;" method="POST" action="{% url 'meals:add_meal_option' %}">
         {% csrf_token %}
-        <input type="text" name="meal_option" class="form-control border-0" placeholder="Nazwa nowej sekcji (np. Śniadanie)" required>
+        <input type="text" name="meal_option" class="form-control border-0" placeholder="Nowy posiłek. Np: Podwieczorek" required>
         <div class="input-group-append">
-          <button class="btn btn-dark px-4" type="submit">Dodaj sekcję</button>
+          <button class="btn btn-dark px-4" type="submit">Dodaj</button>
         </div>
       </form>
     </div>
   </div>
 
-  <div class="row px-md-2">
+  <div class="row row-tight px-md-2">
     {% for meal_option, meals in meals_options_dict.items %}
-    <div class="col-12 col-md-6 col-xl-3 mb-4">
+    <div class="col-12 col-md-6 col-lg-4 col-xl-3 mb-4 mb-2 p-0 p-md-1">
       <div class="card card-option shadow-sm h-100">
         
         <!-- Header with Settings Toggle -->
@@ -158,10 +167,10 @@
         <div class="list-group list-group-flush">
           {% for meal in meals %}
           <a href="{% url 'meals:edit_meal_ingredients' meal.0.id %}" 
-             class="list-group-item list-group-item-action py-2 px-3 meal-item-link border-bottom"
+             class="list-group-item list-group-item-action py-1 px-3 meal-item-link border-bottom"
              title="{{meal.1.4.1}}">
             <div class="d-flex justify-content-between align-items-center flex-wrap" style="gap:4px;">
-              <span class="font-weight-bold" style="font-size:0.85rem; flex: 1; min-width: 100px;">
+              <span class="font-weight-bold" style="font-size:0.9rem; flex: 1; min-width: 100px;">
                 {{meal.0}}{% if meal.0.special %}<span class="text-danger ml-1">*</span>{% endif %}
               </span>
               <div class="d-flex align-items-center flex-wrap" style="gap:2px;">
