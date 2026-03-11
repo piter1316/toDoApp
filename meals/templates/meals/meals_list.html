@@ -298,7 +298,7 @@
                 {% if ch_meal.extras %}
                 <small class="px-2 py-1 text-muted w-100" style="cursor:pointer; font-size: 0.75rem;" data-toggle="modal" data-target="#extrasModal" id="editExtrasSmallWrap_{{ch_meal.id}}">
                   <i class="editExtras font-weight-bold" id="editExtrasSmall_{{ch_meal.id}}">
-                    {{ch_meal.extras}}{% if ch_meal.extras.has_short_expiry %} <sup class="fas fa-hourglass-start text-warning ml-1" ></sup>{% endif %}
+                    {{ch_meal.extras}}{% if ch_meal.extras.has_short_expiry %} <sup class="fas fa-hourglass-start text-dark ml-1" ></sup>{% endif %}
                     {% if ch_meal.extras.is_high_carb %} <sup class="text-danger">{{ch_meal.extras.is_high_carb.0}}</sup> {% endif %}
                   <input type="hidden" id="clicked_position_meal_{{ch_meal.id}}" value="{{ch_meal}}">
                   <input type="hidden" id="clicked_position_extras_{{ch_meal.id}}" value="{{ch_meal.extras}}">
@@ -377,19 +377,18 @@
 <div class="modal fade" id="extrasModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered no_print" role="document">
     <div class="modal-content extrasModal shadow-lg border-0" style="border-radius: 12px;">
-      <div class="modal-header py-3 bg-light border-bottom">
+      <div class="modal-header py-2 bg-light border-bottom">
         <h5 class="modal-title font-weight-bold text-dark" id="extrasMmodalTitle">
-          Dodatki dla: <span id="extrasModalTitleSpan" class="text-primary">-------</span>
+          Dodatki dla: <span id="extrasModalTitleSpan" class="">-------</span>
         </h5>
         <button type="button" class="close text-dark" data-dismiss="modal" aria-label="Close" id="dismiss_extras_modal">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body py-3">
-        <span id="add_extras_span" class="text-center text-muted font-weight-bold text-uppercase tracking-wide d-block mb-2" style="font-size: 0.8rem;">Dodaj z posiłku:</span>
+      <div class="modal-body py-1">
         <div class="text-left">
           <small id="current_extra_small" style="display:none;" class="text-muted">Aktualny dodatek :
-            <a id="current_extras" class="text-primary font-weight-bold" href="#">
+            <a id="current_extras" class="text-dark font-weight-bold" href="#">
             </a>
           </small>
         </div>
@@ -408,7 +407,7 @@
             {% endfor %}
           </select>
         </form>
-        <hr class="m-3 border-light">
+        <hr class="m-2 border-light">
         {% endfor %}
         <a id="delete_extras" style="display:none;" href="{%url 'meals:delete_extras' ' ' %}" class="btn btn-block btn-outline-danger font-weight-bold mb-2 mt-3 shadow-sm"></a>
         <input id="base_delete_url" type="hidden" value="{%url 'meals:delete_extras' ' ' %}">
