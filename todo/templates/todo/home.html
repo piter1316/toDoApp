@@ -1,190 +1,250 @@
 {% extends 'todo/base.html' %}
+{% block extra_head %}
+<style>
+  body { background-color: #f4f7f6 !important; }
+  .macro-badge {
+    display: inline-block;
+    min-width: 36px;
+    text-align: center;
+    padding: 3px 9px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #555;
+    background-color: #f4f6f8;
+    border-radius: 8px;
+    border: 1px solid #e1e5e8;
+    margin: 1px;
+  }
+  .macro-badge-kcal {
+    background-color: #343a40;
+    color: #fff !important;
+    border-color: #343a40;
+  }
+  .home-card {
+    border-radius: 10px;
+    border: 1px solid #e1e5e8;
+    overflow: hidden;
+    height: 100%;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .home-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.05) !important;
+  }
+  .card-header-modern {
+    background: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    padding: 12px;
+  }
+</style>
+{% endblock %}
+
 {% block body %}
 {% load static %}
-<div class="container-fluid mt-1 mt-xl-5">
-  <div class="row">
-    <div class="col-12 mx-auto" id="">
+<div class="container-fluid py-3 py-md-4">
+  <div class="row justify-content-center">
+    <div class="col-12 col-xl-10">
       {% if user.is_authenticated %}
-        <div class="row ">
-          <div class="col-12 col-md-6 col-xl-3 mb-2">
-            <div class="card shadow" style="height:100%;">
-              <div class="card-header bg-secondary text-light text-center">
-                <img src="{% static 'todo/img/utensils-solid.svg' %}" height="45" >
+        <div class="row">
+          
+          <!-- JADŁOSPIS CARD -->
+          <div class="col-12 col-md-6 col-xl-4 mb-3">
+            <div class="card shadow-sm home-card">
+              <div class="card-header-modern text-center">
+                <img src="{% static 'todo/img/utensils-solid.svg' %}" height="35" class="mb-2" style="opacity: 0.7;">
+                <h6 class="mb-0 font-weight-bold text-uppercase text-muted" style="letter-spacing: .05em; font-size: 0.8rem;">Jadłospis</h6>
               </div>
               <div class="card-body">
-                <div class="text-center"><b>{{today}} : {{todays_macro.0}} kcal</b></div>
-                  <div class="text-center">
-                    {{todays_macro.1}}g <sup>białko</sup>|
-                    {{todays_macro.2}}g <sup>tłuszcze</sup>|
-                    {{todays_macro.3}}g <sup>węglowodany</sup>
+                <div class="text-center mb-3">
+                  <div class="mb-2">
+                    <span class="font-weight-bold text-dark">{{today}}</span>
                   </div>
-                <ul class="p-xl-0">
+                  <div class="d-flex justify-content-center flex-wrap" style="gap: 4px;">
+                    <span class="macro-badge macro-badge-kcal">{{todays_macro.0}} kcal</span>
+                    <span class="macro-badge">{{todays_macro.1}}g <small>B</small></span>
+                    <span class="macro-badge">{{todays_macro.2}}g <small>T</small></span>
+                    <span class="macro-badge">{{todays_macro.3}}g <small>W</small></span>
+                  </div>
+                </div>
+                
+                <ul class="list-unstyled mb-3" style="font-size: 0.9rem;">
                   {% for meal in todays_meals %}
-                    <li>{{meal.meal_option}} : <a href="{% url 'meals:edit_meal_ingredients' meal.meal_id %}" class="text-dark">{{meal}}</a></li>
-                  {% if meal.extras %}
-                  <li class="small">Dodatek : <a href="{% url 'meals:edit_meal_ingredients' meal.extras.id %}" class="text-dark">{{meal.extras}}</a></li>
-                  {% endif %}
+                    <li class="mb-1 py-1 border-bottom d-flex justify-content-between align-items-center" style="border-color: #f1f1f1 !important;">
+                      <span class="text-muted small pr-2">{{meal.meal_option}}:</span>
+                      <a href="{% url 'meals:edit_meal_ingredients' meal.meal_id %}" class="text-dark font-weight-bold text-right">{{meal}}</a>
+                    </li>
+                    {% if meal.extras %}
+                    <li class="mb-1 py-1 border-bottom d-flex justify-content-between align-items-center" style="border-color: #f1f1f1 !important; font-size: 0.8rem;">
+                      <span class="text-muted small pr-2">Dodatek:</span>
+                      <a href="{% url 'meals:edit_meal_ingredients' meal.extras.id %}" class="text-muted">{{meal.extras}}</a>
+                    </li>
+                    {% endif %}
                   {% endfor %}
                 </ul>
-                  <ul class="p-xl-0">
-                    {% if meals_list_length %}
-                    <li>
-                      {{meals_list_length}} {% if meals_list_length == 1 %}dzień{% else %} dni{% endif %}.
-                      {{meals}} {% if meals == 1 %}danie{% endif %}{% if meals > 1 and meals < 5 %} różne dania{% endif %}{% if meals >= 5 %}różnych dań{% endif %}.
-                    </li>
-                    <li>{{meal_options}} {% if meal_options == 1 %}posiłek{% endif %}{% if meal_options > 1 and meal_options < 5%}posiłki{% endif %}{% if meal_options >= 5 %}posiłków{% endif %} dziennie.</li>
-                    <li>Średnio: {{average_clories_per_day}} kcal,</li>
-                    <li>{{average_protein_per_day}}g białka,</li>
-                    <li>{{average_fat_per_day}}g tłuszczów,</li>
-                    <li>{{average_carb_per_day}}g węglowodanów dziennie.</li>
-                    {% else %}
-                    <li>Jadłospis jest pusty!</li>
-                    {% endif %}
-                  </ul>
+
+                <div class="p-2 rounded bg-light" style="font-size: 0.8rem;">
+                  {% if meals_list_length %}
+                    <ul class="list-unstyled mb-0 text-muted">
+                      <li><i class="fas fa-calendar-alt mr-2"></i> {{meals_list_length}} {% if meals_list_length == 1 %}dzień{% else %} dni{% endif %} | {{meals}} dań</li>
+                      <li><i class="fas fa-utensils mr-2"></i> Średnio: <b>{{average_clories_per_day}} kcal</b></li>
+                    </ul>
+                  {% else %}
+                    <div class="text-center italic text-muted">Jadłospis jest pusty!</div>
+                  {% endif %}
+                </div>
               </div>
-              <div class="mx-5 mb-2">
-                <a href="{% url 'meals:index' 1 %}" class="btn btn-secondary btn-block">Przejdź</a>
+              <div class="card-footer bg-white border-0 px-4 pb-3">
+                <a href="{% url 'meals:index' 1 %}" class="btn btn-dark btn-block btn-sm">Otwórz jadłospis</a>
               </div>
             </div>
           </div>
-          <div class="col-md-6 col-xl-9 mb-2">
-            <div class="row" style="height:100%; !important">
-              <div class="col-12 col-xl-6 mb-1">
-              <div class="card shadow" style="height:100%;">
-                <div class="card-header bg-secondary text-light text-center">
-                  <img src="{% static 'todo/img/receipt-solid.svg' %}" height="45">
-                </div>
-                <div class="card-body">
-                  <ul>
-                    <li>Zapisane paragony: {{receipts.all|length}}</li>
-                    <li>Na gwarancji: {{receipts.with_warranty|length}}</li>
-                    <li>Po gwarancji: {{receipts.without_warranty|length}}</li>
-                  </ul>
 
-                </div>
-                <div class="mx-5 mb-2">
-                  <a href="{% url 'receipts:receipts_home' %}"  class="btn btn-secondary btn-block">Przejdź</a>
+          <!-- OTHER TOOLS COLUMN -->
+          <div class="col-12 col-md-6 col-xl-8">
+            <div class="row">
+              
+              <!-- PARAGONY -->
+              <div class="col-12 col-xl-6 mb-3">
+                <div class="card shadow-sm home-card">
+                  <div class="card-header-modern d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                      <img src="{% static 'todo/img/receipt-solid.svg' %}" height="24" class="mr-2" style="opacity: 0.7;">
+                      <h6 class="mb-0 font-weight-bold text-uppercase text-muted" style="letter-spacing: .05em; font-size: 0.75rem;">Paragony</h6>
+                    </div>
+                    <a href="{% url 'receipts:receipts_home' %}" class="btn btn-outline-secondary btn-sm py-0" style="font-size: 0.7rem;">PRZEJDŹ</a>
+                  </div>
+                  <div class="card-body py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <div class="text-muted small">Wszystkie</div>
+                      <span class="macro-badge">{{receipts.all|length}}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-1">
+                      <div class="text-muted small">Na gwarancji</div>
+                      <span class="macro-badge" style="background-color: #e8f5e9; color: #2e7d32; border-color: #c8e6c9;">{{receipts.with_warranty|length}}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-              <div class="col-12 col-xl-6 mb-1">
-              <div class="card shadow" style="height:100%;">
-                <div class="card-header bg-secondary text-light text-center">
-                  <img src="{% static 'todo/img/car-solid.svg' %}" height="45">
-                </div>
-                <div class="card-body">
-                  <div class="row">
-                    {% if cars_owned or cars_sold %}
-                    <div class="col-6">
-                      <small>Posiadane</small>
-                      <ul>
-                        {% if cars_owned %}
-                          {% for car in cars_owned %}
-                          <li><a class="text-dark" href="{% url 'cars:car_details' car.id %}">{{car}}</a></li>
-                          {% endfor %}
-                        {% else %}
-                          <li>BRAK !</li>
-                        {% endif %}
-                      </ul>
+
+              <!-- GARAŻ -->
+              <div class="col-12 col-xl-6 mb-3">
+                <div class="card shadow-sm home-card">
+                  <div class="card-header-modern d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                      <img src="{% static 'todo/img/car-solid.svg' %}" height="24" class="mr-2" style="opacity: 0.7;">
+                      <h6 class="mb-0 font-weight-bold text-uppercase text-muted" style="letter-spacing: .05em; font-size: 0.75rem;">Garaż</h6>
                     </div>
-                    <div class="col-6">
-                      <small>Sprzedane</small>
-                      <ul>
-                        {% if cars_sold %}
-                          {% for car in cars_sold %}
-                          <li><a class="text-dark" href="{% url 'cars:car_details' car.id %}">{{car}}</a></li>
-                          {% endfor %}
-                        {% else %}
-                          <li>BRAK !</li>
-                        {% endif %}
-                      </ul>
-                    </div>
+                    <a href="{% url 'cars:cars_home' %}" class="btn btn-outline-secondary btn-sm py-0" style="font-size: 0.7rem;">PRZEJDŹ</a>
+                  </div>
+                  <div class="card-body py-2">
+                    {% if cars_owned %}
+                      <div class="d-flex flex-wrap" style="gap: 4px;">
+                        {% for car in cars_owned %}
+                          <a href="{% url 'cars:car_details' car.id %}" class="macro-badge text-dark text-decoration-none">{{car}}</a>
+                        {% endfor %}
+                      </div>
                     {% else %}
-                    <div class="col-12">
-                      <li>Garaż jest pusty!</li>
-                    </div>
+                      <div class="text-muted small italic">Brak pojazdów</div>
                     {% endif %}
                   </div>
                 </div>
-                <div class="mx-5 mb-2">
-                  <a href="{% url 'cars:cars_home' %}"  class="btn btn-secondary btn-block">Przejdź</a>
+              </div>
+
+              <!-- ZAKUPY -->
+              <div class="col-12 col-xl-6 mb-3">
+                <div class="card shadow-sm home-card">
+                  <div class="card-header-modern d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                      <img src="{% static 'todo/img/shopping-cart-solid.svg' %}" height="24" class="mr-2" style="opacity: 0.7;">
+                      <h6 class="mb-0 font-weight-bold text-uppercase text-muted" style="letter-spacing: .05em; font-size: 0.75rem;">Zakupy</h6>
+                    </div>
+                    <a href="{% url 'shopping:shopping_list_index' %}" class="btn btn-outline-secondary btn-sm py-0" style="font-size: 0.7rem;">PRZEJDŹ</a>
+                  </div>
+                  <div class="card-body py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <div class="text-muted small">Listy / Pozycje</div>
+                      <div>
+                        <span class="macro-badge">{{shopping_lists}}</span>
+                        <span class="macro-badge" style="background-color: #fff3e0; color: #e65100; border-color: #ffe0b2;">{{products_to_buy_counter}}</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-              <div class="col-12 col-xl-6 mb-1">
-              <div class="card shadow" style="height:100%;">
-                <div class="card-header bg-secondary text-light text-center">
-                  <img src="{% static 'todo/img/shopping-cart-solid.svg' %}" height="45">
+
+              <!-- ZADANIA -->
+              <div class="col-12 col-xl-6 mb-3">
+                <div class="card shadow-sm home-card">
+                  <div class="card-header-modern d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                      <img src="{% static 'todo/img/tasks-solid.svg' %}" height="24" class="mr-2" style="opacity: 0.7;">
+                      <h6 class="mb-0 font-weight-bold text-uppercase text-muted" style="letter-spacing: .05em; font-size: 0.75rem;">Zadania</h6>
+                    </div>
+                    <a href="{% url 'todo:index' %}" class="btn btn-outline-secondary btn-sm py-0" style="font-size: 0.7rem;">PRZEJDŹ</a>
+                  </div>
+                  <div class="card-body py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <div class="text-muted small">Do zrobienia</div>
+                      <span class="macro-badge macro-badge-kcal" style="min-width: 45px;">{{all_to_do_count}}</span>
+                    </div>
+                  </div>
                 </div>
-                <div class="card-body">
-                  <ul>
-                    {%  if shopping_lists %}
-                    <li>{{shopping_lists}} {% if shopping_lists == 1 %}lista{% endif %}{% if shopping_lists > 1 and  shopping_lists < 5 %}listy{% endif %}{% if shopping_lists >= 5 %}list{% endif %} zakupów.</li>
-                    <li>{{products_to_buy_counter}} {% if products_to_buy_counter == 1 %}pozycja{% endif %}{% if products_to_buy_counter > 1 and  products_to_buy_counter < 5 %}pozycje{% endif %}{% if products_to_buy_counter >= 5 %}pozycji{% endif %} do kupienia</li>
+              </div>
+
+              <!-- SZAFA (GUNSAFE) -->
+              <div class="col-12 col-xl-6 mb-3">
+                <div class="card shadow-sm home-card">
+                  <div class="card-header-modern d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                      <img src="{% static 'todo/img/vault-solid.svg' %}" height="24" class="mr-2" style="opacity: 0.7;">
+                      <h6 class="mb-0 font-weight-bold text-uppercase text-muted" style="letter-spacing: .05em; font-size: 0.75rem;">Szafa</h6>
+                    </div>
+                    <a href="{% url 'gunsafe:gunsafe_home' %}" class="btn btn-outline-secondary btn-sm py-0" style="font-size: 0.7rem;">PRZEJDŹ</a>
+                  </div>
+                  <div class="card-body py-2">
+                    {% if weapons_count %}
+                      <div class="row no-gutters">
+                        <div class="col-6 pr-1">
+                          <div class="text-muted small mb-1 text-center" style="font-size: 0.6rem;">Broń</div>
+                          <div class="text-center"><span class="macro-badge w-100">{{weapons_count}}</span></div>
+                        </div>
+                        <div class="col-6 pl-1">
+                          <div class="text-muted small mb-1 text-center" style="font-size: 0.6rem;">Amunicja</div>
+                          <div class="text-center"><span class="macro-badge w-100">{{total_ammo_qty}}</span></div>
+                        </div>
+                      </div>
                     {% else %}
-                    <li>Brak list zakupów!</li>
+                      <div class="text-muted small italic">Szafa jest pusta</div>
                     {% endif %}
-                  </ul>
-                </div>
-                <div class="mx-5 mb-2">
-                  <a href="{% url 'shopping:shopping_list_index' %}"  class="btn btn-secondary btn-block">Przejdź</a>
+                  </div>
                 </div>
               </div>
-            </div>
-              <div class="col-12 col-xl-6 mb-1">
-            <div class="card shadow" style="height:100%;">
-              <div class="card-header bg-secondary text-light text-center">
-                <img src="{% static 'todo/img/tasks-solid.svg' %}" height="45">
-              </div>
-              <div class="card-body">
-                <ul>
-                  {% if all_to_do_count %}
-                  <li>{{all_to_do_count}} {% if all_to_do_count == 1 %}zadanie{% endif %}{% if all_to_do_count > 1 and  all_to_do_count < 5 %}zadania{% endif %}{% if all_to_do_count >= 5 %}zadań{% endif %} do zrobienia</li>
-                  {% else %}
-                  <li>Brak zadań do zrobienia!</li>
-                  {% endif %}
-                </ul>
-              </div>
-              <div class="mx-5 mb-2">
-                <a href="{% url 'todo:index' %}"  class="btn btn-secondary btn-block">Przejdź</a>
-              </div>
-            </div>
-          </div>
-          <div class="col-12 col-xl-6 mb-1">
-            <div class="card shadow" style="height:100%;">
-              <div class="card-header bg-secondary text-light text-center">
-                <img src="{% static 'todo/img/vault-solid.svg' %}" height="45">
-              </div>
-              <div class="card-body">
-                <ul>
-                  {% if weapons_count %}
-                  <li>Jednostki broni: {{ weapons_count }}</li>
-                  <li>Amunicja w szafie: {{ total_ammo_qty }} szt.</li>
-                  {% else %}
-                  <li>Szafa jest pusta!</li>
-                  {% endif %}
-                </ul>
-              </div>
-              <div class="mx-5 mb-2">
-                <a href="{% url 'gunsafe:gunsafe_home' %}"  class="btn btn-secondary btn-block">Przejdź</a>
-              </div>
-            </div>
-          </div>
-            </div>
-          </div>
-        </div>
+
+            </div><!-- /inner-row -->
+          </div><!-- /col-8 -->
+
+        </div><!-- /outer-row -->
+
       {% else %}
-        <div class="container">
-          <div class="jumbotron shadow shadow-lg">
-            <h1 class="display-4">Organizer</h1>
-            <p class="lead">Zaloguj się aby móc tworzyć listy toDo i listy zakupowe</p>
-            <hr class="my-4">
-            <p>Bez logowania dostępne są tylko Narzędzia.</p>
-            <a id="home-zaloguj" class="btn btn-success" href="{% url 'accounts:login' %}">Zaloguj</a>
+        <!-- UNAUTHENTICATED VIEW -->
+        <div class="container py-5 text-center">
+          <div class="card shadow-lg border-0 mx-auto" style="max-width: 600px; border-radius: 20px;">
+            <div class="card-body p-5">
+              <h1 class="display-4 font-weight-bold text-dark mb-3">Organizer</h1>
+              <p class="lead text-muted mb-4">Zaloguj się aby móc tworzyć listy toDo i listy zakupowe</p>
+              <hr class="my-4 mx-auto" style="width: 50%;">
+              <div class="p-3 bg-light rounded mb-4" style="font-size: 0.95rem;">
+                <i class="fas fa-info-circle mr-2 text-secondary"></i>
+                Bez logowania dostępne są tylko <span class="font-weight-bold">Narzędzia</span>.
+              </div>
+              <a id="home-zaloguj" class="btn btn-dark btn-lg px-5 shadow-sm" href="{% url 'accounts:login' %}" style="border-radius: 50px;">
+                Zaloguj się
+              </a>
+            </div>
           </div>
         </div>
       {% endif %}
     </div>
   </div>
 </div>
-{% endblock %}
+{% endblock %}
