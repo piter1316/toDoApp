@@ -411,13 +411,13 @@
         <form method="post" action="{% url 'meals:edit_extras' %}" name="editExtras" id="editExtras_{{option.id}}" >{% csrf_token %}
           <input type="hidden" id="" name="meals_list_position" value="">
           <input type="hidden" id="current_meal_id" value="">
-          <input type="hidden" id="option_id" value="">
+          <input type="hidden" id="option_id" value="{{option}}">
           <select onchange="" class="form-control form-control-sm mt-2 shadow-sm" name="extras_select" id="extrasSelect_{{option.id}}">
             <option>
               {{option}}
             </option>
             {% for meal in meals %}
-            <option value="{{meal.0.id}}">{{meal.0.name}} | {{meal.1.0}} kcal {% if meal.1.2 %}| {{meal.1.2.0}} {% endif %} </option>
+            <option value="{{meal.id}}">{{meal.name}} | {{meal.kcal}} kcal {% if meal.hi_protein %} | B{% endif %} </option>
             {% endfor %}
           </select>
         </form>

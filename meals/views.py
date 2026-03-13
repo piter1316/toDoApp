@@ -226,7 +226,7 @@ def meals(request, current=1):
 
     all_meals_in_option_dict = {}
     for option in user_meals_options:
-        all_meals_in_option_dict[option.id] = meals_by_option.get(option.id, [])
+        all_meals_in_option_dict[option] = meals_by_option.get(option.id, [])
 
     # 4. Przetwarzanie struktury dla Template'u
     days_data = []
@@ -262,7 +262,6 @@ def meals(request, current=1):
         # Przetwarzanie pojedynczego wpisu z MealsList
         meal_obj = item.meal
         extras_obj = item.extras
-
         # Inicjalizacja danych dla pojedynczej "komórki" w tabeli
         cell_data = {
             'list_id': item.id,
@@ -275,7 +274,7 @@ def meals(request, current=1):
             'extras_id': extras_obj.id if extras_obj else None,
             'extras_name': extras_obj.name if extras_obj else None,
             'extras_short_expiry': extras_obj.has_short_expiry_flag if extras_obj else False,
-            'dropdown_options': all_meals_in_option_dict.get(item.meal_option_id, [])
+            'dropdown_options': all_meals_in_option_dict.get(item.meal_option, [])
         }
 
         # Makro posiłku głównego
