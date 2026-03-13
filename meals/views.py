@@ -229,7 +229,6 @@ def meals(request, current=1):
             'is_hi_protein': is_hi_protein(kcal, prot),
             'obj': meal
         }
-    print('--->', time.time() - start)
 
     meals_by_option = {}
     for m_id, m_data in meal_macros.items():
