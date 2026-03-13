@@ -1,19 +1,21 @@
-import datetime
 import random
-import time
 from django.contrib import messages
 
-from django.contrib.auth.decorators import login_required
+from django.db.models import Q, Count
 from django.http import HttpResponse
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse
-# Create your views here.
+
 from django.views.decorators.http import require_POST
 
 from meals.forms import MealForm, IngredientForm, MealOptionForm
 from meals.models import MealOption, Meal, Ingredient, MealsList, Week, Unit, MealIngredient, Shop, ProductDivision, \
     is_hi_protein, VEGIES_OUT
 from shopping.models import ShoppingList, Products
+import time
+import datetime
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 
 
 def average_for_whole_list(meals_list, generated_user_meals_options, user, current, meal_ingredients_dict):
@@ -128,50 +130,31 @@ def appended_days_generator(request, first, how_many):
     return days_list
 
 
-def get_maximum_no_of_days(request):
-    user_meals_options = MealOption.objects.filter(user=request.user, is_taken_to_generation=1)
-    no_of_meals_in_option = []
-    for option in user_meals_options:
-        meals_in_option = Meal.objects.filter(user=request.user, meal_option=option, special=0)
-        no_of_meals_in_option.append(len(meals_in_option))
-    if len(no_of_meals_in_option) > 0:
-        min_no_of_meals_in_option = min(no_of_meals_in_option)
-        return min_no_of_meals_in_option
-    else:
-        return 0
+def get_max_days(request, exclude_current=False):
+    # 1. Przygotowujemy filtr dla posiłków
+    # Podstawowe warunki: ten sam użytkownik i nie "specjalne"
+    meal_filter = Q(meal__user=request.user, meal__special=0)
 
+    # 2. Jeśli chcemy "no_repeat", dodajemy warunek wykluczający
+    if exclude_current:
+        excluded_ids = MealsList.objects.filter(
+            user=request.user,
+            current=1,
+            meal_id__isnull=False
+        ).values_list('meal_id', flat=True)
 
-def get_maximum_no_of_days_no_repeat(request):
-    current_meals_list = MealsList.objects.filter(user=request.user, current=1)
-    current_meals = []
-    no_of_meals_in_option = []
-    for item in (list(current_meals_list)):
-        if item.meal_id:
-            current_meals.append(item.meal_id)
-    user_meals_options = MealOption.objects.filter(user=request.user, is_taken_to_generation=1)
-    for option in user_meals_options:
-        meals_in_option = Meal.objects.filter(meal_option=option, user=request.user, special=0)
-        option_meals_list = []
-        for meal in meals_in_option:
-            if meal.id not in current_meals:
-                option_meals_list.append(meal)
-        no_of_meals_in_option.append(len(option_meals_list))
-    if len(no_of_meals_in_option) > 0:
-        min_no_of_meals_in_option = min(no_of_meals_in_option)
-        return min_no_of_meals_in_option
-    else:
-        return 0
+        meal_filter &= ~Q(meal__id__in=excluded_ids)
 
+    # 3. Jedno zapytanie z agregacją
+    counts = MealOption.objects.filter(
+        user=request.user,
+        is_taken_to_generation=1
+    ).annotate(
+        total=Count('meal', filter=meal_filter)
+    ).values_list('total', flat=True)
 
-import time
-import datetime
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from django.db.models import Prefetch
+    return min(counts) if counts else 0
 
-
-# Pamiętaj o zaimportowaniu wszystkich potrzebnych modeli
-# from .models import Meal, MealOption, MealsList, Week, get_today, get_maximum_no_of_days, get_maximum_no_of_days_no_repeat
 
 @login_required(login_url='/accounts/login')
 def meals(request, current=1):
@@ -182,18 +165,13 @@ def meals(request, current=1):
     user = request.user
 
     # 1. Pobieramy opcje
-    user_meals_options = MealOption.objects.filter(user=user, is_taken_to_generation=1).order_by('position')
-
+    user_meals_options = MealOption.objects.filter(user=user).order_by('position')
+    user_meals_options_gen = MealOption.objects.filter(user=user, is_taken_to_generation=1).order_by('position')
     # 2. Pobieramy listę (MealsList) złączoną (JOIN) z modelami Meal i Extras
     # Używamy select_related dla szybkości
     meals_list_qs = MealsList.objects.filter(user=user, current=current).select_related(
         'meal', 'meal_option', 'extras'
     ).order_by('day', 'meal_option__position')
-
-    if not meals_list_qs.exists():
-        return render(request, 'meals/meals_list.html', {
-            'meals_list': [], 'current': current, 'today': get_today()
-        })
 
     generated_user_meals_options = MealsList.objects.filter(user=user, current=current).order_by(
         'meal_option__position').values(
@@ -335,17 +313,13 @@ def meals(request, current=1):
     average_vegies_per_day = round(total_list_vegies / no_of_days)
     average_fruits_per_day = round(total_list_fruits / no_of_days)
 
-    # Inne wymagane zmienne contextu
-    # maximum_no_of_days_to_generate = get_maximum_no_of_days(request) # Zakładam, że to zostało we views.py
-    # maximum_no_of_days_to_generate_no_repeat = get_maximum_no_of_days_no_repeat(request)
-    maximum_no_of_days_to_generate = 7  # Zastąp swoim wywołaniem funkcji
-    maximum_no_of_days_to_generate_no_repeat = 5  # Zastąp swoim wywołaniem funkcji
+    maximum_no_of_days_to_generate = get_max_days(request)
+    maximum_no_of_days_to_generate_no_repeat = get_max_days(request, exclude_current=True)
 
     # Dni tygodnia
     first_day_input_list = {}
     days_of_the_week = list(Week.objects.all())
     today_weekday = get_today().weekday()
-
     if days_of_the_week:
         for i in range(7):
             idx = (today_weekday + i) % 7
@@ -354,7 +328,9 @@ def meals(request, current=1):
                 get_today() + datetime.timedelta(days=i),
                 [day_obj]
             )
+
     days_data = sorted(days_data, key=lambda x: x['day_date'])
+
     context = {
         'days_data': days_data,  # Zastępuje day_meal_option_meal_list
         'generated_user_meals_options': generated_user_meals_options,
@@ -375,6 +351,7 @@ def meals(request, current=1):
         'first_day_input_list': first_day_input_list,
         'maximum_no_of_days_to_generate_no_repeat': maximum_no_of_days_to_generate_no_repeat,
         'all_meals_in_option_dict': all_meals_in_option_dict,
+        'user_meals_options': user_meals_options_gen,
     }
 
     return render(request, 'meals/meals_list.html', context)

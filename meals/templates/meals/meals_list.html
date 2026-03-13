@@ -409,6 +409,7 @@
         </div>
         <div id="current_change_div" style="display:none;" class="text-muted mt-2 mb-1 font-weight-bold">Zmień:</div>
         {% for option, meals in all_meals_in_option_dict.items %}
+
         <form method="post" action="{% url 'meals:edit_extras' %}" name="editExtras" id="editExtras_{{option.id}}" >{% csrf_token %}
           <input type="hidden" id="" name="meals_list_position" value="">
           <input type="hidden" id="current_meal_id" value="">
