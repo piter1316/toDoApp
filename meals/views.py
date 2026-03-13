@@ -4,7 +4,7 @@ import time
 from django.contrib import messages
 
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count, Q, Prefetch
+from django.db.models import Count, Q, Prefetch, Sum, F, FloatField, Case, When, Value
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
@@ -150,8 +150,8 @@ def get_max_days(request, exclude_current=False):
 
 @login_required(login_url='/accounts/login')
 def meals(request, current=1):
-    today_to_template = get_today().date()
     start = time.time()
+    today_to_template = get_today().date()
     in_meals_list = True
 
     current = int(current)
@@ -174,64 +174,59 @@ def meals(request, current=1):
         'meal_option__position').values(
         'meal_option__meal_option', 'meal_option_id').distinct()
 
-    all_meals_qs = Meal.objects.filter(user=user).prefetch_related(
-        Prefetch(
-            'mealingredient_set',
-            queryset=MealIngredient.objects.select_related(
-                'ingredient_id__division'
+
+    all_meals_qs = Meal.objects.filter(user=user).annotate(
+        total_kcal=Sum(
+            F('mealingredient__quantity') * F('mealingredient__ingredient_id__calories_per_100_gram') / 100.0,
+            output_field=FloatField()),
+        total_prot=Sum(F('mealingredient__quantity') * F('mealingredient__ingredient_id__protein_per_100_gram') / 100.0,
+                       output_field=FloatField()),
+        total_fat=Sum(F('mealingredient__quantity') * F('mealingredient__ingredient_id__fat_per_100_gram') / 100.0,
+                      output_field=FloatField()),
+        total_carb=Sum(
+            F('mealingredient__quantity') * F('mealingredient__ingredient_id__carbohydrates_per_100_gram') / 100.0,
+            output_field=FloatField()),
+
+        total_vegies=Sum(
+            Case(
+                When(
+                    Q(mealingredient__ingredient_id__division__division_name__icontains='warzywa') &
+                    ~Q(mealingredient__ingredient_id__name__in=VEGIES_OUT),
+                    then=F('mealingredient__quantity')
+                ),
+                default=Value(0.0),
+                output_field=FloatField()
+            )
+        ),
+        total_fruits=Sum(
+            Case(
+                When(mealingredient__ingredient_id__division__division_name__icontains='owoce',
+                     then=F('mealingredient__quantity')),
+                default=Value(0.0),
+                output_field=FloatField()
             )
         )
-    )
+    ).prefetch_related('mealingredient_set__ingredient_id')  # Potrzebne tylko do short_expiry
 
+    # 3. Teraz wypełniamy słownik meal_macros (to będzie teraz błyskawiczne)
     meal_macros = {}
-    print(time.time() - start)
     for meal in all_meals_qs:
-        # Inicjalizacja liczników
-        kcal = prot = fat = carb = vegies = fruits = 0
-        short_expiry = []
+        # Pobieramy wyniki adnotacji (lub 0, jeśli posiłek nie ma składników)
+        kcal = meal.total_kcal or 0
+        prot = meal.total_prot or 0
 
-        # Dzięki prefetch_related ta pętla NIE UDERZA do bazy danych
-        for mi in meal.mealingredient_set.all():
-            ingr = mi.ingredient_id
-            q = mi.quantity
-
-            # Wyciągamy dane raz do zmiennych, żeby nie kropkować co chwilę
-            cal_100 = ingr.calories_per_100_gram
-            p_100 = ingr.protein_per_100_gram
-            f_100 = ingr.fat_per_100_gram
-            c_100 = ingr.carbohydrates_per_100_gram
-
-            if ingr.short_expiry:
-                short_expiry.append(1)
-
-            # Obliczenia (dzielenie przez 100 raz na końcu lub na zmiennej q)
-            factor = q / 100
-            kcal += cal_100 * factor
-            prot += p_100 * factor
-            fat += f_100 * factor
-            carb += c_100 * factor
-
-            # Optymalizacja sprawdzania dywizji
-            div_name = ingr.division.division_name.lower()
-            ingr_name_lower = ingr.name.lower()
-
-            if 'warzywa' in div_name and ingr_name_lower not in VEGIES_OUT:
-                vegies += q
-            elif 'owoce' in div_name:  # elif, bo owoc rzadko jest warzywem
-                fruits += q
-
-        # Wywołanie funkcji logicznej
-        is_hi_prot = is_hi_protein(float(kcal), float(prot))
+        # Wyciągamy short_expiry z pobranych wcześniej (prefetch) danych
+        short_expiry = [1 for mi in meal.mealingredient_set.all() if mi.ingredient_id.short_expiry]
 
         meal_macros[meal.id] = {
             'kcal': round(kcal),
             'prot': round(prot),
-            'fat': round(fat),
-            'carb': round(carb),
-            'vegies': round(vegies),
-            'fruits': round(fruits),
+            'fat': round(meal.total_fat or 0),
+            'carb': round(meal.total_carb or 0),
+            'vegies': round(meal.total_vegies or 0),
+            'fruits': round(meal.total_fruits or 0),
             'short_expiry': short_expiry,
-            'is_hi_protein': is_hi_prot,
+            'is_hi_protein': is_hi_protein(kcal, prot),
             'obj': meal
         }
     print('--->', time.time() - start)
@@ -243,18 +238,18 @@ def meals(request, current=1):
             meals_by_option[opt_id] = []
         meals_by_option[opt_id].append(
             [m_data['obj'], [m_data['kcal'], m_data['short_expiry'], m_data['is_hi_protein']]])
-    print(time.time() - start)
+
     all_meals_in_option_dict = {}
     for option in all_user_meals_options:
         meals_in_opt = meals_by_option.get(option.id, [])
         meals_in_opt.sort(key=lambda x: x[0].name)
         all_meals_in_option_dict[option] = meals_in_opt
-    print(time.time() - start)
+
     days = []
     for item in meals_list:
         if item.day not in days:
             days.append(item.day)
-    print(time.time() - start)
+
     day_meal_option_meal_list = []
 
     total_list_kcal = 0
@@ -273,17 +268,11 @@ def meals(request, current=1):
         day_vegies = 0
         day_fruits = 0
 
-        # Posiłki w danym dniu (z posortowanej listy meals_list)
         meals_on_day = [m for m in meals_list if m.day == day]
-        # meals_on_day są już posortowane po meal_option__position dzięki order_by w QuerySet
-
         for ml_item in meals_on_day:
             m_id = ml_item.meal_id
             e_id = ml_item.extras_id
-
-            # Dane posiłku głównego
             m_macro = meal_macros.get(m_id, {'kcal': 0, 'prot': 0, 'fat': 0, 'carb': 0, 'vegies': 0, 'fruits': 0})
-            # Dane dodatku
             e_macro = meal_macros.get(e_id, {'kcal': 0, 'prot': 0, 'fat': 0, 'carb': 0, 'vegies': 0, 'fruits': 0})
 
             day_kcal += m_macro['kcal'] + e_macro['kcal']
@@ -293,7 +282,6 @@ def meals(request, current=1):
             day_vegies += m_macro['vegies'] + e_macro['vegies']
             day_fruits += m_macro['fruits'] + e_macro['fruits']
 
-            # Dodajemy do listy posiłków dnia w formacie oczekiwanym przez template
             day_meals_list.append({ml_item: all_meals_in_option_dict.get(ml_item.meal_option)})
 
         day_meal_option_meal_list.append([
@@ -309,8 +297,7 @@ def meals(request, current=1):
         total_list_carb += day_carb
         total_list_vegies += day_vegies
         total_list_fruits += day_fruits
-    print(time.time() - start)
-    # Obliczanie średnich
+
     no_of_days = len(days) if days else 1
     average_clories_per_day = round(total_list_kcal / no_of_days)
     average_protein_per_day = round(total_list_prot / no_of_days)
@@ -318,9 +305,7 @@ def meals(request, current=1):
     average_carb_per_day = round(total_list_carb / no_of_days)
     average_vegies_per_day = round(total_list_vegies / no_of_days)
     average_fruits_per_day = round(total_list_fruits / no_of_days)
-    print(time.time() - start)
 
-    # Pozostałe dane do contextu
     maximum_no_of_days_to_generate = get_max_days(request)
     maximum_no_of_days_to_generate_no_repeat = get_max_days(request, exclude_current=True)
 
@@ -337,7 +322,6 @@ def meals(request, current=1):
             today + datetime.timedelta(days=dates_counter),
             [d for d in all_days if d == day_obj]  # Filtracja w pamięci
         )
-    print(time.time() - start)
     context = {
         'meals_list': meals_list,
         'user_meals_options': user_meals_options,
@@ -359,8 +343,7 @@ def meals(request, current=1):
         'today_to_template': today_to_template,
         'today': get_today(),
     }
-    print(time.time() - start)
-    print('funkcja zakończona')
+    print(time.time() - start, 'funkcja zakończona')
     return render(request, 'meals/meals_list.html', context)
 
 
