@@ -3,6 +3,8 @@ import math
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Sum, F, FloatField
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
 
 VEGIES_OUT = ('ziemniaki', 'passata pomidorowa', 'tofu', 'przecier pomidorowy')
 
@@ -33,6 +35,16 @@ class Meal(models.Model):
     recipe = models.TextField(null=True, blank=True)
     special = models.BooleanField(default=False)
     calories = models.IntegerField(default=0)
+
+    # --- NOWE POLA DO OPTYMALIZACJI ---
+    total_kcal = models.FloatField(default=0)
+    total_protein = models.FloatField(default=0)
+    total_fat = models.FloatField(default=0)
+    total_carb = models.FloatField(default=0)
+    total_vegies = models.FloatField(default=0)
+    total_fruits = models.FloatField(default=0)
+    is_hi_protein_flag = models.CharField(max_length=2, null=True, blank=True)  # Zapisze 'B' lub 'b'
+    has_short_expiry_flag = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -170,3 +182,60 @@ class Week(models.Model):
 
     def __str__(self):
         return self.day_of_the_week
+
+
+# Upewnij się, że ten kod znajduje się pod definicjami klas Meal i MealIngredient
+# oraz że masz zaimportowaną zmienną VEGIES_OUT i funkcję is_hi_protein.
+
+def update_meal_stats_on_change(sender, instance, **kwargs):
+    meal = instance.meal_id  # U Ciebie ForeignKey nazywa się meal_id
+    if not meal:
+        return
+
+    # Pobieramy wszystkie składniki posiłku
+    ingredients = MealIngredient.objects.filter(meal_id=meal).select_related('ingredient_id__division')
+
+    t_kcal = t_prot = t_fat = t_carb = t_veg = t_fru = 0.0
+    has_short = False
+
+    for mi in ingredients:
+        ing = mi.ingredient_id
+        q = float(mi.quantity)
+        factor = q / 100.0
+
+        t_kcal += ing.calories_per_100_gram * factor
+        t_prot += ing.protein_per_100_gram * factor
+        t_fat += ing.fat_per_100_gram * factor
+        t_carb += ing.carbohydrates_per_100_gram * factor
+
+        if ing.short_expiry:
+            has_short = True
+
+        div_name = ing.division.division_name.lower()
+        if 'warzywa' in div_name and ing.name.lower() not in VEGIES_OUT:
+            t_veg += q
+        if 'owoce' in div_name:
+            t_fru += q
+
+    # Zapisujemy przeliczone dane do obiektu Meal
+    meal.total_kcal = round(t_kcal)
+    meal.total_protein = round(t_prot)
+    meal.total_fat = round(t_fat)
+    meal.total_carb = round(t_carb)
+    meal.total_vegies = round(t_veg)
+    meal.total_fruits = round(t_fru)
+    meal.has_short_expiry_flag = has_short
+
+    # Obsługa flagi białka
+    res = is_hi_protein(t_kcal, t_prot)
+    meal.is_hi_protein_flag = res[0] if res else None
+
+    # Ważne: używamy update_fields, aby nie triggerować innych sygnałów w kółko
+    meal.save(update_fields=[
+        'total_kcal', 'total_protein', 'total_fat', 'total_carb',
+        'total_vegies', 'total_fruits', 'has_short_expiry_flag', 'is_hi_protein_flag'
+    ])
+
+
+post_save.connect(update_meal_stats_on_change, sender=MealIngredient)
+post_delete.connect(update_meal_stats_on_change, sender=MealIngredient)

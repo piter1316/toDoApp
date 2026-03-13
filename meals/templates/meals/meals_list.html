@@ -213,7 +213,6 @@
         </div>
       </div>
         <div class="mb-5" id="meals_list" >
-          <!-- We keep table tags so JS doesn't crash, but CSS treats them as a block grid -->
           <table class="w-100" id="table"
                   {% if not current %}style="color: gray !important; opacity: 0.7;"{% endif %}>
             <thead id="meals_list_head">
@@ -223,9 +222,7 @@
                 Średnio: {{average_clories_per_day}} kcal<br>
                 {{average_protein_per_day}}g<sup>b<span class="no_print">iałko</span></sup> |
                 {{average_fat_per_day}}g<sup>t<span class="no_print">łuszcze</span></sup> |
-                {{average_carb_per_day}}g<sup>w<span class="no_print">ęglowodany</span></sup> |
-                {{average_vegies_per_day}}g<sup><i class="fas fa-solid fa-carrot"></i></sup> |
-                {{average_fruits_per_day}}g<sup><i class="fas fa-apple-alt"></i></sup>
+                {{average_carb_per_day}}g<sup>w<span class="no_print">ęglowodany</span></sup>
                 </small>
               </th>
               {% for meal_option in generated_user_meals_options %}
@@ -237,147 +234,136 @@
             </tr>
             </thead>
             <tbody>
-            {% for item in day_meal_option_meal_list %}
-            {% for day, meals in item.0.items %}
-            
-            {% with day_as_list=day|split %}
-                  <tr class="d-xl-none no_print {% if today_to_template|date:'Y-m-d' == day_as_list.1 %} today-highlight-card {% endif %}" id="tr_{{day}}">
-                <td class="text-center bg-light border-bottom mb-2 pb-3" colspan="6" id="div_td_{{day}}">
+
+            {% for day in days_data %}
+
+            <tr class="d-xl-none no_print {% if day.is_today %} today-highlight-card {% endif %}" id="tr_{{day.raw_day}}">
+                <td class="text-center bg-light border-bottom mb-2 pb-3" colspan="6" id="div_td_{{day.raw_day}}">
                   <div class="d-flex justify-content-between align-items-center mb-2 px-3 pt-2">
                     <div class="d-flex align-items-center">
-                      {% if today_to_template|date:'Y-m-d' == day_as_list.1 %}
+                      {% if day.is_today %}
                         <span class="badge badge-dark mr-2" style="font-size: 0.7rem; padding: 2px 6px; background-color: #343a40 !important; color: white !important;">DZIŚ</span>
                       {% endif %}
-                      <h5 class="font-weight-bold mb-0 text-dark">{{day_as_list.0}} <small class="text-muted">{{day_as_list.1}}</small></h5>
+                      <h5 class="font-weight-bold mb-0 text-dark">{{day.day_name}} <small class="text-muted">{{day.day_date}}</small></h5>
                     </div>
-                    <input style="transform: scale(1.2);" type="checkbox" name="day" class="checkbox" value="{% for meal in meals %}{% for ml in meal%}{{ml.id}},{% endfor %}{% endfor %}">
+                    <input style="transform: scale(1.2);" type="checkbox" name="day" class="checkbox" value="{% for m in day.meals %}{{m.list_id}},{% endfor %}">
                   </div>
-                  
-                  <h4 class="font-weight-bold mb-1" style="font-size: 1.25rem; color: #343a40 !important;">{{item.1.0}} <small class="text-muted" style="font-size: 0.8rem;">kcal</small></h4>
-                  
+
+                  <h4 class="font-weight-bold mb-1" style="font-size: 1.25rem; color: #343a40 !important;">{{day.totals.kcal}} <small class="text-muted" style="font-size: 0.8rem;">kcal</small></h4>
+
                   <div class="d-flex justify-content-center flex-wrap px-2">
-                    <span class="macro-badge" data-toggle="tooltip" title="Białko">{{item.1.1}}g <small>B</small></span>
-                    <span class="macro-badge" data-toggle="tooltip" title="Tłuszcze">{{item.1.2}}g <small>T</small></span>
-                    <span class="macro-badge" data-toggle="tooltip" title="Węglowodany">{{item.1.3}}g <small>W</small></span>
-                    <span class="macro-badge"><i class="fas fa-solid fa-carrot text-secondary"></i> {{item.2}}g</span>
-                    <span class="macro-badge"><i class="fas fa-apple-alt text-secondary"></i> {{item.3}}g</span>
+                    <span class="macro-badge" data-toggle="tooltip" title="Białko">{{day.totals.prot}}g <small>B</small></span>
+                    <span class="macro-badge" data-toggle="tooltip" title="Tłuszcze">{{day.totals.fat}}g <small>T</small></span>
+                    <span class="macro-badge" data-toggle="tooltip" title="Węglowodany">{{day.totals.carb}}g <small>W</small></span>
+                    <span class="macro-badge"><i class="fas fa-solid fa-carrot text-secondary"></i> {{day.totals.vegies}}g</span>
+                    <span class="macro-badge"><i class="fas fa-apple-alt text-secondary"></i> {{day.totals.fruits}}g</span>
                   </div>
                 </td>
-               {% endwith %}
             </tr>
 
-            {% with day_as_list=day|split %}
-            <tr style="position:relative" class="text-center {% if today_to_template|date:'Y-m-d' == day_as_list.1 %} today-highlight-card {% endif %}" >
-              <th nowrap class="text-left d-none d-xl-flex" id="th_{{day}}">
-                <div id="div_th_{{day}}" class="w-100 d-flex justify-content-between align-items-center">
-                  <!-- Left: Day Info -->
+            <tr style="position:relative" class="text-center {% if day.is_today %} today-highlight-card {% endif %}" >
+              <th nowrap class="text-left d-none d-xl-flex" id="th_{{day.raw_day}}">
+                <div id="div_th_{{day.raw_day}}" class="w-100 d-flex justify-content-between align-items-center">
                   <div class="d-flex align-items-center">
-                    {% if today_to_template|date:'Y-m-d' == day_as_list.1 %}
+                    {% if day.is_today %}
                       <span class="badge badge-dark mr-2" style="font-size: 0.7rem; padding: 2px 6px;">DZIŚ</span>
                     {% endif %}
                     <h5 class="font-weight-bold mb-0 text-dark mr-3" style="font-size: 0.95rem;">
-                        {{day_as_list.0}} <span class="text-muted font-weight-normal ml-1" style="font-size: 0.8rem;">{{day_as_list.1}}</span>
+                        {{day.day_name}} <span class="text-muted font-weight-normal ml-1" style="font-size: 0.8rem;">{{day.day_date}}</span>
                     </h5>
-                    <input style="transform: scale(1.1);" type="checkbox" name="day" class="checkbox my-0" value="{% for meal in meals %}{% for ml in meal%}{{ml.id}},{% endfor %}{% endfor %}">
+                    <input style="transform: scale(1.1);" type="checkbox" name="day" class="checkbox my-0" value="{% for m in day.meals %}{{m.list_id}},{% endfor %}">
                   </div>
-                  
-                  <!-- Right: Summary Stats -->
+
                   <div class="d-flex align-items-center">
                     <div class="mr-3 px-2 py-0 bg-dark rounded text-white font-weight-bold shadow-sm" style="font-size: 0.85rem; line-height: 1.8;">
-                        {{item.1.0}} <small>KCAL</small>
+                        {{day.totals.kcal}} <small>KCAL</small>
                     </div>
-                    
+
                     <div class="d-flex align-items-center">
-                      <span class="macro-badge px-2 mr-1" title="Białko">{{item.1.1}}g <small>B</small></span>
-                      <span class="macro-badge px-2 mr-1" title="Tłuszcze">{{item.1.2}}g <small>T</small></span>
-                      <span class="macro-badge px-2 mr-1" title="Węglowodany">{{item.1.3}}g <small>W</small></span>
-                      <span class="macro-badge px-2 mr-2"><i class="fas fa-carrot text-secondary"></i> {{item.2}}g</span>
-                      <span class="macro-badge px-2"><i class="fas fa-apple-alt text-secondary"></i> {{item.3}}g</span>
+                      <span class="macro-badge px-2 mr-1" title="Białko">{{day.totals.prot}}g <small>B</small></span>
+                      <span class="macro-badge px-2 mr-1" title="Tłuszcze">{{day.totals.fat}}g <small>T</small></span>
+                      <span class="macro-badge px-2 mr-1" title="Węglowodany">{{day.totals.carb}}g <small>W</small></span>
+                      <span class="macro-badge px-2 mr-2"><i class="fas fa-carrot text-secondary"></i> {{day.totals.vegies}}g</span>
+                      <span class="macro-badge px-2"><i class="fas fa-apple-alt text-secondary"></i> {{day.totals.fruits}}g</span>
                     </div>
                   </div>
                 </div>
-                {% endwith %}
               </th>
-              {% for meal in meals %}
-              <td class="px-2 px-xl-0 d-flex flex-column justify-content-between border-bottom border-xl-0 mb-3 mb-xl-0" style="height: auto;" {%for ch_meal, all in meal.items%} id="td_{{ch_meal.id}}" {% endfor %}  >{%for ch_meal, all in meal.items%}
-                
-                <!-- Display generic meal position wrapper icon/badge -->
+
+              {% for meal_cell in day.meals %}
+              <td class="px-2 px-xl-0 d-flex flex-column justify-content-between border-bottom border-xl-0 mb-3 mb-xl-0" style="height: auto;" id="td_{{meal_cell.list_id}}">
+
                 <div class="mb-2 text-left d-flex justify-content-between align-items-center">
                     <small class="text-uppercase text-muted font-weight-bold tracking-wide" style="font-size: 0.65rem;">
-                        <i class="fas fa-utensils mr-1"></i> {{ch_meal.meal_option.meal_option|default:"Posiłek"}}
+                        <i class="fas fa-utensils mr-1"></i> {{meal_cell.option_name|default:"Posiłek"}}
                     </small>
-                    {% for m in all %}{% if ch_meal.meal_id == m.0.id %} {% if m.1.2 %} <span class="badge badge-light text-muted border shadow-sm">{{m.1.2.0|upper}}</span> {% endif %} {% endif %}{%endfor%}
                 </div>
-                
-                <!-- Inner Meal Content Wrapper for pinning dropdown -->
+
                 <div class="dropdown position-relative">
-                    <div class="font-weight-bold text-dark w-100 text-left mb-2 px-1" style="cursor:pointer; font-size: 0.95rem; line-height: 1.2;" id="dropdownMeal_{{ch_meal.id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      {% if ch_meal.meal_id %}
-                      {{ch_meal}}{% for m in all %}{% if ch_meal.meal_id == m.0.id %} {% if m.0.special %} <span class="text-danger">*</span> {% endif %} {% endif %}{%endfor%}
-                        {% for m in all %}{% if ch_meal.meal_id == m.0.id %} {% if m.1.1 %}<sup class="fas fa-hourglass-start text-dark ml-1" ></sup>{% endif %} {% endif %}{%endfor%}
+                    <div class="font-weight-bold text-dark w-100 text-left mb-2 px-1" style="cursor:pointer; font-size: 0.95rem; line-height: 1.2;" id="dropdownMeal_{{meal_cell.list_id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      {% if meal_cell.meal_id %}
+                        {{meal_cell.meal_name}}
+                        {% if meal_cell.is_special %} <span class="text-danger">*</span> {% endif %}
+                        {% if meal_cell.short_expiry %}<sup class="fas fa-hourglass-start text-dark ml-1" ></sup>{% endif %}
                       {% else %}
-                      <span class="text-muted font-italic font-weight-normal">-----------------------</span>
+                        <span class="text-muted font-italic font-weight-normal">-----------------------</span>
                       {% endif %}
                     </div>
-                    
-                    <!-- Dropdown Actions (Now pinned zaraz pod id=dropdownMeal) -->
-                    <div class="dropdown-menu dropdown-menu-modern p-3 border border-dark shadow shadow-lg" id="dropdownMenu_{{ch_meal.id}}">
+
+                    <div class="dropdown-menu dropdown-menu-modern p-3 border border-dark shadow shadow-lg" id="dropdownMenu_{{meal_cell.list_id}}">
                       {% if current %}
                       <div class=" mx-auto mb-1">
                         <small class="text-muted font-weight-bold text-uppercase d-block mb-2">Zmiana posiłku:</small>
-                        <form id="form_{{ch_meal.id}}" action="{% url 'meals:update_meals_list' %}" method="post" class="form stopPropagation">{% csrf_token %}
-                          <input type="hidden" name="record_id" value="{{ch_meal.id}}">
-                          <input type="hidden" name="meal_option_id" value="{{ch_meal.meal_option_id}}">
-                          <input type="hidden" name="meal_id" value="{{ch_meal.meal_id}}">
-                          <select class="form-control form-control-sm mb-3 shadow-sm w-100" name="to_update" id="toUpdate_{{ch_meal.id}}" style="max-width: 100%;">
+                        <form id="form_{{meal_cell.list_id}}" action="{% url 'meals:update_meals_list' %}" method="post" class="form stopPropagation">{% csrf_token %}
+                          <input type="hidden" name="record_id" value="{{meal_cell.list_id}}">
+                          <input type="hidden" name="meal_option_id" value="{{meal_cell.option_id}}">
+                          <input type="hidden" name="meal_id" value="{{meal_cell.meal_id}}">
+                          <select class="form-control form-control-sm mb-3 shadow-sm w-100" name="to_update" id="toUpdate_{{meal_cell.list_id}}" style="max-width: 100%;">
                             <option value="">-- WYCZYŚĆ POSIŁEK --</option>
-                            {% for m in all %}
-                              <option {% if ch_meal.meal_id == m.0.id %}selected="true"{% endif %} value="{{m.0.id}}">{{m.0}} | {{m.1.0}} kcal{% if m.0.special %} ** {% endif %} {% if m.1.2 %} | {{m.1.2.0}} {% endif %} </option>
+                            {% for drop_opt in meal_cell.dropdown_options %}
+                              <option {% if meal_cell.meal_id == drop_opt.id %}selected="true"{% endif %} value="{{drop_opt.id}}">
+                                {{drop_opt.name}} | {{drop_opt.kcal}} kcal
+                                {% if drop_opt.special %} ** {% endif %}
+                                {% if drop_opt.hi_protein %} | {{drop_opt.hi_protein}} {% endif %}
+                              </option>
                             {% endfor %}
                           </select>
                         </form>
                         {% endif %}
-                        <span id="span_{{ch_meal.id}}">
-                        {% if ch_meal.meal_id %}
-                          <a href="{% url 'meals:edit_meal_ingredients' ch_meal.meal_id %}" id="a_{{ch_meal.id}}" class="btn btn-sm btn-block btn-dark mt-1">Edytuj {{ch_meal}}</a>
+                        <span id="span_{{meal_cell.list_id}}">
+                        {% if meal_cell.meal_id %}
+                          <a href="{% url 'meals:edit_meal_ingredients' meal_cell.meal_id %}" id="a_{{meal_cell.list_id}}" class="btn btn-sm btn-block btn-dark mt-1">Edytuj posiłek</a>
                         {% endif %}
-                          {% if not ch_meal.extras %}
+                          {% if not meal_cell.extras_id %}
                           <button class="editExtras btn btn-sm btn-block btn-secondary mt-1 font-italic"
-                                  id="editExtrasButton_{{ch_meal.id}}" style="cursor:pointer;" data-toggle="modal"
+                                  id="editExtrasButton_{{meal_cell.list_id}}" style="cursor:pointer;" data-toggle="modal"
                                   data-target="#extrasModal">
                             Dodatki
                           </button>
-                          <input type="hidden" id="clicked_position_meal_{{ch_meal.id}}" value="{{ch_meal}}">
+                          <input type="hidden" id="clicked_position_meal_{{meal_cell.list_id}}" value="{{meal_cell.meal_name}}">
                           {% endif %}
                         </span>
                       </div>
                     </div>
                 </div>
-                
-                <!-- Extras Area -->
+
                 <div class="text-left mt-auto px-1 w-100">
-                {% if ch_meal.extras %}
-                <small class="px-2 py-1 text-muted w-100" style="cursor:pointer; font-size: 0.75rem;" data-toggle="modal" data-target="#extrasModal" id="editExtrasSmallWrap_{{ch_meal.id}}">
-                  <i class="editExtras font-weight-bold" id="editExtrasSmall_{{ch_meal.id}}">
-                    {{ch_meal.extras}}{% if ch_meal.extras.has_short_expiry %} <sup class="fas fa-hourglass-start text-dark ml-1" ></sup>{% endif %}
-                    {% if ch_meal.extras.is_high_carb %} <sup class="text-danger">{{ch_meal.extras.is_high_carb.0}}</sup> {% endif %}
-                  <input type="hidden" id="clicked_position_meal_{{ch_meal.id}}" value="{{ch_meal}}">
-                  <input type="hidden" id="clicked_position_extras_{{ch_meal.id}}" value="{{ch_meal.extras}}">
-                    {% for option, meals in all_meals_in_option_dict.items %}{% for meal in meals %}{% if meal.0 == ch_meal.extras%}
-                    <input type="hidden" id="extras_calories_{{ch_meal.id}}" value="{{meal.1.0}}">
-                    {%else%}{% endif %}{% endfor %}{% endfor %}
-                    <input type="hidden" id="extras_link_{{ch_meal.id}}" value="{% url 'meals:edit_meal_ingredients' ch_meal.extras.id %}">
+                {% if meal_cell.extras_id %}
+                <small class="px-2 py-1 text-muted w-100" style="cursor:pointer; font-size: 0.75rem;" data-toggle="modal" data-target="#extrasModal" id="editExtrasSmallWrap_{{meal_cell.list_id}}">
+                  <i class="editExtras font-weight-bold" id="editExtrasSmall_{{meal_cell.list_id}}">
+                    {{meal_cell.extras_name}}{% if meal_cell.extras_short_expiry %} <sup class="fas fa-hourglass-start text-dark ml-1" ></sup>{% endif %}
                   </i>
+                  <input type="hidden" id="clicked_position_meal_{{meal_cell.list_id}}" value="{{meal_cell.meal_name}}">
+                  <input type="hidden" id="clicked_position_extras_{{meal_cell.list_id}}" value="{{meal_cell.extras_name}}">
+                  <input type="hidden" id="extras_link_{{meal_cell.list_id}}" value="{% url 'meals:edit_meal_ingredients' meal_cell.extras_id %}">
                 </small>
                 {% endif %}
-                    </div>
-
-                {% endfor %}
+                </div>
               </td>
               {% endfor %}
             </tr>
             <tr class="no_print"><td class="p-0" colspan="6"><div style="height: 2px;"></div></td></tr>
-            {% endfor %}
+
             {% endfor %}
             </tbody>
           </table>
