@@ -251,11 +251,18 @@ def meals(request, current=1):
             'short_expiry': meal_obj.has_short_expiry_flag if meal_obj else False,
             'extras_id': extras_obj.id if extras_obj else None,
             'extras_name': extras_obj.name if extras_obj else None,
+            'extras_kcal': int(extras_obj.total_kcal) if extras_obj else None,
             'extras_short_expiry': extras_obj.has_short_expiry_flag if extras_obj else False,
             'dropdown_options': all_meals_in_option_dict.get(item.meal_option, [])
         }
 
         # Makro posiłku głównego
+        m_kcal = 0
+        m_prot = 0
+        m_fat = 0
+        m_carb = 0
+        m_veg = 0
+        m_fru = 0
         if meal_obj:
             m_kcal = meal_obj.total_kcal or 0
             m_prot = meal_obj.total_protein or 0
@@ -265,21 +272,21 @@ def meals(request, current=1):
             m_fru = meal_obj.total_fruits or 0
 
             # Dodaj makro dodatków
-            if extras_obj:
-                m_kcal += extras_obj.total_kcal or 0
-                m_prot += extras_obj.total_protein or 0
-                m_fat += extras_obj.total_fat or 0
-                m_carb += extras_obj.total_carb or 0
-                m_veg += extras_obj.total_vegies or 0
-                m_fru += extras_obj.total_fruits or 0
+        if extras_obj:
+            m_kcal += extras_obj.total_kcal or 0
+            m_prot += extras_obj.total_protein or 0
+            m_fat += extras_obj.total_fat or 0
+            m_carb += extras_obj.total_carb or 0
+            m_veg += extras_obj.total_vegies or 0
+            m_fru += extras_obj.total_fruits or 0
 
             # Sumowanie makro dnia
-            current_day_dict['totals']['kcal'] += m_kcal
-            current_day_dict['totals']['prot'] += m_prot
-            current_day_dict['totals']['fat'] += m_fat
-            current_day_dict['totals']['carb'] += m_carb
-            current_day_dict['totals']['vegies'] += m_veg
-            current_day_dict['totals']['fruits'] += m_fru
+        current_day_dict['totals']['kcal'] += m_kcal
+        current_day_dict['totals']['prot'] += m_prot
+        current_day_dict['totals']['fat'] += m_fat
+        current_day_dict['totals']['carb'] += m_carb
+        current_day_dict['totals']['vegies'] += m_veg
+        current_day_dict['totals']['fruits'] += m_fru
 
         current_day_dict['meals'].append(cell_data)
 

@@ -356,7 +356,7 @@
                   <input type="hidden" id="clicked_position_meal_{{meal_cell.list_id}}" value="{{meal_cell.meal_name}}">
                   <input type="hidden" id="clicked_position_extras_{{meal_cell.list_id}}" value="{{meal_cell.extras_name}}">
                   <input type="hidden" id="extras_link_{{meal_cell.list_id}}" value="{% url 'meals:edit_meal_ingredients' meal_cell.extras_id %}">
-                  <input type="hidden" id="extras_calories_{{meal_cell.list_id}}" value="{{meal_cell.list_id}}">
+                  <input type="hidden" id="extras_calories_{{meal_cell.list_id}}" value="{{meal_cell.extras_kcal}}">
                 </small>
                 {% endif %}
                 </div>

@@ -221,7 +221,7 @@ $(document).ready(function(){
       var current_extra = $('#clicked_position_extras_'+num_id).val();
       var current_extra_kcal = $('#extras_calories_' + num_id).val();
       if (current_extra && current_extra_kcal){
-        $('#current_extras').text(current_extra + ' | ' + current_extra_kcal + 'kcal' )
+        $('#current_extras').text(current_extra + ' | ' + current_extra_kcal + ' kcal' )
         var extras_link = $('#extras_link_'+ num_id).val()
         $('#current_extras').attr('href', extras_link)
         $('#delete_extras').text('Usuń' + ' ' + current_extra);
