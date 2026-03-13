@@ -424,7 +424,7 @@
         </form>
         <hr class="m-2 border-light">
         {% endfor %}
-        <a id="delete_extras" style="" href="{%url 'meals:delete_extras' ' ' %}" class="btn btn-block btn-outline-danger font-weight-bold mb-2 mt-3 shadow-sm"></a>
+        <a id="delete_extras" style="display:none;" href="{%url 'meals:delete_extras' ' ' %}" class="btn btn-block btn-outline-danger font-weight-bold mb-2 mt-3 shadow-sm"></a>
         <input id="base_delete_url" type="hidden" value="{%url 'meals:delete_extras' ' ' %}">
       </div>
       <div class="modal-footer p-3 bg-light border-top">
