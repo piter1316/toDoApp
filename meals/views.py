@@ -355,7 +355,7 @@ def meals(request, current=1):
                 get_today() + datetime.timedelta(days=i),
                 [day_obj]
             )
-
+    days_data = sorted(days_data, key=lambda x: x['day_date'])
     context = {
         'days_data': days_data,  # Zastępuje day_meal_option_meal_list
         'generated_user_meals_options': generated_user_meals_options,
