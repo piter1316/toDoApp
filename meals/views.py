@@ -4,7 +4,7 @@ import time
 from django.contrib import messages
 
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Prefetch
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
@@ -128,40 +128,22 @@ def appended_days_generator(request, first, how_many):
     return days_list
 
 
-def get_maximum_no_of_days(request):
+def get_max_days(request, exclude_current=False):
+    meal_filter = Q(meal__user=request.user, meal__special=0)
+    if exclude_current:
+        excluded_ids = MealsList.objects.filter(
+            user=request.user,
+            current=1,
+            meal_id__isnull=False
+        ).values_list('meal_id', flat=True)
 
-    options = MealOption.objects.filter(
+        meal_filter &= ~Q(meal__id__in=excluded_ids)
+    counts = MealOption.objects.filter(
         user=request.user,
         is_taken_to_generation=1
     ).annotate(
-        meals_count=Count('meal', filter=Q(meal__user=request.user, meal__special=0))
-    )
-    counts = options.values_list('meals_count', flat=True)
-
-    return min(counts) if counts else 0
-
-
-def get_maximum_no_of_days_no_repeat(request):
-    excluded_meal_ids = MealsList.objects.filter(
-        user=request.user,
-        current=1,
-        meal_id__isnull=False
-    ).values_list('meal_id', flat=True)
-
-    options = MealOption.objects.filter(
-        user=request.user,
-        is_taken_to_generation=1
-    ).annotate(
-        available_meals_count=Count(
-            'meal',
-            filter=Q(
-                meal__user=request.user,
-                meal__special=0
-            ) & ~Q(meal__id__in=excluded_meal_ids)
-        )
-    )
-
-    counts = options.values_list('available_meals_count', flat=True)
+        total=Count('meal', filter=meal_filter)
+    ).values_list('total', flat=True)
 
     return min(counts) if counts else 0
 
@@ -193,40 +175,54 @@ def meals(request, current=1):
         'meal_option__meal_option', 'meal_option_id').distinct()
 
     all_meals_qs = Meal.objects.filter(user=user).prefetch_related(
-        'mealingredient_set__ingredient_id__division'
+        Prefetch(
+            'mealingredient_set',
+            queryset=MealIngredient.objects.select_related(
+                'ingredient_id__division'
+            )
+        )
     )
-
 
     meal_macros = {}
     print(time.time() - start)
     for meal in all_meals_qs:
-        kcal = 0
-        prot = 0
-        fat = 0
-        carb = 0
-        vegies = 0
-        fruits = 0
+        # Inicjalizacja liczników
+        kcal = prot = fat = carb = vegies = fruits = 0
         short_expiry = []
 
+        # Dzięki prefetch_related ta pętla NIE UDERZA do bazy danych
         for mi in meal.mealingredient_set.all():
             ingr = mi.ingredient_id
             q = mi.quantity
+
+            # Wyciągamy dane raz do zmiennych, żeby nie kropkować co chwilę
+            cal_100 = ingr.calories_per_100_gram
+            p_100 = ingr.protein_per_100_gram
+            f_100 = ingr.fat_per_100_gram
+            c_100 = ingr.carbohydrates_per_100_gram
+
             if ingr.short_expiry:
                 short_expiry.append(1)
 
+            # Obliczenia (dzielenie przez 100 raz na końcu lub na zmiennej q)
+            factor = q / 100
+            kcal += cal_100 * factor
+            prot += p_100 * factor
+            fat += f_100 * factor
+            carb += c_100 * factor
 
-            kcal += (ingr.calories_per_100_gram * q / 100)
-            prot += (ingr.protein_per_100_gram * q / 100)
-            fat += (ingr.fat_per_100_gram * q / 100)
-            carb += (ingr.carbohydrates_per_100_gram * q / 100)
-
+            # Optymalizacja sprawdzania dywizji
             div_name = ingr.division.division_name.lower()
-            if 'warzywa' in div_name and ingr.name.lower() not in VEGIES_OUT:
+            ingr_name_lower = ingr.name.lower()
+
+            if 'warzywa' in div_name and ingr_name_lower not in VEGIES_OUT:
                 vegies += q
-            if 'owoce' in div_name:
+            elif 'owoce' in div_name:  # elif, bo owoc rzadko jest warzywem
                 fruits += q
 
+        # Wywołanie funkcji logicznej
         is_hi_prot = is_hi_protein(float(kcal), float(prot))
+
         meal_macros[meal.id] = {
             'kcal': round(kcal),
             'prot': round(prot),
@@ -238,8 +234,7 @@ def meals(request, current=1):
             'is_hi_protein': is_hi_prot,
             'obj': meal
         }
-    print(time.time() - start)
-    print(meal_macros)
+    print('--->', time.time() - start)
 
     meals_by_option = {}
     for m_id, m_data in meal_macros.items():
@@ -323,11 +318,11 @@ def meals(request, current=1):
     average_carb_per_day = round(total_list_carb / no_of_days)
     average_vegies_per_day = round(total_list_vegies / no_of_days)
     average_fruits_per_day = round(total_list_fruits / no_of_days)
-    print('--->',time.time() - start)
+    print(time.time() - start)
 
     # Pozostałe dane do contextu
-    maximum_no_of_days_to_generate = get_maximum_no_of_days(request)
-    maximum_no_of_days_to_generate_no_repeat = get_maximum_no_of_days_no_repeat(request)
+    maximum_no_of_days_to_generate = get_max_days(request)
+    maximum_no_of_days_to_generate_no_repeat = get_max_days(request, exclude_current=True)
 
     all_days = list(Week.objects.all().order_by('id'))
     today = get_today()
