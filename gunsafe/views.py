@@ -163,6 +163,23 @@ def gunsafe_home(request):
     # Całkowita suma wszystkich pocisków
     total_ammo = ammo_inventory.aggregate(Sum('qty'))['qty__sum'] or 0
 
+    # Wyjścia na strzelnicę - podsumowanie
+    shootings_raw = Shooting.objects.filter(weapon__user=request.user).values('date', 'weapon__name').annotate(
+        total_rounds=Sum('rounds')).order_by('-date', 'weapon__name')
+    
+    shooting_outings = {}
+    for s in shootings_raw:
+        dt = s['date']
+        if dt not in shooting_outings:
+            shooting_outings[dt] = {'items': [], 'total': 0}
+        
+        rounds = s['total_rounds']
+        shooting_outings[dt]['items'].append({
+            'weapon': s['weapon__name'],
+            'rounds': rounds
+        })
+        shooting_outings[dt]['total'] += rounds
+
     context = {
         'weapons': weapons,
         'ammo_inventory': ammo_inventory,
@@ -170,6 +187,7 @@ def gunsafe_home(request):
         'calibers': calibers,
         'ammo_by_caliber': ammo_by_caliber,
         'total_ammo': total_ammo,
+        'shooting_outings': shooting_outings,
         'today': date.today(),
     }
     return render(request, 'gunsafe/home.html', context)
