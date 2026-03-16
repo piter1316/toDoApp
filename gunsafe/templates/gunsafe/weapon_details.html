@@ -54,7 +54,7 @@
                         <li class="list-group-item bg-transparent border-secondary d-flex justify-content-between">
                             <span class="text-muted">Licznik <small>(całk. / ost. czysz.)</small>:</span>
                             <span>
-                                <span class="badge badge-secondary">{{ weapon.total_rounds_fired }} szt.</span> /
+                                <span class="badge badge-secondary">{{ weapon.total_rounds_fired }} szt.</span> <span class="text-light">/</span>
                                 <span class="badge {% if weapon.rounds_since_cleaning > 200 %}badge-danger{% elif weapon.rounds_since_cleaning > 100 %}badge-warning{% else %}badge-info{% endif %}">{{ weapon.rounds_since_cleaning }} szt.</span>
                             </span>
                         </li>
@@ -199,8 +199,8 @@
         </div>
 
         <!-- Tabela czyszczeń -->
-        <div class="col-md-6 mb-4">
-            <div class="card bg-dark border-secondary shadow">
+        <div class="col-md-6 mb-4 ">
+            <div class="card bg-dark border-secondary shadow h-100">
                 <div class="card-header border-secondary bg-transparent d-flex justify-content-between align-items-center">
                     <h5 class="mb-0 text-light"><i class="fas fa-soap mr-2"></i>Historia czyszczenia</h5>
                     <button class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#addCleaningModal">
@@ -234,6 +234,41 @@
                                 {% empty %}
                                 <tr>
                                     <td colspan="3" class="text-center text-muted font-italic">Brak wpisów</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Tabela statystyk strzelań -->
+        <div class="col-12 mb-4">
+            <div class="card bg-dark border-secondary shadow">
+                <div class="card-header border-secondary bg-transparent">
+                    <h5 class="mb-0 text-light"><i class="fas fa-chart-line mr-2"></i>Statystyki strzelań</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover mb-0">
+                            <thead>
+                                <tr class="text-muted">
+                                    <th>Data</th>
+                                    <th class="text-right">Suma amunicji</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for stat in shooting_stats %}
+                                <tr>
+                                    <td>{{ stat.date|date:"d.m.Y" }}</td>
+                                    <td class="text-right font-weight-bold">{{ stat.total_rounds }} szt.</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="2" class="text-center text-muted font-italic">Brak danych</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
