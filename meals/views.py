@@ -1,7 +1,7 @@
 import random
 from django.contrib import messages
 
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Prefetch
 from django.http import HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse
@@ -366,54 +366,39 @@ def meals(request, current=1):
 
 @login_required(login_url='/accounts/login')
 def edit_meals(request):
-    form = MealForm(request.POST)
-    form_ingredient = IngredientForm(request.POST)
-    form_meal_option = MealOptionForm(request.POST)
     user = request.user
 
-    # Pobieramy opcje posiłków i jednostki
+    form = MealForm(request.POST or None)
+    form_ingredient = IngredientForm(request.POST or None)
+    form_meal_option = MealOptionForm(request.POST or None)
+
+    # 2. Pobieramy opcje posiłków
     meals_options = MealOption.objects.filter(user=user).order_by('position')
     units = Unit.objects.all()
 
-    # Optymalne pobranie wszystkich posiłków użytkownika z ich składnikami
-    all_meals_qs = Meal.objects.filter(user=user).prefetch_related(
-        'mealingredient_set__ingredient_id__division'
+    all_meals_qs = Meal.objects.filter(user=user).select_related('meal_option').prefetch_related(
+        Prefetch(
+            'mealingredient_set',
+            queryset=MealIngredient.objects.select_related('ingredient_id__division')
+        )
     ).order_by('name')
 
-    # Słownik posiłków zgrupowany po ID opcji
-    meals_by_option_id = {}
+    meals_options_dict = {option: [] for option in meals_options}
+
+    opt_map = {option.id: option for option in meals_options}
 
     for meal in all_meals_qs:
-        kcal = 0
-        prot = 0
-        fat = 0
-        carb = 0
+        option_obj = opt_map.get(meal.meal_option_id)
+        if option_obj:
 
-        # Obliczamy makroskładniki dla posiłku
-        for mi in meal.mealingredient_set.all():
-            ingr = mi.ingredient_id
-            q = mi.quantity
-            kcal += (ingr.calories_per_100_gram * q / 100)
-            prot += (ingr.protein_per_100_gram * q / 100)
-            fat += (ingr.fat_per_100_gram * q / 100)
-            carb += (ingr.carbohydrates_per_100_gram * q / 100)
-
-        _is_high_prot = is_hi_protein(float(kcal), float(prot))
-
-        opt_id = meal.meal_option_id
-        if opt_id not in meals_by_option_id:
-            meals_by_option_id[opt_id] = []
-
-        # Format danych: [meal_obj, [kcal, prot, fat, carb, hi_prot_flag]]
-        meals_by_option_id[opt_id].append([
-            meal,
-            [round(kcal), round(prot), round(fat), round(carb), _is_high_prot]
-        ])
-
-    # Budujemy finalny słownik dla template'u zachowując kolejność opcji
-    meals_options_dict = {}
-    for option in meals_options:
-        meals_options_dict[option] = meals_by_option_id.get(option.id, [])
+            macro_data = [
+                round(meal.total_kcal or 0),
+                round(meal.total_protein or 0),
+                round(meal.total_fat or 0),
+                round(meal.total_carb or 0),
+                meal.is_hi_protein_flag
+            ]
+            meals_options_dict[option_obj].append([meal, macro_data])
 
     context = {
         'form': form,
@@ -593,28 +578,27 @@ def delete_meal_option(request, meal_option_id):
 
 @login_required(login_url='/accounts/login')
 def edit_meal_ingredients(request, meal_id):
-    meal = Meal.objects.filter(user_id=request.user, pk=meal_id)
-    ingredients = MealIngredient.objects.select_related('ingredient_id').filter(meal_id=meal_id)
-    user_ingredients = Ingredient.objects.filter(user=request.user).order_by('name')
+    meal_obj = get_object_or_404(Meal, user_id=request.user, pk=meal_id)
+    meal_list = [meal_obj]
+    ingredients = MealIngredient.objects.filter(meal_id=meal_id).select_related('ingredient_id')
+    user_ingredients = Ingredient.objects.filter(user=request.user).select_related('division').order_by('name')
     user_shops = Shop.objects.filter(user=request.user)
     units = Unit.objects.all()
-    if meal[0].recipe:
-        recipe_rows = len(meal[0].recipe.split('\n'))
-    else:
-        recipe_rows = 1
-    macro = meal[0].macro
+
+    recipe_text = meal_obj.recipe or ""
+    recipe_rows = recipe_text.count('\n') + 1 if recipe_text else 1
 
     context = {
-        'meal': meal,
+        'meal': meal_list,
         'ingredients': ingredients,
         'units': units,
         'recipe_rows': recipe_rows,
         'user_ingredients': user_ingredients,
         'user_shops': user_shops,
-        'calories': round(macro.get('kcal')),
-        'protein': round(macro.get('protein')),
-        'fat': round(macro.get('fat')),
-        'carbohydrates': round(macro.get('carb'))
+        'calories': round(meal_obj.total_kcal),
+        'protein': round(meal_obj.total_protein),
+        'fat': round(meal_obj.total_fat),
+        'carbohydrates': round(meal_obj.total_carb)
     }
     return render(request, 'meals/meal_edit.html', context)
 
