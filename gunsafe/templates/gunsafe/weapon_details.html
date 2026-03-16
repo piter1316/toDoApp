@@ -14,7 +14,7 @@
 
     <div class="row">
         <!-- Informacje o broni -->
-        <div class="col-md-4 mb-4">
+        <div class="col-xl-4 mb-4">
             <div class="card bg-dark border-secondary shadow h-100">
                 <div class="card-header border-secondary d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Dane techniczne</h5>
@@ -31,11 +31,11 @@
                     <ul class="list-group list-group-flush bg-transparent">
                         <li class="list-group-item bg-transparent border-secondary d-flex justify-content-between">
                             <span class="text-muted">Typ broni:</span>
-                            <span>{{ weapon.weapon_type.name|default:"N/A" }}</span>
+                            <span class="text-light">{{ weapon.weapon_type.name|default:"N/A" }}</span>
                         </li>
                         <li class="list-group-item bg-transparent border-secondary d-flex justify-content-between">
                             <span class="text-muted">Kaliber:</span>
-                            <span>
+                            <span class="text-light">
                                 {% for cal in weapon.calibers.all %}
                                 {{ cal.name }}{% if not forloop.last %}, {% endif %}
                                 {% empty %}
@@ -45,14 +45,14 @@
                         </li>
                         <li class="list-group-item bg-transparent border-secondary d-flex justify-content-between">
                             <span class="text-muted">Nr seryjny:</span>
-                            <span>{{ weapon.serial_no|default:"N/A" }}</span>
+                            <span class="text-light">{{ weapon.serial_no|default:"N/A" }}</span>
                         </li>
                         <li class="list-group-item bg-transparent border-secondary d-flex justify-content-between">
                             <span class="text-muted">Akcja:</span>
-                            <span>{{ weapon.action|default:"N/A" }}</span>
+                            <span class="text-light">{{ weapon.action|default:"N/A" }}</span>
                         </li>
                         <li class="list-group-item bg-transparent border-secondary d-flex justify-content-between">
-                            <span class="text-muted">Nalot (całk. / ost. czysz.):</span>
+                            <span class="text-muted">Licznik <small>(całk. / ost. czysz.)</small>:</span>
                             <span>
                                 <span class="badge badge-secondary">{{ weapon.total_rounds_fired }} szt.</span> /
                                 <span class="badge {% if weapon.rounds_since_cleaning > 200 %}badge-danger{% elif weapon.rounds_since_cleaning > 100 %}badge-warning{% else %}badge-info{% endif %}">{{ weapon.rounds_since_cleaning }} szt.</span>
@@ -60,7 +60,7 @@
                         </li>
                         <li class="list-group-item bg-transparent border-secondary d-flex justify-content-between">
                             <span class="text-muted">Data zakupu:</span>
-                            <span>{{ weapon.purchase_date|date:"d.m.Y"|default:"---" }}</span>
+                            <span class="text-light">{{ weapon.purchase_date|date:"d.m.Y"|default:"---" }}</span>
                         </li>
                     </ul>
                 </div>
@@ -68,7 +68,7 @@
         </div>
 
         <!-- Akcesoria i Magazynki -->
-        <div class="col-md-8 mb-4">
+        <div class="col-xl-8 mb-4">
             <div class="row">
                 <div class="col-md-6 mb-4 mb-md-0">
                     <div class="card bg-dark border-secondary shadow h-100">
@@ -117,7 +117,7 @@
                             <div class="list-group list-group-flush bg-transparent">
                                 {% for mag in weapon.magazines.all %}
                                 <div class="list-group-item bg-transparent border-secondary px-0 d-flex justify-content-between align-items-center">
-                                    <span>{{ mag.manufacturer|default:"Producent nieznany" }} ({{ mag.capacity }} rd)</span>
+                                    <span class="text-light">{{ mag.manufacturer|default:"Producent nieznany" }} ({{ mag.capacity }} rd)</span>
                                     <div>
                                         <button class="btn btn-xs btn-outline-secondary mr-1" data-toggle="modal" data-target="#editMagazineModal{{ mag.id }}">
                                             <i class="fas fa-edit"></i>
