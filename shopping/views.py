@@ -15,8 +15,6 @@ from shopping.models import ShoppingList, Products, Checklist
 
 @login_required(login_url='/accounts/login')
 def shopping_list_index(request):
-    names_test = [1, 1, 2, 2, 2, 2, 3, 4, 5]
-    start = time.time()
     shopping_lists = ShoppingList.objects.filter(user_id=request.user.id)
     shopping_lists_dict = {}
     form = ShoppingListForm(request.POST)
@@ -94,7 +92,6 @@ def shopping_list_index(request):
         'units': units,
         'checklist': checklist,
         'divisions': divisions,
-        'names_test': names_test,
     }
     return render(request, 'shopping/index.html', context)
 
