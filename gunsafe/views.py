@@ -163,7 +163,7 @@ def gunsafe_home(request):
     # Całkowita suma wszystkich pocisków
     total_ammo = ammo_inventory.aggregate(Sum('qty'))['qty__sum'] or 0
 
-    # Wyjścia na strzelnicę - podsumowanie
+    # Wyjścia na strzelnicę — podsumowanie
     shootings_raw = Shooting.objects.filter(weapon__user=request.user).values('date', 'weapon__name').annotate(
         total_rounds=Sum('rounds')).order_by('-date', 'weapon__name')
     
@@ -281,8 +281,8 @@ def weapon_details(request, weapon_id):
                 ammo_info = " ".join([p for p in parts if p]).strip()
             elif old_ammo_safe and not use_safe_ammo:
                 # Jeśli wcześniej była amunicja, a teraz nie chcemy zdejmować ze stanu,
-                # to zachowujemy stary opis jeśli istniał, lub czyścimy?
-                # User pewnie chce zachować info o tym co strzelał.
+                # to zachowujemy stary opis, jeśli istniał, lub czyścimy?
+                # User pewnie chce zachować info o tym, co strzelał.
                 ammo_info = shooting.ammo_info
 
             shooting.rounds = new_rounds
