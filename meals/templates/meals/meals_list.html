@@ -189,6 +189,11 @@
   .navbar-offcanvas {
       z-index: 5100 !important;
   }
+  
+  /* Fix: newMealsListModal and generateShoppingListsModal must be above the menu on small screens */
+  #newMealsListModal, #generateShoppingListsModal {
+      z-index: 6000 !important;
+  }
 </style>
 {% endblock %}
 
