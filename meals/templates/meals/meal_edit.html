@@ -49,7 +49,7 @@
                  style="font-size:1rem; letter-spacing:.02em;">
                 {{meal.0.name|upper}}
                 {% if meal.0.special %}<span class="text-danger ml-1">*</span>{% endif %}
-                {% if meal.0.macro.is_hi_protein %}
+                {% if meal.0.is_hi_protein_flag %}
                   <sup><b>{{meal.0.macro.is_hi_protein.0}}</b></sup>
                 {% endif %}
               </p>
@@ -144,17 +144,17 @@
                      text-transform:uppercase; letter-spacing:.04em;">
             <span>Składniki</span>
             <span>
-              {% if meal.0.macro.total_vegies %}
+              {% if meal.0.total_vegies %}
                 <span class="macro-badge">
-                  <i class="fas fa-carrot"></i> {{meal.0.macro.total_vegies}}g
+                  <i class="fas fa-carrot"></i> {{meal.0.total_vegies}}g
                 </span>
               {% endif %}
-              {% if meal.0.macro.total_fruits %}
+              {% if meal.0.total_fruits %}
                 <span class="macro-badge">
-                  <i class="fas fa-apple-alt"></i> {{meal.0.macro.total_fruits}}g
+                  <i class="fas fa-apple-alt"></i> {{meal.0.total_fruits}}g
                 </span>
               {% endif %}
-              {% if meal.0.macro.is_hi_protein %}
+              {% if meal.0.is_hi_protein %}
                 <span class="macro-badge"># {{meal.0.macro.is_hi_protein.1}}</span>
               {% endif %}
             </span>

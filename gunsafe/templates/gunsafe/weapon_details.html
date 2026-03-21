@@ -14,7 +14,7 @@
 
     <div class="row">
         <!-- Informacje o broni -->
-        <div class="col-12 mb-4">
+        <div class="col-xl-4 mb-4">
             <div class="card bg-dark border-secondary shadow h-100">
                 <div class="card-header border-secondary d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Dane techniczne</h5>
@@ -29,38 +29,38 @@
                 </div>
                 <div class="card-body">
                     <ul class="list-group list-group-flush bg-transparent">
-                        <li class="list-group-item bg-transparent border-secondary d-flex justify-content-between align-items-center align-items-center">
+                        <li class="list-group-item bg-transparent border-secondary d-flex justify-content-between">
                             <span class="text-muted">Typ broni:</span>
-                            <span class="badge badge-light p-2 px-3" style="font-size: 100%; font-weight: 600;">{{ weapon.weapon_type.name|default:"N/A" }}</span>
+                            <span class="text-light">{{ weapon.weapon_type.name|default:"N/A" }}</span>
                         </li>
-                        <li class="list-group-item bg-transparent border-secondary d-flex justify-content-between align-items-center">
+                        <li class="list-group-item bg-transparent border-secondary d-flex justify-content-between">
                             <span class="text-muted">Kaliber:</span>
-                            <span>
+                            <span class="text-light">
                                 {% for cal in weapon.calibers.all %}
-                                <span class="badge badge-light p-2 px-3" style="font-size: 100%; font-weight: 600;">{{ cal.name }}</span>{% if not forloop.last %}, {% endif %}
+                                {{ cal.name }}{% if not forloop.last %}, {% endif %}
                                 {% empty %}
                                 N/A
                                 {% endfor %}
                             </span>
                         </li>
-                        <li class="list-group-item bg-transparent border-secondary d-flex justify-content-between align-items-center">
+                        <li class="list-group-item bg-transparent border-secondary d-flex justify-content-between">
                             <span class="text-muted">Nr seryjny:</span>
-                            <span class="badge badge-light p-2 px-3" style="font-size: 100%; font-weight: 600;">{{ weapon.serial_no|default:"N/A" }}</span>
+                            <span class="text-light">{{ weapon.serial_no|default:"N/A" }}</span>
                         </li>
-                        <li class="list-group-item bg-transparent border-secondary d-flex justify-content-between align-items-center">
+                        <li class="list-group-item bg-transparent border-secondary d-flex justify-content-between">
                             <span class="text-muted">Akcja:</span>
-                            <span class="badge badge-light p-2 px-3" style="font-size: 100%; font-weight: 600;">{{ weapon.action|default:"N/A" }}</span>
+                            <span class="text-light">{{ weapon.action|default:"N/A" }}</span>
                         </li>
-                        <li class="list-group-item bg-transparent border-secondary d-flex justify-content-between align-items-center">
-                            <span class="text-muted">Nalot (całk. / ost. czysz.):</span>
+                        <li class="list-group-item bg-transparent border-secondary d-flex justify-content-between">
+                            <span class="text-muted">Licznik <small>(całk. / ost. czysz.)</small>:</span>
                             <span>
-                                <span class="badge badge-secondary p-2 px-2" style="font-size: 100%; font-weight: 600;">{{ weapon.total_rounds_fired }} szt.</span> /
-                                <span class="badge {% if weapon.rounds_since_cleaning > 200 %}badge-danger{% elif weapon.rounds_since_cleaning > 100 %}badge-warning{% else %}badge-info{% endif %} p-2 px-2"  style="font-size: 100%; font-weight: 600;">{{ weapon.rounds_since_cleaning }} szt.</span>
+                                <span class="badge badge-secondary">{{ weapon.total_rounds_fired }} szt.</span> <span class="text-light">/</span>
+                                <span class="badge {% if weapon.rounds_since_cleaning > 200 %}badge-danger{% elif weapon.rounds_since_cleaning > 100 %}badge-warning{% else %}badge-info{% endif %}">{{ weapon.rounds_since_cleaning }} szt.</span>
                             </span>
                         </li>
-                        <li class="list-group-item bg-transparent border-secondary d-flex justify-content-between align-items-center">
+                        <li class="list-group-item bg-transparent border-secondary d-flex justify-content-between">
                             <span class="text-muted">Data zakupu:</span>
-                            <span class="badge badge-light p-2 px-3" style="font-size: 100%; font-weight: 600;">{{ weapon.purchase_date|date:"d.m.Y"|default:"---" }}</span>
+                            <span class="text-light">{{ weapon.purchase_date|date:"d.m.Y"|default:"---" }}</span>
                         </li>
                     </ul>
                 </div>
@@ -68,7 +68,7 @@
         </div>
 
         <!-- Akcesoria i Magazynki -->
-        <div class="col-12 mb-4">
+        <div class="col-xl-8 mb-4">
             <div class="row">
                 <div class="col-md-6 mb-4 mb-md-0">
                     <div class="card bg-dark border-secondary shadow h-100">
@@ -199,8 +199,8 @@
         </div>
 
         <!-- Tabela czyszczeń -->
-        <div class="col-md-6 mb-4">
-            <div class="card bg-dark border-secondary shadow">
+        <div class="col-md-6 mb-4 ">
+            <div class="card bg-dark border-secondary shadow h-100">
                 <div class="card-header border-secondary bg-transparent d-flex justify-content-between align-items-center">
                     <h5 class="mb-0 text-light"><i class="fas fa-soap mr-2"></i>Historia czyszczenia</h5>
                     <button class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#addCleaningModal">
@@ -234,6 +234,41 @@
                                 {% empty %}
                                 <tr>
                                     <td colspan="3" class="text-center text-muted font-italic">Brak wpisów</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Tabela statystyk strzelań -->
+        <div class="col-12 mb-4">
+            <div class="card bg-dark border-secondary shadow">
+                <div class="card-header border-secondary bg-transparent">
+                    <h5 class="mb-0 text-light"><i class="fas fa-chart-line mr-2"></i>Statystyki strzelań</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover mb-0">
+                            <thead>
+                                <tr class="text-muted">
+                                    <th>Data</th>
+                                    <th class="text-right">Suma amunicji</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for stat in shooting_stats %}
+                                <tr>
+                                    <td>{{ stat.date|date:"d.m.Y" }}</td>
+                                    <td class="text-right font-weight-bold">{{ stat.total_rounds }} szt.</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="2" class="text-center text-muted font-italic">Brak danych</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

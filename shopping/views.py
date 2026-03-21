@@ -1,13 +1,12 @@
 import os
-import time
 
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
-# Create your views here.
+
 from django.views.decorators.http import require_POST
 
-from meals.models import Unit, Meal, Ingredient, MealsList, MealIngredient, Shop, ProductDivision
+from meals.models import Unit, Ingredient, MealsList, MealIngredient, Shop, ProductDivision
 from myproject.settings import BASE_DIR
 from shopping.forms import ShoppingListForm, ProductsForm
 from shopping.models import ShoppingList, Products, Checklist
@@ -15,8 +14,6 @@ from shopping.models import ShoppingList, Products, Checklist
 
 @login_required(login_url='/accounts/login')
 def shopping_list_index(request):
-    names_test = [1, 1, 2, 2, 2, 2, 3, 4, 5]
-    start = time.time()
     shopping_lists = ShoppingList.objects.filter(user_id=request.user.id)
     shopping_lists_dict = {}
     form = ShoppingListForm(request.POST)
@@ -82,7 +79,8 @@ def shopping_list_index(request):
                                        products_on_shopping_list[p]['id'],
                                        products_on_shopping_list[p]['unit_id__unit'], generated_meals_with_product,
                                        products_on_shopping_list[p]['unit_id__id'], first]
-            # product_quantity_bought = ['product.quantity', 'product.bought', 'product.id', 'product.unit', generated_meals_with_product]
+            # product_quantity_bought = ['product.quantity', 'product.bought', 'product.id', 'product.unit',
+            # generated_meals_with_product]
             product_quantity = {products_on_shopping_list[p]['product_name']: product_quantity_bought}
             products.append(product_quantity)
 
@@ -94,7 +92,6 @@ def shopping_list_index(request):
         'units': units,
         'checklist': checklist,
         'divisions': divisions,
-        'names_test': names_test,
     }
     return render(request, 'shopping/index.html', context)
 
@@ -108,7 +105,7 @@ def add_shopping_list(request):
     return redirect('shopping:shopping_list_index')
 
 
-def delete_shopping_list(request, shopping_list_id):
+def delete_shopping_list(_request, shopping_list_id):
     ShoppingList.objects.filter(id=shopping_list_id).delete()
     return redirect('shopping:shopping_list_index')
 
@@ -121,7 +118,6 @@ def delete_all_shopping_lists(request):
 @require_POST
 def add_product(request, shopping_list_id):
     shopping_list = get_object_or_404(ShoppingList, pk=shopping_list_id)
-    form = ProductsForm(request.POST)
     new_product = Products(shopping_list_id=shopping_list,
                            product_name=request.POST['product_name'].lower(),
                            quantity=request.POST['quantity'],
@@ -149,7 +145,8 @@ def add_product(request, shopping_list_id):
             loop_html = """
                 <li class="list-group-item p-0">
                   <small>
-                    <a class="text-dark" href="/mealsEdit">{}</a>: <a class="text-dark" href="/mealsEdit/edit_meal_ingredients/{}">{}</a>
+                    <a class="text-dark" href="/mealsEdit">{}</a>: <a class="text-dark" 
+                    href="/mealsEdit/edit_meal_ingredients/{}">{}</a>
                   </small>
                 </li>
                 """
@@ -164,7 +161,7 @@ def add_product(request, shopping_list_id):
                                              query_set_e[0].extras)
                 loop_html_total += loop_html
         html = html.replace('###LOOP###', loop_html_total)
-    except Exception as e:
+    except Exception:
         html = html.replace('###LOOP###', '')
 
     return HttpResponse(html)
@@ -185,26 +182,26 @@ def update_product(request, product_id):
         return HttpResponse(str(new_quantity) + '_' + str(new_unit))
 
 
-def bought(request, id):
-    product = Products.objects.get(pk=id)
+def bought(_request, i_d):
+    product = Products.objects.get(pk=i_d)
     product.bought = True
     product.save()
     return redirect('shopping:shopping_list_index')
 
 
-def un_bought(request, id):
-    product = Products.objects.get(pk=id)
+def un_bought(_request, i_d):
+    product = Products.objects.get(pk=i_d)
     product.bought = False
     product.save()
     return redirect('shopping:shopping_list_index')
 
 
-def delete_bought(request, shopping_list_id):
+def delete_bought(_request, shopping_list_id):
     Products.objects.filter(bought__exact=True, shopping_list_id=shopping_list_id).delete()
     return HttpResponse('Selected products deleted from list')
 
 
-def purge_list(request, shopping_list_id):
+def purge_list(_request, shopping_list_id):
     Products.objects.filter(shopping_list_id=shopping_list_id).delete()
     return redirect('shopping:shopping_list_index')
 
@@ -242,7 +239,7 @@ def add_from_checklist(request):
             new_shopping_product = Products(product_name=product_name, quantity=1, bought=0,
                                             shopping_list_id=shopping_list_to_update, unit_id=1)
             new_shopping_product_list.append(new_shopping_product)
-        except Exception as e:
+        except Exception:
             pass
     Products.objects.bulk_create(new_shopping_product_list)
 
