@@ -2,7 +2,7 @@
 
 {% block extra_head %}
 <!-- New Card-based Layout CSS applied strictly to table primitives -->
-<style>
+<style xmlns="http://www.w3.org/1999/html">
   body {
       background-color: #f4f7f6 !important;
       color: #333 !important;
@@ -304,7 +304,7 @@
                     </small>
                 </div>
 
-                <div class="dropdown position-relative">
+                <div class="dropdown position-relative d-flex align-items-top justify-content-between">
                     <div class="font-weight-bold text-dark w-100 text-left mb-2 px-1" style="cursor:pointer;" id="dropdownMeal_{{meal_cell.list_id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                       {% if meal_cell.meal_id %}
                         {{meal_cell.meal_name}}
@@ -314,11 +314,34 @@
                         <span class="text-muted font-italic font-weight-normal">-----------------------</span>
                       {% endif %}
                     </div>
-
                     <div class="dropdown-menu dropdown-menu-modern p-3 border border-dark shadow shadow-lg" id="dropdownMenu_{{meal_cell.list_id}}">
                       {% if current %}
                       <div class=" mx-auto mb-1">
                         <small class="text-muted font-weight-bold text-uppercase d-block mb-2">Zmiana posiłku:</small>
+                        {% if meal_cell.meal_id %}
+                      <div class="mb-1">
+                        <div class="progress border-0 bg-secondary" style="height: 20px; font-size: 0.65rem; border-radius: 4px;">
+
+
+                          <div class="progress-bar bg-success"
+                               style="width: {% widthratio meal_cell.b meal_cell.total_macro 100 %}%">
+                               {{ meal_cell.b }}b
+                          </div>
+
+                          <div class="progress-bar bg-warning text-dark"
+                               style="width: {% widthratio meal_cell.t meal_cell.total_macro 100 %}%">
+                               {{ meal_cell.t }}t
+                          </div>
+
+                          <div class="progress-bar bg-dark text-light"
+                               style="width: {% widthratio meal_cell.w meal_cell.total_macro 100 %}%">
+                               {{ meal_cell.w }}w
+                          </div>
+
+                      </div>
+                      </div>
+                    {% else %}
+                    {% endif %}
                         <form id="form_{{meal_cell.list_id}}" action="{% url 'meals:update_meals_list' %}" method="post" class="form stopPropagation">{% csrf_token %}
                           <input type="hidden" name="record_id" value="{{meal_cell.list_id}}">
                           <input type="hidden" name="meal_option_id" value="{{meal_cell.option_id}}">

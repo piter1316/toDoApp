@@ -241,10 +241,34 @@ def meals(request, current=1):
         meal_obj = item.meal
         extras_obj = item.extras
         # Inicjalizacja danych dla pojedynczej "komórki" w tabeli
+        total_macro = int(meal_obj.total_carb) if meal_obj else 0 + int(
+            meal_obj.total_fat) if meal_obj else 0 + int(meal_obj.total_protein) if meal_obj else 0
+        try:
+            b_precent = int(meal_obj.total_protein) if meal_obj else 0 / total_macro
+        except ZeroDivisionError:
+            b_precent = 0
+
+        try:
+            t_precent = int(meal_obj.total_fat) if meal_obj else 0 / total_macro
+        except ZeroDivisionError:
+            t_precent = 0
+
+        try:
+            w_precent = int(meal_obj.total_carb) if meal_obj else 0 / total_macro
+        except ZeroDivisionError:
+            w_precent = 0
         cell_data = {
             'list_id': item.id,
             'option_name': item.meal_option.meal_option,
             'option_id': item.meal_option_id,
+            'kcal': int(meal_obj.total_kcal) if meal_obj else None,
+            'b': int(meal_obj.total_protein) if meal_obj else None,
+            'b_precent': b_precent,
+            't_precent': t_precent,
+            'w_precent': w_precent,
+            't': int(meal_obj.total_fat) if meal_obj else None,
+            'w': int(meal_obj.total_carb) if meal_obj else None,
+            'total_macro': total_macro,
             'meal_id': meal_obj.id if meal_obj else None,
             'meal_name': meal_obj.name if meal_obj else "-----------------------",
             'is_special': meal_obj.special if meal_obj else False,
@@ -390,7 +414,6 @@ def edit_meals(request):
     for meal in all_meals_qs:
         option_obj = opt_map.get(meal.meal_option_id)
         if option_obj:
-
             macro_data = [
                 round(meal.total_kcal or 0),
                 round(meal.total_protein or 0),
