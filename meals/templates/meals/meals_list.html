@@ -316,32 +316,31 @@
                     </div>
                     <div class="dropdown-menu dropdown-menu-modern p-3 border border-dark shadow shadow-lg" id="dropdownMenu_{{meal_cell.list_id}}">
                       {% if current %}
+                      {% if meal_cell.meal_id %}
+                          <small class="text-muted font-weight-bold text-uppercase d-block mb-2">Makro:</small>
+                          <hr class="dropdown-divider">
+                          <div class="mb-1">
+                            <div class="progress border-0 bg-secondary" style="height: 20px; font-size: 0.65rem; border-radius: 4px;">
+
+                              <div class="progress-bar bg-secondary text-light"
+                                   style="width: {% widthratio meal_cell.b meal_cell.total_macro 100 %}%">
+                                   {{ meal_cell.b }}g b
+                              </div>
+
+                              <div class="progress-bar bg-warning text-dark"
+                                   style="width: {% widthratio meal_cell.t meal_cell.total_macro 100 %}%">
+                                   {{ meal_cell.t }}g t
+                              </div>
+                              <div class="progress-bar bg-dark text-light"
+                                   style="width: {% widthratio meal_cell.w meal_cell.total_macro 100 %}%">
+                                   {{ meal_cell.w }}g w
+                              </div>
+                            </div>
+                          </div>
+                        {% else %}
+                        {% endif %}
                       <div class=" mx-auto mb-1">
                         <small class="text-muted font-weight-bold text-uppercase d-block mb-2">Zmiana posiłku:</small>
-                        {% if meal_cell.meal_id %}
-                      <div class="mb-1">
-                        <div class="progress border-0 bg-secondary" style="height: 20px; font-size: 0.65rem; border-radius: 4px;">
-
-
-                          <div class="progress-bar bg-success"
-                               style="width: {% widthratio meal_cell.b meal_cell.total_macro 100 %}%">
-                               {{ meal_cell.b }}b
-                          </div>
-
-                          <div class="progress-bar bg-warning text-dark"
-                               style="width: {% widthratio meal_cell.t meal_cell.total_macro 100 %}%">
-                               {{ meal_cell.t }}t
-                          </div>
-
-                          <div class="progress-bar bg-dark text-light"
-                               style="width: {% widthratio meal_cell.w meal_cell.total_macro 100 %}%">
-                               {{ meal_cell.w }}w
-                          </div>
-
-                      </div>
-                      </div>
-                    {% else %}
-                    {% endif %}
                         <form id="form_{{meal_cell.list_id}}" action="{% url 'meals:update_meals_list' %}" method="post" class="form stopPropagation">{% csrf_token %}
                           <input type="hidden" name="record_id" value="{{meal_cell.list_id}}">
                           <input type="hidden" name="meal_option_id" value="{{meal_cell.option_id}}">
