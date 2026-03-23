@@ -257,6 +257,23 @@ def meals(request, current=1):
             w_precent = int(meal_obj.total_carb) if meal_obj else 0 / total_macro
         except ZeroDivisionError:
             w_precent = 0
+
+        extras_total_macro = int(extras_obj.total_carb) if extras_obj else 0 + int(
+            extras_obj.total_fat) if extras_obj else 0 + int(extras_obj.total_protein) if extras_obj else 0
+        try:
+            extras_b_precent = int(extras_obj.total_protein) if extras_obj else 0 / extras_total_macro
+        except ZeroDivisionError:
+            extras_b_precent = 0
+
+        try:
+            extras_t_precent = int(extras_obj.total_fat) if extras_obj else 0 / extras_total_macro
+        except ZeroDivisionError:
+            extras_t_precent = 0
+
+        try:
+            extras_w_precent = int(extras_obj.total_carb) if extras_obj else 0 / extras_total_macro
+        except ZeroDivisionError:
+            extras_w_precent = 0
         cell_data = {
             'list_id': item.id,
             'option_name': item.meal_option.meal_option,
@@ -269,6 +286,7 @@ def meals(request, current=1):
             't': int(meal_obj.total_fat) if meal_obj else None,
             'w': int(meal_obj.total_carb) if meal_obj else None,
             'total_macro': total_macro,
+            'extras_total_macro': extras_total_macro,
             'meal_id': meal_obj.id if meal_obj else None,
             'meal_name': meal_obj.name if meal_obj else "-----------------------",
             'is_special': meal_obj.special if meal_obj else False,
@@ -276,6 +294,9 @@ def meals(request, current=1):
             'extras_id': extras_obj.id if extras_obj else None,
             'extras_name': extras_obj.name if extras_obj else None,
             'extras_kcal': int(extras_obj.total_kcal) if extras_obj else None,
+            'extras_b': int(extras_obj.total_protein) if extras_obj else None,
+            'extras_t': int(extras_obj.total_fat) if extras_obj else None,
+            'extras_w': int(extras_obj.total_carb) if extras_obj else None,
             'extras_short_expiry': extras_obj.has_short_expiry_flag if extras_obj else False,
             'dropdown_options': all_meals_in_option_dict.get(item.meal_option, [])
         }

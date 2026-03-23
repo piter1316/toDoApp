@@ -220,8 +220,20 @@ $(document).ready(function(){
       $('#delete_extras').attr('href', base_url + num_id)
       var current_extra = $('#clicked_position_extras_'+num_id).val();
       var current_extra_kcal = $('#extras_calories_' + num_id).val();
+      var current_extra_b = $('#extras_protein_' + num_id).val();
+      var current_extra_t = $('#extras_fat_' + num_id).val();
+      var current_extra_w = $('#extras_carb_' + num_id).val();
+      var current_extra_total_macro_ = $('#extras_total_macro_' + num_id).val();
       if (current_extra && current_extra_kcal){
-        $('#current_extras').text(current_extra + ' | ' + current_extra_kcal + ' kcal' )
+        $('#current_extras').text(current_extra + ' | ' + current_extra_kcal + ' kcal')
+        $('#chart-extras-kcal').text(current_extra_kcal)
+        $('#chart-extras-b').text(current_extra_b + 'g b')
+        $('#chart-extras-b').css('width', current_extra_b/ current_extra_total_macro_ * 100 + "%");
+        $('#chart-extras-t').text(current_extra_t + 'g t')
+        $('#chart-extras-t').css('width', current_extra_t/ current_extra_total_macro_ * 100 + "%");
+        $('#chart-extras-w').text(current_extra_w + 'g w')
+        $('#chart-extras-w').css('width', current_extra_w/ current_extra_total_macro_ * 100 + "%");
+
         var extras_link = $('#extras_link_'+ num_id).val()
         $('#current_extras').attr('href', extras_link)
         $('#delete_extras').text('Usuń' + ' ' + current_extra);
@@ -229,7 +241,39 @@ $(document).ready(function(){
         $('#current_extra_small').fadeIn('fast');
         $('#current_change_div').fadeIn('fast');
         $('#add_extras_span').fadeOut('fast');
+        const chartId = "chart-extras";
+        const canvas = document.getElementById(chartId);
+
+        if (canvas) {
+            // Pobieramy dane bezpośrednio z atrybutów data- tego konkretnego canvasa
+            var b = parseFloat(current_extra_b) || 0;
+            var t = parseFloat(current_extra_t) || 0;
+            var w = parseFloat(current_extra_w) || 0;
+
+            chart = new Chart(canvas.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [w, t, b],
+                        backgroundColor: ['#343a40', '#ffc107', '#6c757d'],
+                        borderWidth: 0,
+                        cutout: '85%'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    aspectRatio: 1, // Gwarantuje koło bez zniekształceń
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: true }
+                    }
+                }
+            });
+        }
       }
+      // Musisz mieć dostęp do zmiennej num_id (np. przekazanej z Django do JS)
+
 
     })
 
@@ -242,6 +286,10 @@ $(document).ready(function(){
       $('#current_change_div').fadeOut('fast');
       $('#current_extra_small').fadeOut('fast');
       $('#add_extras_span').fadeIn('fast');
+      if (chart) {
+        chart.destroy(); // Całkowite skasowanie wykresu
+        chart = null;    // Wyczyszczenie zmiennej
+    }
 
     })
 

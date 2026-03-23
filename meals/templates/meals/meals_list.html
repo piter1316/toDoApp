@@ -404,6 +404,10 @@
                   <input type="hidden" id="clicked_position_extras_{{meal_cell.list_id}}" value="{{meal_cell.extras_name}}">
                   <input type="hidden" id="extras_link_{{meal_cell.list_id}}" value="{% url 'meals:edit_meal_ingredients' meal_cell.extras_id %}">
                   <input type="hidden" id="extras_calories_{{meal_cell.list_id}}" value="{{meal_cell.extras_kcal}}">
+                  <input type="hidden" id="extras_protein_{{meal_cell.list_id}}" value="{{meal_cell.extras_b}}">
+                  <input type="hidden" id="extras_fat_{{meal_cell.list_id}}" value="{{meal_cell.extras_t}}">
+                  <input type="hidden" id="extras_carb_{{meal_cell.list_id}}" value="{{meal_cell.extras_w}}">
+                  <input type="hidden" id="extras_total_macro_{{meal_cell.list_id}}" value="{{meal_cell.extras_total_macro}}">
                 </span>
                 {% endif %}
                 </div>
@@ -454,7 +458,7 @@
             </a>
           </small>
         </div>
-        <div id="current_change_div" style="display:none;" class="text-muted mt-2 mb-1 font-weight-bold">Zmień:</div>
+        <div id="current_change_div" style="display:none;" class="text-muted mt-1 mb-1 font-weight-bold">Zmień:</div>
         {% for option, meals in all_meals_in_option_dict.items %}
 
         <form method="post" action="{% url 'meals:edit_extras' %}" name="editExtras" id="editExtras_{{option.id}}" >{% csrf_token %}
@@ -472,12 +476,45 @@
         </form>
         <hr class="m-2 border-light">
         {% endfor %}
-        <a id="delete_extras" style="display:none;" href="{%url 'meals:delete_extras' ' ' %}" class="btn btn-block btn-outline-danger font-weight-bold mb-2 mt-3 shadow-sm"></a>
+        <a id="delete_extras" style="display:none;" href="{%url 'meals:delete_extras' ' ' %}" class="btn btn-block btn-outline-danger font-weight-bold m-1 shadow-sm"></a>
         <input id="base_delete_url" type="hidden" value="{%url 'meals:delete_extras' ' ' %}">
       </div>
-      <div class="modal-footer p-3 bg-light border-top">
-        <button type="button" class="btn btn-secondary shadow-sm px-4 font-weight-bold" data-dismiss="modal">ZAMKNIJ</button>
+      <div class="modal-footer p-1 bg-light border-top d-flex justify-content-between align-items-top">
+        <div class="text-dark w-25 ">
+        <div class="card-body p-0">
+            <div class="position-relative">
+                <canvas id="chart-extras"
+                        class="macro-chart-extras"
+                        width="200" height="200"></canvas>
+
+                <div class="position-absolute w-100 text-center" style="top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none;">
+                    <div class="h4 mb-0 font-weight-bold" id="chart-extras-kcal"></div>
+                    <small class="text-muted text-uppercase" style="font-size: 0.6rem;">kcal</small>
+                </div>
+            </div>
+
+            <div class="progress border-0 bg-secondary mt-1" style="height: 20px; font-size: 0.65rem; border-radius: 4px;">
+
+              <div class="progress-bar bg-secondary text-light" id="chart-extras-b"
+                   style="width: {% widthratio meal_cell.b meal_cell.total_macro 100 %}%">
+                   {{ meal_cell.extras_b }}g b
+              </div>
+
+              <div class="progress-bar bg-warning text-dark" id="chart-extras-t"
+                   style="width: {% widthratio meal_cell.t meal_cell.total_macro 100 %}%">
+                   {{ meal_cell.extras_t }}g t
+              </div>
+              <div class="progress-bar bg-dark text-light" id="chart-extras-w"
+                   style="width: {% widthratio meal_cell.w meal_cell.total_macro 100 %}%">
+                   {{ meal_cell.extras_w }}g w
+              </div>
+            </div>
+              </div>
+          </div>
+        <button type="button" class="btn btn-secondary shadow-sm px-4 font-weight-bold align-self-end" data-dismiss="modal">ZAMKNIJ</button>
+
       </div>
+
     </div>
   </div>
 </div>
