@@ -316,29 +316,6 @@
                     </div>
                     <div class="dropdown-menu dropdown-menu-modern p-3 border border-dark shadow shadow-lg" id="dropdownMenu_{{meal_cell.list_id}}">
                       {% if current %}
-                      {% if meal_cell.meal_id %}
-                          <small class="text-muted font-weight-bold text-uppercase d-block mb-2">Makro:</small>
-                          <hr class="dropdown-divider">
-                          <div class="mb-1">
-                            <div class="progress border-0 bg-secondary" style="height: 20px; font-size: 0.65rem; border-radius: 4px;">
-
-                              <div class="progress-bar bg-secondary text-light"
-                                   style="width: {% widthratio meal_cell.b meal_cell.total_macro 100 %}%">
-                                   {{ meal_cell.b }}g b
-                              </div>
-
-                              <div class="progress-bar bg-warning text-dark"
-                                   style="width: {% widthratio meal_cell.t meal_cell.total_macro 100 %}%">
-                                   {{ meal_cell.t }}g t
-                              </div>
-                              <div class="progress-bar bg-dark text-light"
-                                   style="width: {% widthratio meal_cell.w meal_cell.total_macro 100 %}%">
-                                   {{ meal_cell.w }}g w
-                              </div>
-                            </div>
-                          </div>
-                        {% else %}
-                        {% endif %}
                       <div class=" mx-auto mb-1">
                         <small class="text-muted font-weight-bold text-uppercase d-block mb-2">Zmiana posiłku:</small>
                         <form id="form_{{meal_cell.list_id}}" action="{% url 'meals:update_meals_list' %}" method="post" class="form stopPropagation">{% csrf_token %}
@@ -370,6 +347,49 @@
                           <input type="hidden" id="clicked_position_meal_{{meal_cell.list_id}}" value="{{meal_cell.meal_name}}">
                           {% endif %}
                         </span>
+                        <small class="text-muted font-weight-bold text-uppercase d-block mb-2">Makro:</small>
+                        {% if meal_cell.meal_id %}
+                          <div class="card  text-dark w-75 mx-auto">
+                              <div class="card-body p-3">
+                                  <div class="position-relative">
+                                      <canvas id="chart-{{ meal_cell.meal_id }}"
+                                              class="macro-chart"
+                                              data-b="{{ meal_cell.b }}"
+                                              data-t="{{ meal_cell.t }}"
+                                              data-w="{{ meal_cell.w }}"
+                                              width="200" height="200"></canvas>
+
+                                      <div class="position-absolute w-100 text-center" style="top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none;">
+                                          <div class="h4 mb-0 font-weight-bold">{{meal_cell.kcal}}</div>
+                                          <small class="text-muted text-uppercase" style="font-size: 0.6rem;">kcal</small>
+                                      </div>
+                                  </div>
+
+                                  <div class="progress border-0 bg-secondary mt-1" style="height: 20px; font-size: 0.65rem; border-radius: 4px;">
+
+                                    <div class="progress-bar bg-secondary text-light"
+                                         style="width: {% widthratio meal_cell.b meal_cell.total_macro 100 %}%">
+                                         {{ meal_cell.b }}g b
+                                    </div>
+
+                                    <div class="progress-bar bg-warning text-dark"
+                                         style="width: {% widthratio meal_cell.t meal_cell.total_macro 100 %}%">
+                                         {{ meal_cell.t }}g t
+                                    </div>
+                                    <div class="progress-bar bg-dark text-light"
+                                         style="width: {% widthratio meal_cell.w meal_cell.total_macro 100 %}%">
+                                         {{ meal_cell.w }}g w
+                                    </div>
+                                  </div>
+                                    </div>
+                                </div>
+
+                          <hr class="dropdown-divider">
+                          <div class="mb-1">
+
+                          </div>
+                        {% else %}
+                        {% endif %}
                       </div>
                     </div>
                 </div>
@@ -491,25 +511,25 @@
             $(this).removeClass('stack-top');
         });
 
-        // Smart Boundary Adjuster: Prevents dropdowns from going off-screen 
+        // Smart Boundary Adjuster: Prevents dropdowns from going off-screen
         // without the "flicking/jumping" of native Popper.js
         $(document).on('shown.bs.dropdown', '.dropdown', function () {
             var $menu = $(this).find('.dropdown-menu-modern');
             if (!$menu.length) return;
-            
+
             // Reset to prevent cumulative offsets
             $menu.css('margin-left', '0');
-            
+
             var rect = $menu[0].getBoundingClientRect();
             var viewportWidth = $(window).width();
             var margin = 10; // Safety gap from screen edge
-            
+
             // Check Right Overflow
             if (rect.right > viewportWidth) {
                 var shiftRight = rect.right - viewportWidth + margin;
                 $menu.css('margin-left', -shiftRight + 'px');
             }
-            
+
             // Check Left Overflow
             var updatedRect = $menu[0].getBoundingClientRect();
             if (updatedRect.left < 0) {
@@ -518,5 +538,39 @@
             }
         });
     });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Znajdź wszystkie wykresy na stronie
+    const chartElements = document.querySelectorAll('.macro-chart');
+
+    chartElements.forEach(canvas => {
+        // Pobierz dane z atrybutów data-
+        const b = parseFloat(canvas.dataset.b);
+        const t = parseFloat(canvas.dataset.t);
+        const w = parseFloat(canvas.dataset.w);
+
+        new Chart(canvas.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [w, t, b],
+                    backgroundColor: ['#343a40', '#ffc107', '#6c757d'],
+                    borderWidth: 0,
+                    cutout: '85%'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: true }
+                }
+            }
+        });
+    });
+});
 </script>
 {% endblock %}
