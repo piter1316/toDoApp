@@ -37,7 +37,7 @@
       </div>
     </div>
   </div>
-  {% if shopping_lists %}
+
   <div class="row d-flex justify-content-center">
     <div class="col-12 px-1 px-md-2">
       <div class="jumbotron shadow p-1 mb-1">
@@ -45,7 +45,7 @@
         <hr class="my-2">
         <div class="form-row">
           <div class="col-12 {% if shopping_lists %}col-md-8{% endif %}">
-            <button type="button" class="btn btn-primary btn-block mb-1 mb-md-0" data-toggle="modal"
+            <button type="button" class="btn btn-dark btn-block mb-1 mb-md-0" data-toggle="modal"
                     data-target="#addNewList">
               Dodaj nową
             </button>
@@ -64,6 +64,7 @@
         </div>
       </div>
     </div>
+    {% if shopping_lists %}
     {% for shop, products in shopping_lists.items %}
     <div class="col-12 col-md-6 col-lg-4 col-xl-3 mb-3 px-1 px-md-2">
       <div class="card shadow" id="{{shop}}">
@@ -80,37 +81,37 @@
               <div class="dropdown-item">
                 <form action="{% url 'shopping:shopping_list_edit' shop.id %}" method="POST" id="shopNameUpdate_{{shop.id}}" class="shopNameUpdate_" role="form">{% csrf_token%}
                   <input class="form-control mb-1" type="text" name="name" id="shopNameUpdateInput_{{shop.id}}"  value="{{shop.name}}">
-                  <button type="submit" class="btn btn-success btn-block btn-sm" id="edit-btn">Zmień nazwe</button>
+                  <button type="submit" class="btn btn-dark btn-block btn-sm" id="edit-btn">Zmień nazwe</button>
                 </form>
               </div>
-              {% if products %}
               <a class="dropdown-item">
                 <button class="btn btn-outline-dark btn-block btn-sm" type="button" onclick="printShoppingList({{shop.id}})">Drukuj listę</button>
               </a>
-              {% endif %}
-              <form class="dropdown-item" action="{% url 'shopping:delete' shop.id %}">
-                <input type="hidden" name="to_delete" value="{{shop.id}}">
-                <button onclick="return confirm('Usunąć {{shop}} i wszystkie pozycje z listy?')"
-                        class="btn btn-danger btn-sm btn-block" type="submit">Usuń listę
-                </button>
-              </form>
-              {% if products %}
+
+
               <div class="dropdown-divider"></div>
               <a class="dropdown-item deleteBought_" href="{% url 'shopping:delete_bought' shop.id %}" >
-                <button class="btn btn-warning btn-sm btn-block" id="deleteBought_{{shop.id}}">Usuń kupione</button>
+                <button class="btn btn-secondary btn-sm btn-block" id="deleteBought_{{shop.id}}">Usuń kupione</button>
               </a>
               <a class="dropdown-item" href="{% url 'shopping:purge_list' shop.id %}">
                 <button onclick="return confirm('Wyczyścić wszystkie pozycje z listy?')"
-                        class="btn btn-warning btn-sm btn-block">Wyczyść listę
+                        class="btn btn-secondary btn-sm btn-block">Wyczyść listę
                 </button>
               </a>
+              <form class="dropdown-item" action="{% url 'shopping:delete' shop.id %}">
+                <input type="hidden" name="to_delete" value="{{shop.id}}">
+                <button onclick="return confirm('Usunąć {{shop}} i wszystkie pozycje z listy?')"
+                        class="btn btn-outline-danger btn-sm btn-block" type="submit">Usuń listę
+                </button>
+              </form>
               <form style="display:none" class="bought_checkbox_form dropdown-item" action="{% url 'shopping:bought_many' %}" method="POST" id="boughtManyForm_{{forloop.counter}}">{% csrf_token %}
                 <button class="btn btn-secondary btn-block btn-sm" type="submit">Zaznaczone = kupione</button>
+
                   {% for product in products %}
                   <input style="display:none"  type="checkbox" name="bought_checkbox" class="bought_checkbox" id="checked_{% for prod, qt in product.items %}{{qt.2}}{% endfor %}" value="{% for prod, qt in product.items %}{{qt.2}}{% endfor %}">
                 {% endfor %}
               </form>
-              {% endif %}
+
             </div>
           </div>
         </div>
@@ -169,7 +170,7 @@
                   </div>
                   <div class="form-group row mb-0">
                     <div class="col-12">
-                      <button class="btn btn-primary btn-block" type="submit">Zmień</button>
+                      <button class="btn btn-dark btn-block" type="submit">Zmień</button>
                     </div>
                   </div>
                 </form>
@@ -215,11 +216,10 @@
   </div>
   {% else %}
   <div class="container">
-    <div class="alert alert-info" role="alert">
+    <div class="alert alert-dark mt-2" role="alert">
       <h4 class="alert-heading">Brak list zakupowych!</h4>
       <p>Dodaj nową listę, a pojawi się ona w tym miejscu!</p>
       <hr>
-      <p class="mb-0">Widzisz ten ekran ponieważ nie posiadasz żadnych list zakupów!</p>
     </div>
   </div>
   {% endif %}
@@ -243,7 +243,7 @@
             <div class="input-group">
               {{form.name}}
               <span class="input-group-btn">
-                  <button type="submit" class="btn btn-success" id="add-btn">DODAJ</button>
+                  <button type="submit" class="btn btn-dark" id="add-btn">DODAJ</button>
                 </span>
             </div>
           </div>

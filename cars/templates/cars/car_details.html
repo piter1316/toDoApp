@@ -490,7 +490,7 @@
     e.preventDefault();
     $.ajax({
       type:'POST',
-      url:'/cars/carDetails/{{detail.pk}}/add_fuel_fill',
+      url: $(this).attr('action'),
       data:{
         date:$('#id_date').val(),
         liters:$('#id_liters').val(),

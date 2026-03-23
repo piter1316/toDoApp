@@ -21,7 +21,7 @@
         <form class="" action="{% url 'meals:generate_shopping_lists' %}" method="post">{% csrf_token %}
 <!--          <label><input type="checkbox" checked>Wszystkie dni</label><br>-->
           <input type="number" class="form-control mb-1" required name="how_many_people" placeholder="Dla ilu osób?">
-          <button type="submit" class="btn btn-primary btn-block">GENERUJ</button>
+          <button type="submit" class="btn btn-dark btn-block">GENERUJ</button>
           <label><input name="delete_generated_shopping_lists" checked type="checkbox">Usunąć listy wygenerowane poprzednio?</label>
         </form>
       </div>
@@ -120,7 +120,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuluj</button>
-        <button type="submit" class="btn btn-primary">Generuj</button>
+        <button type="submit" class="btn btn-dark">Generuj</button>
       </div>
     </div>
   </form>
