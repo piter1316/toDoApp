@@ -225,7 +225,7 @@ $(document).ready(function(){
       var current_extra_w = $('#extras_carb_' + num_id).val();
       var current_extra_total_macro_ = $('#extras_total_macro_' + num_id).val();
       if (current_extra && current_extra_kcal){
-        $('#current_extras').text(current_extra + ' | ' + current_extra_kcal + ' kcal')
+        $('#current_extras').text(current_extra)
         $('#chart-extras-kcal').text(current_extra_kcal)
         $('#chart-extras-b').text(current_extra_b + 'g b')
         $('#chart-extras-b').css('width', current_extra_b/ current_extra_total_macro_ * 100 + "%");
