@@ -238,9 +238,11 @@ $(document).ready(function(){
         $('#current_extras').attr('href', extras_link)
         $('#delete_extras').text('Usuń' + ' ' + current_extra);
         $('#delete_extras').fadeIn('fast');
+        $('#extras-cart-container').fadeIn('fast');
         $('#current_extra_small').fadeIn('fast');
         $('#current_change_div').fadeIn('fast');
         $('#add_extras_span').fadeOut('fast');
+        $('#extras-empty-container').fadeOut('fast');
         const chartId = "chart-extras";
         const canvas = document.getElementById(chartId);
 
@@ -283,9 +285,11 @@ $(document).ready(function(){
       $('#current_extras').text('')
       $('#current_extras').attr('href','')
       $('#delete_extras').fadeOut('fast');
+      $('#extras-cart-container').fadeOut('fast');
       $('#current_change_div').fadeOut('fast');
       $('#current_extra_small').fadeOut('fast');
       $('#add_extras_span').fadeIn('fast');
+      $('#extras-empty-container').fadeIn('fast');
       if (chart) {
         chart.destroy(); // Całkowite skasowanie wykresu
         chart = null;    // Wyczyszczenie zmiennej
