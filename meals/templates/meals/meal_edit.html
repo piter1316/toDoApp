@@ -394,12 +394,17 @@
 
     </div>
     <div class="col-12 col-xl-4 px-1 px-md-2">
-        <div class="card bg-light  " >
+      <div class="card bg-light  "  id="m-chart">
 
 
-    <div class="card-body p-1">
+            <div class="card-body p-1">
         <div class="position-relative mx-auto" style="width: 100%; max-width: 300px;">
-            <canvas id="targetStackChart"></canvas>
+            <canvas id="targetStackChart"
+        data-protein="{{ protein|unlocalize }}"
+        data-fat="{{ fat|unlocalize }}"
+        data-carbs="{{ carbohydrates|unlocalize }}">>
+
+            </canvas>
 
             <div class="position-absolute w-100 text-center" style="bottom: 0; left: 0;">
                 <div class="h2 mb-0 font-weight-bold text-dark">{{calories}}</div>
@@ -441,17 +446,14 @@
                 <div class="progress-bar bg-warning progress-bar-striped" role="progressbar" style="width: {% widthratio meal.0.total_fruits 100 100 %}%; border-radius: 6px;"></div>
             </div>
         </div>
-    </div>
-</div>
-
-<script>
-(function() {
+              <script>
+function renderTargetChart() {
   // Dane z Django
 var p = parseFloat("{{ protein|unlocalize }}".replace(',', '.')) || 0;
 var f = parseFloat("{{ fat|unlocalize }}".replace(',', '.')) || 0;
 var c = parseFloat("{{ carbohydrates|unlocalize }}".replace(',', '.')) || 0;
 
-var dataKcal = [p * 4, f * 9, c * 4];
+var dataKcal = [p, f, c ];
 
 var canvas = document.getElementById('targetStackChart');
 var ctx = canvas.getContext('2d');
@@ -495,8 +497,13 @@ window.myChart = new Chart(ctx, {
         }
     }
 });
-})();
+};
+  renderTargetChart();
 </script>
+    </div>
+        </div>
+
+
     </div><!-- /col -->
   </div><!-- /row -->
 
@@ -541,10 +548,12 @@ window.myChart = new Chart(ctx, {
 <script type="text/javascript">
 $(document).ready(function () {
 
+
   /* ── helpers ──────────────────────────────────────────── */
   function reloadData(json) {
     $('#ingredients_list').replaceWith($('#ingredients_list', json));
     $('#card-header').replaceWith($('#card-header', json));
+    $('#m-chart').replaceWith($('#m-chart', json));
   }
 
   /* ── Name-edit panel ──────────────────────────────────── */
@@ -666,6 +675,7 @@ $(document).ready(function () {
       success: function (json) {
         setTimeout(function () {
           $('#update_recipe_container').replaceWith($('#update_recipe_container', json));
+
         }, 200);
       }
     });
@@ -697,7 +707,7 @@ $(document).ready(function () {
     $.ajax({
       type: 'GET',
       url: '/mealsEdit/delete_ingredient/' + {{meal.0.id}} + '/' + ingr_id,
-      success: function (json) { reloadData(json); }
+      success: function (json) { reloadData(json);}
     });
   });
 
