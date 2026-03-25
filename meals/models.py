@@ -13,9 +13,9 @@ def is_hi_protein(total_kcal, total_protein):
     if total_protein != 0 or total_kcal != 0:
         percent_of_prot = round((total_protein * 4) / total_kcal * 100, 2)
         if total_protein * 4 >= (total_kcal * 0.28):
-            return 'B', f'Bardzo wysoka zawartość białka ({percent_of_prot}%)'
+            return 'B', f'Wysokobiałkowe+ ({percent_of_prot}%)'
         if (total_kcal * 0.25) <= total_protein * 4 < (total_kcal * 0.28):
-            return 'b', f'wysoka zawartość białka ({percent_of_prot}%)'
+            return 'b', f'Wysokobiałkowe ({percent_of_prot}%)'
 
 
 class MealOption(models.Model):
