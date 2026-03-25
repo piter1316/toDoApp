@@ -224,6 +224,7 @@ $(document).ready(function(){
       var current_extra_t = $('#extras_fat_' + num_id).val();
       var current_extra_w = $('#extras_carb_' + num_id).val();
       var current_extra_total_macro_ = $('#extras_total_macro_' + num_id).val();
+
       if (current_extra && current_extra_kcal){
         $('#current_extras').text(current_extra)
         $('#chart-extras-kcal').text(current_extra_kcal)
@@ -290,10 +291,12 @@ $(document).ready(function(){
       $('#current_extra_small').fadeOut('fast');
       $('#add_extras_span').fadeIn('fast');
       $('#extras-empty-container').fadeIn('fast');
-      if (chart) {
-        chart.destroy(); // Całkowite skasowanie wykresu
-        chart = null;    // Wyczyszczenie zmiennej
-    }
+
+      let canvas = document.getElementById('chart-extras');
+      if (canvas) {
+          let chart = Chart.getChart(canvas);
+          if (chart) chart.destroy();
+      }
 
     })
 
@@ -596,6 +599,7 @@ $('body').on('change','select[name="to_update"]',function(e){
       },
       success: function(data){
         refreshOnMealChange(form_id, thToRefresh, checkbox, data)
+        initMacroCharts();
       }
     });
   });
@@ -631,7 +635,6 @@ $('body').on('change','select[name="to_update"]',function(e){
       }
     }
     var option = $('#option_id').val();
-    console.log(option)
     $.ajax({
       type:'POST',
       url:'/mealsList/1/edit_extras/',
@@ -644,6 +647,7 @@ $('body').on('change','select[name="to_update"]',function(e){
       success: function(data){
         refreshOnMealChange(form_id, thToRefresh, checkbox, data)
         refreshModal(form_id, opt_id, data)
+        initMacroCharts();
       }
     });
   });
@@ -687,6 +691,7 @@ $('body').on('change','select[name="to_update"]',function(e){
       success: function(data){
         refreshOnMealChange(form_id, thToRefresh, checkbox, data)
         refreshModal(form_id, opt_id, data)
+        initMacroCharts();
       }
     });
   });
