@@ -253,26 +253,42 @@ $(document).ready(function(){
             var t = parseFloat(current_extra_t) || 0;
             var w = parseFloat(current_extra_w) || 0;
 
-            chart = new Chart(canvas.getContext('2d'), {
-                type: 'doughnut',
-                data: {
-                    datasets: [{
-                        data: [w, t, b],
-                        backgroundColor: ['#343a40', '#ffc107', '#6c757d'],
-                        borderWidth: 0,
-                        cutout: '85%'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    aspectRatio: 1, // Gwarantuje koło bez zniekształceń
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: { enabled: true }
-                    }
-                }
-            });
+            new Chart(canvas.getContext('2d'), {
+              type: 'doughnut',
+              data: {
+                  datasets: [{
+                      data: [b, t, w], // Twoje zmienne: Węgle, Tłuszcze, Białka
+                      backgroundColor: ['#6c757d', '#ffc107', '#343a40'], // Niebieski, Żółty, Zielony
+                      borderWidth: 0,
+                      cutout: '82%',     // Cieńszy pierścień wygląda nowocześniej
+                      borderRadius: 10,  // Zaokrąglone końce segmentów
+                      spacing: 3         // Delikatne przerwy między kolorami
+                  }]
+              },
+              options: {
+                  responsive: true,
+                  maintainAspectRatio: true,
+                  aspectRatio: 2,        // Bardzo ważne dla półkola (szerokość 2 : wysokość 1)
+                  rotation: -90,         // Obraca start rysowania o 90 stopni w lewo
+                  circumference: 180,    // Rysuje tylko połowę okręgu
+                  layout: {
+                      padding: {
+                          bottom: 10     // Miejsce na ewentualny tekst pod wykresem
+                      }
+                  },
+                  plugins: {
+                      legend: { display: false },
+                      tooltip: {
+                          enabled: true,
+                          callbacks: {
+                              label: function(item) {
+                                  return ' ' + Math.round(item.raw) + ' kcal';
+                              }
+                          }
+                      }
+                  }
+              }
+          });
         }
       }
       // Musisz mieć dostęp do zmiennej num_id (np. przekazanej z Django do JS)

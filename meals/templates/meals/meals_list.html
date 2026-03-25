@@ -607,19 +607,35 @@ function initMacroCharts() {
             type: 'doughnut',
             data: {
                 datasets: [{
-                    data: [w, t, b],
-                    backgroundColor: ['#343a40', '#ffc107', '#6c757d'],
+                    data: [b, t, w], // Twoje zmienne: Węgle, Tłuszcze, Białka
+                    backgroundColor: ['#6c757d', '#ffc107', '#343a40'],
                     borderWidth: 0,
-                    cutout: '85%'
+                    cutout: '82%',     // Cieńszy pierścień wygląda nowocześniej
+                    borderRadius: 10,  // Zaokrąglone końce segmentów
+                    spacing: 3         // Delikatne przerwy między kolorami
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: true,
-                aspectRatio: 1,
+                aspectRatio: 2,        // Bardzo ważne dla półkola (szerokość 2 : wysokość 1)
+                rotation: -90,         // Obraca start rysowania o 90 stopni w lewo
+                circumference: 180,    // Rysuje tylko połowę okręgu
+                layout: {
+                    padding: {
+                        bottom: 10     // Miejsce na ewentualny tekst pod wykresem
+                    }
+                },
                 plugins: {
                     legend: { display: false },
-                    tooltip: { enabled: true }
+                    tooltip: {
+                        enabled: true,
+                        callbacks: {
+                            label: function(item) {
+                                return ' ' + Math.round(item.raw) + ' kcal';
+                            }
+                        }
+                    }
                 }
             }
         });
