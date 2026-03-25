@@ -392,8 +392,114 @@
         </div>
       </div>
 
+    </div>
+    <div class="col-12 col-xl-4 px-1 px-md-2">
+        <div class="card bg-light  " >
+
+
+    <div class="card-body p-1">
+        <div class="position-relative mx-auto" style="width: 100%; max-width: 300px;">
+            <canvas id="targetStackChart"></canvas>
+
+            <div class="position-absolute w-100 text-center" style="bottom: 0; left: 0;">
+                <div class="h2 mb-0 font-weight-bold text-dark">{{calories}}</div>
+                <div class="text-muted text-uppercase " style="font-size: 0.7rem; margin-top: -5px;">Suma kcal</div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-around my-2 text-center">
+            <div>
+                <div class="small text-primary">Białko</div>
+                <div class="font-weight-bold">{{protein}} <span class="small">g</span></div>
+            </div>
+            <div>
+                <div class="small text-warning">Tłuszcze</div>
+                <div class="font-weight-bold">{{fat}} <span class="small">g</span></div>
+            </div>
+            <div>
+                <div class="small text-dark">Węgle</div>
+                <div class="font-weight-bold">{{carbohydrates}} <span class="small">g</span></div>
+            </div>
+        </div>
+
+        <hr class="border-secondary">
+
+        <div class="mt-2">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="small">🥦 Warzywa (Cel: 400g)</span>
+                <span class="badge badge-success px-2 py-1">{{meal.0.total_vegies}}g / {% widthratio meal.0.total_vegies 400 100 %}%</span>
+            </div>
+            <div class="progress bg-secondary" style="height: 12px; border-radius: 6px;">
+                <div class="progress-bar bg-success progress-bar-striped" role="progressbar" style="width: {% widthratio meal.0.total_vegies 400 100 %}%; border-radius: 6px;"></div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-3 mb-1">
+                <span class="small">🍎 Owoce (Cel: 100g)</span>
+                <span class="badge badge-warning px-2 py-1 text-dark">{{meal.0.total_fruits}}g / {% widthratio meal.0.total_fruits 100 100 %}%</span>
+            </div>
+            <div class="progress bg-secondary" style="height: 12px; border-radius: 6px;">
+                <div class="progress-bar bg-warning progress-bar-striped" role="progressbar" style="width: {% widthratio meal.0.total_fruits 100 100 %}%; border-radius: 6px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+  // Dane z Django
+var p = parseFloat("{{ protein|unlocalize }}".replace(',', '.')) || 0;
+var f = parseFloat("{{ fat|unlocalize }}".replace(',', '.')) || 0;
+var c = parseFloat("{{ carbohydrates|unlocalize }}".replace(',', '.')) || 0;
+
+var dataKcal = [p * 4, f * 9, c * 4];
+
+var canvas = document.getElementById('targetStackChart');
+var ctx = canvas.getContext('2d');
+
+// W wersji 2.x niszczymy wykres inaczej - sprawdzając czy zmienna istnieje
+// Jeśli masz to w AJAX, musisz zdefiniować 'window.myChart' globalnie
+if (window.myChart instanceof Chart) {
+    window.myChart.destroy();
+}
+
+window.myChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Białko', 'Tłuszcze', 'Węglowodany'],
+        datasets: [{
+            data: dataKcal,
+            backgroundColor: [
+                '#0064CD', // niebieski
+                '#ffc107', // Żółty
+                '#343a40'  // czarny
+            ],
+            borderWidth: 2,
+            borderColor: '#343a40'
+        }]
+    },
+    options: {
+        rotation: 1 * Math.PI,      // W v2.x rotacja jest w radianach!
+        circumference: 1 * Math.PI, // Półkole
+        cutoutPercentage: 80,       // W v2 nazywa się to inaczej
+        aspectRatio: 2,
+        legend: {
+            display: false          // W v2 NIE MA 'plugins', legend jest bezpośrednio
+        },
+        tooltips: {                 // W v2 'tooltip' to 'tooltips'
+            callbacks: {
+                label: function(tooltipItem, data) {
+                    var val = data.datasets[0].data[tooltipItem.index];
+                    return data.labels[tooltipItem.index] + ': ' + Math.round(val) + ' g';
+                }
+            }
+        }
+    }
+});
+})();
+</script>
     </div><!-- /col -->
   </div><!-- /row -->
+
 </div><!-- /container-fluid -->
 
 
