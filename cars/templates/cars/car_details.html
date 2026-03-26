@@ -137,35 +137,45 @@
             {% for filling in car_fuel_fill_list %}
             <div class="col-12 mb-1" id="filling_row_{{filling.pk}}">
               <div class="card shadow-sm h-100 border-left border-dark" style="border-left-width: 5px !important;">
-                <div class="card-body p-1 d-flex align-items-center"> <div class="d-flex align-items-center flex-grow-1">
-                  <span style="font-family: monospace;" class="badge badge-dark badge-pill mr-1 d-flex align-items-center justify-content-center">
-                    {{forloop.revcounter}}
-                  </span>
-
-                  <div class="d-flex flex-wrap text-muted flex-grow-1 justify-content-between mr-1" style="font-family: monospace;">
-                    <span class="d-block  font-weight-bold mb-0 text-dark"><i class="fas fa-calendar mr-1" ></i>{{filling.date|date:"d.m.Y"}}</span>
-                    <span><i class="fas fa-gas-pump mr-1"></i><strong>{{filling.liters|floatformat:"2"}}</strong>l</span>
-                    <span><i class="fas fa-road mr-1"></i><strong>{{filling.kilometers}}</strong>km</span>
-                    <span><i class="fas fa-tag mr-1"></i>{{filling.fuel_price}}zł</span>
-                    <span><i class="fas fa-tachometer-alt mr-1"></i>{{filling.mileage}}</span>
+                <div class="card-body p-1 d-flex align-items-center">
+                  <div class="d-flex align-items-center flex-grow-1">
+                    <div class="row no-gutters flex-grow-1 align-items-center text-muted">
+                      <div class="col-5 col-md-3 font-weight-bold text-dark text-truncate d-flex align-items-center">
+                        <span class="mr-1 position-relative d-inline-flex align-items-center justify-content-center" style="width: 1.25em; height: 1.25em;">
+                          <i class="fas fa-calendar position-absolute" style="font-size: 1.25em; color: #6c757d; opacity: 0.5;"></i>
+                          <span style="font-family: Arial, sans-serif; font-size: 0.55rem; position: relative; top: 0.15rem; color: #343a40; font-weight: 800;">
+                            {{forloop.revcounter}}
+                          </span>
+                        </span>
+                        {{filling.date|date:"d.m.Y"}}
+                      </div>
+                      <div class="col-3 col-md-2 text-truncate">
+                        <i class="fas fa-gas-pump mr-1"></i><strong>{{filling.liters|floatformat:"2"}}</strong>l
+                      </div>
+                      <div class="col-4 col-md-2 text-truncate text-right text-md-left">
+                        <i class="fas fa-road mr-1"></i><strong>{{filling.kilometers}}</strong>km
+                      </div>
+                      <div class="col-5 col-md-2 text-truncate mt-1 mt-md-0">
+                        <i class="fas fa-tag mr-1"></i>{{filling.fuel_price}}zł
+                      </div>
+                      <div class="col-7 col-md-3 text-truncate mt-1 mt-md-0 text-left">
+                        <i class="fas fa-tachometer-alt mr-1"></i>{{filling.mileage}}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="d-flex align-items-center border-left pl-2 ml-1">
+                    <div class="text-right mr-2" style="line-height: 0.8; min-width: 50px;">
+                      <span class="d-block h5 font-weight-bold mb-0 text-dark">
+                        {{ filling.liters|average_fuel_cons:filling.kilometers|floatformat:"2" }}
+                      </span>
+                      <small class="text-muted font-weight-bold" style="font-size: 10px;">l/100km</small>
+                    </div>
+                    <a onclick="return confirm('Usunąć to tankowanie?')" data-id="{{filling.pk}}" id="filling_{{filling.pk}}"
+                       class="filling_ text-secondary" href="#filling_{{filling.pk}}">
+                      <i class="far fa-trash-alt h5 mb-0"></i>
+                    </a>
                   </div>
                 </div>
-
-                <div class="d-flex align-items-center border-left pl-1 ml-1">
-                  <div class="text-right mr-2" style="line-height: 0.8;">
-                    <span class="d-block h5 font-weight-bold mb-0 text-dark">
-                      {{ filling.liters|average_fuel_cons:filling.kilometers|floatformat:"2" }}
-                    </span>
-                    <small class="text-muted font-weight-bold" style="font-size: 10px;">l/100km</small>
-                  </div>
-
-                  <a onclick="return confirm('Usunąć to tankowanie?')" data-id="{{filling.pk}}" id="filling_{{filling.pk}}"
-                     class="filling_ text-secondary" href="#filling_{{filling.pk}}">
-                    <i class="far fa-trash-alt h5 mb-0"></i>
-                  </a>
-                </div>
-
-              </div>
               </div>
             </div>
             {% endfor %}
