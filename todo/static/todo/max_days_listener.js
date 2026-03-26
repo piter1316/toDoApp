@@ -229,11 +229,11 @@ $(document).ready(function(){
         $('#current_extras').text(current_extra)
         $('#chart-extras-kcal').text(current_extra_kcal)
         $('#chart-extras-b').text('B:' + current_extra_b + 'g')
-        $('#chart-extras-b').css('width', current_extra_b/ current_extra_total_macro_ * 100 + "%");
+
         $('#chart-extras-t').text('T:' + current_extra_t + 'g')
-        $('#chart-extras-t').css('width', current_extra_t/ current_extra_total_macro_ * 100 + "%");
+
         $('#chart-extras-w').text('W:' + current_extra_w + 'g')
-        $('#chart-extras-w').css('width', current_extra_w/ current_extra_total_macro_ * 100 + "%");
+
 
         var extras_link = $('#extras_link_'+ num_id).val()
         $('#current_extras').attr('href', extras_link)
