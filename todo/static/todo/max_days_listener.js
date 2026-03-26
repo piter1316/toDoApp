@@ -228,11 +228,11 @@ $(document).ready(function(){
       if (current_extra && current_extra_kcal){
         $('#current_extras').text(current_extra)
         $('#chart-extras-kcal').text(current_extra_kcal)
-        $('#chart-extras-b').text(current_extra_b + 'g b')
+        $('#chart-extras-b').text('B:' + current_extra_b + 'g')
         $('#chart-extras-b').css('width', current_extra_b/ current_extra_total_macro_ * 100 + "%");
-        $('#chart-extras-t').text(current_extra_t + 'g t')
+        $('#chart-extras-t').text('T:' + current_extra_t + 'g')
         $('#chart-extras-t').css('width', current_extra_t/ current_extra_total_macro_ * 100 + "%");
-        $('#chart-extras-w').text(current_extra_w + 'g w')
+        $('#chart-extras-w').text('W:' + current_extra_w + 'g')
         $('#chart-extras-w').css('width', current_extra_w/ current_extra_total_macro_ * 100 + "%");
 
         var extras_link = $('#extras_link_'+ num_id).val()
@@ -261,7 +261,6 @@ $(document).ready(function(){
                       backgroundColor: ['#6c757d', '#ffc107', '#343a40'], // Niebieski, Żółty, Zielony
                       borderWidth: 0,
                       cutout: '82%',     // Cieńszy pierścień wygląda nowocześniej
-                      borderRadius: 10,  // Zaokrąglone końce segmentów
                       spacing: 3         // Delikatne przerwy między kolorami
                   }]
               },
@@ -282,7 +281,7 @@ $(document).ready(function(){
                           enabled: true,
                           callbacks: {
                               label: function(item) {
-                                  return ' ' + Math.round(item.raw) + ' kcal';
+                                  return ' ' + Math.round(item.raw) + ' g';
                               }
                           }
                       }
