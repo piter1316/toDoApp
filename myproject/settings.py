@@ -142,3 +142,6 @@ MEDIA_URL = 'media/'
 STATIC_URL = '/static/'
 
 STATIC_ROOT = '/home/piter1316/toDoApp/todo/static'
+
+
+SESSION_SAVE_EVERY_REQUEST = True
