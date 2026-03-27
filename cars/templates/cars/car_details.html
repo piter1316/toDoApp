@@ -65,24 +65,24 @@
 <div class="container-fluid mt-2 px-0 px-md-2" xmlns="http://www.w3.org/1999/html">
   <ul class="nav nav-tabs mb-1 row no-gutters" id="myTab" role="tablist">
     <li class="nav-item col">
-      <a class="btn btn-outline-secondary active border-right-0 w-100" id="fuel-tab" data-toggle="tab" href="#fuel"
+      <a class="btn btn-outline-dark active border-right-0 w-100" id="fuel-tab" data-toggle="tab" href="#fuel"
          role="tab"
          aria-controls="fuel" aria-selected="true" style=" border-radius: 5px 0px 0px 5px !important;"><i
           class=" px-2 fas fa-gas-pump"></i></a>
     </li>
     <li class="nav-item col">
-      <a class="btn btn-outline-secondary rounded-0 w-100" id="service-tab" data-toggle="tab" href="#service"
+      <a class="btn btn-outline-dark rounded-0 w-100" id="service-tab" data-toggle="tab" href="#service"
          role="tab"
          aria-controls="service" aria-selected="false"><i class=" px-2 fas fa-tools"></i></a>
     </li>
     <li class="nav-item col">
-      <a class="btn btn-outline-secondary rounded-0 w-100" id="info-tab" data-toggle="tab" href="#info"
+      <a class="btn btn-outline-dark rounded-0 w-100" id="info-tab" data-toggle="tab" href="#info"
          role="tab"
          aria-controls="info" aria-selected="false"><i class="fas fa-info-circle"></i></a>
     </li>
 
     <li class="nav-item col">
-      <a class="btn btn-outline-secondary border-left-0 w-100" id="contact-tab" data-toggle="tab" href="#chart"
+      <a class="btn btn-outline-dark border-left-0 w-100" id="contact-tab" data-toggle="tab" href="#chart"
          role="tab"
          aria-controls="chart" aria-selected="false" style=" border-radius: 0px 5px 5px 0px !important;"><i
           class=" px-2 fas fa-chart-pie"></i></a>
@@ -228,8 +228,8 @@
     </div>
     <div class="tab-pane fade p-2 service {% if active_tab == 'service' %} show active{% endif %}" id="service"
          role="tabpanel" aria-labelledby="service-tab">
-      <div class="btn-group btn-block">
-        <a href="{% url 'cars:add_service_form' car.0.pk %}" class="btn btn-outline-secondary ">Nowy
+      <div class="btn-group btn-block mb-1">
+        <a href="{% url 'cars:add_service_form' car.0.pk %}" class="btn btn-outline-dark ">Nowy
         serwis</a>
       {% if service_dictionary.items %}
         <a href="{% url 'cars:download_history' car.0.id %}" class="btn btn-outline-dark">Pobierz historię</a>
@@ -238,7 +238,7 @@
       </div>
 
       <table class="d-none d-lg-table table table-bordered bg-light table-sm table-striped mb-0">
-        <thead class="bg-secondary text-center text-light sticky-top">
+        <thead class="bg-dark text-center text-light sticky-top">
         <tr>
           <td>Lp.</td>
           <td>Data</td>
@@ -434,77 +434,210 @@
     </div>
 
     <div class="tab-pane fade mx-auto col-lg-10 p-0"  id="chart"  role="tabpanel" aria-labelledby="chart-tab">
-      <canvas class="bg-light rounded p-1 w-100" id="myChart"></canvas>
+      <div class="row align-items-center mb-3 text-muted p-1">
+          <div class="col-12 col-xl-auto mb-2 mb-xl-0 font-weight-bold">
+              <i class="fas fa-chart-area mr-1"></i>Historia spalania
+          </div>
+
+          <div class="col-12 col-md-auto mb-2 mb-md-0 ml-xl-auto">
+              <div class="btn-group btn-group-sm w-100" role="group" id="chart-filters">
+                  <button type="button" class="btn btn-outline-dark" onclick="filterChart(1, this)">1 m-c</button>
+                  <button type="button" class="btn btn-outline-dark" onclick="filterChart(3, this)">3 m-ce</button>
+                  <button type="button" class="btn btn-outline-dark" onclick="filterChart(6, this)">6 m-cy</button>
+                  <button type="button" class="btn btn-outline-dark active" onclick="filterChart(12, this)">Rok</button>
+                  <button type="button" class="btn btn-outline-dark " onclick="filterChart('all', this)">Wszystko</button>
+              </div>
+          </div>
+
+          <div class="col-12 col-md-auto d-flex align-items-center">
+              <input type="date" id="customDateStart" class="form-control form-control-sm mr-1" onchange="filterCustomDate()" title="Data początkowa">
+              <span>-</span>
+              <input type="date" id="customDateEnd" class="form-control form-control-sm ml-1" onchange="filterCustomDate()" title="Data końcowa">
+          </div>
+      </div>
+      <div class="w-100" style="position: relative; height: 60vh; min-height: 250px;">
+        <canvas class="bg-light rounded p-1 w-100" id="myChart"></canvas>
+      </div>
       <script>
-          var ctx = document.getElementById('myChart').getContext('2d');
-          var chart_data_json = JSON.parse('{{chart_dates|escapejs }}');
-          var dates_array = []
-          var consumption_array = []
-          var average_array = []
-          var liters_array = []
-          var kilometers_array = []
-          var bars_color_array = []
-          chart_data_json.forEach(getDatesArray);
-          if (chart_data_json.length > 0){
-            chart_data_json.forEach(average);
-          }else{average_array.push(0)}
+    // 1. ODBIÓR DANYCH Z DJANGO (Bez zmian)
+    var raw_data = JSON.parse('{{chart_dates|escapejs }}');
 
-          for (var i=0; i<average_array.length; i++){
-            if(average_array[i]> consumption_array[i]){
-              bars_color_array.push('rgba(40, 167, 69,1)')
-            }else{
-              bars_color_array.push('rgba(220, 53, 69,1)')
-            }
-          }
+    // 2. PRZETWORZENIE DANYCH
+    var all_data = raw_data.map(function(item) {
+        var l = parseFloat(item.fields.liters);
+        var km = parseFloat(item.fields.kilometers);
+        var cons = km > 0 ? (l / km * 100) : 0;
 
-          var mixedChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-              datasets: [{
-                label: 'L/100KM',
-                fill: false,
-                data: consumption_array,
-                backgroundColor: bars_color_array
-              }, {
-                label: 'Średnie: '+ average_array[0] ,
-                data: average_array,
-                borderColor: 'rgba(0, 0, 0, 0.5)',
-                // Changes this dataset to become a line
-                type: 'line',
-                fill: false,
-                pointRadius: 0
-              }],
-              labels: dates_array
+        return {
+            date: new Date(item.fields.date),
+            dateStr: item.fields.date,
+            liters: l,
+            kilometers: km,
+            consumption: parseFloat(cons.toFixed(2))
+        };
+    });
+
+    all_data.sort((a, b) => a.date - b.date);
+
+    // 3. INICJALIZACJA WYKRESU
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: { labels: [], datasets: [] },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            legend: {
+                position: 'bottom',
+                labels: { fontColor: '#6c757d', usePointStyle: true, padding: 15 }
             },
-          options: {
-
+            elements: {
+                line: { tension: 0.4 } // Miękkie krzywe
+            },
             scales: {
-              yAxes: [{
-                  ticks: {
-                      beginAtZero: false,
-                      suggestedMin: 5,
-                  }
-              }]
+                xAxes: [{
+                    gridLines: { display: false },
+                    ticks: { fontColor: '#adb5bd', maxTicksLimit: 6 }
+                }],
+                yAxes: [{
+                    gridLines: { color: 'rgba(0,0,0,0.05)', borderDash: [5, 5] },
+                    ticks: { fontColor: '#6c757d', suggestedMin: 4, stepSize: 1 }
+                }]
+            },
+            tooltips: {
+                mode: 'index',
+                intersect: false,
+                backgroundColor: 'rgba(52, 58, 64, 0.9)',
+                callbacks: {
+                    label: function(tooltipItem, data) {
+                        return data.datasets[tooltipItem.datasetIndex].label + ': ' + tooltipItem.yLabel + ' L/100km';
+                    }
+                }
             }
         }
+    });
+
+    // 4. FUNKCJA RYSUJĄCA I KOLORUJĄCA PUNKTY ZGODNIE ZE ŚREDNIĄ
+    function renderChart(dataSlice) {
+        var labels = [];
+        var consData = [];
+        var totalLiters = 0;
+        var totalKm = 0;
+
+        // Pierwsza pętla: obliczamy średnią, żeby wiedzieć, jak pomalować kropki
+        dataSlice.forEach(d => {
+            totalLiters += d.liters;
+            totalKm += d.kilometers;
         });
 
-          function getDatesArray(item, index){
-          dates_array.push(item['fields']['date']);
-          var l = item['fields']['liters'];
-          var km = item['fields']['kilometers'];
-          consumption_array.push((l/km*100).toFixed(2));
-          liters_array.push(l);
-          kilometers_array.push(km)
-          }
-          var liters_total = liters_array.reduce((a, b) => a + b, 0)
-          var kilometers_total = kilometers_array.reduce((a, b) => a + b, 0)
-          function average(){
-            let avg = (((liters_array.reduce((a, b) => a + b, 0))/(kilometers_array.reduce((a, b) => a + b, 0)))*100).toFixed(2)
-            average_array.push(avg)
-          }
+        var avg = totalKm > 0 ? ((totalLiters / totalKm) * 100).toFixed(2) : 0;
+        var numAvg = parseFloat(avg);
+        var avgData = Array(dataSlice.length).fill(avg);
 
-      </script>
+        // Tablice na kolory punktów (indywidualne dla każdego tankowania)
+        var pointColors = [];
+        var pointBgColors = [];
+
+        // Druga pętla: przypisujemy dane i ustalamy kolory kropek
+        dataSlice.forEach(d => {
+            labels.push(d.dateStr);
+            consData.push(d.consumption);
+
+            if (d.consumption > numAvg) {
+                // Ponad średnią (Złe spalanie) -> Czarne
+                pointColors.push('#000000');
+                pointBgColors.push('#000000');
+            } else {
+                // Poniżej lub równe średniej (Dobre spalanie) -> Zielone z oryginalnego kodu
+                pointColors.push('rgba(40, 167, 69, 1)');
+                pointBgColors.push('rgba(40, 167, 69, 1)');
+            }
+        });
+
+        myChart.data.labels = labels;
+        myChart.data.datasets = [
+            {
+                label: 'Spalanie',
+                data: consData,
+                borderColor: '#6c757d', // Szara linia
+                backgroundColor: 'rgba(108, 117, 125, 0.1)', // Delikatne wypełnienie
+                borderWidth: 2,
+                // Tutaj przekazujemy tablice kolorów dla kropek
+                pointBackgroundColor: pointBgColors,
+                pointBorderColor: pointColors,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                fill: true
+            },
+            {
+                label: 'Średnia (' + avg + ')',
+                data: avgData,
+                borderColor: '#343a40',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                pointRadius: 0, // Średnia to tylko linia, bez kropek
+                fill: false
+            }
+        ];
+        myChart.update();
+    }
+
+    // 5. FILTROWANIE PO PRZYCISKACH (MIESIĄCE)
+    function filterChart(months, btnElement) {
+        // Zdejmij klasę active ze wszystkich przycisków
+        document.querySelectorAll('#chart-filters .btn').forEach(btn => btn.classList.remove('active'));
+
+        // Jeśli funkcja została wywołana kliknięciem (btnElement istnieje), dodaj active
+        if (btnElement) {
+            btnElement.classList.add('active');
+        } else {
+            // Jeśli to start strony (btnElement to null), znajdź przycisk "Rok" i go podświetl
+            // Zakładamy, że przycisk "Rok" to 4. przycisk (index 3) w grupie
+            let yearBtn = document.querySelectorAll('#chart-filters .btn')[3];
+            if(yearBtn) yearBtn.classList.add('active');
+        }
+
+        // Reszta funkcji pozostaje bez zmian...
+        document.getElementById('customDateStart').value = '';
+        document.getElementById('customDateEnd').value = '';
+
+        if (months === 'all') {
+            renderChart(all_data);
+            return;
+        }
+
+        var cutoffDate = new Date();
+        cutoffDate.setMonth(cutoffDate.getMonth() - months);
+        var filteredData = all_data.filter(d => d.date >= cutoffDate);
+        renderChart(filteredData);
+    }
+
+    // 6. RĘCZNE FILTROWANIE PO KALENDARZACH
+    function filterCustomDate() {
+        // Odznacz przyciski gotowych okresów
+        document.querySelectorAll('#chart-filters .btn').forEach(btn => btn.classList.remove('active'));
+
+        var startVal = document.getElementById('customDateStart').value;
+        var endVal = document.getElementById('customDateEnd').value;
+        var filteredData = all_data;
+
+        if (startVal) {
+            var startDate = new Date(startVal);
+            startDate.setHours(0,0,0,0);
+            filteredData = filteredData.filter(d => d.date >= startDate);
+        }
+        if (endVal) {
+            var endDate = new Date(endVal);
+            endDate.setHours(23,59,59,999);
+            filteredData = filteredData.filter(d => d.date <= endDate);
+        }
+
+        renderChart(filteredData);
+    }
+
+    // Uruchomienie domyślnie z pełnymi danymi
+    filterChart(12, null);
+</script>
     </div>
   </div>
 </div>
