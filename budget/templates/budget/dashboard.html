@@ -1,0 +1,122 @@
+{% extends 'todo/base.html' %}
+
+{% block body %}
+
+<style>
+    .budget-bg { background-color: #1a1b1e; color: #e9ecef; }
+    .pln-card { background-color: #25262b; border: 1px solid #373a40; border-radius: 8px; }
+    .pln-100-text { color: #3b8252; }
+    .pln-100-btn { background-color: #3b8252; color: white; border: none; }
+    .pln-100-btn:hover { background-color: #2e8b57; color: white; }
+    .pln-input { background-color: #141517; border: 1px solid #373a40; color: white; }
+    .add-btn-sm { padding: 2px 8px; font-size: 12px; }
+</style>
+<div class="container-fluid budget-bg py-4 min-vh-100">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="font-weight-bold pln-100-text mb-0"><i class="fas fa-wallet mr-2"></i>Moje Budżety</h2>
+
+        <div class="d-flex">
+            <button class="btn btn-outline-info btn-sm mr-2" data-toggle="modal" data-target="#modalCategory">
+                + Kategoria
+            </button>
+            <button class="btn pln-100-btn btn-sm" data-toggle="modal" data-target="#modalLedger">
+                <i class="fas fa-plus mr-1"></i> Nowa Dziedzina
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        {% for ledger in ledgers %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card pln-card h-100 shadow-lg" style="border-left: 4px solid #316C9A;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="text-light mb-0 font-weight-bold">{{ ledger.name }}</h4>
+                        <button class="btn btn-outline-secondary add-btn-sm" data-toggle="modal" data-target="#modalSection{{ ledger.id }}">
+                            + sekcja
+                        </button>
+                    </div>
+
+                    <div class="list-group list-group-flush">
+                        {% for section in ledger.sections.all|dictsort:"order" %}
+                        <a href="{% url 'budget:section_detail' section.pk %}" class="list-group-item list-group-item-action bg-transparent text-light border-secondary d-flex justify-content-between align-items-center px-0">
+                            <span><i class="far fa-folder-open mr-2 text-muted"></i>{{ section.name }}</span>
+                            <i class="fas fa-chevron-right text-muted small"></i>
+                        </a>
+                        {% empty %}
+                        <p class="text-muted small mt-2">Brak sekcji (np. miesięcy).</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalSection{{ ledger.id }}" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content pln-card">
+                    <form action="{% url 'budget:add_section' ledger.id %}" method="POST">
+                        {% csrf_token %}
+                        <div class="modal-header border-secondary">
+                            <h5 class="modal-title">Nowa sekcja w: {{ ledger.name }}</h5>
+                        </div>
+                        <div class="modal-body">
+                            <input type="text" name="name" class="form-control pln-input" placeholder="np. Styczeń 2026" required>
+                        </div>
+                        <div class="modal-footer border-secondary">
+                            <button type="submit" class="btn pln-100-btn">Dodaj</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="modal fade" id="modalLedger" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content pln-card text-light">
+            <form action="{% url 'budget:add_ledger' %}" method="POST">
+                {% csrf_token %}
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">Dodaj nową dziedzinę</h5>
+                </div>
+                <div class="modal-body">
+                    <label class="small text-muted">Nazwa (np. Wydatki Osobiste 2026)</label>
+                    <input type="text" name="name" class="form-control pln-input" required>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="submit" class="btn pln-100-btn">Stwórz dziedzinę</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalCategory" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content pln-card text-light">
+            <form action="{% url 'budget:add_category' %}" method="POST">
+                {% csrf_token %}
+                <div class="modal-header border-secondary text-info">
+                    <h5 class="modal-title">Nowa kategoria wydatków</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="small text-muted">Nazwa</label>
+                        <input type="text" name="name" class="form-control pln-input" placeholder="np. Jedzenie" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="small text-muted">Kolor na wykresie</label>
+                        <input type="color" name="color" class="form-control pln-input" value="#3b8252">
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="submit" class="btn btn-info">Dodaj kategorię</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
