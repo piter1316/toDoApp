@@ -230,6 +230,29 @@
                   </div>
                 </div>
               </div>
+              <div class="col-12 col-xl-6 mb-3">
+                <div class="card shadow-sm home-card">
+                  <div class="card-header-modern d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                      <img src="{% static 'todo/img/wallet-solid-full.svg' %}" height="24" class="mr-2" style="opacity: 0.7;">
+                      <h6 class="mb-0 font-weight-bold text-uppercase text-muted" style="letter-spacing: .05em; font-size: 0.75rem;">Finanse</h6>
+                    </div>
+                    <a href="{% url 'budget:budget_dashboard' %}" class="btn btn-outline-secondary btn-sm py-0" style="font-size: 0.7rem;">PRZEJDŹ</a>
+                  </div>
+                  <div class="card-body py-2">
+                    {% if last_expense %}
+                      <div class="row no-gutters">
+                        <div class="col-12 pr-1">
+                          <div class="text-muted small mb-1 text-center" style="font-size: 0.6rem;">Ostatni wydatek</div>
+                          <div class="text-center"><span class="macro-badge w-100">{{last_expense}}</span></div>
+                        </div>
+                      </div>
+                    {% else %}
+                      <div class="text-muted small italic">Brak finansów</div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
 
             </div><!-- /inner-row -->
           </div><!-- /col-8 -->
@@ -258,4 +281,4 @@
     </div>
   </div>
 </div>
-{% endblock %}
+{% endblock %}

@@ -14,6 +14,7 @@ from receipts.models import Receipt
 from meals.models import MealsList, MealIngredient, Meal, Ingredient
 from shopping.models import ShoppingList, Products
 from gunsafe.models import Weapon, AmmoSafe
+from budget.models import Expense
 from .forms import TodoForm
 from .models import Todo, TodoTodostep, ToDoMain
 
@@ -238,6 +239,9 @@ def home(request):
         ammo_inventory = AmmoSafe.objects.filter(user=request.user)
         total_ammo_qty = sum(ammo.qty for ammo in ammo_inventory)
 
+        # budget data
+        last_expense = Expense.objects.filter(user=request.user).last()
+
         distinct_meals = []
         for meal in meals:
             if meal.current:
@@ -265,6 +269,7 @@ def home(request):
             'today': today,
             'receipts': receipts_dict,
             'weapons_count': weapons.count(),
+            'last_expense': last_expense,
             'total_ammo_qty': total_ammo_qty,
         }
     else:
