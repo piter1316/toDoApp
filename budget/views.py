@@ -1,6 +1,6 @@
 from datetime import date
 from decimal import Decimal
-from django.db.models import Sum
+from django.db.models import Sum, Count
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
@@ -12,7 +12,6 @@ def budget_dashboard(request):
     # Pobieramy wszystkie dziedziny zalogowanego użytkownika
     ledgers = Ledger.objects.filter(user=request.user).prefetch_related('sections')
     categories = Category.objects.filter(user=request.user)
-    print(categories)
     return render(request, 'budget/dashboard.html', {'ledgers': ledgers, 'categories': categories})
 
 
@@ -50,6 +49,28 @@ def section_detail(request, pk):
 
     total_budget = section.budget_account + section.budget_cash
 
+    category_data = expenses.values(
+        'category__name',
+        'category__color'
+    ).annotate(
+        total=Sum('amount'),
+        count=Count('id')
+    ).order_by('-total')  # Sortujemy od największych wydatków
+
+    chart_labels = []
+    chart_values = []
+    chart_colors = []
+
+    for entry in category_data:
+        # Obsługa wydatków bez kategorii (jeśli takie są)
+        name = entry['category__name'] or "Bez kategorii"
+        color = entry['category__color'] or "#6c757d"  # Domyślny szary
+
+        chart_labels.append(name)
+        # Zamieniamy Decimal na float, bo JS nie lubi Decimal
+        chart_values.append(float(entry['total']))
+        chart_colors.append(color)
+
     context = {
         'section': section,
         'expenses': expenses,
@@ -64,8 +85,22 @@ def section_detail(request, pk):
         'remaining_account': section.budget_account - account_expenses,
         'remaining_cash': section.budget_cash - cash_expenses,
         'remaining_total': total_budget - total_amount,
+        'chart_labels': chart_labels,
+        'chart_values': chart_values,
+        'chart_colors': chart_colors,
+        # Przekazujemy też pogrupowane dane, żeby zrobić legendę w HTML
+        'category_stats': category_data,
     }
     return render(request, 'budget/section_detail.html', context)
+
+
+@login_required
+def delete_expense(request, pk):
+    expense = get_object_or_404(Expense, pk=pk, user=request.user)
+    section_pk = expense.section.pk
+    if request.method == 'POST':
+        expense.delete()
+    return redirect('budget:section_detail', pk=section_pk)
 
 
 @login_required
@@ -111,6 +146,31 @@ def add_section(request, ledger_id):
 
 
 @login_required
+def delete_section(request, pk):
+    section = get_object_or_404(Section, pk=pk, ledger__user=request.user)
+    if request.method == 'POST':
+        section.delete()
+    return redirect('budget:budget_dashboard')
+
+
+@login_required
+def delete_ledger(request, pk):
+    ledger = get_object_or_404(Ledger, pk=pk, user=request.user)
+
+    # Sprawdzamy, czy dziedzina jest pusta
+    if ledger.sections.count() == 0:
+        if request.method == 'POST':
+            ledger.delete()
+            return redirect('budget:budget_dashboard')
+    else:
+        # Opcjonalnie: komunikat o błędzie, jeśli ktoś próbuje obejść UI
+        from django.contrib import messages
+        messages.error(request, "Nie można usunąć dziedziny, która zawiera sekcje!")
+
+    return redirect('budget:budget_dashboard')
+
+
+@login_required
 def add_category(request):
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -119,3 +179,57 @@ def add_category(request):
             Category.objects.create(name=name, color=color, user=request.user)
     # Wracamy tam, skąd przyszliśmy
     return redirect(request.META.get('HTTP_REFERER', 'budget:budget_dashboard'))
+
+
+@login_required
+def ledger_detail(request, pk):
+    ledger = get_object_or_404(Ledger, pk=pk, user=request.user)
+
+    # Pobieramy WSZYSTKIE wydatki dla tej dziedziny (ze wszystkich jej sekcji)
+    expenses = Expense.objects.filter(section__ledger=ledger)
+
+    # Suma całkowita wydatków w dziedzinie
+    total_amount = expenses.aggregate(Sum('amount'))['amount__sum'] or Decimal('0.00')
+
+    # Opcjonalnie: Suma całkowitego budżetu ze wszystkich sekcji
+    total_budget_account = ledger.sections.aggregate(Sum('budget_account'))['budget_account__sum'] or Decimal('0.00')
+    total_budget_cash = ledger.sections.aggregate(Sum('budget_cash'))['budget_cash__sum'] or Decimal('0.00')
+    total_budget = total_budget_account + total_budget_cash
+
+    # DANE DO WYKRESU (Grupowanie po kategoriach dla całej dziedziny)
+    category_data = expenses.values(
+        'category__name',
+        'category__color'
+    ).annotate(
+        total=Sum('amount'),
+        count=Count('id')
+    ).order_by('-total')
+
+    chart_labels = []
+    chart_values = []
+    chart_colors = []
+
+    # Przygotowujemy listy dla Chart.js i liczymy procenty
+    for entry in category_data:
+        name = entry['category__name'] or "Bez kategorii"
+        color = entry['category__color'] or "#6c757d"
+        total_val = float(entry['total'])
+
+        # Obliczanie procentu w widoku (bezpieczne, bez mathfilters!)
+        percentage = (total_val / float(total_amount) * 100) if total_amount > 0 else 0
+        entry['percentage'] = percentage
+
+        chart_labels.append(name)
+        chart_values.append(total_val)
+        chart_colors.append(color)
+
+    context = {
+        'ledger': ledger,
+        'total_amount': total_amount,
+        'total_budget': total_budget,
+        'chart_labels': chart_labels,
+        'chart_values': chart_values,
+        'chart_colors': chart_colors,
+        'category_stats': category_data,
+    }
+    return render(request, 'budget/ledger_detail.html', context)

@@ -11,16 +11,16 @@
     .pln-input { background-color: #141517; border: 1px solid #373a40; color: white; }
     .add-btn-sm { padding: 2px 8px; font-size: 12px; }
 </style>
-<div class="container-fluid budget-bg py-4 min-vh-100">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="font-weight-bold pln-100-text mb-0"><i class="fas fa-wallet mr-2"></i>Moje Budżety</h2>
+<div class="container-fluid budget-bg py-2 min-vh-100">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="font-weight-bold pln-100-text mb-0"><i class="fas fa-wallet mr-2"></i>Finanse</h2>
 
         <div class="d-flex">
-            <button class="btn btn-outline-info btn-sm mr-2" data-toggle="modal" data-target="#modalCategory">
+            <button class="btn btn-outline-light btn-sm mr-2" data-toggle="modal" data-target="#modalCategory">
                 + Kategoria
             </button>
             <button class="btn pln-100-btn btn-sm" data-toggle="modal" data-target="#modalLedger">
-                <i class="fas fa-plus mr-1"></i> Nowa Dziedzina
+                <i class="fas fa-plus mr-1"></i>Nowy
             </button>
         </div>
     </div>
@@ -31,18 +31,42 @@
             <div class="card pln-card h-100 shadow-lg" style="border-left: 4px solid #316C9A;">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4 class="text-light mb-0 font-weight-bold">{{ ledger.name }}</h4>
-                        <button class="btn btn-outline-secondary add-btn-sm" data-toggle="modal" data-target="#modalSection{{ ledger.id }}">
-                            + sekcja
-                        </button>
+                        <h4 class="text-light mb-0 font-weight-bold">
+                            <a href="{% url 'budget:ledger_detail' ledger.pk %}" class="text-light text-decoration-none">
+                                <i class="fas fa-wallet mr-2"></i>{{ ledger.name }}
+                            </a>
+                        </h4>
+
+                        <div class="d-flex align-items-center">
+                            <button class="btn btn-outline-light btn-sm" data-toggle="modal" data-target="#modalSection{{ ledger.id }}">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            {% if ledger.sections.count == 0 %}
+                                <form action="{% url 'budget:delete_ledger' ledger.pk %}" method="POST" class="mr-2" onsubmit="return confirm('Usunąć pustą dziedzinę?')">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-link text-danger" style="opacity: 0.6;" title="Usuń pustą dziedzinę">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            {% endif %}
+
+                        </div>
                     </div>
 
                     <div class="list-group list-group-flush">
                         {% for section in ledger.sections.all|dictsort:"order" %}
-                        <a href="{% url 'budget:section_detail' section.pk %}" class="list-group-item list-group-item-action bg-transparent text-light border-secondary d-flex justify-content-between align-items-center px-0">
-                            <span><i class="far fa-folder-open mr-2 text-muted"></i>{{ section.name }}</span>
-                            <i class="fas fa-chevron-right text-muted small"></i>
-                        </a>
+                            <div class="list-group-item bg-transparent border-secondary px-0 d-flex justify-content-between align-items-center">
+                                <a href="{% url 'budget:section_detail' section.pk %}" class="text-light flex-grow-1" style="text-decoration: none;">
+                                    <i class="far fa-folder-open mr-2 text-muted"></i>{{ section.name }}
+                                </a>
+
+                                <form action="{% url 'budget:delete_section' section.pk %}" method="POST" onsubmit="return confirm('Czy na pewno usunąć sekcję {{ section.name }} i WSZYSTKIE jej wydatki?')">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-link text-danger p-0 px-2" style="opacity: 0.5; font-size: 0.8rem;">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </form>
+                            </div>
                         {% empty %}
                         <p class="text-muted small mt-2">Brak sekcji (np. miesięcy).</p>
                         {% endfor %}

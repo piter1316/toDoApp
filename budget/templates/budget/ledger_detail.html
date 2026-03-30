@@ -1,0 +1,124 @@
+{% extends 'todo/base.html' %}
+{% load l10n %}
+
+{% block body %}
+<style>
+    /* Motyw PLN Dark - podstawa */
+    .budget-bg { background-color: #1a1b1e; color: #e9ecef; }
+    .pln-card { background-color: #25262b; border: 1px solid #373a40; border-radius: 8px; }
+    .pln-200-text { color: #d4af37; font-weight: 800; }
+</style>
+
+<div class="container-fluid budget-bg py-4 min-vh-100">
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+    <div class="mb-3 mb-md-0 text-center text-md-left">
+        <a href="{% url 'budget:budget_dashboard' %}" class="text-muted text-decoration-none small">
+            <i class="fas fa-arrow-left mr-1"></i> Wróć do kokpitu
+        </a>
+        <h2 class="font-weight-bold text-light mt-1 mb-0 text-truncate">
+            <i class="fas fa-wallet text-info mr-2"></i>{{ ledger.name }}
+        </h2>
+    </div>
+
+    <div class="pln-card p-2 px-3 shadow-sm border-info mx-auto mx-md-0"
+         style="border-left: 3px solid #17a2b8 !important; min-width: 200px;">
+        <div class="text-center text-md-right">
+            <small class="text-muted text-uppercase d-block" style="font-size: 0.65rem; letter-spacing: 1px;">Wydano łącznie</small>
+            <h3 class="pln-200-text mb-0" style="font-size: 1.5rem;">
+                {{ total_amount|floatformat:"2" }} <small class="text-muted" style="font-size: 0.9rem;">zł</small>
+            </h3>
+            <small class="text-muted d-block" style="font-size: 0.7rem;">Zaplanowany budżet: {{ total_budget|floatformat:"0" }} zł</small>
+        </div>
+    </div>
+</div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card pln-card shadow-lg p-3">
+                <h5 class="text-light mb-4"><i class="fas fa-chart-pie mr-2 text-info"></i>Globalna analiza wydatków</h5>
+
+                <div class="row align-items-center">
+                    <div class="col-md-5 mb-4 mb-md-0 d-flex justify-content-center align-items-center" style="position: relative;">
+                        <div style="width: 100%; max-width: 300px; height: 300px;">
+                            <canvas id="ledgerDoughnutChart"></canvas>
+                        </div>
+                        <div class="text-center" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1;">
+                            <small class="text-muted text-uppercase d-block" style="font-size: 0.7rem; letter-spacing: 1px;">Suma</small>
+                            <h3 class="pln-200-text mb-0 font-weight-bold" style="font-size: 1.6rem;">{{ total_amount|floatformat:"0" }} <span class="text-muted" style="font-size: 1rem;">zł</span></h3>
+                        </div>
+                    </div>
+
+                    <div class="col-md-7">
+                        <div class="list-group list-group-flush pr-2" >
+                            {% for stat in category_stats %}
+                            <div class="list-group-item bg-transparent text-light border-secondary d-flex justify-content-between align-items-center px-0 py-2">
+                                <div class="d-flex align-items-center text-truncate">
+                                    <div style="width: 6px; height: 24px; background-color: {{ stat.category__color|default:'#6c757d' }}; border-radius: 4px;" class="mr-3"></div>
+                                    <div class="text-truncate">
+                                        <span class="font-weight-bold">{{ stat.category__name|default:"Bez kategorii" }}</span>
+                                        <small class="text-muted d-block">{{ stat.count }} wydatków w całej dziedzinie</small>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <span class="font-weight-bold pln-200-text" style="font-size: 1.1rem;">{{ stat.total|floatformat:"2" }} zł</span>
+                                    <small class="text-muted d-block">{{ stat.percentage|floatformat:"0" }}%</small>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="text-center text-muted py-4">Brak wydatków w tej dziedzinie.</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% block extra_scripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var ctx = document.getElementById('ledgerDoughnutChart').getContext('2d');
+
+            var chartData = {
+                labels: {{ chart_labels|safe }},
+                datasets: [{
+                    data: {{ chart_values|safe }},
+                    backgroundColor: {{ chart_colors|safe }},
+                    borderColor: '#1a1b1e',
+                    borderWidth: 3,
+                    hoverBorderColor: '#fff',
+                    hoverBorderWidth: 1,
+                }]
+            };
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: chartData,
+                options: {
+                    cutoutPercentage: 80,
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    legend: { display: false },
+                    tooltips: {
+                        backgroundColor: '#25262b',
+                        titleFontColor: '#8898aa',
+                        bodyFontColor: '#fff',
+                        borderColor: '#373a40',
+                        borderWidth: 1,
+                        xPadding: 12,
+                        yPadding: 12,
+                    },
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}
+
+{% endblock %}
+
