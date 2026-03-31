@@ -54,7 +54,7 @@
                         <small class="text-muted text-uppercase d-block" style="font-size: 0.7rem;">Wydano</small>
                         <h5 class="pln-200-text mb-0" style="font-weight: bold;">{{ total_amount|floatformat:"2" }}
                             {% if section.budget_cash or section.budget_account %}
-                                <small class="text-muted d-block d-md-inline small">/ {{ section.budget_cash|add:section.budget_account }}</small>
+                                <small class="text-muted d-block d-md-inline small">/ {{ section.total_budget|floatformat:"2" }}</small>
                             {% endif %}
                         </h5>
 
@@ -169,12 +169,17 @@
 
                 <div class="row align-items-center">
                     <div class="col-md-5 mb-4 mb-md-0 d-flex justify-content-center align-items-center" style="position: relative;">
-                        <div style="width: 100%; max-width: 300px; height: 300px;">
-                            <canvas id="categoryDoughnutChart"></canvas>
-                        </div>
-                        <div class="text-center" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1;">
-                            <small class="text-muted text-uppercase d-block" style="font-size: 0.7rem; letter-spacing: 1px;">Suma</small>
-                            <h3 class="pln-200-text mb-0 font-weight-bold" style="font-size: 1.6rem;">{{ total_amount|floatformat:"0" }} <span class="text-muted" style="font-size: 1rem;">zł</span></h3>
+                        <div style="position: relative; width: 100%; max-width: 300px; margin: 0 auto;">
+                            <div style="position: relative; z-index: 10;">
+                                <canvas id="categoryDoughnutChart" style="height: 300px; width: 300px;"></canvas>
+                            </div>
+
+                            <div class="text-center" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1; pointer-events: none; width: 100%;">
+                                <small class="text-muted text-uppercase d-block" style="font-size: 0.7rem; letter-spacing: 1px;">Suma</small>
+                                <h3 class="pln-200-text mb-0 font-weight-bold" style="font-size: 1.6rem;">
+                                    {{ total_amount|floatformat:2 }} <span class="text-muted" style="font-size: 1rem;">zł</span>
+                                </h3>
+                            </div>
                         </div>
                     </div>
 
@@ -263,20 +268,49 @@
                 type: 'doughnut',
                 data: chartData,
                 options: {
-                    cutoutPercentage: 80, // Bardzo cienki pierścień (nowoczesny wygląd)
+                    cutoutPercentage: 80,
                     responsive: true,
-                    maintainAspectRatio: false, // Pozwala na sztywny rozmiar w divie
-                    legend: {
-                        display: false // Wyłączamy domyślną legendę
-                    },
+                    maintainAspectRatio: false,
+                    legend: { display: false },
                     tooltips: {
-                        backgroundColor: '#25262b', // Ciemny tooltip
+                        backgroundColor: '#25262b',
                         titleFontColor: '#8898aa',
                         bodyFontColor: '#fff',
                         borderColor: '#373a40',
                         borderWidth: 1,
                         xPadding: 12,
                         yPadding: 12,
+                        // Tutaj dodajemy własny format dymka
+                        callbacks: {
+                            label: function(tooltipItem, data) {
+                                // 1. Pobieramy nazwę kategorii
+                                var label = data.labels[tooltipItem.index] || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+
+                                // 2. Pobieramy dane i konkretną kwotę
+                                var dataset = data.datasets[tooltipItem.datasetIndex];
+                                var currentValue = dataset.data[tooltipItem.index];
+
+                                // 3. Liczymy całkowitą sumę wydatków na wykresie
+                                var total = dataset.data.reduce(function(previousValue, currentVal) {
+                                    return parseFloat(previousValue) + parseFloat(currentVal);
+                                }, 0);
+
+                                // 4. Obliczamy procenty (z jednym miejscem po przecinku)
+                                var percentage = 0;
+                                if (total > 0) {
+                                    percentage = ((currentValue / total) * 100).toFixed(1);
+                                }
+
+                                // 5. Formatujemy kwotę (np. dodajemy .00 na końcu)
+                                var formattedValue = parseFloat(currentValue).toFixed(2);
+
+                                // Zwracamy gotowy tekst do dymka
+                                return label + formattedValue + ' zł (' + percentage + '%)';
+                            }
+                        }
                     },
                     animation: {
                         animateScale: true,

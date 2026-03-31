@@ -33,6 +33,10 @@ class Section(models.Model):
     def __str__(self):
         return f"{self.ledger.name} - {self.name}"
 
+    @property
+    def total_budget(self):
+        return self.budget_account + self.budget_cash
+
 
 class Expense(models.Model):
     title = models.CharField(max_length=255)

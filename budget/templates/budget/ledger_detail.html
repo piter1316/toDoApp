@@ -7,6 +7,16 @@
     .budget-bg { background-color: #1a1b1e; color: #e9ecef; }
     .pln-card { background-color: #25262b; border: 1px solid #373a40; border-radius: 8px; }
     .pln-200-text { color: #d4af37; font-weight: 800; }
+    .chart-container, canvas {
+    position: relative;
+    z-index: 10 !important;
+}
+
+    /* Kontener z Twoją sumą spychamy niżej */
+    .total-sum-container {
+        position: relative;
+        z-index: 1 !important;
+    }
 </style>
 
 <div class="container-fluid budget-bg py-4 min-vh-100">
@@ -40,12 +50,18 @@
 
                 <div class="row align-items-center">
                     <div class="col-md-5 mb-4 mb-md-0 d-flex justify-content-center align-items-center" style="position: relative;">
-                        <div style="width: 100%; max-width: 300px; height: 300px;">
-                            <canvas id="ledgerDoughnutChart"></canvas>
-                        </div>
-                        <div class="text-center" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1;">
-                            <small class="text-muted text-uppercase d-block" style="font-size: 0.7rem; letter-spacing: 1px;">Suma</small>
-                            <h3 class="pln-200-text mb-0 font-weight-bold" style="font-size: 1.6rem;">{{ total_amount|floatformat:"0" }} <span class="text-muted" style="font-size: 1rem;">zł</span></h3>
+                        <div style="position: relative; width: 100%; max-width: 300px; margin: 0 auto;">
+
+                            <div style="position: relative; z-index: 10;">
+                                <canvas id="ledgerDoughnutChart" style="height: 300px; width: 300px;"></canvas>
+                            </div>
+
+                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1; text-align: center; pointer-events: none;">
+                                <small class="text-muted text-uppercase" style="font-size: 0.7rem; letter-spacing: 1px; display: block;">Suma</small>
+                                <h3 class="pln-200-text mb-0" style="font-size: 1.4rem; font-weight: bold; margin: 0;">
+                                    {{ total_amount|floatformat:2 }} <span class="text-muted" style="font-size: 0.9rem;">zł</span>
+                                </h3>
+                            </div>
                         </div>
                     </div>
 
@@ -109,6 +125,37 @@
                         borderWidth: 1,
                         xPadding: 12,
                         yPadding: 12,
+                        // Tutaj dodajemy własny format dymka
+                        callbacks: {
+                            label: function(tooltipItem, data) {
+                                // 1. Pobieramy nazwę kategorii
+                                var label = data.labels[tooltipItem.index] || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+
+                                // 2. Pobieramy dane i konkretną kwotę
+                                var dataset = data.datasets[tooltipItem.datasetIndex];
+                                var currentValue = dataset.data[tooltipItem.index];
+
+                                // 3. Liczymy całkowitą sumę wydatków na wykresie
+                                var total = dataset.data.reduce(function(previousValue, currentVal) {
+                                    return parseFloat(previousValue) + parseFloat(currentVal);
+                                }, 0);
+
+                                // 4. Obliczamy procenty (z jednym miejscem po przecinku)
+                                var percentage = 0;
+                                if (total > 0) {
+                                    percentage = ((currentValue / total) * 100).toFixed(1);
+                                }
+
+                                // 5. Formatujemy kwotę (np. dodajemy .00 na końcu)
+                                var formattedValue = parseFloat(currentValue).toFixed(2);
+
+                                // Zwracamy gotowy tekst do dymka
+                                return label + formattedValue + ' zł (' + percentage + '%)';
+                            }
+                        }
                     },
                     animation: {
                         animateScale: true,
