@@ -25,8 +25,37 @@
                 <div class="mb-3 mb-md-0">
                     <h5 class="text-muted mb-0" style="font-size: 0.9rem;">{{ section.ledger.name }}</h5>
                     <h2 class="font-weight-bold mb-0 text-light" style="font-size: 1.5rem;">{{ section.name }}</h2>
+                    <script>
+                        function toggleIncome(sectionId, originalValue) {
+                            const incomeElement = document.getElementById(`income-value-${sectionId}`);
+                            const iconElement = document.getElementById(`income-icon-${sectionId}`);
+
+                            // Sprawdzamy, czy obecnie ukryte (czy są tam gwiazdki)
+                            if (incomeElement.innerText.includes('***')) {
+                                // POKAZUJEMY: Przywracamy wartość
+                                incomeElement.innerText = `Dochód: ${originalValue} zł`;
+                                iconElement.classList.remove('fa-eye-slash');
+                                iconElement.classList.add('fa-eye');
+                            } else {
+                                // UKRYWAMY: Zamieniamy na gwiazdki
+                                incomeElement.innerText = 'Dochód: **** zł';
+                                iconElement.classList.remove('fa-eye');
+                                iconElement.classList.add('fa-eye-slash');
+                            }
+                        }
+                        </script>
                     {% if section.income %}
-                        <small class="text-success font-weight-bold">Dochód: {{ section.income }} zł</small>
+                        <div class="d-inline-flex align-items-center">
+                            <small class="text-success font-weight-bold mr-2" id="income-value-{{ section.id }}">
+                                Dochód: {{ section.income }} zł
+                            </small>
+
+                            <a href="javascript:void(0);"
+                               onclick="toggleIncome({{ section.id }}, '{{ section.income }}')"
+                               style="text-decoration: none; color: #8898aa;">
+                                <i class="far fa-eye" id="income-icon-{{ section.id }}"></i>
+                            </a>
+                        </div>
                     {% endif %}
                 </div>
 

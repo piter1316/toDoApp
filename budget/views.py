@@ -3,8 +3,9 @@ from decimal import Decimal
 from django.db.models import Sum, Count
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
 from .models import Ledger, Section, Expense, Category
+from collections import defaultdict
+
 
 
 @login_required
@@ -223,8 +224,33 @@ def ledger_detail(request, pk):
         chart_values.append(total_val)
         chart_colors.append(color)
 
+    expenses_by_category = defaultdict(list)
+    expenses = Expense.objects.filter(
+        section__ledger=ledger
+    ).select_related('category').order_by('-date')
+
+    # Grupowanie danych w Pythonie
+    grouped_data = {}
+    for exp in expenses:
+        cat = exp.category
+        if cat not in grouped_data:
+            grouped_data[cat] = {
+                'category': cat,
+                'expenses': [],
+                'total': 0
+            }
+        grouped_data[cat]['expenses'].append(exp)
+        grouped_data[cat]['total'] += exp.amount
+    sorted_categories = sorted(
+        grouped_data.values(),
+        key=lambda x: x['total'],
+        reverse=True
+    )
+
     context = {
         'ledger': ledger,
+        'expenses_by_category': sorted_categories,
+        'total_amount_expenses': sum(item['total'] for item in grouped_data.values()),
         'total_amount': total_amount,
         'total_budget': total_budget,
         'chart_labels': chart_labels,
