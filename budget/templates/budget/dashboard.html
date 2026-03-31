@@ -32,7 +32,11 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div class="d-flex align-items-center">
-                            <h5 class="mb-0 mr-3">{{ ledger.name }}</h5>
+                            <h5 class="mb-0 mr-3">
+                                <a href="{% url 'budget:ledger_detail' ledger.pk %}" class="text-light text-decoration-none">
+                                <i class="fas fa-wallet mr-2"></i>{{ ledger.name }}
+                            </a>
+                            </h5>
 
                             <div class="btn-group">
                                 {% if not forloop.first %}
