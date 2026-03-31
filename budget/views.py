@@ -8,12 +8,13 @@ from collections import defaultdict
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from .models import UserSettings
+from django.shortcuts import redirect
 
 
 @login_required
 def budget_dashboard(request):
     # Pobieramy wszystkie dziedziny zalogowanego użytkownika
-    ledgers = Ledger.objects.filter(user=request.user).prefetch_related('sections')
+    ledgers = Ledger.objects.filter(user=request.user).order_by('sort_order', '-created_at')
     categories = Category.objects.filter(user=request.user)
     return render(request, 'budget/dashboard.html', {'ledgers': ledgers, 'categories': categories})
 
@@ -270,3 +271,33 @@ def toggle_income_setting(request):
     settings.hide_income = not settings.hide_income
     settings.save()
     return JsonResponse({'hide_income': settings.hide_income})
+
+
+def move_ledger(request, ledger_id, direction):
+    ledger = get_object_or_404(Ledger, id=ledger_id, user=request.user)
+
+    # Szukamy sąsiada w zależności od kierunku
+    if direction == 'up':
+        # Sąsiad "wyżej" to ten z mniejszym sort_order (ale najbliższy)
+        neighbor = Ledger.objects.filter(
+            user=request.user,
+            sort_order__lt=ledger.sort_order
+        ).order_by('-sort_order').first()
+    else:
+        # Sąsiad "niżej" to ten z większym sort_order (ale najbliższy)
+        neighbor = Ledger.objects.filter(
+            user=request.user,
+            sort_order__gt=ledger.sort_order
+        ).order_by('sort_order').first()
+
+    if neighbor:
+        # Klasyczna zamiana wartości (swap)
+        old_order = ledger.sort_order
+        ledger.sort_order = neighbor.sort_order
+        neighbor.sort_order = old_order
+
+        ledger.save()
+        neighbor.save()
+
+    return redirect('budget:budget_dashboard')
+

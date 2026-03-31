@@ -31,11 +31,31 @@
             <div class="card pln-card h-100 shadow-lg" style="border-left: 4px solid #316C9A;">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4 class="text-light mb-0 font-weight-bold">
-                            <a href="{% url 'budget:ledger_detail' ledger.pk %}" class="text-light text-decoration-none">
-                                <i class="fas fa-wallet mr-2"></i>{{ ledger.name }}
-                            </a>
-                        </h4>
+                        <div class="d-flex align-items-center">
+                            <h5 class="mb-0 mr-3">{{ ledger.name }}</h5>
+
+                            <div class="btn-group">
+                                {% if not forloop.first %}
+                                    <a href="{% url 'budget:move_ledger' ledger.id 'up' %}" class="btn btn-sm text-secondary">
+                                        <i class="fas fa-chevron-up"></i>
+                                    </a>
+                                {% else %}
+                                    <span class="btn btn-sm text-muted" style="opacity: 0.3; cursor: not-allowed;">
+                                        <i class="fas fa-chevron-up"></i>
+                                    </span>
+                                {% endif %}
+
+                                {% if not forloop.last %}
+                                    <a href="{% url 'budget:move_ledger' ledger.id 'down' %}" class="btn btn-sm text-secondary">
+                                        <i class="fas fa-chevron-down"></i>
+                                    </a>
+                                {% else %}
+                                    <span class="btn btn-sm text-muted" style="opacity: 0.3; cursor: not-allowed;">
+                                        <i class="fas fa-chevron-down"></i>
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
 
                         <div class="d-flex align-items-center">
                             <button class="btn btn-outline-light btn-sm" data-toggle="modal" data-target="#modalSection{{ ledger.id }}">

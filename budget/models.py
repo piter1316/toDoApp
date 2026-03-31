@@ -15,9 +15,23 @@ class Ledger(models.Model):
     name = models.CharField(max_length=200)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+    sort_order = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ['sort_order', '-created_at']
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.id:  # Tylko przy tworzeniu nowego obiektu
+            min_order = Ledger.objects.filter(user=self.user).aggregate(models.Min('sort_order'))[
+                'sort_order__min']
+            if min_order is not None:
+                self.sort_order = min_order - 1
+            else:
+                self.sort_order = 0
+        super().save(*args, **kwargs)
 
 
 class Section(models.Model):
