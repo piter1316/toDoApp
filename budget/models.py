@@ -53,6 +53,9 @@ class Expense(models.Model):
         return f"{self.title} - {self.amount} zł"
 
 
-from django.db import models
+class UserSettings(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='settings')
+    hide_income = models.BooleanField(default=False)
 
-# Create your models here.
+    def __str__(self):
+        return f"Ustawienia {self.user.username}"

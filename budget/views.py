@@ -5,7 +5,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from .models import Ledger, Section, Expense, Category
 from collections import defaultdict
-
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from .models import UserSettings
 
 
 @login_required
@@ -259,3 +261,12 @@ def ledger_detail(request, pk):
         'category_stats': category_data,
     }
     return render(request, 'budget/ledger_detail.html', context)
+
+
+@require_POST
+def toggle_income_setting(request):
+    # Pobieramy ustawienia (tworzymy je, jeśli nie istnieją)
+    settings, created = UserSettings.objects.get_or_create(user=request.user)
+    settings.hide_income = not settings.hide_income
+    settings.save()
+    return JsonResponse({'hide_income': settings.hide_income})

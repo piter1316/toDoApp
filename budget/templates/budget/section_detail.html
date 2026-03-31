@@ -25,38 +25,66 @@
                 <div class="mb-3 mb-md-0">
                     <h5 class="text-muted mb-0" style="font-size: 0.9rem;">{{ section.ledger.name }}</h5>
                     <h2 class="font-weight-bold mb-0 text-light" style="font-size: 1.5rem;">{{ section.name }}</h2>
-                    <script>
-                        function toggleIncome(sectionId, originalValue) {
-                            const incomeElement = document.getElementById(`income-value-${sectionId}`);
-                            const iconElement = document.getElementById(`income-icon-${sectionId}`);
-
-                            // Sprawdzamy, czy obecnie ukryte (czy są tam gwiazdki)
-                            if (incomeElement.innerText.includes('***')) {
-                                // POKAZUJEMY: Przywracamy wartość
-                                incomeElement.innerText = `Dochód: ${originalValue} zł`;
-                                iconElement.classList.remove('fa-eye-slash');
-                                iconElement.classList.add('fa-eye');
-                            } else {
-                                // UKRYWAMY: Zamieniamy na gwiazdki
-                                incomeElement.innerText = 'Dochód: **** zł';
-                                iconElement.classList.remove('fa-eye');
-                                iconElement.classList.add('fa-eye-slash');
-                            }
-                        }
-                        </script>
                     {% if section.income %}
                         <div class="d-inline-flex align-items-center">
-                            <small class="text-success font-weight-bold mr-2" id="income-value-{{ section.id }}">
-                                Dochód: {{ section.income }} zł
+                            <small class="text-success font-weight-bold mr-2"
+                                   id="income-value-{{ section.id }}"
+                                   data-income="{{ section.income }}"
+                                   style="font-family: monospace;">
+                                {% if user.settings.hide_income %}
+                                    Dochód: ****,** zł
+                                {% else %}
+                                    Dochód: {{ section.income }} zł
+                                {% endif %}
                             </small>
 
                             <a href="javascript:void(0);"
-                               onclick="toggleIncome({{ section.id }}, '{{ section.income }}')"
+                               onclick="toggleIncomeGlobal({{ section.id }})"
                                style="text-decoration: none; color: #8898aa;">
-                                <i class="far fa-eye" id="income-icon-{{ section.id }}"></i>
+                                <i class="far {% if user.settings.hide_income %}fa-eye-slash{% else %}fa-eye{% endif %}"
+                                   id="income-icon-{{ section.id }}"></i>
                             </a>
                         </div>
-                    {% endif %}
+                        {% endif %}
+
+                    <script>
+                    function toggleIncomeGlobal(sectionId) {
+                        fetch('{% url "budget:toggle_income_setting" %}', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': '{{ csrf_token }}',
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            // Znajdujemy wszystkie pola dochodu na stronie
+                            const allIncomeValues = document.querySelectorAll('[id^="income-value-"]');
+                            const allIcons = document.querySelectorAll('[id^="income-icon-"]');
+
+                            allIncomeValues.forEach(el => {
+                                // Pobieramy ukrytą wartość z atrybutu data
+                                const rawValue = el.getAttribute('data-income');
+
+                                if (data.hide_income) {
+                                    el.innerText = 'Dochód:  ****,** zł';
+                                } else {
+                                    el.innerText = `Dochód: ${rawValue} zł`;
+                                }
+                            });
+
+                            // Podmieniamy wszystkie ikonki oczu
+                            allIcons.forEach(icon => {
+                                if (data.hide_income) {
+                                    icon.classList.replace('fa-eye', 'fa-eye-slash');
+                                } else {
+                                    icon.classList.replace('fa-eye-slash', 'fa-eye');
+                                }
+                            });
+                        })
+                        .catch(error => console.error('Błąd AJAX:', error));
+                    }
+                    </script>
                 </div>
 
                 <div class="d-flex flex-row flex-nowrap justify-content-center text-center">
