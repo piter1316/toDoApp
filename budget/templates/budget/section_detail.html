@@ -18,7 +18,7 @@
 </style>
 
 <div class="container-fluid budget-bg py-4 min-vh-100">
-    <div class="row mb-4">
+    <div class="row mb-4" id="budget-header-row">
         <div class="col-md-12">
             <div class="card pln-card p-3 shadow-sm d-flex flex-column flex-md-row justify-content-between align-items-center text-center text-md-left">
 
@@ -135,7 +135,7 @@
         <div class="col-12 col-md-4 mb-4">
             <div class="card pln-card p-3 shadow-sm">
                 <h5 class="text-light mb-3"><i class="fas fa-plus-circle mr-2 pln-100-text"></i>Dodaj wydatek</h5>
-                <form method="POST">
+                <form method="POST" class="ajax-form">
                     {% csrf_token %}
                     <div class="form-group">
                         <label class="text-muted small">Data</label>
@@ -169,7 +169,7 @@
         </div>
 
         <div class="col-12 col-md-8">
-            <div class="card pln-card p-0 shadow-sm">
+            <div class="card pln-card p-0 shadow-sm" id="expense-list-container">
                 <div class="table-responsive">
                     <table class="table table-dark table-hover mb-0" style="background-color: transparent;">
                     <thead style="background-color: #1a1b1e; border-bottom: 2px solid #373a40;">
@@ -200,7 +200,7 @@
                                     {{ expense.amount|floatformat:"2" }}
                                 </td>
                                 <td class="align-middle text-center">
-                                    <form action="{% url 'budget:delete_expense' expense.pk %}" method="POST" onsubmit="return confirm('Usunąć ten wydatek?')">
+                                    <form action="{% url 'budget:delete_expense' expense.pk %}" class="ajax-form" method="POST" onsubmit="return confirm('Usunąć ten wydatek?')">
                                         {% csrf_token %}
                                         <button type="submit" class="btn btn-link text-danger p-0 m-0" style="text-decoration: none; opacity: 0.6;">
                                             <i class="fas fa-times"></i>
@@ -219,7 +219,7 @@
             </div>
         </div>
     </div>
-    <div class="row mt-4 mb-5">
+    <div class="row mt-4 mb-5" id="analysis-section">
         <div class="col-12">
             <div class="card pln-card shadow-lg p-3">
                 <h5 class="text-light mb-4"><i class="fas fa-chart-pie mr-2 text-info"></i>Analiza wydatków wg kategorii</h5>
@@ -276,7 +276,7 @@
 <div class="modal fade" id="modalBudgetEdit" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content pln-card text-light">
-            <form action="{% url 'budget:edit_section_budget' section.pk %}" method="POST">
+            <form action="{% url 'budget:edit_section_budget' section.pk %}" class="ajax-form" method="POST" data-modal="#modalBudgetEdit">
                 {% csrf_token %}
                 <div class="modal-header border-secondary">
                     <h5 class="modal-title">Budżet dla: {{ section.name }}</h5>
@@ -305,77 +305,166 @@
 
 {% block extra_scripts %}
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var ctx = document.getElementById('categoryDoughnutChart').getContext('2d');
+    function renderChart() {
+        var canvas = document.getElementById('categoryDoughnutChart');
+        if (!canvas) return;
+        var ctx = canvas.getContext('2d');
 
-            // Konfiguracja kolorów i efektów
-            var chartData = {
-                labels: {{ chart_labels|safe }},
-                datasets: [{
-                    data: {{ chart_values|safe }},
-                    backgroundColor: {{ chart_colors|safe }},
-                    borderColor: '#1a1b1e', // Kolor tła aplikacji, żeby oddzielić paski
-                    borderWidth: 3, // Gruba ramka daje efekt "segmentów"
-                    hoverBorderColor: '#fff', // Biała ramka przy najechaniu
-                    hoverBorderWidth: 1,
-                }]
-            };
+        // Konfiguracja kolorów i efektów
+        var chartData = {
+            labels: {{ chart_labels|safe }},
+            datasets: [{
+                data: {{ chart_values|safe }},
+                backgroundColor: {{ chart_colors|safe }},
+                borderColor: '#1a1b1e', // Kolor tła aplikacji, żeby oddzielić paski
+                borderWidth: 3, // Gruba ramka daje efekt "segmentów"
+                hoverBorderColor: '#fff', // Biała ramka przy najechaniu
+                hoverBorderWidth: 1,
+            }]
+        };
 
-            var myDoughnutChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: chartData,
-                options: {
-                    cutoutPercentage: 80,
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    legend: { display: false },
-                    tooltips: {
-                        backgroundColor: '#25262b',
-                        titleFontColor: '#8898aa',
-                        bodyFontColor: '#fff',
-                        borderColor: '#373a40',
-                        borderWidth: 1,
-                        xPadding: 12,
-                        yPadding: 12,
-                        // Tutaj dodajemy własny format dymka
-                        callbacks: {
-                            label: function(tooltipItem, data) {
-                                // 1. Pobieramy nazwę kategorii
-                                var label = data.labels[tooltipItem.index] || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-
-                                // 2. Pobieramy dane i konkretną kwotę
-                                var dataset = data.datasets[tooltipItem.datasetIndex];
-                                var currentValue = dataset.data[tooltipItem.index];
-
-                                // 3. Liczymy całkowitą sumę wydatków na wykresie
-                                var total = dataset.data.reduce(function(previousValue, currentVal) {
-                                    return parseFloat(previousValue) + parseFloat(currentVal);
-                                }, 0);
-
-                                // 4. Obliczamy procenty (z jednym miejscem po przecinku)
-                                var percentage = 0;
-                                if (total > 0) {
-                                    percentage = ((currentValue / total) * 100).toFixed(1);
-                                }
-
-                                // 5. Formatujemy kwotę (np. dodajemy .00 na końcu)
-                                var formattedValue = parseFloat(currentValue).toFixed(2);
-
-                                // Zwracamy gotowy tekst do dymka
-                                return label + formattedValue + ' zł (' + percentage + '%)';
+        var myDoughnutChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: chartData,
+            options: {
+                cutoutPercentage: 80,
+                responsive: true,
+                maintainAspectRatio: false,
+                legend: { display: false },
+                tooltips: {
+                    backgroundColor: '#25262b',
+                    titleFontColor: '#8898aa',
+                    bodyFontColor: '#fff',
+                    borderColor: '#373a40',
+                    borderWidth: 1,
+                    xPadding: 12,
+                    yPadding: 12,
+                    // Tutaj dodajemy własny format dymka
+                    callbacks: {
+                        label: function(tooltipItem, data) {
+                            // 1. Pobieramy nazwę kategorii
+                            var label = data.labels[tooltipItem.index] || '';
+                            if (label) {
+                                label += ': ';
                             }
+
+                            // 2. Pobieramy dane i konkretną kwotę
+                            var dataset = data.datasets[tooltipItem.datasetIndex];
+                            var currentValue = dataset.data[tooltipItem.index];
+
+                            // 3. Liczymy całkowitą sumę wydatków na wykresie
+                            var total = dataset.data.reduce(function(previousValue, currentVal) {
+                                return parseFloat(previousValue) + parseFloat(currentVal);
+                            }, 0);
+
+                            // 4. Obliczamy procenty (z jednym miejscem po przecinku)
+                            var percentage = 0;
+                            if (total > 0) {
+                                percentage = ((currentValue / total) * 100).toFixed(1);
+                            }
+
+                            // 5. Formatujemy kwotę (np. dodajemy .00 na końcu)
+                            var formattedValue = parseFloat(currentValue).toFixed(2);
+
+                            // Zwracamy gotowy tekst do dymka
+                            return label + formattedValue + ' zł (' + percentage + '%)';
                         }
-                    },
-                    animation: {
-                        animateScale: true,
-                        animateRotate: true
                     }
+                },
+                animation: {
+                    animateScale: true,
+                    animateRotate: true
                 }
-            });
+            }
         });
+    }
+
+    // Wywołaj przy starcie
+    document.addEventListener('DOMContentLoaded', renderChart);
+</script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // Funkcja odświeżająca wykres (wyciągnięta na zewnątrz, by móc ją wywołać po AJAX)
+        function initCategoryChart() {
+            const canvas = document.getElementById('categoryDoughnutChart');
+            if (!canvas) return;
+
+            // Musimy pobrać nowe dane z atrybutów lub skryptu (najprościej przeładować skrypt Chart.js)
+            // W tym przypadku Chart.js korzysta z zmiennych Django, które są wstrzykiwane do HTML.
+            // Po AJAXie musimy pobrać te wartości z nowego HTML.
+        }
+
+        async function handleAjaxSubmit(e) {
+            const form = e.target.closest('.ajax-form') || (e.target.tagName === 'FORM' && e.target);
+            if (!form) return;
+
+            e.preventDefault();
+            const formData = new FormData(form);
+            const modalSelector = form.getAttribute('data-modal');
+
+            try {
+                const response = await fetch(form.action || window.location.href, {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+
+                if (!response.ok) throw new Error('Błąd serwera');
+
+                const html = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+
+                // 1. ZAMYKANIE MODALA (Twardy reset)
+                    if (modalSelector) {
+                        // Próbujemy zamknąć standardowo
+                        $(modalSelector).modal('hide');
+
+                        // Wymuszamy usunięcie efektów wizualnych Bootstrapa, które blokują stronę
+                        setTimeout(() => {
+                            $('body').removeClass('modal-open'); // Odblokowuje scrollowanie
+                            $('.modal-backdrop').remove();       // Usuwa ciemne tło
+                            $(modalSelector).removeClass('show'); // Ukrywa modal wizualnie
+                            $(modalSelector).css('display', 'none'); // Całkowicie wyłącza renderowanie
+                        }, 50); // Małe opóźnienie, żeby Bootstrap zdążył przetworzyć swoje zdarzenia
+                    }
+
+                // 2. PODMIANA ELEMENTÓW
+                const selectors = [
+                    '#budget-header-row',
+                    '#expense-list-container',
+                    '#analysis-section',
+                    '#modalBudgetEdit .modal-content' // Podmieniamy też wnętrze modala, żeby dane były świeże!
+                ];
+
+                selectors.forEach(selector => {
+                    const newEl = doc.querySelector(selector);
+                    const oldEl = document.querySelector(selector);
+                    if (newEl && oldEl) {
+                        oldEl.innerHTML = newEl.innerHTML;
+                    }
+                });
+
+                // 3. CZYSZCZENIE FORMULARZA (jeśli to dodawanie wydatku)
+                if (!form.action.includes('delete') && !modalSelector) {
+                    form.reset();
+                }
+
+                // 4. RE-INICJALIZACJA WYKRESU (jeśli masz funkcję renderChart)
+                if (typeof renderChart === "function") {
+                    renderChart();
+                }
+
+            } catch (error) {
+                console.error('AJAX Error:', error);
+                // Jeśli coś pójdzie nie tak, odświeżamy stronę, żeby nie zostawić użytkownika z błędem
+                window.location.reload();
+            }
+        }
+
+        document.body.addEventListener('submit', handleAjaxSubmit);
+    });
     </script>
 {% endblock %}
 {% endblock %}
