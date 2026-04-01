@@ -78,7 +78,7 @@
                     </div>
 
                     <div class="list-group list-group-flush">
-                        {% for section in ledger.sections.all|dictsort:"order" %}
+                        {% for section in ledger.sections.all|dictsortreversed:"id" %}
                             <div class="list-group-item bg-transparent border-secondary px-0 d-flex justify-content-between align-items-center">
                                 <a href="{% url 'budget:section_detail' section.pk %}" class="text-light flex-grow-1" style="text-decoration: none;">
                                     <i class="far fa-folder-open mr-2 text-muted"></i>{{ section.name }}
