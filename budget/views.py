@@ -199,6 +199,18 @@ def ledger_detail(request, pk):
 
     # Opcjonalnie: Suma całkowitego budżetu ze wszystkich sekcji
     total_budget_account = ledger.sections.aggregate(Sum('budget_account'))['budget_account__sum'] or Decimal('0.00')
+    stats = ledger.sections.aggregate(
+        total_income=Sum('income'),
+        sections_count=Count('id')
+    )
+
+    # Wyciągamy wartości (z zabezpieczeniem przed None)
+    total_income = stats['total_income'] or Decimal('0.00')
+    sections_count = stats['sections_count'] or 0
+    if sections_count > 0:
+        total_income_per_section = Decimal(total_income / sections_count)
+    else:
+        total_income_per_section = 0
     total_budget_cash = ledger.sections.aggregate(Sum('budget_cash'))['budget_cash__sum'] or Decimal('0.00')
     total_budget = total_budget_account + total_budget_cash
 
@@ -258,6 +270,8 @@ def ledger_detail(request, pk):
         'total_amount_expenses': sum(item['total'] for item in grouped_data.values()),
         'total_amount': total_amount,
         'total_budget': total_budget,
+        'total_income': total_income,
+        'total_income_per_section': total_income_per_section,
         'chart_labels': chart_labels,
         'chart_values': chart_values,
         'chart_colors': chart_colors,

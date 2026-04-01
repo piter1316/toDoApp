@@ -38,7 +38,20 @@
             <h3 class="pln-200-text mb-0" style="font-size: 1.5rem;">
                 {{ total_amount|floatformat:"2" }} <small class="text-muted" style="font-size: 0.9rem;">zł</small>
             </h3>
-            <small class="text-muted d-block" style="font-size: 0.7rem;">Zaplanowany budżet: {{ total_budget|floatformat:"0" }} zł</small>
+            <small class="d-block">Zaplanowany budżet:
+                {% if user.settings.hide_income %}****,** {% else %}{{ total_budget|floatformat:"2" }}{% endif%} zł
+            </small>
+            {% if total_income %}
+
+                <small class=" d-block" >Zadeklarowany dochód:
+                    {% if user.settings.hide_income %}****,** {% else %}{{ total_income|floatformat:"2" }}{% endif%} zł
+                </small>
+                {% if total_income_per_section %}
+                    <small class=" d-block" >Zadeklarowany dochód na sekcję:
+                        {% if user.settings.hide_income %}****,** {% else %}{{ total_income_per_section|floatformat:"2" }}{% endif%} zł
+                    </small>
+                {% endif%}
+            {% endif %}
         </div>
     </div>
 </div>
