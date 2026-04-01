@@ -200,7 +200,7 @@
                                     {{ expense.amount|floatformat:"2" }}
                                 </td>
                                 <td class="align-middle text-center">
-                                    <form action="{% url 'budget:delete_expense' expense.pk %}" class="ajax-form" method="POST" onsubmit="return confirm('Usunąć ten wydatek?')">
+                                    <form action="{% url 'budget:delete_expense' expense.pk %}" class="ajax-form" method="POST" data-confirm="Czy na pewno chcesz usunąć ten wydatek?">
                                         {% csrf_token %}
                                         <button type="submit" class="btn btn-link text-danger p-0 m-0" style="text-decoration: none; opacity: 0.6;">
                                             <i class="fas fa-times"></i>
@@ -398,6 +398,11 @@
         async function handleAjaxSubmit(e) {
             const form = e.target.closest('.ajax-form') || (e.target.tagName === 'FORM' && e.target);
             if (!form) return;
+            const confirmMsg = form.getAttribute('data-confirm');
+            if (confirmMsg && !confirm(confirmMsg)) {
+                e.preventDefault(); // Zatrzymuje wysyłkę AJAX
+                return;            // Przerywa funkcję
+            }
 
             e.preventDefault();
             const formData = new FormData(form);

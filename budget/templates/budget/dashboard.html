@@ -81,7 +81,7 @@
                                 <i class="fas fa-plus"></i>
                             </button>
                             {% if ledger.sections.count == 0 %}
-                                <form action="{% url 'budget:delete_ledger' ledger.pk %}" method="POST" class="mr-2 ajax-delete-ledger" onsubmit="return confirm('Usunąć pustą dziedzinę?')">
+                                <form action="{% url 'budget:delete_ledger' ledger.pk %}" method="POST" class="mr-2 ajax-delete-ledger" data-confirm="Usunąć pustą dziedzinę?">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-link text-danger" style="opacity: 0.6;" title="Usuń pustą dziedzinę">
                                         <i class="fas fa-trash-alt"></i>
@@ -102,7 +102,7 @@
                                         <i class="fas fa-thumbtack {% if section.is_pinned %}text-20-pln{% else %}text-muted{% endif %}" style="{% if not section.is_pinned %}opacity: 0.3;{% endif %}"></i>
                                     </a>
 
-                                <form action="{% url 'budget:delete_section' section.pk %}" method="POST" class="ajax-delete-section" onsubmit="return confirm('Czy na pewno usunąć sekcję {{ section.name }} i WSZYSTKIE jej wydatki?')">
+                                <form action="{% url 'budget:delete_section' section.pk %}" method="POST" class="ajax-delete-section" data-confirm="Czy na pewno usunąć sekcję {{ section.name }} i WSZYSTKIE jej wydatki?">
                                     {% csrf_token %}
                                     <input type="hidden" name="ledger_id" value="{{ ledger.id }}"> <button type="submit" class="btn btn-link text-danger p-0 px-2" style="opacity: 0.5; font-size: 0.8rem;">
                                         <i class="fas fa-times"></i>
@@ -232,6 +232,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const form = e.target;
 
         if (form.id === 'form-add-ledger' || form.classList.contains('ajax-delete-ledger')) {
+            const confirmMsg = form.getAttribute('data-confirm');
+            if (confirmMsg && !confirm(confirmMsg)) {
+                e.preventDefault(); // Zatrzymuje wysyłkę AJAX
+                return;            // Przerywa funkcję
+            }
             e.preventDefault();
             fetchAndReplace(form.action, {
                 method: form.method,
@@ -240,16 +245,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         else if (form.classList.contains('ajax-add-section') || form.classList.contains('ajax-delete-section')) {
+            const confirmMsg = form.getAttribute('data-confirm');
+            if (confirmMsg && !confirm(confirmMsg)) {
+                e.preventDefault(); // Zatrzymuje wysyłkę AJAX
+                return;            // Przerywa funkcję
+            }
             e.preventDefault();
-            // Tutaj odświeżamy #dashboard-main-content zamiast tylko karty,
-            // bo dodanie/usunięcie sekcji może wpływać na to, co jest przypięte na górze
+            const ledgerId = form.querySelector('input[name="ledger_id"]').value;
+            const targetId = `#ledger-container-${ledgerId}`;
+            const modalId = `#modalSection${ledgerId}`;
+
             fetchAndReplace(form.action, {
                 method: form.method,
                 body: new FormData(form)
-            }, '#dashboard-main-content', form.closest('.modal') ? `#${form.closest('.modal').id}` : null, form);
+            }, targetId, modalId, form);
         }
 
         else if (form.classList.contains('ajax-category-form')) {
+            const confirmMsg = form.getAttribute('data-confirm');
+            if (confirmMsg && !confirm(confirmMsg)) {
+                e.preventDefault(); // Zatrzymuje wysyłkę AJAX
+                return;            // Przerywa funkcję
+            }
             e.preventDefault();
             fetchAndReplace(form.action, {
                 method: form.method,
