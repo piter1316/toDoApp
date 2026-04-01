@@ -134,18 +134,18 @@
     <div class="row">
         <div class="col-12 col-md-4 mb-4">
             <div class="card pln-card p-3 shadow-sm">
-                <h5 class="text-light mb-3"><i class="fas fa-plus-circle mr-2 pln-100-text"></i>Dodaj wydatek</h5>
+                <h5 class="text-light mb-1"><i class="fas fa-plus-circle mr-2 pln-100-text"></i>Dodaj wydatek</h5>
                 <form method="POST" class="ajax-form">
                     {% csrf_token %}
-                    <div class="form-group">
+                    <div class="form-group mb-1">
                         <label class="text-muted small">Data</label>
                         <input type="date" name="date" class="form-control pln-input form-control-sm" value="{{ today|date:'Y-m-d' }}" required>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group mb-1">
                         <label class="text-muted small">Co kupiłeś?</label>
                         <input type="text" name="title" class="form-control pln-input form-control-sm" required>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group mb-1">
                         <label class="text-muted small">Kategoria</label>
                         <select name="category" class="form-control pln-input form-control-sm" >
                             <option value="">Wybierz...</option>
@@ -154,11 +154,11 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group mb-1">
                         <label class="text-muted small">Kwota (zł)</label>
                         <input type="number" name="amount" step="0.01" class="form-control pln-input form-control-sm pln-200-text font-weight-bold" required>
                     </div>
-                    <div class="form-group form-check mb-3">
+                    <div class="form-group form-check mb-1">
                         <input type="checkbox" name="is_cash" class="form-check-input" id="cashCheck">
                         <label class="form-check-label text-muted small" for="cashCheck">Płatność gotówką</label>
                     </div>
@@ -184,22 +184,22 @@
                     <tbody>
                         {% for expense in expenses %}
                             <tr class="p-1">
-                                <td class="align-middle text-muted" style="font-size: 0.85rem;">{{ expense.date|date:"d.m.y" }}</td>
-                                <td class="align-middle text-light">
+                                <td class="align-middle text-muted p-1" style="font-size: 0.85rem;">{{ expense.date|date:"d.m.y" }}</td>
+                                <td class="align-middle text-light p-1">
                                     {{ expense.title }}
                                     {% if expense.is_cash %}
                                         <i class="fas fa-coins text-warning ml-1" style="font-size: 0.7rem;" title="Gotówka"></i>
                                     {% endif %}
                                 </td>
-                                <td class="align-middle">
+                                <td class="align-middle p-1">
                                     <span class="badge" style="background-color: {{ expense.category.color }}; color: #fff; font-size: 0.7rem;">
                                         {{ expense.category.name }}
                                     </span>
                                 </td>
-                                <td class="align-middle text-right font-weight-bold text-light">
+                                <td class="align-middle text-right font-weight-bold text-light p-1">
                                     {{ expense.amount|floatformat:"2" }}
                                 </td>
-                                <td class="align-middle text-center">
+                                <td class="align-middle text-center p-1">
                                     <form action="{% url 'budget:delete_expense' expense.pk %}" class="ajax-form" method="POST" data-confirm="Czy na pewno chcesz usunąć ten wydatek?">
                                         {% csrf_token %}
                                         <button type="submit" class="btn btn-link text-danger p-0 m-0" style="text-decoration: none; opacity: 0.6;">
