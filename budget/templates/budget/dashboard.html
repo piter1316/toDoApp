@@ -27,8 +27,9 @@
             </button>
         </div>
     </div>
+    <div class="mb-4 px-2" id="pinned_sections">
     {% if pinned_sections %}
-    <div class="mb-4 px-2">
+
         <h6 class="text-muted small mb-2"><i class="fas fa-thumbtack mr-1"></i> Przypięte sekcje</h6>
         <div class="d-flex flex-wrap" style="gap: 8px;">
             {% for p_sec in pinned_sections %}
@@ -37,8 +38,9 @@
                 </a>
             {% endfor %}
         </div>
-    </div>
+
     {% endif %}
+    </div>
 
     <div class="row" id="ledgers-row">
         {% for ledger in ledgers %}
@@ -202,7 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
      * Główna funkcja: Wysyła żądanie, pobiera odświeżony HTML,
      * i aktualizuje tylko wskazany element.
      */
-    async function fetchAndReplace(url, options, targetSelector, modalToClose = null, formToReset = null) {
+    async function fetchAndReplace(url, options, targetSelectors, modalToClose = null, formToReset = null) {
         try {
             const response = await fetch(url, options);
             if (!response.ok) throw new Error('Network response was not ok');
@@ -211,15 +213,26 @@ document.addEventListener('DOMContentLoaded', () => {
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
 
-            const newContent = doc.querySelector(targetSelector);
-            const oldContent = document.querySelector(targetSelector);
+            // Zamieniamy na tablicę, jeśli podano pojedynczy string
+            const selectors = Array.isArray(targetSelectors) ? targetSelectors : [targetSelectors];
 
-            if (newContent && oldContent) {
-                oldContent.innerHTML = newContent.innerHTML;
-            }
+            selectors.forEach(selector => {
+                const newContent = doc.querySelector(selector);
+                const oldContent = document.querySelector(selector);
+                if (newContent && oldContent) {
+                    oldContent.innerHTML = newContent.innerHTML;
+                }
+            });
 
             if (formToReset) formToReset.reset();
-            if (modalToClose) $(modalToClose).modal('hide');
+            if (modalToClose) {
+                $(modalToClose).modal('hide');
+                // Twardy reset Bootstrapa
+                setTimeout(() => {
+                    document.body.classList.remove('modal-open');
+                    $('.modal-backdrop').remove();
+                }, 100);
+            }
 
         } catch (error) {
             console.error('AJAX Error:', error);
@@ -258,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
             fetchAndReplace(form.action, {
                 method: form.method,
                 body: new FormData(form)
-            }, targetId, modalId, form);
+            }, [targetId, '#pinned_sections'], modalId, form);
         }
 
         else if (form.classList.contains('ajax-category-form')) {

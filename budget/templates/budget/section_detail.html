@@ -228,6 +228,9 @@
                     <div class="col-md-5 mb-4 mb-md-0 d-flex justify-content-center align-items-center" style="position: relative;">
                         <div style="position: relative; width: 100%; max-width: 300px; margin: 0 auto;">
                             <div style="position: relative; z-index: 10;">
+                                {{ chart_labels|json_script:"labels-data" }}
+                                {{ chart_values|json_script:"values-data" }}
+                                {{ chart_colors|json_script:"colors-data" }}
                                 <canvas id="categoryDoughnutChart" style="height: 300px; width: 300px;"></canvas>
                             </div>
 
@@ -305,27 +308,38 @@
 
 {% block extra_scripts %}
     <script>
+    // Globalna zmienna trzymająca wykres, żebyśmy mogli go zniszczyć po AJAX-ie
+    let myDoughnutChart = null;
+
     function renderChart() {
-        var canvas = document.getElementById('categoryDoughnutChart');
+        const canvas = document.getElementById('categoryDoughnutChart');
         if (!canvas) return;
-        var ctx = canvas.getContext('2d');
 
-        // Konfiguracja kolorów i efektów
-        var chartData = {
-            labels: {{ chart_labels|safe }},
-            datasets: [{
-                data: {{ chart_values|safe }},
-                backgroundColor: {{ chart_colors|safe }},
-                borderColor: '#1a1b1e', // Kolor tła aplikacji, żeby oddzielić paski
-                borderWidth: 3, // Gruba ramka daje efekt "segmentów"
-                hoverBorderColor: '#fff', // Biała ramka przy najechaniu
-                hoverBorderWidth: 1,
-            }]
-        };
+        // ZABICIE STAREGO WYKRESU
+        if (myDoughnutChart !== null) {
+            myDoughnutChart.destroy();
+        }
 
-        var myDoughnutChart = new Chart(ctx, {
+        // POBIERANIE ŚWIEŻYCH DANYCH Z JSON_SCRIPT
+        // textContent wyciąga czysty JSON, a JSON.parse go przetwarza
+        const labels = JSON.parse(document.getElementById('labels-data').textContent);
+        const values = JSON.parse(document.getElementById('values-data').textContent);
+        const colors = JSON.parse(document.getElementById('colors-data').textContent);
+
+        const ctx = canvas.getContext('2d');
+        myDoughnutChart = new Chart(ctx, {
             type: 'doughnut',
-            data: chartData,
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: colors,
+                    borderColor: '#1a1b1e',
+                    borderWidth: 3,
+                    hoverBorderColor: '#fff',
+                    hoverBorderWidth: 1,
+                }]
+            },
             options: {
                 cutoutPercentage: 80,
                 responsive: true,
@@ -339,47 +353,39 @@
                     borderWidth: 1,
                     xPadding: 12,
                     yPadding: 12,
-                    // Tutaj dodajemy własny format dymka
                     callbacks: {
                         label: function(tooltipItem, data) {
-                            // 1. Pobieramy nazwę kategorii
                             var label = data.labels[tooltipItem.index] || '';
-                            if (label) {
-                                label += ': ';
-                            }
+                            if (label) label += ': ';
 
-                            // 2. Pobieramy dane i konkretną kwotę
                             var dataset = data.datasets[tooltipItem.datasetIndex];
                             var currentValue = dataset.data[tooltipItem.index];
 
-                            // 3. Liczymy całkowitą sumę wydatków na wykresie
                             var total = dataset.data.reduce(function(previousValue, currentVal) {
                                 return parseFloat(previousValue) + parseFloat(currentVal);
                             }, 0);
 
-                            // 4. Obliczamy procenty (z jednym miejscem po przecinku)
                             var percentage = 0;
                             if (total > 0) {
                                 percentage = ((currentValue / total) * 100).toFixed(1);
                             }
 
-                            // 5. Formatujemy kwotę (np. dodajemy .00 na końcu)
                             var formattedValue = parseFloat(currentValue).toFixed(2);
-
-                            // Zwracamy gotowy tekst do dymka
                             return label + formattedValue + ' zł (' + percentage + '%)';
                         }
                     }
                 },
                 animation: {
-                    animateScale: true,
-                    animateRotate: true
+                    // Wyłączamy animację przy przeładowaniu AJAX, żeby nie "skakało" za każdym razem
+                    // (możesz zmienić na true jeśli wolisz)
+                    animateScale: false,
+                    animateRotate: false
                 }
             }
         });
     }
 
-    // Wywołaj przy starcie
+    // Wywołanie przy pierwszym załadowaniu całej strony
     document.addEventListener('DOMContentLoaded', renderChart);
 </script>
     <script>
