@@ -15,8 +15,10 @@ from django.shortcuts import redirect
 def budget_dashboard(request):
     # Pobieramy wszystkie dziedziny zalogowanego użytkownika
     ledgers = Ledger.objects.filter(user=request.user).order_by('sort_order', '-created_at')
+    pinned_sections = Section.objects.filter(ledger__user=request.user, is_pinned=True)
     categories = Category.objects.filter(user=request.user)
-    return render(request, 'budget/dashboard.html', {'ledgers': ledgers, 'categories': categories})
+    return render(request, 'budget/dashboard.html',
+                  {'ledgers': ledgers, 'categories': categories, 'pinned_sections': pinned_sections, })
 
 
 @login_required
@@ -301,3 +303,10 @@ def move_ledger(request, ledger_id, direction):
 
     return redirect('budget:budget_dashboard')
 
+
+def toggle_pin_section(request, section_id):
+    section = get_object_or_404(Section, id=section_id, ledger__user=request.user)
+    section.is_pinned = not section.is_pinned
+    section.save()
+    # Przeładowanie strony (nasz AJAX przechwyci i tak tylko HTML)
+    return redirect('budget:budget_dashboard')

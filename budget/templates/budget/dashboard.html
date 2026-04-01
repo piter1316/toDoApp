@@ -10,8 +10,11 @@
     .pln-100-btn:hover { background-color: #2e8b57; color: white; }
     .pln-input { background-color: #141517; border: 1px solid #373a40; color: white; }
     .add-btn-sm { padding: 2px 8px; font-size: 12px; }
+    .pln-20-badge { background-color: #7a5299;  } /* Bolesław Chrobry - Fiolet */
+    .text-20-pln { color: #7a5299; } /* Bolesław Chrobry - Fiolet */
+
 </style>
-<div class="container-fluid budget-bg py-2 min-vh-100">
+<div class="container-fluid budget-bg py-2 min-vh-100" id="dashboard-main-content">
     <div class="d-flex justify-content-between align-items-center mb-2 pb-1 border-bottom border-light">
         <h2 class="font-weight-bold pln-100-text mb-0"><i class="fas fa-wallet mr-2"></i>Finanse</h2>
 
@@ -24,6 +27,18 @@
             </button>
         </div>
     </div>
+    {% if pinned_sections %}
+    <div class="mb-4 px-2">
+        <h6 class="text-muted small mb-2"><i class="fas fa-thumbtack mr-1"></i> Przypięte sekcje</h6>
+        <div class="d-flex flex-wrap" style="gap: 8px;">
+            {% for p_sec in pinned_sections %}
+                <a href="{% url 'budget:section_detail' p_sec.pk %}" class="px-3 py-2 badge badge-pill text-light text-decoration-none pln-20-badge">
+                    {{ p_sec.name }} | {{ p_sec.ledger.name }}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
 
     <div class="row" id="ledgers-row">
         {% for ledger in ledgers %}
@@ -83,6 +98,9 @@
                                 <a href="{% url 'budget:section_detail' section.pk %}" class="text-light flex-grow-1" style="text-decoration: none;">
                                     <i class="far fa-folder-open mr-2 text-muted"></i>{{ section.name }}
                                 </a>
+                                <a href="{% url 'budget:toggle_pin_section' section.pk %}" class="ajax-toggle-pin mr-2 text-decoration-none" title="Przypnij/Odepnij">
+                                        <i class="fas fa-thumbtack {% if section.is_pinned %}text-20-pln{% else %}text-muted{% endif %}" style="{% if not section.is_pinned %}opacity: 0.3;{% endif %}"></i>
+                                    </a>
 
                                 <form action="{% url 'budget:delete_section' section.pk %}" method="POST" class="ajax-delete-section" onsubmit="return confirm('Czy na pewno usunąć sekcję {{ section.name }} i WSZYSTKIE jej wydatki?')">
                                     {% csrf_token %}
@@ -189,12 +207,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(url, options);
             if (!response.ok) throw new Error('Network response was not ok');
 
-            // Parsujemy odpowiedź od Django (cały odświeżony widok HTML)
             const html = await response.text();
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
 
-            // Podmieniamy stary element na nowy
             const newContent = doc.querySelector(targetSelector);
             const oldContent = document.querySelector(targetSelector);
 
@@ -202,24 +218,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 oldContent.innerHTML = newContent.innerHTML;
             }
 
-            // Opcjonalne czyszczenie UX
             if (formToReset) formToReset.reset();
             if (modalToClose) $(modalToClose).modal('hide');
 
         } catch (error) {
             console.error('AJAX Error:', error);
-            // Awaryjny fallback: w razie błędu przeładuj stronę normalnie
             window.location.reload();
         }
     }
-
-    // --- DELEGACJA ZDARZEŃ (Nasłuchuje również na nowo wygenerowanych elementach) ---
 
     // 1. Zdarzenia SUBMIT (Formularze)
     document.body.addEventListener('submit', function(e) {
         const form = e.target;
 
-        // A. Dodawanie/Usuwanie nowej dziedziny (aktualizacja całego rzędu)
         if (form.id === 'form-add-ledger' || form.classList.contains('ajax-delete-ledger')) {
             e.preventDefault();
             fetchAndReplace(form.action, {
@@ -228,20 +239,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }, '#ledgers-row', '#modalLedger', form);
         }
 
-        // B. Dodawanie/Usuwanie nowej sekcji (aktualizacja TYLKO jednej karty z dziedziną)
         else if (form.classList.contains('ajax-add-section') || form.classList.contains('ajax-delete-section')) {
             e.preventDefault();
-            const ledgerId = form.querySelector('input[name="ledger_id"]').value;
-            const targetId = `#ledger-container-${ledgerId}`;
-            const modalId = `#modalSection${ledgerId}`;
-
+            // Tutaj odświeżamy #dashboard-main-content zamiast tylko karty,
+            // bo dodanie/usunięcie sekcji może wpływać na to, co jest przypięte na górze
             fetchAndReplace(form.action, {
                 method: form.method,
                 body: new FormData(form)
-            }, targetId, modalId, form);
+            }, '#dashboard-main-content', form.closest('.modal') ? `#${form.closest('.modal').id}` : null, form);
         }
 
-        // C. Kategorie (aktualizacja TYLKO wnętrza modala)
         else if (form.classList.contains('ajax-category-form')) {
             e.preventDefault();
             fetchAndReplace(form.action, {
@@ -251,15 +258,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 2. Zdarzenia CLICK (Sortowanie i linki z akcjami)
+    // 2. Zdarzenia CLICK (Sortowanie i Pinezki)
     document.body.addEventListener('click', function(e) {
-        // Obsługa strzałek "Góra / Dół" (aktualizacja całego rzędu, bo dziedziny zmieniają ułożenie)
+        // Obsługa strzałek "Góra / Dół"
         const moveBtn = e.target.closest('a.ajax-move');
         if (moveBtn) {
             e.preventDefault();
-            fetchAndReplace(moveBtn.href, {
-                method: 'GET'
-            }, '#ledgers-row');
+            fetchAndReplace(moveBtn.href, { method: 'GET' }, '#ledgers-row');
+            return; // Kończymy, żeby nie sprawdzać dalej
+        }
+
+        // OBSŁUGA PINEZKI (teraz poprawnie wewnątrz listenera click)
+        const pinBtn = e.target.closest('a.ajax-toggle-pin');
+        if (pinBtn) {
+            e.preventDefault();
+            fetchAndReplace(pinBtn.href, { method: 'GET' }, '#dashboard-main-content');
         }
     });
 

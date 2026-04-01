@@ -17,5 +17,6 @@ urlpatterns = [
     path('ledger/<int:pk>/delete/', views.delete_ledger, name='delete_ledger'),
     path('ledger/<int:pk>/', views.ledger_detail, name='ledger_detail'),
     path('toggle-income/', views.toggle_income_setting, name='toggle_income_setting'),
-    path('ledger/<int:ledger_id>/move/<str:direction>/', views.move_ledger, name='move_ledger')
+    path('ledger/<int:ledger_id>/move/<str:direction>/', views.move_ledger, name='move_ledger'),
+    path('section/<int:section_id>/toggle-pin/', views.toggle_pin_section, name='toggle_pin_section'),
 ]

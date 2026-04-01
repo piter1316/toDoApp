@@ -38,6 +38,7 @@ class Section(models.Model):
     name = models.CharField(max_length=100)
     ledger = models.ForeignKey(Ledger, on_delete=models.CASCADE, related_name='sections')
     order = models.IntegerField(default=0)
+    is_pinned = models.BooleanField(default=False)
 
     # NOWE POLA BUDŻETOWE
     income = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, verbose_name="Dochód")
