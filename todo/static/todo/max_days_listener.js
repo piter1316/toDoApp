@@ -56,8 +56,8 @@ $(document).ready(function(){
         }
       });
       setTimeout(function(){$('#meal_options_form, #meal_options_form_hr').hide(600)}, 200);
-      var day_short = $('#meals_list .text-center:last span b').text().split(' | ')[0];
-      var date_short = $('#meals_list .text-center:last span b').text().split('|')[1].split(':')[0].trim();
+      var day_short = $('#meals_list .short_day_date:last').text().trim().split(' ')[0];
+      var date_short = $('#meals_list .day_date:last').text().trim();
       var parsed_date = new Date(date_short)
       parsed_date.setDate(parsed_date.getDate() + 1)
       var year = parsed_date.getFullYear()
@@ -74,7 +74,8 @@ $(document).ready(function(){
        $("#first_day option").each(function() {
         current_options.push(this.value);
     });
-
+    console.log(day_short)
+    console.log(date_short)
     switch(day_short){
     case 'PN':
       var to_append = $('<option>',{value: '2|'+ proper_date, text : "WTOREK "+ " | "+ proper_date})

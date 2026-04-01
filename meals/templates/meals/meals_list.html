@@ -273,8 +273,8 @@
                     {% if day.is_today %}
                       <span class="badge badge-dark mr-2" style="font-size: 0.7rem; padding: 2px 6px;">DZIŚ</span>
                     {% endif %}
-                    <h5 class="font-weight-bold mb-0 text-dark mr-3" style="font-size: 0.95rem;">
-                        {{day.day_name}} <span class="text-muted font-weight-normal ml-1" style="font-size: 0.8rem;">{{day.day_date}}</span>
+                    <h5 class="font-weight-bold mb-0 text-dark mr-3 short_day_date" style="font-size: 0.95rem;">
+                      {{day.day_name}} <span class="text-muted font-weight-normal ml-1" style="font-size: 0.8rem;"><b class="day_date">{{day.day_date}}</b></span>
                     </h5>
                     <input style="transform: scale(1.1);" type="checkbox" name="day" class="checkbox my-0" value="{% for m in day.meals %}{{m.list_id}},{% endfor %}">
                   </div>

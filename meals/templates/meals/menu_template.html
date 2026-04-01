@@ -43,9 +43,11 @@
           <hr class="bg-dark my-1">
         </a>
         <form action="{% url 'meals:delete_selected_days' %}" class="deleteSelectedDays my-1 w-100"  id="deleteSelectedDays" method="POST">{% csrf_token %}
-          {% for item in day_meal_option_meal_list %}{% for day, meals in item.0.items %}{% for meal in meals %}{% for ml in meal%}
-            <input type="checkbox"  style="display:none;" value="{{ml.id}}" class="mealsListPosition_{{ml.id}}" name="mealsListPosition">{% endfor %}
-          {% endfor %}{% endfor %}{% endfor %}
+          {% for item in days_data %}
+            {% for item_2 in item.meals %}
+              <input type="checkbox"  style="display:none;" value="{{item_2.list_id}}" class="mealsListPosition_{{item_2.list_id}}" name="mealsListPosition">
+            {% endfor %}
+          {% endfor %}
           <button type="submit" class="btn  py-0 px-0 text-left border-0  btn-block deleteSelectedDaysButton" disabled >
             <i class="fas fa-trash mr-1"></i>Usuń zaznaczone dni
           </button>
