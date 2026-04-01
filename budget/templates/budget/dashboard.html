@@ -25,9 +25,9 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="row" id="ledgers-row">
         {% for ledger in ledgers %}
-        <div class="col-md-6 col-lg-4 mb-4">
+        <div class="col-md-6 col-lg-4 mb-4" id="ledger-container-{{ ledger.id }}">
             <div class="card pln-card h-100 shadow-lg" style="border-left: 4px solid #316C9A;">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -40,7 +40,7 @@
 
                             <div class="btn-group">
                                 {% if not forloop.first %}
-                                    <a href="{% url 'budget:move_ledger' ledger.id 'up' %}" class="btn btn-sm text-secondary">
+                                    <a href="{% url 'budget:move_ledger' ledger.id 'up' %}" class="btn btn-sm text-secondary ajax-move">
                                         <i class="fas fa-chevron-up"></i>
                                     </a>
                                 {% else %}
@@ -50,7 +50,7 @@
                                 {% endif %}
 
                                 {% if not forloop.last %}
-                                    <a href="{% url 'budget:move_ledger' ledger.id 'down' %}" class="btn btn-sm text-secondary">
+                                    <a href="{% url 'budget:move_ledger' ledger.id 'down' %}" class="btn btn-sm text-secondary ajax-move">
                                         <i class="fas fa-chevron-down"></i>
                                     </a>
                                 {% else %}
@@ -66,7 +66,7 @@
                                 <i class="fas fa-plus"></i>
                             </button>
                             {% if ledger.sections.count == 0 %}
-                                <form action="{% url 'budget:delete_ledger' ledger.pk %}" method="POST" class="mr-2" onsubmit="return confirm('Usunąć pustą dziedzinę?')">
+                                <form action="{% url 'budget:delete_ledger' ledger.pk %}" method="POST" class="mr-2 ajax-delete-ledger" onsubmit="return confirm('Usunąć pustą dziedzinę?')">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-link text-danger" style="opacity: 0.6;" title="Usuń pustą dziedzinę">
                                         <i class="fas fa-trash-alt"></i>
@@ -84,9 +84,9 @@
                                     <i class="far fa-folder-open mr-2 text-muted"></i>{{ section.name }}
                                 </a>
 
-                                <form action="{% url 'budget:delete_section' section.pk %}" method="POST" onsubmit="return confirm('Czy na pewno usunąć sekcję {{ section.name }} i WSZYSTKIE jej wydatki?')">
+                                <form action="{% url 'budget:delete_section' section.pk %}" method="POST" class="ajax-delete-section" onsubmit="return confirm('Czy na pewno usunąć sekcję {{ section.name }} i WSZYSTKIE jej wydatki?')">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-link text-danger p-0 px-2" style="opacity: 0.5; font-size: 0.8rem;">
+                                    <input type="hidden" name="ledger_id" value="{{ ledger.id }}"> <button type="submit" class="btn btn-link text-danger p-0 px-2" style="opacity: 0.5; font-size: 0.8rem;">
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </form>
@@ -102,9 +102,9 @@
         <div class="modal fade" id="modalSection{{ ledger.id }}" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content pln-card">
-                    <form action="{% url 'budget:add_section' ledger.id %}" method="POST">
+                    <form action="{% url 'budget:add_section' ledger.id %}" method="POST" class="ajax-add-section">
                         {% csrf_token %}
-                        <div class="modal-header border-secondary">
+                        <input type="hidden" name="ledger_id" value="{{ ledger.id }}"> <div class="modal-header border-secondary">
                             <h5 class="modal-title">Nowa sekcja w: {{ ledger.name }}</h5>
                         </div>
                         <div class="modal-body">
@@ -124,7 +124,7 @@
 <div class="modal fade" id="modalLedger" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content pln-card text-light">
-            <form action="{% url 'budget:add_ledger' %}" method="POST">
+            <form action="{% url 'budget:add_ledger' %}" method="POST" id="form-add-ledger">
                 {% csrf_token %}
                 <div class="modal-header border-secondary">
                     <h5 class="modal-title">Dodaj nową dziedzinę</h5>
@@ -147,9 +147,9 @@
             <div class="modal-header border-secondary text-info">
                 <h5 class="modal-title">Zarządzaj Kategoriami</h5>
             </div>
-            <div class="modal-body row">
+            <div class="modal-body row" id="categories-modal-body">
                 <div class="col-md-5 border-right border-secondary">
-                    <form action="{% url 'budget:add_category' %}" method="POST">
+                    <form action="{% url 'budget:add_category' %}" method="POST" class="ajax-category-form">
                         {% csrf_token %}
                         <h6>Dodaj nową</h6>
                         <div class="form-group">
@@ -165,7 +165,7 @@
                 <div class="col-md-7" style="max-height: 300px; overflow-y: auto;">
                     <h6>Twoje kategorie</h6>
                     {% for cat in categories %}
-                    <form action="{% url 'budget:edit_category' cat.id %}" method="POST" class="d-flex mb-2">
+                    <form action="{% url 'budget:edit_category' cat.id %}" method="POST" class="d-flex mb-2 ajax-category-form">
                         {% csrf_token %}
                         <input type="color" name="color" value="{{ cat.color }}" class="mr-1" style="width: 30px; height: 30px; padding: 0;">
                         <input type="text" name="name" value="{{ cat.name }}" class="form-control pln-input form-control-sm mr-1">
@@ -177,5 +177,92 @@
         </div>
     </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
 
+    /**
+     * Główna funkcja: Wysyła żądanie, pobiera odświeżony HTML,
+     * i aktualizuje tylko wskazany element.
+     */
+    async function fetchAndReplace(url, options, targetSelector, modalToClose = null, formToReset = null) {
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) throw new Error('Network response was not ok');
+
+            // Parsujemy odpowiedź od Django (cały odświeżony widok HTML)
+            const html = await response.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+
+            // Podmieniamy stary element na nowy
+            const newContent = doc.querySelector(targetSelector);
+            const oldContent = document.querySelector(targetSelector);
+
+            if (newContent && oldContent) {
+                oldContent.innerHTML = newContent.innerHTML;
+            }
+
+            // Opcjonalne czyszczenie UX
+            if (formToReset) formToReset.reset();
+            if (modalToClose) $(modalToClose).modal('hide');
+
+        } catch (error) {
+            console.error('AJAX Error:', error);
+            // Awaryjny fallback: w razie błędu przeładuj stronę normalnie
+            window.location.reload();
+        }
+    }
+
+    // --- DELEGACJA ZDARZEŃ (Nasłuchuje również na nowo wygenerowanych elementach) ---
+
+    // 1. Zdarzenia SUBMIT (Formularze)
+    document.body.addEventListener('submit', function(e) {
+        const form = e.target;
+
+        // A. Dodawanie/Usuwanie nowej dziedziny (aktualizacja całego rzędu)
+        if (form.id === 'form-add-ledger' || form.classList.contains('ajax-delete-ledger')) {
+            e.preventDefault();
+            fetchAndReplace(form.action, {
+                method: form.method,
+                body: new FormData(form)
+            }, '#ledgers-row', '#modalLedger', form);
+        }
+
+        // B. Dodawanie/Usuwanie nowej sekcji (aktualizacja TYLKO jednej karty z dziedziną)
+        else if (form.classList.contains('ajax-add-section') || form.classList.contains('ajax-delete-section')) {
+            e.preventDefault();
+            const ledgerId = form.querySelector('input[name="ledger_id"]').value;
+            const targetId = `#ledger-container-${ledgerId}`;
+            const modalId = `#modalSection${ledgerId}`;
+
+            fetchAndReplace(form.action, {
+                method: form.method,
+                body: new FormData(form)
+            }, targetId, modalId, form);
+        }
+
+        // C. Kategorie (aktualizacja TYLKO wnętrza modala)
+        else if (form.classList.contains('ajax-category-form')) {
+            e.preventDefault();
+            fetchAndReplace(form.action, {
+                method: form.method,
+                body: new FormData(form)
+            }, '#categories-modal-body', null, form.action.includes('add_category') ? form : null);
+        }
+    });
+
+    // 2. Zdarzenia CLICK (Sortowanie i linki z akcjami)
+    document.body.addEventListener('click', function(e) {
+        // Obsługa strzałek "Góra / Dół" (aktualizacja całego rzędu, bo dziedziny zmieniają ułożenie)
+        const moveBtn = e.target.closest('a.ajax-move');
+        if (moveBtn) {
+            e.preventDefault();
+            fetchAndReplace(moveBtn.href, {
+                method: 'GET'
+            }, '#ledgers-row');
+        }
+    });
+
+});
+</script>
 {% endblock %}
