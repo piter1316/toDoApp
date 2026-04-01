@@ -270,6 +270,7 @@ def ledger_detail(request, pk):
         'total_amount_expenses': sum(item['total'] for item in grouped_data.values()),
         'total_amount': total_amount,
         'total_budget': total_budget,
+        'total_budget_cash': total_budget_cash,
         'total_income': total_income,
         'total_income_per_section': total_income_per_section,
         'chart_labels': chart_labels,

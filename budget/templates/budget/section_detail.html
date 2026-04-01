@@ -47,44 +47,7 @@
                         </div>
                         {% endif %}
 
-                    <script>
-                    function toggleIncomeGlobal(sectionId) {
-                        fetch('{% url "budget:toggle_income_setting" %}', {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRFToken': '{{ csrf_token }}',
-                                'Content-Type': 'application/json'
-                            }
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            // Znajdujemy wszystkie pola dochodu na stronie
-                            const allIncomeValues = document.querySelectorAll('[id^="income-value-"]');
-                            const allIcons = document.querySelectorAll('[id^="income-icon-"]');
 
-                            allIncomeValues.forEach(el => {
-                                // Pobieramy ukrytą wartość z atrybutu data
-                                const rawValue = el.getAttribute('data-income');
-
-                                if (data.hide_income) {
-                                    el.innerText = 'Dochód:  ****,** zł';
-                                } else {
-                                    el.innerText = `Dochód: ${rawValue} zł`;
-                                }
-                            });
-
-                            // Podmieniamy wszystkie ikonki oczu
-                            allIcons.forEach(icon => {
-                                if (data.hide_income) {
-                                    icon.classList.replace('fa-eye', 'fa-eye-slash');
-                                } else {
-                                    icon.classList.replace('fa-eye-slash', 'fa-eye');
-                                }
-                            });
-                        })
-                        .catch(error => console.error('Błąd AJAX:', error));
-                    }
-                    </script>
                 </div>
 
                 <div class="d-flex flex-row flex-nowrap justify-content-center text-center">

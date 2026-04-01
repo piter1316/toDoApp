@@ -22,39 +22,49 @@
 <div class="container-fluid budget-bg py-4 ">
 
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
-    <div class="mb-3 mb-md-0 text-center text-md-left">
-        <a href="{% url 'budget:budget_dashboard' %}" class="text-muted text-decoration-none small">
-            <i class="fas fa-arrow-left mr-1"></i> Wróć do kokpitu
-        </a>
-        <h2 class="font-weight-bold text-light mt-1 mb-0 text-truncate">
-            <i class="fas fa-wallet text-info mr-2"></i>{{ ledger.name }}
-        </h2>
-    </div>
+            <div class="mb-3 mb-md-0 text-center text-md-left">
+                <a href="{% url 'budget:budget_dashboard' %}" class="text-muted text-decoration-none small">
+                    <i class="fas fa-arrow-left mr-1"></i> Wróć do kokpitu
+                </a>
+                <h2 class="font-weight-bold text-light mt-1 mb-0 text-truncate">
+                    <i class="fas fa-wallet text-info mr-2"></i>{{ ledger.name }}
+                </h2>
+            </div>
 
-    <div class="pln-card p-2 px-3 shadow-sm border-info mx-auto mx-md-0"
-         style="border-left: 3px solid #17a2b8 !important; min-width: 200px;">
-        <div class="text-center text-md-right">
-            <small class="text-muted text-uppercase d-block" style="font-size: 0.65rem; letter-spacing: 1px;">Wydano łącznie</small>
-            <h3 class="pln-200-text mb-0" style="font-size: 1.5rem;">
-                {{ total_amount|floatformat:"2" }} <small class="text-muted" style="font-size: 0.9rem;">zł</small>
-            </h3>
-            <small class="d-block">Zaplanowany budżet:
-                {% if user.settings.hide_income %}****,** {% else %}{{ total_budget|floatformat:"2" }}{% endif%} zł
-            </small>
-            {% if total_income %}
+            <div class="pln-card p-2 px-3 shadow-sm border-info mx-auto mx-md-0"
+             style="border-left: 3px solid #17a2b8 !important; min-width: 200px;">
+            <div class="text-center text-md-right">
+                <div class="mb-1">
+                    <i id="income-icon-global"
+                       class="fas {% if user.settings.hide_income %}fa-eye-slash{% else %}fa-eye{% endif %} text-muted cursor-pointer"
+                       onclick="toggleIncomeGlobal()"
+                       style="cursor: pointer;"></i>
+                </div>
 
-                <small class=" d-block" >Zadeklarowany dochód:
-                    {% if user.settings.hide_income %}****,** {% else %}{{ total_income|floatformat:"2" }}{% endif%} zł
-                </small>
-                {% if total_income_per_section %}
-                    <small class=" d-block" >Zadeklarowany dochód na sekcję:
-                        {% if user.settings.hide_income %}****,** {% else %}{{ total_income_per_section|floatformat:"2" }}{% endif%} zł
+                <small class="text-muted text-uppercase d-block" style="font-size: 0.65rem; letter-spacing: 1px;">Wydano łącznie</small>
+                <h3 class="pln-200-text mb-0" style="font-size: 1.5rem;">
+                    {{ total_amount|floatformat:"2" }} <small class="text-muted" style="font-size: 0.9rem;">zł</small>
+                </h3>
+
+
+                {% if total_income %}
+                    <small class="d-block">Zadeklarowany dochód:
+                        <span class="income-sensitive" data-raw-value="{{ total_income|floatformat:'2' }}">
+                            {% if user.settings.hide_income %}****,**{% else %}{{ total_income|floatformat:"2" }}{% endif %}
+                        </span> zł
                     </small>
-                {% endif%}
-            {% endif %}
+
+                    {% if total_income_per_section %}
+                        <small class="d-block">Zadeklarowany dochód na sekcję:
+                            <span class="income-sensitive" data-raw-value="{{ total_income_per_section|floatformat:'2' }}">
+                                {% if user.settings.hide_income %}****,**{% else %}{{ total_income_per_section|floatformat:"2" }}{% endif %}
+                            </span> zł
+                        </small>
+                    {% endif %}
+                {% endif %}
+            </div>
         </div>
-    </div>
-</div>
+        </div>
 
     <div class="row mt-4">
         <div class="col-12">

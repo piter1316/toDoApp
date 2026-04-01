@@ -30,6 +30,52 @@
   <script src="{% static 'todo/bootstrap4-toggle.min.js' %}"></script>
   <script src="{% static 'todo/jquery.formset.js' %}"></script>
   {% block extra_head %}{% endblock %}
+
+  <script>
+    function toggleIncomeGlobal() {
+        fetch('{% url "budget:toggle_income_setting" %}', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // 1. Obsługa starych pól (w sekcjach)
+            const oldFields = document.querySelectorAll('[id^="income-value-"]');
+            oldFields.forEach(el => {
+                const rawValue = el.getAttribute('data-income');
+                el.innerText = data.hide_income ? 'Dochód:  ****,** zł' : `Dochód: ${rawValue} zł`;
+            });
+
+            // 2. Obsługa nowych pól w Ledger Detail (klasa .income-sensitive)
+            const sensitiveFields = document.querySelectorAll('.income-sensitive');
+            sensitiveFields.forEach(el => {
+                const rawValue = el.getAttribute('data-raw-value');
+                const suffix = el.getAttribute('data-suffix') || ''; // Dla ikonki monet przy budżecie
+
+                if (data.hide_income) {
+                    el.innerHTML = '****,**';
+                } else {
+                    el.innerHTML = rawValue + suffix;
+                }
+            });
+
+            // 3. Podmiana wszystkich ikonek (w tym tej nowej globalnej)
+            const allIcons = document.querySelectorAll('[id^="income-icon-"]');
+            allIcons.forEach(icon => {
+                if (data.hide_income) {
+                    icon.classList.replace('fa-eye', 'fa-eye-slash');
+                } else {
+                    icon.classList.replace('fa-eye-slash', 'fa-eye');
+                }
+            });
+        })
+        .catch(error => console.error('Błąd AJAX:', error));
+    }
+</script>
+
 </head>
 <body>
 <div class="navbar-overlay" id="navbarOverlay"></div>
@@ -184,5 +230,6 @@
       });
     });
   </script>
+
 </body>
 </html>
