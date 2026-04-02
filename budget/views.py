@@ -59,7 +59,7 @@ def section_detail(request, pk):
     account_expenses = expenses.filter(is_cash=False).aggregate(Sum('amount'))['amount__sum'] or Decimal('0.00')
 
     total_budget = section.budget_account + section.budget_cash
-
+    remaining_amount = total_budget - total_amount
     category_data = expenses.values(
         'category__name',
         'category__color'
@@ -101,6 +101,7 @@ def section_detail(request, pk):
         'chart_colors': chart_colors,
         # Przekazujemy też pogrupowane dane, żeby zrobić legendę w HTML
         'category_stats': category_data,
+        'remaining_amount': remaining_amount,
     }
     return render(request, 'budget/section_detail.html', context)
 

@@ -21,7 +21,7 @@
                           /* DYNAMICZNY CIEŃ: Cień tylko dla białego tekstu, usuwamy dla ciemnego */
                           text-shadow: {% if percent_raw|add:0 > 75 and percent_raw|add:0 <= 100 %}none{% else %}1px 1px 2px rgba(0,0,0,0.5){% endif %};">
 
-                Wykorzystanie: {{ percent_raw }}%
+                Wykorzystanie&nbsp;—&nbsp;{{ percent_raw }}% {% if remaining_amount %} | Pozostało&nbsp;—&nbsp;{{ remaining_amount }} zł{% endif %}
             </small>
           {% endif %}
       </div>
