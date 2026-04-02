@@ -121,7 +121,7 @@ def car_details(request, car_id):
     for fuel in car_fuel_fill_list:
         total_fuel_list.append(fuel.liters)
         total_km_list.append(fuel.kilometers)
-        averages_list.append(round(fuel.liters/fuel.kilometers * 100, 2))
+        averages_list.append(round(fuel.liters / fuel.kilometers * 100, 2))
         fuel_cost_list.append(fuel.liters * float(fuel.fuel_price))
         dates_list.append(fuel.date)
     if car_fuel_fill_list:
@@ -249,12 +249,10 @@ def add_fuel_fill(request, pk):
         filling = form.save(commit=False)
         filling.car_id = car
         filling.save()
-        context = {}
-
         return redirect('/cars/carDetails/{}#service'.format(pk))
 
 
-def delete_fuel_fill(request, pk):
+def delete_fuel_fill(_request, pk):
     fuel = Fuel.objects.filter(pk=pk)
     car_id = fuel[0].car_id_id
     Fuel.objects.filter(pk=pk).delete()
@@ -291,8 +289,8 @@ def edit_parts_services(request, car_id, service_id):
     # Get our existing link data for this user.  This is used as initial data.
     user_links = SparePart.objects.filter(service_id=service_id)
 
-    link_data = [{'part_service': l.name, 'price': l.price, 'service': l.service}
-                 for l in user_links]
+    link_data = [{'part_service': l_d.name, 'price': l_d.price, 'service': l_d.service}
+                 for l_d in user_links]
 
     if request.method == 'POST':
         link_formset = LinkFormSet(request.POST)
@@ -362,7 +360,7 @@ def edit_invoices(request, car_id, service_id):
     return render(request, 'cars/editInvoices.html', context)
 
 
-def delete_service(request, car_id, service_id):
+def delete_service(_request, car_id, service_id):
     invoices = Invoice.objects.filter(service_id=service_id)
     for invoice in invoices:
         path = os.path.join(BASE_DIR, str(invoice.file))
@@ -375,7 +373,7 @@ def delete_service(request, car_id, service_id):
     return redirect('/cars/carDetails/{}#service'.format(car_id))
 
 
-def edit_service_details(request, car_id, service_id):
+def edit_service_details(request, _car_id, _service_id):
     form = AddServiceForm(request.POST)
     context = {
         'form': form
@@ -399,7 +397,7 @@ class ServiceDeailsUpdate(UpdateView):
         return '{}#service'.format(reverse('cars:car_details', kwargs={'car_id': car_id}))
 
 
-def delete_invoice(request, car_id, service_id, invoice_id):
+def delete_invoice(_request, car_id, service_id, invoice_id):
     invoice = get_object_or_404(Invoice, pk=invoice_id)
     path = os.path.join(BASE_DIR, str(invoice.file))
     try:
@@ -437,8 +435,7 @@ def download_history(request, car_id):
     sum_font_style = xlwt.XFStyle()
     sum_font_style.font.bold = True
     for service, elements in services_dict.items():
-        print(service)
-        row_num = row_num + 1
+        row_num += 1
         ws.write(row_num, 0, str(service.date), font_style)
         ws.write(row_num, 1, service.mileage, font_style)
         for element in elements[0]:
@@ -464,7 +461,6 @@ def download_history(request, car_id):
     try:
         wb.save(excel_save_path)
     except FileNotFoundError:
-        print('create dir')
         os.mkdir(excel_mkdir_path)
         wb.save(excel_save_path)
     zip_file = zipfile.ZipFile(byte_data, "w")
