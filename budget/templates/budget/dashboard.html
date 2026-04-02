@@ -97,22 +97,36 @@
                     <div class="list-group list-group-flush">
                         {% for section in ledger.sections.all|dictsortreversed:"id" %}
                             <div class="list-group-item bg-transparent border-secondary px-0 d-flex justify-content-between align-items-center">
-                                <a href="{% url 'budget:section_detail' section.pk %}" class="text-light flex-grow-1" style="text-decoration: none;">
-                                    <i class="far fa-folder-open mr-2 text-muted"></i>{{ section.name }}
+                                <a href="{% url 'budget:section_detail' section.pk %}" class="text-light flex-grow-1 mr-3" style="text-decoration: none; min-width: 0;">
+                                    <div class="d-flex flex-column">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <span><i class="far fa-folder-open mr-2 text-muted"></i>{{ section.name }}</span>
+                                            {% if section.total_budget %}
+                                                <small class="badge badge-pill badge-light">
+                                                    {% widthratio section.total_spent section.total_budget 100 %}%
+                                                    {% include 'budget/_progress_bar.html' with spent=section.total_spent budget=section.total_budget is_dashboard=True %}
+                                                </small>
+                                            {% endif %}
+                                        </div>
+                                    </div>
                                 </a>
-                                <a href="{% url 'budget:toggle_pin_section' section.pk %}" class="ajax-toggle-pin mr-2 text-decoration-none" title="Przypnij/Odepnij">
+
+                                <div class="d-flex align-items-center">
+                                    <a href="{% url 'budget:toggle_pin_section' section.pk %}" class="ajax-toggle-pin mr-2 text-decoration-none" title="Przypnij/Odepnij">
                                         <i class="fas fa-thumbtack {% if section.is_pinned %}text-20-pln{% else %}text-muted{% endif %}" style="{% if not section.is_pinned %}opacity: 0.3;{% endif %}"></i>
                                     </a>
 
-                                <form action="{% url 'budget:delete_section' section.pk %}" method="POST" class="ajax-delete-section" data-confirm="Czy na pewno usunąć sekcję {{ section.name }} i WSZYSTKIE jej wydatki?">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="ledger_id" value="{{ ledger.id }}"> <button type="submit" class="btn btn-link text-danger p-0 px-2" style="opacity: 0.5; font-size: 0.8rem;">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </form>
+                                    <form action="{% url 'budget:delete_section' section.pk %}" method="POST" class="ajax-delete-section" data-confirm="Czy na pewno usunąć sekcję {{ section.name }} i WSZYSTKIE jej wydatki?">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="ledger_id" value="{{ ledger.id }}">
+                                        <button type="submit" class="btn btn-link text-danger p-0 px-2" style="opacity: 0.5; font-size: 0.8rem;">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         {% empty %}
-                        <p class="text-muted small mt-2">Brak sekcji (np. miesięcy).</p>
+                            <p class="text-muted small mt-2">Brak sekcji (np. miesięcy).</p>
                         {% endfor %}
                     </div>
                 </div>

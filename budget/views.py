@@ -1,6 +1,6 @@
 from datetime import date
 from decimal import Decimal
-from django.db.models import Sum, Count
+from django.db.models import Sum, Count, Prefetch
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from .models import Ledger, Section, Expense, Category
@@ -14,7 +14,12 @@ from django.shortcuts import redirect
 @login_required
 def budget_dashboard(request):
     # Pobieramy wszystkie dziedziny zalogowanego użytkownika
-    ledgers = Ledger.objects.filter(user=request.user).order_by('sort_order', '-created_at')
+    sections_with_stats = Section.objects.annotate(
+        total_spent=Sum('expenses__amount')
+    )
+    ledgers = Ledger.objects.filter(user=request.user) \
+        .prefetch_related(Prefetch('sections', queryset=sections_with_stats)) \
+        .order_by('sort_order', '-created_at')
     pinned_sections = Section.objects.filter(ledger__user=request.user, is_pinned=True)
     categories = Category.objects.filter(user=request.user)
     return render(request, 'budget/dashboard.html',
