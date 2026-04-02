@@ -117,6 +117,7 @@ def car_details(request, car_id):
     averages_list = []
     fuel_cost_list = []
     dates_list = []
+
     for fuel in car_fuel_fill_list:
         total_fuel_list.append(fuel.liters)
         total_km_list.append(fuel.kilometers)
@@ -144,6 +145,12 @@ def car_details(request, car_id):
         last_service = service_list[0]
     except IndexError:
         last_service = ''
+    try:
+        zakup = car[0].mileage
+        last_fuel = list(car_fuel_fill_list)[0].mileage
+        total_km = last_fuel - zakup
+    except:
+        pass
 
     stats_data = get_stats_data(json.loads(chart_dates))
     context = {
