@@ -41,7 +41,7 @@ urlpatterns = [
     path('', include('exchange_rates.urls')),
     path('', include('receipts.urls')),
     path('', include('gunsafe.urls')),
-    path('', include('budget.urls'), name='budget'),
+    path('', include('budget.urls')),
     url(r'^media/(?P<path>.*)$', protected_serve, {'document_root': settings.MEDIA_ROOT}),
 
 ]

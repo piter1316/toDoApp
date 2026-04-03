@@ -81,7 +81,8 @@
 <div class="navbar-overlay" id="navbarOverlay"></div>
 <div class="sticky-top navbar-main-container">
   <nav class="navbar navbar-expand-lg navbar-light bg-light py-0 py-lg-1">
-    <a class="navbar-brand" href="{% url 'home' %}">ORGANIZER{% if user.is_authenticated %}<small> {{request.user}}</small>{% endif %}</a>
+    <a class="navbar-brand" href="{% url 'home' %}">ORGANIZER
+      {% if user.is_authenticated %}<small> {{request.user}}</small>{% endif %}</a>
     <button class="navbar-toggler modern-hamburger" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <i class="fas fa-bars"></i>
     </button>
@@ -90,6 +91,7 @@
           <i class="fas fa-times" id="closeSidebar"></i>
       </div>
       <ul class="navbar-nav mr-auto text-center">
+        {% if user.is_authenticated %}
         <li class="nav-item">
           <a class="nav-link" href="{% url 'shopping:shopping_list_index' %}">Zakupy</a>
         </li>
@@ -118,6 +120,7 @@
         <li class="nav-item">
           <a class="nav-link" href="{% url 'budget:budget_dashboard' %}">Finanse</a>
         </li>
+        {% endif %}
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="narzedzia" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Narzędzia
