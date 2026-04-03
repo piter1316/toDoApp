@@ -26,11 +26,10 @@ from todo import views
 @login_required
 def protected_serve(request, path, document_root=None, show_indexes=False):
     return serve(request, path, document_root, show_indexes)
-
-
 urlpatterns = [
     path('admin/', admin.site.urls),
-
+    path('gunsafe/', include('gunsafe.urls')),
+    path('budget/', include('budget.urls')),
     path('', views.home, name='home'),
     path('', include('todo.urls'), name='todo'),
     path('', include('passwordGenerator.urls')),
@@ -40,8 +39,8 @@ urlpatterns = [
     path('', include('cars.urls')),
     path('', include('exchange_rates.urls')),
     path('', include('receipts.urls')),
-    path('', include('gunsafe.urls')),
-    path('', include('budget.urls')),
     url(r'^media/(?P<path>.*)$', protected_serve, {'document_root': settings.MEDIA_ROOT}),
 
 ]
+
+

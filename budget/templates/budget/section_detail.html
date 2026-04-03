@@ -368,6 +368,9 @@
         async function handleAjaxSubmit(e) {
             const form = e.target.closest('.ajax-form') || (e.target.tagName === 'FORM' && e.target);
             if (!form) return;
+            if (form.action.includes('logout') || form.id === 'logout-form') {
+                return;
+            }
             const confirmMsg = form.getAttribute('data-confirm');
             if (confirmMsg && !confirm(confirmMsg)) {
                 e.preventDefault(); // Zatrzymuje wysyłkę AJAX
