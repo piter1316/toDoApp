@@ -159,10 +159,18 @@
                         </table>
                     </div>
 
-                    <div class="card-footer text-right" style="border-top: 1px solid #373a40; background: rgba(255,255,255,0.02); border-radius: 0 0 12px 12px;">
-                        <span class="text-muted small mr-2">RAZEM:</span>
-                        <span class="h5 mb-0 font-weight-bold text-info">
-                            {{ item.total|floatformat:2 }} <small>zł</small>
+                    <div class="card-footer d-flex justify-content-between" style="border-top: 1px solid #373a40; background: rgba(255,255,255,0.02); border-radius: 0 0 12px 12px;">
+                        {% if item.per_section %}
+                            <span class="text-muted">
+                                <small class="text-muted small mr-2">Średnio na sekcję:</small>
+                                <span >{{ item.per_section|floatformat:2 }} <small>zł</small></span>
+                            </span>
+                        {% endif %}
+                        <span>
+                            <span class="text-muted small mr-2">RAZEM:</span>
+                            <span class="h5 mb-0 font-weight-bold text-info">
+                                {{ item.total|floatformat:2 }} <small>zł</small>
+                            </span>
                         </span>
                     </div>
                 </div>

@@ -4,7 +4,7 @@ from datetime import datetime
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
+
 from django.core.files.storage import FileSystemStorage
 from django.db import transaction
 from django.forms import formset_factory
@@ -12,18 +12,18 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.files.storage import default_storage
 
-# Create your views here.
-from django.urls import reverse, reverse_lazy
+
+from django.urls import reverse
 from django.views.generic import UpdateView
 from pymysql import IntegrityError
 
 from cars import forms
 from cars.forms import CarForm, FuelFillForm, AddServiceForm, LinkForm, BaseLinkFormSet, InvoiceForm
 from cars.models import Car, Fuel, Service, SparePart, Invoice
-from myproject.settings import BASE_DIR, MEDIA_ROOT
+from myproject.settings import BASE_DIR
 from django.core import serializers
 import xlwt
-from io import BytesIO, StringIO
+from io import BytesIO
 import zipfile
 
 
@@ -474,5 +474,4 @@ def download_history(request, car_id):
     zip_file.close()
     response = HttpResponse(byte_data.getvalue(), content_type='application/zip')
     response['Content-Disposition'] = f'attachment; filename=historia_serwisowa_{car_name}.zip'
-
     return response

@@ -260,10 +260,13 @@ def ledger_detail(request, pk):
             grouped_data[cat] = {
                 'category': cat,
                 'expenses': [],
-                'total': 0
+                'total': 0,
+                'per_section': 0
             }
         grouped_data[cat]['expenses'].append(exp)
         grouped_data[cat]['total'] += exp.amount
+        if sections_count:
+            grouped_data[cat]['per_section'] = Decimal(grouped_data[cat]['total'] / sections_count)
     sorted_categories = sorted(
         grouped_data.values(),
         key=lambda x: x['total'],
