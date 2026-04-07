@@ -1,4 +1,3 @@
-from django.db.models import Model
 from django.shortcuts import render
 
 from cars.models import Car, Fuel
