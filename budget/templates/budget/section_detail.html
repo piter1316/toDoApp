@@ -96,43 +96,58 @@
     </div>
 
     <div class="row">
-        <div class="col-12 col-md-4 mb-4">
-            <div class="card pln-card p-3 shadow-sm">
-                <h5 class="text-light mb-1"><i class="fas fa-plus-circle mr-2 pln-100-text"></i>Dodaj wydatek</h5>
+        <div class="col-12 col-lg-4 mb-4">
+            <div class="card pln-card p-2 shadow-sm">
+                <h6 class="text-light mb-1"><i class="fas fa-plus-circle mr-2 pln-100-text"></i>Dodaj wydatek</h6>
                 <form method="POST" class="ajax-form">
                     {% csrf_token %}
-                    <div class="form-group mb-1">
-                        <label class="text-muted small">Data</label>
-                        <input type="date" name="date" class="form-control pln-input form-control-sm" value="{{ today|date:'Y-m-d' }}" required>
-                    </div>
-                    <div class="form-group mb-1">
-                        <label class="text-muted small">Co kupiłeś?</label>
-                        <input type="text" name="title" class="form-control pln-input form-control-sm" required>
-                    </div>
-                    <div class="form-group mb-1">
-                        <label class="text-muted small">Kategoria</label>
-                        <select name="category" class="form-control pln-input form-control-sm" >
-                            <option value="">Wybierz...</option>
-                            {% for cat in categories %}
-                                <option value="{{ cat.id }}">{{ cat.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="form-group mb-1">
-                        <label class="text-muted small">Kwota (zł)</label>
-                        <input type="number" name="amount" step="0.01" class="form-control pln-input form-control-sm pln-200-text font-weight-bold" required>
-                    </div>
-                    <div class="form-group form-check mb-1">
-                        <input type="checkbox" name="is_cash" class="form-check-input" id="cashCheck">
-                        <label class="form-check-label text-muted small" for="cashCheck">Płatność gotówką</label>
-                    </div>
+                    <div class="form-row no-gutters align-items-center">
 
-                    <button type="submit" class="btn pln-100-btn btn-sm btn-block font-weight-bold">Zapisz wydatek</button>
+                        <div class="col-6 mb-1 px-1">
+                            <input type="date" name="date"
+                                   class="form-control form-control-sm pln-input border-0 bg-black-transparent text-muted"
+                                   value="{{ today|date:'Y-m-d' }}" required>
+                        </div>
+
+                        <div class="col-6  mb-1 px-1">
+                            <input type="text" name="title" placeholder="Co kupiłeś?"
+                                   class="form-control form-control-sm pln-input border-0 bg-black-transparent" required>
+                        </div>
+
+                        <div class="col-6  mb-1 px-1">
+                            <select name="category" class="form-control form-control-sm pln-input border-0 bg-black-transparent">
+                                <option value="" selected disabled>Kategoria...</option>
+                                {% for cat in categories %}
+                                    <option value="{{ cat.id }}">{{ cat.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-3 col-md-2 mb-1 px-1">
+                            <input type="number" name="amount" step="0.01" placeholder="0.00"
+                                   class="form-control form-control-sm pln-input border-0 bg-black-transparent font-weight-bold text-success text-right" required>
+                        </div>
+
+                        <div class="col-3 mb-1 px-1 text-left">
+                            <div class="custom-control custom-checkbox pt-1">
+                                <input type="checkbox" name="is_cash" class="custom-control-input" id="cashCheck">
+                                <label class="custom-control-label text-muted small" for="cashCheck" title="Gotówka?">
+                                    <i class="fas fa-coins text-warning ml-1"></i>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-12  mb-1 px-1">
+                            <button type="submit" class="btn pln-100-btn btn-sm btn-block font-weight-bold">
+                                <i class="fas fa-check mr-1"></i>Zapisz
+                            </button>
+                        </div>
+                    </div>
                 </form>
             </div>
         </div>
 
-        <div class="col-12 col-md-8">
+        <div class="col-12 col-lg-8">
             <div class="card pln-card p-0 shadow-sm" id="expense-list-container">
                 <div class="table-responsive">
                     <table class="table table-dark table-hover mb-0" style="background-color: transparent;">
@@ -185,7 +200,7 @@
     </div>
     <div class="row mt-4 mb-5" id="analysis-section">
         <div class="col-12">
-            <div class="card pln-card shadow-lg p-3">
+            <div class="card pln-card shadow-lg p-2">
                 <h5 class="text-light mb-4"><i class="fas fa-chart-pie mr-2 text-info"></i>Analiza wydatków wg kategorii</h5>
 
                 <div class="row align-items-center">
