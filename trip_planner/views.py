@@ -8,11 +8,8 @@ from cars.models import Car, Fuel
 def trip_planner(request):
     car_avg_dict = {}
     if request.user.is_authenticated:
-        print(request.user)
         cars = Car.objects.filter(user=request.user.pk)
-
         for car in cars:
-            avg = 0
             try:
                 fuels = Fuel.objects.filter(car_id=car.pk)
                 fuel_liters = [fuel.liters for fuel in fuels]
@@ -22,6 +19,5 @@ def trip_planner(request):
                     car_avg_dict[car.name] = avg
             except:
                 pass
-            print(car_avg_dict)
     context = {'car_avg_dict': car_avg_dict}
     return render(request, 'trip_planner/trip_planner.html', context)
