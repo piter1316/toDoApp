@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'exchange_rates',
     'gunsafe',
     'budget',
+    'trip_planner',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

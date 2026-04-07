@@ -33,6 +33,7 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('', include('todo.urls'), name='todo'),
     path('', include('passwordGenerator.urls')),
+    path('', include('trip_planner.urls')),
     path('', include('accounts.urls')),
     path('', include('shopping.urls')),
     path('', include('meals.urls')),

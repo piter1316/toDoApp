@@ -1,0 +1,190 @@
+{% extends 'todo/base.html' %}
+{% block body %}
+<style>
+    /* Stylistyka pasująca do generatora haseł */
+    .trip-card {
+        background: rgba(30, 30, 30, 0.8);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #eee;
+    }
+    .leg-row {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+        margin-bottom: 5px;
+        transition: all 0.3s;
+    }
+    .leg-row:hover { background: rgba(0, 0, 0, 0.3); }
+    .total-display {
+        font-family: 'Courier New', monospace;
+        color: #00ff41;
+        font-size: 1.5rem;
+        border-top: 1px dashed #444;
+    }
+</style>
+
+<div class="card trip-card shadow-lg mb-4">
+    <div class="card-header border-0 bg-transparent d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-route mr-2 text-info"></i>Kalkulator Trasy Pro</h5>
+        <button class="btn btn-sm btn-outline-light" onclick="addLeg()">+ Dodaj etap (Kraj)</button>
+    </div>
+    <div class="card-body">
+        {% if user.is_authenticated %}
+            {% if car_avg_dict %}
+                <div class="row no-gutters mb-3 pb-3 border-bottom border-secondary">
+                    <div class="col-6 col-md-3 px-1">
+                        <label class="small text-muted mb-0">Samochód</label>
+                        <select id="car_selector" class="form-control form-control-sm bg-dark text-light border-0" oninput="syncCarConsumption()">
+                            <option value="" id="custom_option" hidden disabled>Własne / Manualne</option>
+                            {% for car, avg_consumption in car_avg_dict.items %}
+                            <option value="{{avg_consumption|stringformat:'.2f'}}">{{car}} </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+        <div class="row no-gutters mb-3 pb-3 border-bottom border-secondary">
+            <div class="col-6 col-md-3 px-1">
+                <label class="small text-muted mb-0">Spalanie (l/100km)</label>
+                <input type="number" id="avg_consumption" step="0.01" class="form-control form-control-sm bg-dark text-light border-0" oninput="detachCar(); calculateTotal();">
+            </div>
+            <div class="col-6 col-md-3 px-1">
+                <label class="small text-muted mb-0">Liczba osób</label>
+                <input type="number" id="passengers" class="form-control form-control-sm bg-dark text-light border-0" value="1" oninput="calculateTotal()">
+            </div>
+        </div>
+
+        <div id="legs-container">
+            <div class="leg-row p-2 animate__animated animate__fadeIn">
+                <div class="form-row no-gutters align-items-end">
+                    <div class="col-5 col-md-4 px-1">
+                        <input type="text" placeholder="Kraj/Etap" class="form-control form-control-sm bg-transparent text-light border-0 border-bottom">
+                    </div>
+                    <div class="col-3 col-md-2 px-1">
+                        <input type="number" placeholder="km" class="form-control form-control-sm bg-transparent text-light border-0 border-bottom leg-km" oninput="calculateTotal()">
+                    </div>
+                    <div class="col-2 col-md-2 px-1">
+                        <input type="number" step="0.01" placeholder="Paliwo" class="form-control form-control-sm bg-transparent text-light border-0 border-bottom leg-price" oninput="calculateTotal()">
+                    </div>
+                    <div class="col-2 col-md-2 px-1">
+                        <input type="number" placeholder="Opłaty" class="form-control form-control-sm bg-transparent text-light border-0 border-bottom leg-fees" oninput="calculateTotal()">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="total-display mt-4 pt-3 text-right">
+            <div class="small text-muted" style="font-size: 0.8rem; letter-spacing: 1px;">ŁĄCZNY KOSZT WYPRAWY</div>
+            <span id="total_cost">0.00</span> <small>PLN</small>
+            <div class="text-info" style="font-size: 0.9rem;">
+                <i class="fas fa-user-friends mr-1"></i> <span id="per_person">0.00</span> / os.
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+  /**
+   * 1. Synchronizacja spalania z wybranym samochodem
+   */
+
+  function detachCar() {
+    const carSelector = document.getElementById('car_selector');
+    if (carSelector) {
+      carSelector.value = ""; // Ustawia na pusty placeholder
+    }
+  }
+
+  function syncCarConsumption() {
+    const carSelector = document.getElementById('car_selector');
+    const consumptionInput = document.getElementById('avg_consumption');
+
+    if (carSelector && consumptionInput) {
+      // Przypisz wartość spalania z wybranej opcji do pola tekstowego
+      consumptionInput.value = carSelector.value;
+      // Odśwież obliczenia całego kosztu
+      calculateTotal();
+    }
+  }
+
+  /**
+   * 2. Główna funkcja licząca koszty trasy
+   */
+  function calculateTotal() {
+    // Pobierz bazowe parametry (spalanie i osoby)
+    const avgCons = parseFloat(document.getElementById('avg_consumption').value) || 0;
+    const passengers = parseFloat(document.getElementById('passengers').value) || 1;
+
+    // Pobierz wszystkie pola z etapów
+    const kms = document.querySelectorAll('.leg-km');
+    const prices = document.querySelectorAll('.leg-price');
+    const fees = document.querySelectorAll('.leg-fees');
+
+    let total = 0;
+
+    // Pętla po każdym dodanym etapie (kraju)
+    for (let i = 0; i < kms.length; i++) {
+      let dist = parseFloat(kms[i].value) || 0;
+      let fuelPrice = parseFloat(prices[i].value) || 0;
+      let legFees = parseFloat(fees[i].value) || 0;
+
+      // Wzór: (dystans * spalanie / 100) * cena paliwa + opłaty dodatkowe
+      let fuelCost = (dist * avgCons / 100) * fuelPrice;
+      total += fuelCost + legFees;
+    }
+
+    // Wyświetl wyniki w podsumowaniu
+    const totalDisplay = document.getElementById('total_cost');
+    const perPersonDisplay = document.getElementById('per_person');
+
+    if (totalDisplay) totalDisplay.innerText = total.toFixed(2);
+    if (perPersonDisplay) perPersonDisplay.innerText = (total / passengers).toFixed(2);
+  }
+
+  /**
+   * 3. Dodawanie nowego etapu (wiersza) podróży
+   */
+  function addLeg() {
+    const container = document.getElementById('legs-container');
+    if (!container) return;
+
+    const newLeg = document.createElement('div');
+    newLeg.className = 'leg-row p-2 animate__animated animate__fadeIn';
+    newLeg.innerHTML = `
+        <div class="form-row no-gutters align-items-end">
+            <div class="col-5 col-md-4 px-1">
+                <input type="text" placeholder="Kolejny etap/kraj" class="form-control form-control-sm bg-transparent text-light border-0 border-bottom">
+            </div>
+            <div class="col-3 col-md-2 px-1">
+                <input type="number" placeholder="km" class="form-control form-control-sm bg-transparent text-light border-0 border-bottom leg-km" oninput="calculateTotal()">
+            </div>
+            <div class="col-2 col-md-2 px-1">
+                <input type="number" step="0.01" placeholder="Paliwo" class="form-control form-control-sm bg-transparent text-light border-0 border-bottom leg-price" oninput="calculateTotal()">
+            </div>
+            <div class="col-1 col-md-2 px-1">
+                <input type="number" placeholder="Opłaty" class="form-control form-control-sm bg-transparent text-light border-0 border-bottom leg-fees" oninput="calculateTotal()">
+            </div>
+            <div class="col-1 text-right px-1">
+                <button type="button" class="btn btn-sm text-danger p-0" onclick="this.closest('.leg-row').remove(); calculateTotal();">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    `;
+    container.appendChild(newLeg);
+  }
+
+  /**
+   * 4. Start skryptu po załadowaniu strony
+   */
+  document.addEventListener('DOMContentLoaded', function() {
+    // Jeśli jest lista aut, ustaw spalanie pierwszego z nich
+    syncCarConsumption();
+
+    // Policz wszystko na start (żeby wyzerować pola)
+    calculateTotal();
+  });
+</script>
+
+{% endblock %}

@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'receipts',
     'gunsafe',
     'budget',
+    'trip_planner',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
