@@ -102,9 +102,15 @@
       }
   }
 
+  @media (min-width: 768px) {
+  .custom-border-sm {
+    border: 0 !important;
+  }
+}
+
   /* Current Day Highlight */
   .today-highlight-card {
-      border: 2px solid #ffffff !important; /* Dark theme highlight */
+      border-bottom: 2px solid #ffffff !important; /* Dark theme highlight */
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1) !important;
       position: relative;
   }
@@ -242,8 +248,8 @@
 
             {% for day in days_data %}
 
-            <tr class="d-xl-none no_print rounded {% if day.is_today %} bg-secondary today-highlight-card{% endif %}" id="tr_{{day.raw_day}}">
-                <td class="text-center border-bottom mb-2 pb-3 {% if day.is_today %} bg-secondary {% endif %}" colspan="6" id="div_td_{{day.raw_day}}">
+            <tr class="d-xl-none no_print rounded mb-0 {% if day.is_today %} bg-secondary today-highlight-card{% endif %}" id="tr_{{day.raw_day}}">
+                <td class="text-center border-bottom {% if day.is_today %} bg-secondary {% endif %}" colspan="6" id="div_td_{{day.raw_day}}">
                   <div class="d-flex justify-content-between align-items-center mb-2 px-3 pt-2">
                     <div class="d-flex align-items-center">
                       {% if day.is_today %}
@@ -256,7 +262,7 @@
 
                   <h4 class="font-weight-bold mb-1 {% if day.is_today %} text-light{% endif %}" style="font-size: 1.25rem;">{{day.totals.kcal}} <small class="{% if day.is_today %} text-light {% else %}text-muted{% endif %}" style="font-size: 0.8rem;">kcal</small></h4>
 
-                  <div class="d-flex justify-content-center flex-wrap px-2">
+                  <div class="d-flex justify-content-center flex-wrap p-1">
                     <span class="macro-badge" data-toggle="tooltip" title="Białko">{{day.totals.prot}}g <small>B</small></span>
                     <span class="macro-badge" data-toggle="tooltip" title="Tłuszcze">{{day.totals.fat}}g <small>T</small></span>
                     <span class="macro-badge" data-toggle="tooltip" title="Węglowodany">{{day.totals.carb}}g <small>W</small></span>
@@ -266,7 +272,7 @@
                 </td>
             </tr>
 
-            <tr style="position:relative" class="text-center {% if day.is_today %} bg-secondary today-highlight-card  {% endif %}" >
+            <tr style="position:relative" class="text-center rounded border border-secondary border-top-0 border-left-0 border-right-0 custom-border-sm{% if day.is_today %} bg-secondary today-highlight-card  {% endif %}" >
               <th nowrap class="text-left d-none d-xl-flex {% if day.is_today %} bg-secondary text-light {% endif %}" id="th_{{day.raw_day}}">
                 <div id="div_th_{{day.raw_day}}" class="w-100 d-flex justify-content-between align-items-center">
                   <div class="d-flex align-items-center">
@@ -296,7 +302,7 @@
               </th>
 
               {% for meal_cell in day.meals %}
-              <td class="px-2 px-xl-0 d-flex flex-column justify-content-between border-bottom border-xl-0 mb-3 mb-xl-0 {% if day.is_today %} bg-secondary text-light {% endif %}" style="height: auto;" id="td_{{meal_cell.list_id}}">
+              <td class="p-2 px-xl-0 d-flex flex-column justify-content-between border-bottom border-xl-0  mb-xl-0 {% if day.is_today %} bg-secondary text-light {% endif %}" style="height: auto;" id="td_{{meal_cell.list_id}}">
 
                 <div class="ml-1 mb-2 text-left d-flex justify-content-between align-items-center">
                     <small class="text-uppercase {% if day.is_today %} text-light {% else %}text-muted{% endif %} font-weight-bold tracking-wide" style="font-size: 0.65rem;">
@@ -314,7 +320,7 @@
                         <span class="text-muted font-italic font-weight-normal">-----------------------</span>
                       {% endif %}
                     </div>
-                    <div class="dropdown-menu dropdown-menu-modern p-3 border border-dark shadow shadow-lg" id="dropdownMenu_{{meal_cell.list_id}}">
+                    <div class="dropdown-menu dropdown-menu-modern p-3 border border-secondary shadow shadow-lg" id="dropdownMenu_{{meal_cell.list_id}}">
                       {% if current %}
                       <div class=" mx-auto mb-1">
                         <small class="text-muted font-weight-bold text-uppercase d-block mb-2">Zmiana posiłku:</small>
@@ -411,7 +417,7 @@
               </td>
               {% endfor %}
             </tr>
-            <tr class="no_print"><td class="p-0" colspan="6"><div style="height: 2px;"></div></td></tr>
+
 
             {% endfor %}
             </tbody>
