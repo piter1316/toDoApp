@@ -302,7 +302,7 @@
               </th>
 
               {% for meal_cell in day.meals %}
-              <td class="p-2 px-xl-0 d-flex flex-column justify-content-between border-bottom border-xl-0  mb-xl-0 {% if day.is_today %} bg-secondary text-light border-0 {% endif %}" style="height: auto;" id="td_{{meal_cell.list_id}}">
+              <td class="p-2 px-xl-0 d-flex flex-column justify-content-between border-bottom border-xl-0  mb-xl-0 {% if day.is_today %} bg-secondary text-light {% endif %}" style="height: auto;" id="td_{{meal_cell.list_id}}">
 
                 <div class="ml-1 mb-2 text-left d-flex justify-content-between align-items-center">
                     <small class="text-uppercase {% if day.is_today %} text-light {% else %}text-muted{% endif %} font-weight-bold tracking-wide" style="font-size: 0.65rem;">
