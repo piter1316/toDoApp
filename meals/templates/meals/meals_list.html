@@ -317,7 +317,7 @@
                         {% if meal_cell.is_special %} <span class="text-danger">*</span> {% endif %}
                         {% if meal_cell.short_expiry %}<sup class="fas fa-hourglass-start text-dark ml-1" ></sup>{% endif %}
                       {% else %}
-                        <span class="text-muted font-italic font-weight-normal">-----------------------</span>
+                        <span class="{% if day.is_today %} text-light {% else %}text-muted{% endif %} font-italic font-weight-normal">-----------------------</span>
                       {% endif %}
                     </div>
                     <div class="dropdown-menu dropdown-menu-modern p-3 border border-secondary shadow shadow-lg" id="dropdownMenu_{{meal_cell.list_id}}">
