@@ -249,7 +249,7 @@
             {% for day in days_data %}
 
             <tr class="d-xl-none no_print rounded mb-0 {% if day.is_today %} bg-secondary today-highlight-card{% endif %}" id="tr_{{day.raw_day}}">
-                <td class="text-center border-bottom {% if day.is_today %} bg-secondary {% endif %}" colspan="6" id="div_td_{{day.raw_day}}">
+                <td class="text-center border-bottom {% if day.is_today %} bg-dark {% endif %}" colspan="6" id="div_td_{{day.raw_day}}">
                   <div class="d-flex justify-content-between align-items-center mb-2 px-3 pt-2">
                     <div class="d-flex align-items-center">
                       {% if day.is_today %}
@@ -273,7 +273,7 @@
             </tr>
 
             <tr style="position:relative" class="text-center rounded border border-secondary border-top-0 border-left-0 border-right-0 custom-border-sm{% if day.is_today %} bg-secondary today-highlight-card  {% endif %}" >
-              <th nowrap class="text-left d-none d-xl-flex {% if day.is_today %} bg-secondary text-light {% endif %}" id="th_{{day.raw_day}}">
+              <th nowrap class="text-left d-none d-xl-flex {% if day.is_today %} bg-dark text-light {% endif %}" id="th_{{day.raw_day}}">
                 <div id="div_th_{{day.raw_day}}" class="w-100 d-flex justify-content-between align-items-center">
                   <div class="d-flex align-items-center">
                     {% if day.is_today %}
