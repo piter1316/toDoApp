@@ -44,8 +44,12 @@
             // 1. Obsługa starych pól (w sekcjach)
             const oldFields = document.querySelectorAll('[id^="income-value-"]');
             oldFields.forEach(el => {
-                const rawValue = el.getAttribute('data-income');
-                el.innerText = data.hide_income ? 'Dochód:  ****,** zł' : `Dochód: ${rawValue} zł`;
+                const rawValue = el.getAttribute('data-income'); // np. "1 234,56"
+                console.log(rawValue)
+                // Zamienia każdą cyfrę (\d) na gwiazdkę (*), ignoruje spacje i przecinki
+                const maskedValue = rawValue.replace(/\d/g, '*');
+
+                el.innerText = data.hide_income ? `Dochód: ${maskedValue} zł` : `Dochód: ${rawValue} zł`;
             });
 
             // 2. Obsługa nowych pól w Ledger Detail (klasa .income-sensitive)
@@ -53,9 +57,9 @@
             sensitiveFields.forEach(el => {
                 const rawValue = el.getAttribute('data-raw-value');
                 const suffix = el.getAttribute('data-suffix') || ''; // Dla ikonki monet przy budżecie
-
+                const maskedValue = rawValue.replace(/\d/g, '*');
                 if (data.hide_income) {
-                    el.innerHTML = '****,**';
+                    el.innerHTML = maskedValue;
                 } else {
                     el.innerHTML = rawValue + suffix;
                 }
