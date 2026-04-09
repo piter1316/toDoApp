@@ -20,18 +20,17 @@
 </style>
 
 <div class="container-fluid budget-bg py-4 ">
-
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
-            <div class="mb-3 mb-md-0 text-center text-md-left">
-                <a href="{% url 'budget:budget_dashboard' %}" class="text-muted text-decoration-none small">
-                    <i class="fas fa-arrow-left mr-1"></i> Wróć do kokpitu
-                </a>
-                <h2 class="font-weight-bold text-light mt-1 mb-0 text-truncate">
-                    <i class="fas fa-wallet text-info mr-2"></i>{{ ledger.name }}
-                </h2>
-            </div>
+        <div class="mb-3 mb-md-0 text-center text-md-left">
+            <a href="{% url 'budget:budget_dashboard' %}" class="text-muted text-decoration-none small">
+                <i class="fas fa-arrow-left mr-1"></i> Wróć do kokpitu
+            </a>
+            <h2 class="font-weight-bold text-light mt-1 mb-0 text-truncate">
+                <i class="fas fa-wallet text-info mr-2"></i>{{ ledger.name }}
+            </h2>
+        </div>
 
-            <div class="pln-card p-2 px-3 shadow-sm border-info mx-auto mx-md-0"
+        <div class="pln-card p-2 px-3 shadow-sm border-info mx-auto mx-md-0"
              style="border-left: 3px solid #17a2b8 !important; min-width: 200px;">
             <div class="text-center text-md-right">
                 <small class="text-muted text-uppercase d-block" style="font-size: 0.65rem; letter-spacing: 1px;">Wydano łącznie</small>
@@ -39,18 +38,14 @@
                     {{ total_amount|floatformat:"2" }} <small class="text-muted" style="font-size: 0.9rem;">zł</small>
                 </h3>
                 {% if total_amount_per_section %}
-                        <small class="d-block text-muted">na sekcję:
-                            <span class="pln-200-text">
-                                {{ total_amount_per_section|floatformat:"2" }}
-                            </span> zł
-                        </small>
-
-              {% endif %}
-              <hr class="m-1" style="border: 0; height: 1px; background-color: white; opacity: 1;">
-
-
+                    <small class="d-block text-muted">na sekcję:
+                        <span class="pln-200-text">
+                            {{ total_amount_per_section|floatformat:"2" }}
+                        </span> zł
+                    </small>
+                {% endif %}
+                <hr class="m-1" style="border: 0; height: 1px; background-color: white; opacity: 1;">
                 {% if total_income %}
-
                     <small class="d-block"><i id="income-icon-global"
                        class="fas {% if user.settings.hide_income %}fa-eye-slash{% else %}fa-eye{% endif %} text-muted cursor-pointer mr-2"
                        onclick="toggleIncomeGlobal()"
@@ -70,8 +65,7 @@
                 {% endif %}
             </div>
         </div>
-        </div>
-
+    </div>
     <div class="row mt-4">
         <div class="col-12">
             <div class="card pln-card shadow-lg p-3">
@@ -116,14 +110,13 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
 </div>
+<!---->
 <div class="container-fluid budget-bg  pb-5">
     <h4 class="mb-4 font-weight-bold text-white">Szczegółowy wykaz kategorii</h4>
-
     <div class="row">
         {% for item in expenses_by_category %}
             <div class="col-12 col-md-6 col-xl-4 mb-4">
