@@ -1,7 +1,7 @@
 from datetime import date
 from decimal import Decimal
 from django.db.models import Sum, Count, Prefetch
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Ledger, Section, Expense, Category
 from collections import defaultdict

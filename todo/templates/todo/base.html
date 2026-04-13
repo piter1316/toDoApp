@@ -49,34 +49,34 @@
                 // Zamienia każdą cyfrę (\d) na gwiazdkę (*), ignoruje spacje i przecinki
                 const maskedValue = rawValue.replace(/\d/g, '*');
 
-                el.innerText = data.hide_income ? `Dochód: ${maskedValue} zł` : `Dochód: ${rawValue} zł`;
-            });
+                  el.innerText = data.hide_income ? `Dochód: ${maskedValue} zł` : `Dochód: ${rawValue} zł`;
+              });
 
-            // 2. Obsługa nowych pól w Ledger Detail (klasa .income-sensitive)
-            const sensitiveFields = document.querySelectorAll('.income-sensitive');
-            sensitiveFields.forEach(el => {
-                const rawValue = el.getAttribute('data-raw-value');
-                const suffix = el.getAttribute('data-suffix') || ''; // Dla ikonki monet przy budżecie
-                const maskedValue = rawValue.replace(/\d/g, '*');
-                if (data.hide_income) {
-                    el.innerHTML = maskedValue;
-                } else {
-                    el.innerHTML = rawValue + suffix;
-                }
-            });
+              // 2. Obsługa nowych pól w Ledger Detail (klasa .income-sensitive)
+              const sensitiveFields = document.querySelectorAll('.income-sensitive');
+              sensitiveFields.forEach(el => {
+                  const rawValue = el.getAttribute('data-raw-value');
+                  const suffix = el.getAttribute('data-suffix') || ''; // Dla ikonki monet przy budżecie
+                  const maskedValue = rawValue.replace(/\d/g, '*');
+                  if (data.hide_income) {
+                      el.innerHTML = maskedValue;
+                  } else {
+                      el.innerHTML = rawValue + suffix;
+                  }
+              });
 
-            // 3. Podmiana wszystkich ikonek (w tym tej nowej globalnej)
-            const allIcons = document.querySelectorAll('[id^="income-icon-"]');
-            allIcons.forEach(icon => {
-                if (data.hide_income) {
-                    icon.classList.replace('fa-eye', 'fa-eye-slash');
-                } else {
-                    icon.classList.replace('fa-eye-slash', 'fa-eye');
-                }
-            });
-        })
-        .catch(error => console.error('Błąd AJAX:', error));
-    }
+              // 3. Podmiana wszystkich ikonek (w tym tej nowej globalnej)
+              const allIcons = document.querySelectorAll('[id^="income-icon-"]');
+              allIcons.forEach(icon => {
+                  if (data.hide_income) {
+                      icon.classList.replace('fa-eye', 'fa-eye-slash');
+                  } else {
+                      icon.classList.replace('fa-eye-slash', 'fa-eye');
+                  }
+              });
+          })
+          .catch(error => console.error('Błąd AJAX:', error));
+      }
 </script>
 
 </head>
