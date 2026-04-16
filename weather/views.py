@@ -1,7 +1,11 @@
 import json
 import os
+
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.template.loader import render_to_string
+
 from budget.models import UserSettings  # Zakładam taką nazwę modelu
 from weather.utils import get_nask_weather
 
@@ -28,7 +32,8 @@ def weather_dashboard(request):
     user_settings, created = UserSettings.objects.get_or_create(user=request.user)
 
     # Przekształcamy string "1,2,3" w listę intów
-    selected_ids = [int(i) for i in user_settings.weather_stations.split(',') if i]
+    raw_stations = user_settings.weather_stations or ""
+    selected_ids = [int(i) for i in raw_stations.split(',') if i]
 
     if request.method == "POST":
         action = request.POST.get('action')
@@ -46,6 +51,25 @@ def weather_dashboard(request):
 
         user_settings.weather_stations = ",".join(map(str, selected_ids))
         user_settings.save()
+
+        if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+            # Ponownie pobieramy i sortujemy stacje po zmianach
+            user_stations = [s for s in stations if s['id'] in selected_ids]
+            home_weather_data = get_nask_weather(user_settings.home_station_id)
+            for station in user_stations:
+                station['live_data'] = get_nask_weather(station['id'])
+            user_stations.sort(key=lambda x: x['id'] == user_settings.home_station_id, reverse=True)
+
+            html = render_to_string('weather/weather_grid.html', {
+                'user_stations': user_stations,
+                'home_id': user_settings.home_station_id,
+                'csrf_token': request.META.get('CSRF_COOKIE')  # Ważne dla formularzy
+            }, request=request)
+            # Renderujemy fragment navbara (NOWOŚĆ)
+            navbar_html = render_to_string('weather/navbar_weather.html', {
+                'navbar_weather': home_weather_data
+            }, request=request)
+            return JsonResponse({'html': html, 'navbar_html': navbar_html})
         return redirect('weather:weather_dashboard')
 
     # Pobieramy pełne obiekty stacji, które wybrał użytkownik

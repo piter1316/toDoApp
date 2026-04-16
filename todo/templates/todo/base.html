@@ -83,12 +83,17 @@
 <body>
 <div class="navbar-overlay" id="navbarOverlay"></div>
 <div class="sticky-top navbar-main-container">
+
   <nav class="navbar navbar-expand-lg navbar-light bg-light py-0 py-lg-1">
     <a class="navbar-brand" href="{% url 'home' %}">ORGANIZER
       {% if user.is_authenticated %}<small> {{request.user}}</small>{% endif %}</a>
+      <div class="d-flex d-lg-none  align-items-center ml-auto mr-3 px-3 py-1 rounded-pill" id="global-weather">
+        {% include 'weather/navbar_weather.html' %}
+      </div>
     <button class="navbar-toggler modern-hamburger" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <i class="fas fa-bars"></i>
     </button>
+
     <div class="collapse navbar-collapse navbar-offcanvas" id="navbarSupportedContent">
       <div class="close-sidebar text-right d-lg-none p-3">
           <i class="fas fa-times" id="closeSidebar"></i>
@@ -122,6 +127,9 @@
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{% url 'budget:budget_dashboard' %}">Finanse</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'weather:weather_dashboard' %}">Pogoda</a>
         </li>
         {% endif %}
         <li class="nav-item dropdown">
@@ -158,6 +166,9 @@
       </div>
 
       <!-- Desktop User Profile -->
+      <div class="d-none d-md-flex align-items-center ml-auto mr-3 px-3 py-1 rounded-pill" id="global-weather-desktop">
+        {% include 'weather/navbar_weather.html' %}
+      </div>
       <div class="btn-group dropleft float-right d-none d-lg-inline-flex align-items-center">
         <button type="button" class="btn-user-modern-desktop dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <i class="fas fa-user-circle mr-2"></i> {{user}}
@@ -173,6 +184,7 @@
           </div>
         </div>
       </div>
+
       {% else %}
       <div class="text-center my-4 d-lg-none px-3">
         <a class="btn btn-success btn-block" href="{% url 'accounts:login' %}">Zaloguj</a>
