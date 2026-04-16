@@ -1,0 +1,141 @@
+{% extends 'todo/base.html' %}
+
+{% block body %}
+<div class="pln-card p-4 shadow-sm border-0" style="background: rgba(30, 30, 30, 0.7); backdrop-filter: blur(10px); ">
+    <h4 class="text-light mb-4"><i class="fas fa-cloud-sun mr-2"></i> Konfiguracja Pogody</h4>
+
+    <div class="position-relative mb-5">
+        <label class="text-light small">Znajdź swoją miejscowość lub szkołę:</label>
+        <input type="text" id="station-search" class="form-control bg-dark text-light border-0 shadow-none"
+               placeholder="Wpisz miasto lub nazwę stacji..." autocomplete="off">
+
+        <div id="search-results" class="list-group position-absolute w-100 shadow-lg" style="z-index: 1000; max-height: 300px; overflow-y: auto; display: none;">
+            </div>
+    </div>
+
+    <h6 class="text-muted text-uppercase small mb-3">Twoje lokalizacje:</h6>
+        <div class="row" id="weather-grid">
+        {% for s in user_stations %}
+        <div class="col-12 col-md-6 col-lg-4 mb-4"> <div class="pln-card h-100 p-3 shadow-sm d-flex flex-column justify-content-between position-relative"
+                 style="background: rgba(30, 30, 30, 0.6);
+                        backdrop-filter: blur(10px);
+                        border-radius: 15px;
+
+                        border: 2px solid {% if s.id == home_id %}#17a2b8{% else %}rgba(255,255,255,0.1){% endif %};">
+
+                <div>
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div style="max-width: 75%;">
+                            <strong class="text-light d-block text-truncate" title="{{ s.city }}">{{ s.city }}</strong>
+                            <small class="text-muted d-block text-truncate" style="font-size: 0.7rem;" title="{{ s.name }}">
+                                {{ s.name }}
+                            </small>
+                        </div>
+
+                        <div class="d-flex">
+                            <form method="POST" class="m-0"> {% csrf_token %}
+                                <input type="hidden" name="station_id" value="{{ s.id }}">
+                                {% if s.id != home_id %}
+                                    <button name="action" value="set_home" class="btn btn-link text-info p-1 shadow-none" title="Ustaw jako domową">
+                                        <i class="fas fa-thumbtack text-light" style="opacity: 1 !important; filter: drop-shadow(0 0 2px rgba(23, 162, 184, 0.4));"></i>
+                                    </button>
+                                {% else %}
+                                    <span class="text-info p-1"><i class="fas fa-home"></i></span>
+                                {% endif %}
+                                <button name="action" value="remove" class="btn btn-link text-danger p-1 shadow-none" title="Usuń">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-auto">
+                    {% if s.live_data %}
+                    <div class="pt-2 border-top border-secondary d-flex flex-wrap justify-content-between align-items-center">
+                        <div class="mr-2">
+                            <span class="text-light font-weight-bold" style="font-size: 1.1rem;">
+                                {{ s.live_data.temp|floatformat:1 }}°C
+                            </span>
+                            <div class="text-muted" style="font-size: 0.65rem;">
+                                <i class="fas fa-tint mr-1"></i>{{ s.live_data.hum|floatformat:0 }}%
+                                <i class="fas fa-compress-arrows-alt ml-2 mr-1"></i>{{ s.live_data.press|floatformat:0 }} hPa
+                            </div>
+                        </div>
+                        <span class="badge px-2 py-1" style="background-color: {{ s.live_data.pm25_color }}; color: #000; font-size: 0.7rem; border-radius: 6px;">
+                            PM2.5: {{ s.live_data.pm25|floatformat:0 }}
+                        </span>
+                    </div>
+                    {% else %}
+                    <div class="pt-2 border-top border-secondary text-center">
+                        <small class="text-muted font-italic">Oczekiwanie na dane...</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <style>
+        /* Zapobieganie "skakaniu" karty przy hoverze i trzymanie równej wysokości */
+        .pln-card {
+            min-height: 140px;
+        }
+
+        /* Poprawka dla Bootstrap 4, jeśli nie masz g-4 w tej wersji */
+        #weather-grid {
+            margin-right: -10px;
+            margin-left: -10px;
+        }
+        #weather-grid .col {
+            padding-right: 10px;
+            padding-left: 10px;
+        }
+    </style>
+</div>
+
+<script>
+// Dane z backendu
+const allStations = {{ all_stations_json|safe }};
+const searchInput = document.getElementById('station-search');
+const resultsDiv = document.getElementById('search-results');
+
+searchInput.addEventListener('input', function() {
+    const val = this.value.toLowerCase();
+    resultsDiv.innerHTML = '';
+
+    if (val.length < 2) {
+        resultsDiv.style.display = 'none';
+        return;
+    }
+
+    const matches = allStations.filter(s =>
+        s.city.toLowerCase().includes(val) || s.name.toLowerCase().includes(val)
+    ).slice(0, 10); // Tylko 10 wyników dla wydajności
+
+    matches.forEach(s => {
+        const item = document.createElement('button');
+        item.className = 'list-group-item list-group-item-action bg-dark text-light border-secondary small py-2';
+        item.innerHTML = `<strong>${s.city}</strong><br><span class="text-muted" style="font-size:0.75rem">${s.name}</span>`;
+        item.onclick = () => addStation(s.id);
+        resultsDiv.appendChild(item);
+    });
+
+    resultsDiv.style.display = matches.length ? 'block' : 'none';
+});
+
+function addStation(id) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.innerHTML = `{% csrf_token %}<input type="hidden" name="action" value="add"><input type="hidden" name="station_id" value="${id}">`;
+    document.body.appendChild(form);
+    form.submit();
+}
+
+// Zamknij wyniki przy kliknięciu obok
+document.addEventListener('click', (e) => {
+    if (!searchInput.contains(e.target)) resultsDiv.style.display = 'none';
+});
+</script>
+{% endblock %}

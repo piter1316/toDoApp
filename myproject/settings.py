@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'gunsafe',
     'budget',
     'trip_planner',
+    'weather',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

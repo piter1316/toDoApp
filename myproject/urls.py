@@ -30,6 +30,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('gunsafe/', include('gunsafe.urls')),
     path('budget/', include('budget.urls')),
+    path('weather/', include('weather.urls')),
     path('', views.home, name='home'),
     path('', include('todo.urls'), name='todo'),
     path('', include('passwordGenerator.urls')),
