@@ -1,10 +1,12 @@
 import json
 import os
 
+from django.core.cache import cache
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.template.loader import render_to_string
+from django.views.decorators.csrf import csrf_exempt
 
 from budget.models import UserSettings  # Zakładam taką nazwę modelu
 from weather.utils import get_weather_from_ose
@@ -107,6 +109,29 @@ def home_weather(request):
         # Na razie zwrócimy tylko ID do paska menu
         return {'navbar_home_station_id': settings.home_station_id}
     return {}
+
+
 # def weather_dashboard(request):
 #     context = {}
 #     return render(request, 'weather/weather_dash.html', context)
+
+@csrf_exempt
+def update_weather_data(request):
+    # Sprawdź hasło z nagłówka
+    auth_key = request.META.get('HTTP_X_RELAY_AUTH')
+    if auth_key != "TwojeTajneHaslo123":
+        return JsonResponse({'error': 'Unauthorized'}, status=401)
+
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            # Wyciągamy smog_data tak jak wcześniej
+            stations = data.get('smog_data', [])
+            if stations:
+                # Zapisujemy w cache na 15 minut
+                cache.set('ose_all_stations_data', stations, 900)
+                return JsonResponse({'status': 'ok', 'count': len(stations)})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+    return JsonResponse({'status': 'method not allowed'}, status=405)
