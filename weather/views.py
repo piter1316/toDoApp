@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.template.loader import render_to_string
 
 from budget.models import UserSettings  # Zakładam taką nazwę modelu
-from weather.utils import get_nask_weather
+from weather.utils import get_weather_from_ose
 
 
 # Funkcja pomocnicza do ładowania stacji
@@ -33,32 +33,37 @@ def weather_dashboard(request):
 
     # Przekształcamy string "1,2,3" w listę intów
     raw_stations = user_settings.weather_stations or ""
-    selected_ids = [int(i) for i in raw_stations.split(',') if i]
-
+    selected_ids = [i for i in raw_stations.split(',') if i]
     if request.method == "POST":
         action = request.POST.get('action')
         station_id = request.POST.get('station_id')
 
         if action == "add" and station_id:
-            if int(station_id) not in selected_ids:
-                selected_ids.append(int(station_id))
+            if station_id not in selected_ids:
+                selected_ids.append(station_id)
         elif action == "remove":
-            selected_ids.remove(int(station_id))
-            if user_settings.home_station_id == int(station_id):
+            selected_ids.remove(station_id)
+            if user_settings.home_station_id == station_id:
                 user_settings.home_station_id = None
         elif action == "set_home":
-            user_settings.home_station_id = int(station_id)
+            user_settings.home_station_id = station_id
 
         user_settings.weather_stations = ",".join(map(str, selected_ids))
         user_settings.save()
 
         if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
             # Ponownie pobieramy i sortujemy stacje po zmianach
-            user_stations = [s for s in stations if s['id'] in selected_ids]
-            home_weather_data = get_nask_weather(user_settings.home_station_id)
+            user_stations = [s for s in stations if s['name'] in selected_ids]
+            home_weather_data = get_weather_from_ose(user_settings.home_station_id)
             for station in user_stations:
-                station['live_data'] = get_nask_weather(station['id'])
-            user_stations.sort(key=lambda x: x['id'] == user_settings.home_station_id, reverse=True)
+                station['live_data'] = get_weather_from_ose(station['name'])
+            home_name = str(user_settings.home_station_id).strip().upper()
+
+            # 2. Sortowanie
+            user_stations.sort(key=lambda x: (
+                x['name'].strip().upper() != home_name,
+                x['city'].strip().upper()
+            ))
 
             html = render_to_string('weather/weather_grid.html', {
                 'user_stations': user_stations,
@@ -73,10 +78,17 @@ def weather_dashboard(request):
         return redirect('weather:weather_dashboard')
 
     # Pobieramy pełne obiekty stacji, które wybrał użytkownik
-    user_stations = [s for s in stations if s['id'] in selected_ids]
+    user_stations = [s for s in stations if s['name'] in selected_ids]
     for station in user_stations:
-        station['live_data'] = get_nask_weather(station['id'])
-    user_stations.sort(key=lambda x: x['id'] == user_settings.home_station_id, reverse=True)
+        station['live_data'] = get_weather_from_ose(station['name'])
+
+    home_name = str(user_settings.home_station_id).strip().upper()
+
+    # 2. Sortowanie
+    user_stations.sort(key=lambda x: (
+        x['name'].strip().upper() != home_name,
+        x['city'].strip().upper()
+    ))
 
     return render(request, 'weather/weather_dash.html', {
         'user_stations': user_stations,

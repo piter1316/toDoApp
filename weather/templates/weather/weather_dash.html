@@ -60,7 +60,7 @@ searchInput.addEventListener('input', function() {
         const item = document.createElement('button');
         item.className = 'list-group-item list-group-item-action bg-dark text-light border-secondary small py-2';
         item.innerHTML = `<strong>${s.city}</strong><br><span class="text-muted" style="font-size:0.75rem">${s.name}</span>`;
-        item.onclick = () => addStation(s.id);
+        item.onclick = () => addStation(s.name);
         resultsDiv.appendChild(item);
     });
 

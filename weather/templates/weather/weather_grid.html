@@ -18,8 +18,8 @@
 
                 <div class="d-flex">
                     <form method="POST" class="m-0"> {% csrf_token %}
-                        <input type="hidden" name="station_id" value="{{ s.id }}">
-                        {% if s.id != home_id %}
+                        <input type="hidden" name="station_id" value="{{ s.name }}">
+                        {% if s.name != home_id %}
                             <button name="action" value="set_home" class="btn btn-link text-info p-1 shadow-none" title="Ustaw jako domową">
                                 <i class="fas fa-thumbtack text-light" style="opacity: 1 !important; filter: drop-shadow(0 0 2px rgba(23, 162, 184, 0.4));"></i>
                             </button>
