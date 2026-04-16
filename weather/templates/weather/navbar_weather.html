@@ -1,5 +1,12 @@
 {% if navbar_weather %}
-  <span class="text-dark mr-3">
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+  <span class="text-dark mr-3" data-bs-toggle="tooltip"
+        data-bs-placement="top"
+        title="{{ navbar_weather.timestamp }}">
     <i class="fas fa-thermometer-half text-info mr-1"></i>
     {{ navbar_weather.temp|floatformat:1 }}°C
   </span>
