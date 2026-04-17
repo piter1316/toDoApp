@@ -1,14 +1,13 @@
 {% if navbar_weather %}
-<script>
-  $(function () {
-  $('[data-toggle="tooltip"]').tooltip()
-})
-</script>
-  <span class="text-dark mr-3" data-bs-toggle="tooltip"
-        data-bs-placement="top"
+  <div>
+    <span class="text-dark mr-3"
         title="{{ navbar_weather.timestamp }}">
     <i class="fas fa-thermometer-half text-info mr-1"></i>
     {{ navbar_weather.temp|floatformat:1 }}°C
-  </span>
-  <i class="fas fa-tint mr-1"></i>{{ navbar_weather.hum|floatformat:0 }}%
+    </span>
+    <i class="fas fa-tint mr-1"></i>{{ navbar_weather.hum|floatformat:0 }}%
+    <div class="small text-muted w-100 text-center">{{ navbar_weather.timestamp }}</div>
+  </div>
+
+
 {% endif %}
