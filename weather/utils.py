@@ -70,7 +70,7 @@ def get_all_ose_data():
             json_data = response.json()
             all_data = json_data.get('smog_data', [])
 
-            cache.set(cache_key, all_data, 300)
+            cache.set(cache_key, all_data, 650)
             return all_data
 
     except Exception as e:
