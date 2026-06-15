@@ -785,9 +785,13 @@ def generate_shopping_lists(request):
                     unit = 1
                 else:
                     unit = 2
+                try:
+                    product_division = shopping_item.division
+                except Exception:
+                    product_division = ProductDivision(id=1)
                 new_list_position = Products(product_name=shopping_item, quantity=qt[0],
                                              shopping_list_id_id=new_shopping_list.id,
-                                             unit_id=unit, division_id=shopping_item.division)
+                                             unit_id=unit, division_id=product_division)
                 new_list_position_list.append(new_list_position)
             Products.objects.bulk_create(new_list_position_list)
     return redirect('shopping:shopping_list_index')
