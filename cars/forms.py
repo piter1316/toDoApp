@@ -42,10 +42,10 @@ class CarForm(forms.ModelForm):
                'placeholder': 'np. 184000'}))
     logo = forms.FileField(required=False,
                            widget=forms.FileInput(attrs={'multiple': True,
-                                                                  'class': 'form-control-file mb-2'}))
+                                                         'class': 'form-control-file mb-2'}))
     image = forms.FileField(required=False,
                             widget=forms.FileInput(attrs={'multiple': True,
-                                                                   'class': 'form-control-file mb-2'}))
+                                                          'class': 'form-control-file mb-2'}))
 
     sold = forms.CheckboxInput()
 
@@ -55,9 +55,14 @@ class CarForm(forms.ModelForm):
 
 
 class FuelFillForm(forms.ModelForm):
-    date = forms.DateField(widget=forms.DateInput(
-        attrs={'class': 'form-control p-0', 'type': 'date', 'value': get_date()}
-    ))
+    date = forms.DateField(
+        widget=forms.DateInput(attrs={'class': 'form-control p-0', 'type': 'date'})
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self.is_bound and 'date' not in self.initial:
+            self.initial['date'] = date.today().isoformat()
 
     liters = forms.FloatField(widget=forms.NumberInput(
         attrs={'class': 'form-control  p-0', 'min': 1}
@@ -81,7 +86,7 @@ class FuelFillForm(forms.ModelForm):
 
 class AddServiceForm(forms.ModelForm):
     date = forms.DateField(widget=forms.DateInput(
-        attrs={'class': 'form-control p-0', 'type': 'date', 'value': get_date()},format='%Y-%m-%d'
+        attrs={'class': 'form-control p-0', 'type': 'date', 'value': get_date()}, format='%Y-%m-%d'
     ))
     mileage = forms.IntegerField(required=False, widget=forms.NumberInput(
         attrs={'class': 'form-control  p-0 ', 'min': 1, 'placeholder': 'Podaj przebieg w dniu serwisu'}))
@@ -137,9 +142,7 @@ class InvoiceForm(forms.ModelForm):
                            widget=forms.FileInput(attrs={
                                'class': 'form-control-file', 'required': 'true',
                            }))
+
     class Meta:
         model = models.Invoice
         fields = ['name', 'file']
-
-
-
