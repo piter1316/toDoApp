@@ -109,13 +109,16 @@
                   <a href="{% url 'cars:car_details' car.id %}" class="text-decoration-none text-secondary">
                     <div class="card h-100 shadow-sm border bg-light hover-card rounded-lg" style="opacity: 0.85;">
                       <div class="card-body text-center d-flex flex-column justify-content-center align-items-center py-4">
-                        {% if car.logo %}
-                          <img src="{{car.logo.url}}" class="car-logo-img mb-3" style="filter: grayscale(100%); opacity: 0.7;" alt="Logo samochodu">
+                         {% if car.make %}
+                          <!-- Ładowanie logo z CDN na podstawie nazwy marki (np. 'bmw', 'audi', 'toyota') -->
+                          <img src="https://cdn.jsdelivr.net/gh/vehiclespecs/brand-logos@v1.0.0/{{car.make|slugify}}-logo.svg" alt="BMW logo"
+                               class="car-logo-img mb-3"
+                               alt="Logo {{ car.brand }}"
+                               onerror="this.onerror=null; this.src='{% static 'todo/img/car-solid.svg' %}';"/>
                         {% else %}
-                          <img src="{% static 'todo/img/car-solid.svg' %}" class="car-logo-img mb-3 text-muted" style="opacity: 0.3;" alt="Placeholder">
+                          <img src="{% static 'todo/img/car-solid.svg' %}" class="car-logo-img mb-3 text-muted" style="opacity: 0.5;" alt="Placeholder">
                         {% endif %}
-                        <h5 class="card-title font-weight-bold mb-0 text-truncate w-100">{{car}}</h5>
-                        <small class="text-muted mt-2">Historia</small>
+                        <h5 class="card-title font-weight-bold mb-0 text-truncate w-100">{{car.model}}</h5>
                       </div>
                     </div>
                   </a>
