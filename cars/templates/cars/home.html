@@ -75,12 +75,17 @@
                   <a href="{% url 'cars:car_details' car.id %}" class="text-decoration-none text-dark">
                     <div class="card h-100 shadow-sm border-0 hover-card bg-white rounded-lg">
                       <div class="card-body text-center d-flex flex-column justify-content-center align-items-center py-4">
-                        {% if car.logo %}
-                          <img src="{{car.logo.url}}" class="car-logo-img mb-3" alt="Logo samochodu">
+                        {% if car.make %}
+                          <img src="https://api.asetrix.online/api/v1/logos/{{car.make|slugify}}"
+                               class="car-logo-img mb-3"
+                               alt="Logo {{ car.make }}"
+                               onerror="this.onerror=null; this.src='{% static 'todo/img/car-solid.svg' %}'; this.nextElementSibling.style.display='block';">
+                          <!-- Tytuł jest domyślnie ukryty. Pojawi się tylko wtedy, gdy logo się nie załaduje -->
+                          <h5 class="card-title font-weight-bold mb-0 text-truncate w-100" style="display: none;">{{car}}</h5>
                         {% else %}
                           <img src="{% static 'todo/img/car-solid.svg' %}" class="car-logo-img mb-3 text-muted" style="opacity: 0.5;" alt="Placeholder">
+                          <h5 class="card-title font-weight-bold mb-0 text-truncate w-100">{{car}}</h5>
                         {% endif %}
-                        <h5 class="card-title font-weight-bold mb-0 text-truncate w-100">{{car}}</h5>
                       </div>
                     </div>
                   </a>
