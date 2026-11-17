@@ -1,4 +1,6 @@
 import random
+from typing import Optional, List, Tuple, Union
+
 from django.contrib import messages
 
 from django.db.models import Q, Count, Prefetch
@@ -620,6 +622,13 @@ def delete_meal_option(request, meal_option_id):
     return redirect('meals:edit_meals')
 
 
+def sum_meal_price(products: List[Tuple[Optional[float], float]]) -> Optional[float]:
+    if any(price is None or price == 0 for price, _ in products):
+        return None
+
+    return round(sum(price * grams / 100 for price, grams in products), 2)
+
+
 @login_required(login_url='/accounts/login')
 def edit_meal_ingredients(request, meal_id):
     meal_obj = get_object_or_404(Meal, user_id=request.user, pk=meal_id)
@@ -631,6 +640,7 @@ def edit_meal_ingredients(request, meal_id):
 
     recipe_text = meal_obj.recipe or ""
     recipe_rows = recipe_text.count('\n') + 1 if recipe_text else 1
+    ingr_price_list = [(i.ingredient_id.price_per_100_gram, i.quantity) for i in ingredients]
 
     context = {
         'meal': meal_list,
@@ -642,7 +652,8 @@ def edit_meal_ingredients(request, meal_id):
         'calories': round(meal_obj.total_kcal),
         'protein': round(meal_obj.total_protein),
         'fat': round(meal_obj.total_fat),
-        'carbohydrates': round(meal_obj.total_carb)
+        'carbohydrates': round(meal_obj.total_carb),
+        'sum_meal_price': sum_meal_price(ingr_price_list)
     }
     return render(request, 'meals/meal_edit.html', context)
 

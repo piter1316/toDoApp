@@ -142,7 +142,9 @@
               style="background:#f8f9fa; border-bottom:1px solid #eee;
                      font-size:.73rem; color:#666; font-weight:600;
                      text-transform:uppercase; letter-spacing:.04em;">
-            <span>Składniki</span>
+            <span>Składniki</span>{% if sum_meal_price %}
+              <div><i class="fas fa-coins text-warning mr-1"></i>{{sum_meal_price}} PLN</div>
+              {% endif %}
             <span>
               {% if meal.0.total_vegies %}
                 <span class="macro-badge">
@@ -258,6 +260,10 @@
                 <tr>
                   <td class="py-0 text-muted">Sklep:</td>
                   <td class="text-right py-0">{{ingredient.ingredient_id.shop}}</td>
+                </tr>
+                <tr>
+                  <td class="py-0 text-muted">Cena 100g:</td>
+                  <td class="text-right py-0">{{ingredient.ingredient_id.price_per_100_gram}}</td>
                 </tr>
                 {% endif %}
               </table>
@@ -446,7 +452,7 @@
                 <div class="progress-bar bg-warning progress-bar-striped" role="progressbar" style="width: {% widthratio meal.0.total_fruits 100 100 %}%; border-radius: 6px;"></div>
             </div>
         </div>
-              <div>Koszt: </div>
+
               <script>
 function renderTargetChart() {
   // Dane z Django
