@@ -124,6 +124,7 @@ class Ingredient(models.Model):
     shop = models.ForeignKey(Shop, on_delete=models.SET_NULL, default=1, null=True)
     short_expiry = models.BooleanField(default=False, null=True)
     division = models.ForeignKey(ProductDivision, models.DO_NOTHING, default=1)
+    price_per_100_gram = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, default=0)
 
     def __str__(self):
         return self.name

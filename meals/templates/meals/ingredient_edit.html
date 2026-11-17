@@ -1,5 +1,7 @@
 {% extends 'todo/base.html' %}
+
 {% block body %}
+{% load l10n %}
 
 
   <div class="container mt-1 mt-lg-3" >
@@ -53,6 +55,10 @@
             <div class="col">
               Średnia sztuka / opakowanie :
               <input type="number" class="form-control" name="avg_unit" value="{{ingredient.weight_per_unit}}">
+            </div>
+            <div class="col">
+              Cena za 100g :
+              <input type="number" class="form-control" name="price_per_100_gram" value="{{ingredient.price_per_100_gram | unlocalize}}" step="any">
             </div>
           </div>
           <div class="form-row">

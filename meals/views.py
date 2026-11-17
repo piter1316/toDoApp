@@ -850,6 +850,7 @@ def new_ingredient(request):
     fat = request.POST.get('fat', False)
     carb = request.POST.get('carb', False)
     avg_unit = request.POST.get('avg_unit', False)
+    price_per_100_gram = request.POST.get('price_per_100_gram', False)
     shop_select = request.POST.get('shop', False)
     short_expiry = request.POST.get('short_expiry', False)
     division = request.POST.get('division', 1)
@@ -866,6 +867,8 @@ def new_ingredient(request):
         carb = 0
     if not avg_unit:
         avg_unit = 0
+    if not price_per_100_gram:
+        price_per_100_gram = 0
     if shop_select == 'None':
         shop = None
     else:
@@ -874,7 +877,8 @@ def new_ingredient(request):
                                 protein_per_100_gram=prot,
                                 fat_per_100_gram=fat,
                                 carbohydrates_per_100_gram=carb,
-                                weight_per_unit=avg_unit, shop=shop, short_expiry=short_expiry, division_id=division)
+                                weight_per_unit=avg_unit, shop=shop, short_expiry=short_expiry, division_id=division,
+                                price_per_100_gram=price_per_100_gram)
     new_ingredient.save()
     return redirect('meals:edit_ingredients')
 
@@ -906,6 +910,7 @@ def edit_ingredient(request, ingr_id):
     fat = request.POST.get('fat', False)
     carb = request.POST.get('carb', False)
     avg_unit = request.POST.get('avg_unit', False)
+    price_per_100_gram = request.POST.get('price_per_100_gram', False)
     shop_select = request.POST.get('shop', False)
     short_expiry = request.POST.get('short_expiry', False)
     division = request.POST.get('division', 1)
@@ -923,6 +928,8 @@ def edit_ingredient(request, ingr_id):
         carb = 0
     if not avg_unit:
         avg_unit = 0
+    if not price_per_100_gram:
+        price_per_100_gram = 0
     if shop_select == 'None':
         shop = None
     else:
@@ -931,7 +938,6 @@ def edit_ingredient(request, ingr_id):
         division = ProductDivision.objects.get(pk=1)
     else:
         division = ProductDivision.objects.get(pk=division)
-
     edited_ingredient = Ingredient.objects.get(pk=ingr_id)
     edited_ingredient.name = new_ingredient_name
     edited_ingredient.calories_per_100_gram = kcal
@@ -942,6 +948,7 @@ def edit_ingredient(request, ingr_id):
     edited_ingredient.shop = shop
     edited_ingredient.short_expiry = short_expiry
     edited_ingredient.division = division
+    edited_ingredient.price_per_100_gram = price_per_100_gram
     edited_ingredient.save()
     if return_url:
         return redirect(return_url)
