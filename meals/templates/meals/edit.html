@@ -7,7 +7,7 @@
     display: inline-block;
     min-width: 32px;
     text-align: center;
-    padding: 3px 8px;
+    padding: 1px 4px;
     font-size: 0.75rem;
     font-weight: 700;
     color: #555;
@@ -86,7 +86,7 @@
 {% block body %}
 {% load l10n %}
 <div class="container-fluid py-3">
-  
+
   <!-- Add Meal Option Form -->
   <div class="row justify-content-center mb-2">
     <div class="col-12 col-md-8 col-xl-6">
@@ -104,12 +104,12 @@
     {% for meal_option, meals in meals_options_dict.items %}
     <div class="col-12 col-md-6 col-lg-4 col-xl-3 mb-4 mb-2 p-0 p-md-1">
       <div class="card card-option shadow-sm h-100">
-        
+
         <!-- Header with Settings Toggle -->
         <div class="card-header-modern d-flex justify-content-between align-items-center">
           <span>{{forloop.counter}}. {{meal_option}}</span>
-          <button type="button" 
-                  class="btn btn-outline-secondary btn-sm border-0 dropdownMealModern" 
+          <button type="button"
+                  class="btn btn-outline-secondary btn-sm border-0 dropdownMealModern"
                   id="dropdownMeal_{{forloop.counter}}"
                   style="padding: 2px 6px;">
             <i class="fas fa-cog" style="pointer-events:none;"></i>
@@ -129,7 +129,7 @@
               <a class="nav-link py-1 px-1" id="deleteMealOption-tab-{{forloop.counter}}" data-toggle="pill" href="#deteteMealOption_{{forloop.counter}}" role="tab">Usuń</a>
             </li>
           </ul>
-          
+
           <div class="tab-content p-2">
             <!-- Add Meal -->
             <div class="tab-pane fade show active" id="addMeal_{{forloop.counter}}" role="tabpanel">
@@ -143,7 +143,7 @@
                 <button class="btn btn-dark btn-sm btn-block" type="submit">Dodaj danie</button>
               </form>
             </div>
-            
+
             <!-- Edit Option -->
             <div class="tab-pane fade" id="editMealOption_{{forloop.counter}}" role="tabpanel">
               <form action="{% url 'meals:update_meal_option' meal_option.id %}" method="post">
@@ -156,12 +156,12 @@
                 <button type="submit" class="btn btn-dark btn-sm btn-block">Zapisz</button>
               </form>
             </div>
-            
+
             <!-- Delete Option -->
             <div class="tab-pane fade text-center" id="deteteMealOption_{{forloop.counter}}" role="tabpanel">
               <p class="small text-muted mb-2">Czy na pewno usunąć całą sekcję?</p>
-              <a onclick="return confirm('Usunąć {{meal_option}} i wszystkie pozycje?')" 
-                 class="btn btn-danger btn-sm btn-block" 
+              <a onclick="return confirm('Usunąć {{meal_option}} i wszystkie pozycje?')"
+                 class="btn btn-danger btn-sm btn-block"
                  href="{% url 'meals:delete_meal_option' meal_option.id %}">Usuń sekcję</a>
             </div>
           </div>
@@ -170,13 +170,13 @@
         <!-- Meals List -->
         <div class="list-group list-group-flush">
           {% for meal in meals %}
-          <a href="{% url 'meals:edit_meal_ingredients' meal.0.id %}" 
-             class="list-group-item list-group-item-action py-1 px-3 meal-item-link border-bottom"
+          <a href="{% url 'meals:edit_meal_ingredients' meal.0.id %}"
+             class="list-group-item list-group-item-action py-1 px-2 meal-item-link border-bottom"
              title="{{meal.1.4.1}}">
             <div class="d-flex justify-content-between align-items-center flex-wrap" style="gap:4px;">
               <span class="font-weight-bold" style="font-size:0.9rem; flex: 1; min-width: 100px;">
                 {{meal.0}}{% if meal.0.special %}<span class="text-danger ml-1">*</span>{% endif %}
-              </span>
+              </span>{% if meal.1.5 %}<small class="">{{meal.1.5}}<i class="fas fa-coins text-dark ml-1"></i></small>{% endif %}
               <div class="d-flex align-items-center flex-wrap" style="gap:2px;">
                 <span class="macro-badge macro-badge-kcal" style="font-size:0.75rem;">{{meal.1.0}} <small>kcal</small></span>
                 <span class="macro-badge {% if meal.1.4.0 == 'B' %}macro-badge-protein-hi_p{% endif %}
@@ -207,10 +207,10 @@ $(document).ready(function() {
     e.stopPropagation();
     var id = $(this).attr('id').split('_')[1];
     var $target = $('#dropdownMealContent_' + id);
-    
+
     // Zwijamy inne otwarte panele w tej samej kolumnie/widoku (opcjonalnie)
     $('[id^="dropdownMealContent_"]').not($target).slideUp(200);
-    
+
     $target.slideToggle(200);
   });
 

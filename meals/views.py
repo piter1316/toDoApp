@@ -1,4 +1,5 @@
 import random
+from decimal import Decimal, ROUND_HALF_UP
 from typing import Optional, List, Tuple, Union
 
 from django.contrib import messages
@@ -411,6 +412,27 @@ def meals(request, current=1):
     return render(request, 'meals/meals_list.html', context)
 
 
+def get_meal_price(meal: Meal) -> Optional[Decimal]:
+    """Returns meal price or None if any ingredient has no price."""
+    total = Decimal("0")
+    ingredients = meal.mealingredient_set.all()
+
+    if not ingredients:
+        return None
+
+    for item in ingredients:
+        price = item.ingredient_id.price_per_100_gram
+        if price is None or price <= 0:
+            return None
+
+        total += price * Decimal(str(item.quantity)) / Decimal("100")
+
+    return total.quantize(
+        Decimal("0.01"),
+        rounding=ROUND_HALF_UP
+    )
+
+
 @login_required(login_url='/accounts/login')
 def edit_meals(request):
     user = request.user
@@ -442,7 +464,8 @@ def edit_meals(request):
                 round(meal.total_protein or 0),
                 round(meal.total_fat or 0),
                 round(meal.total_carb or 0),
-                meal.is_hi_protein_flag
+                meal.is_hi_protein_flag,
+                get_meal_price(meal)
             ]
             meals_options_dict[option_obj].append([meal, macro_data])
 
