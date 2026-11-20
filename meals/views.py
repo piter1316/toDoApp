@@ -172,8 +172,20 @@ def meals(request, current=1):
     user_meals_options_gen = MealOption.objects.filter(user=user, is_taken_to_generation=1).order_by('position')
     # 2. Pobieramy listę (MealsList) złączoną (JOIN) z modelami Meal i Extras
     # Używamy select_related dla szybkości
-    meals_list_qs = MealsList.objects.filter(user=user, current=current).select_related(
+
+    meals_list_qs = MealsList.objects.filter(
+        user=user, current=current
+    ).select_related(
         'meal', 'meal_option', 'extras'
+    ).prefetch_related(
+        Prefetch(
+            'meal__mealingredient_set',
+            queryset=MealIngredient.objects.select_related('ingredient_id')
+        ),
+        Prefetch(
+            'extras__mealingredient_set',
+            queryset=MealIngredient.objects.select_related('ingredient_id')
+        )
     ).order_by('day', 'meal_option__position')
 
     generated_user_meals_options = MealsList.objects.filter(user=user, current=current).order_by(
@@ -216,6 +228,8 @@ def meals(request, current=1):
 
     total_list_kcal = total_list_prot = total_list_fat = total_list_carb = total_list_vegies = total_list_fruits = 0
     days_set = set()
+    total_list_price = Decimal("0")
+    has_missing_prices = False
 
     for item in meals_list_qs:
         day_str = item.day
@@ -236,13 +250,33 @@ def meals(request, current=1):
                 'day_date': day_date,
                 'is_today': str(today_to_template) == day_date,
                 'meals': [],
-                'totals': {'kcal': 0, 'prot': 0, 'fat': 0, 'carb': 0, 'vegies': 0, 'fruits': 0}
+                'totals': {
+                    'kcal': 0, 'prot': 0, 'fat': 0,
+                    'carb': 0, 'vegies': 0, 'fruits': 0,
+                    'price': Decimal("0.00")
+                }
             }
             current_day_str = day_str
 
         # Przetwarzanie pojedynczego wpisu z MealsList
         meal_obj = item.meal
         extras_obj = item.extras
+        meal_price = get_meal_price(meal_obj) if meal_obj else None
+        print(meal_price)
+        extras_price = get_meal_price(extras_obj) if extras_obj else None
+
+        # Cena dania razem z dodatkami
+        if meal_obj or extras_obj:
+            if ((meal_obj and meal_price is None) or
+                    (extras_obj and extras_price is None)):
+                item_price = None
+            else:
+                item_price = (meal_price or Decimal("0")) + (
+                        extras_price or Decimal("0")
+                )
+        else:
+            item_price = None
+
         # Inicjalizacja danych dla pojedynczej "komórki" w tabeli
         total_macro = int(meal_obj.total_carb) if meal_obj else 0 + int(
             meal_obj.total_fat) if meal_obj else 0 + int(meal_obj.total_protein) if meal_obj else 0
@@ -277,6 +311,8 @@ def meals(request, current=1):
             extras_w_precent = int(extras_obj.total_carb) if extras_obj else 0 / extras_total_macro
         except ZeroDivisionError:
             extras_w_precent = 0
+
+
         cell_data = {
             'list_id': item.id,
             'option_name': item.meal_option.meal_option,
@@ -335,6 +371,19 @@ def meals(request, current=1):
         current_day_dict['totals']['carb'] += m_carb
         current_day_dict['totals']['vegies'] += m_veg
         current_day_dict['totals']['fruits'] += m_fru
+        for meal in (meal_obj, extras_obj):
+            if meal is None:
+                continue
+
+            price = get_meal_price(meal)
+
+            if price is None:
+                current_day_dict['totals']['price'] = None
+                break
+
+            if current_day_dict['totals']['price'] is not None:
+                current_day_dict['totals']['price'] += price
+
 
         current_day_dict['meals'].append(cell_data)
 
@@ -358,6 +407,10 @@ def meals(request, current=1):
         total_list_carb += d['totals']['carb']
         total_list_vegies += d['totals']['vegies']
         total_list_fruits += d['totals']['fruits']
+        if d['totals']['price'] is None:
+            has_missing_prices = True
+        else:
+            total_list_price += d['totals']['price']
 
     # Obliczanie średnich
     no_of_days = len(days_set) if days_set else 1
@@ -367,6 +420,12 @@ def meals(request, current=1):
     average_carb_per_day = round(total_list_carb / no_of_days)
     average_vegies_per_day = round(total_list_vegies / no_of_days)
     average_fruits_per_day = round(total_list_fruits / no_of_days)
+    average_price_per_day = (
+        None if has_missing_prices
+        else (total_list_price / Decimal(no_of_days)).quantize(
+            Decimal("0.01"), rounding=ROUND_HALF_UP
+        )
+    )
 
     maximum_no_of_days_to_generate = get_max_days(request)
     maximum_no_of_days_to_generate_no_repeat = get_max_days(request, exclude_current=True)
@@ -407,6 +466,7 @@ def meals(request, current=1):
         'maximum_no_of_days_to_generate_no_repeat': maximum_no_of_days_to_generate_no_repeat,
         'all_meals_in_option_dict': all_meals_in_option_dict,
         'user_meals_options': user_meals_options_gen,
+        'average_price_per_day': average_price_per_day,
     }
 
     return render(request, 'meals/meals_list.html', context)

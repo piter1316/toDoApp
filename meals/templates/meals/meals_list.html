@@ -221,6 +221,12 @@
           <span class="badge badge-pill badge-light border border-secondary text-muted mx-1 mb-1 px-3 py-1">{{average_carb_per_day}}g <small>węgle</small></span>
           <span class="badge badge-pill badge-light border border-secondary text-muted mx-1 mb-1 px-3 py-1">{{average_vegies_per_day}}g <i class="fas fa-solid fa-carrot text-secondary"></i></span>
           <span class="badge badge-pill badge-light border border-secondary text-muted mx-1 mb-1 px-3 py-1">{{average_fruits_per_day}}g <i class="fas fa-apple-alt text-secondary"></i></span>
+          {% if average_price_per_day is not None %}
+          <span class="badge badge-pill badge-light border border-secondary mx-1 mb-1 px-3 py-1">
+              <i class="fas fa-coins text-warning mr-1"></i>
+              {{average_price_per_day|floatformat:2}} zł
+          </span>
+          {% endif %}
         </div>
       </div>
         <div class="mb-5" id="meals_list" >
@@ -268,6 +274,12 @@
                     <span class="macro-badge" data-toggle="tooltip" title="Węglowodany">{{day.totals.carb}}g <small>W</small></span>
                     <span class="macro-badge"><i class="fas fa-solid fa-carrot text-secondary"></i> {{day.totals.vegies}}g</span>
                     <span class="macro-badge"><i class="fas fa-apple-alt text-secondary"></i> {{day.totals.fruits}}g</span>
+                    {% if day.totals.price is not None %}
+                      <span class="ml-2 font-weight-bold text-nowrap {% if day.is_today %} text-light {% else %}text-dark{% endif %}">
+                          <i class="fas fa-coins text-warning mr-1"></i>
+                          {{day.totals.price|floatformat:2}} zł
+                      </span>
+                  {% endif %}
                   </div>
                 </td>
             </tr>
@@ -281,6 +293,12 @@
                     {% endif %}
                     <h5 class="font-weight-bold mb-0 {% if day.is_today %} text-light {% else %} text-dark {% endif %}  mr-3 short_day_date" style="font-size: 0.95rem;">
                       {{day.day_name}} <span class="{% if day.is_today %} text-light {% else %} text-muted {% endif %} font-weight-normal ml-1" style="font-size: 0.8rem;"><b class="day_date">{{day.day_date}}</b></span>
+                    {% if day.totals.price is not None %}
+    <span class="ml-2 font-weight-bold text-nowrap">
+        <i class="fas fa-coins text-warning mr-1"></i>
+        {{day.totals.price|floatformat:2}} zł
+    </span>
+{% endif %}
                     </h5>
                     <input style="transform: scale(1.1);" type="checkbox" name="day" class="checkbox my-0" value="{% for m in day.meals %}{{m.list_id}},{% endfor %}">
                   </div>
