@@ -262,7 +262,6 @@ def meals(request, current=1):
         meal_obj = item.meal
         extras_obj = item.extras
         meal_price = get_meal_price(meal_obj) if meal_obj else None
-        print(meal_price)
         extras_price = get_meal_price(extras_obj) if extras_obj else None
 
         # Cena dania razem z dodatkami
@@ -893,7 +892,6 @@ def generate_shopping_lists(request):
 
 def delete_selected_days(request):
     meals_list_positions_to_delete_list = request.POST.getlist('mealsListPosition')
-    print(meals_list_positions_to_delete_list)
     for item in meals_list_positions_to_delete_list:
         MealsList.objects.filter(user=request.user, pk=item).delete()
     return redirect('/mealsList/1')
