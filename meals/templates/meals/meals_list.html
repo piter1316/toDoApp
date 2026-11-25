@@ -148,20 +148,20 @@
       border-radius: 12px;
       padding: 10px;
       z-index: 4000 !important;
-      max-width: 95vw;
-      width: auto;
-      min-width: 260px;
       color: #333;
       position: absolute !important;
       top: 100% !important;
-      left: 0 !important;
       transform: none !important; /* Lock vertical position to the meal cell */
+      width: 100% !important;
+      min-width: 0 !important;
+      max-width: none !important;
+      left: 0 !important;
+      right: 0 !important;
+      box-sizing: border-box;
   }
 
   @media (max-width: 575.98px) {
       .dropdown-menu-modern {
-          min-width: 240px;
-          max-width: 90vw;
           left: 0 !important;
           transform: none !important;
           margin-left: 0 !important;
@@ -170,6 +170,10 @@
           max-width: 100% !important;
       }
   }
+  .dropdown-menu-modern.open-up {
+    top: auto !important;
+    bottom: 100% !important;
+}
   
   /* Ensure parent td doesn't clip or overlap wrongly */
   td.dropdown {

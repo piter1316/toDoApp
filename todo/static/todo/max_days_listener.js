@@ -761,3 +761,47 @@ $(document).on('shown.bs.modal', '#extrasModal', function () {
 });
 
 
+
+$(document).on('shown.bs.dropdown', '.dropdown', function () {
+    const menu = $(this).children('.dropdown-menu-modern').first();
+
+    if (!menu.length) return;
+
+    const parentRect = this.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - parentRect.bottom - 10;
+    const spaceAbove = parentRect.top - 10;
+
+    // Reset poprzedniego pozycjonowania
+    menu.removeClass('open-up');
+    menu.css({
+        maxHeight: '',
+        overflowY: ''
+    });
+
+    const menuHeight = menu[0].scrollHeight;
+
+    // Otwórz w górę, jeśli tam jest więcej miejsca
+    const openUp = menuHeight > spaceBelow && spaceAbove > spaceBelow;
+
+    if (openUp) {
+        menu.addClass('open-up');
+    }
+
+    // Dopasuj wysokość listy do dostępnego miejsca
+    const availableHeight = openUp ? spaceAbove : spaceBelow;
+
+    menu.css({
+        maxHeight: Math.max(80, availableHeight) + 'px',
+        overflowY: 'auto'
+    });
+});
+
+// Przy zamknięciu resetujemy pozycjonowanie
+$(document).on('hidden.bs.dropdown', '.dropdown', function () {
+    $(this).children('.dropdown-menu-modern')
+        .removeClass('open-up')
+        .css({
+            maxHeight: '',
+            overflowY: ''
+        });
+});
