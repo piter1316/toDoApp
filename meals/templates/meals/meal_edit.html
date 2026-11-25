@@ -311,7 +311,7 @@
                 <small class="text-muted font-weight-bold text-uppercase d-block mb-1"
                        style="font-size:.7rem; letter-spacing:.04em;">Nowy składnik:</small>
                 <div class="mb-2">
-                  <select class="form-control form-control-sm"
+                  <select class="form-control form-control-sm select2-search"
                           name="ingredient"
                           id="select_ingredient">
                     {% for ingredient in user_ingredients %}
@@ -553,15 +553,52 @@ window.myChart = new Chart(ctx, {
 
 <!-- ══ JAVASCRIPT ════════════════════════════════════════ -->
 <script type="text/javascript">
+
+function initIngredientSelect2() {
+    const select = $('#select_ingredient');
+
+    if (!select.length || select.hasClass('select2-hidden-accessible')) {
+        return;
+    }
+
+    select.select2({
+        theme: 'bootstrap4',
+        width: '100%',
+        minimumResultsForSearch: 0,
+        dropdownParent: $('#new_ingredient_form'),
+        language: {
+            noResults: function () {
+                return 'Brak wyników';
+            },
+            searching: function () {
+                return 'Wyszukiwanie...';
+            }
+        }
+    });
+}
+
 $(document).ready(function () {
 
 
   /* ── helpers ──────────────────────────────────────────── */
+
   function reloadData(json) {
-    $('#ingredients_list').replaceWith($('#ingredients_list', json));
-    $('#card-header').replaceWith($('#card-header', json));
-    $('#m-chart').replaceWith($('#m-chart', json));
+      // Zachowujemy informację, czy formularz był otwarty
+      const wasOpen = $('#new_ingredient_form').is(':visible');
+
+      // Podmieniamy dane po AJAX
+      $('#ingredients_list').replaceWith($('#ingredients_list', json));
+      $('#card-header').replaceWith($('#card-header', json));
+      $('#m-chart').replaceWith($('#m-chart', json));
+
+      // Przywracamy stan formularza
+      if (wasOpen) {
+          $('#new_ingredient_form').show();
+          $('#btn_add_ingredient_toggle').text('Zamknij');
+          initIngredientSelect2();
+      }
   }
+
 
   /* ── Name-edit panel ──────────────────────────────────── */
   $(document).on('click', '#btn_toggle_name_edit', function (e) {
@@ -595,15 +632,23 @@ $(document).ready(function () {
   });
 
   /* ── Options / add-ingredient panel ──────────────────── */
+
   $(document).on('click', '#btn_add_ingredient_toggle', function () {
-    var btn = $(this);
-    if (btn.text().trim() == "Opcje") {
-      btn.text("Zamknij");
+    const btn = $(this);
+    const form = $('#new_ingredient_form');
+
+    if (form.is(':visible')) {
+        btn.text('Opcje');
+        form.slideUp(200);
     } else {
-      btn.text("Opcje");
+        btn.text('Zamknij');
+
+        form.slideDown(200, function () {
+            initIngredientSelect2();
+        });
     }
-    $('#new_ingredient_form').slideToggle(200);
-  });
+});
+
 
   /* ── Ingredient expand/collapse ─────────────────────── */
   $(document).on('click', '.ingr-toggle-btn', function () {

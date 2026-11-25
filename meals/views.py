@@ -166,6 +166,8 @@ def meals(request, current=1):
     in_meals_list = True
     current = int(current)
     user = request.user
+    total_meals_price = Decimal("0.00")
+    total_price_incomplete = False
 
     # 1. Pobieramy opcje
     user_meals_options = MealOption.objects.filter(user=user).order_by('position')
@@ -370,6 +372,7 @@ def meals(request, current=1):
         current_day_dict['totals']['carb'] += m_carb
         current_day_dict['totals']['vegies'] += m_veg
         current_day_dict['totals']['fruits'] += m_fru
+
         for meal in (meal_obj, extras_obj):
             if meal is None:
                 continue
@@ -377,9 +380,14 @@ def meals(request, current=1):
             price = get_meal_price(meal)
 
             if price is None:
+                total_price_incomplete = True
                 current_day_dict['totals']['price'] = None
-                break
+                continue
 
+            # Łączny koszt wszystkich wycenionych posiłków
+            total_meals_price += price
+
+            # Koszt dnia, jeśli nie ma brakujących cen
             if current_day_dict['totals']['price'] is not None:
                 current_day_dict['totals']['price'] += price
 
@@ -466,6 +474,8 @@ def meals(request, current=1):
         'all_meals_in_option_dict': all_meals_in_option_dict,
         'user_meals_options': user_meals_options_gen,
         'average_price_per_day': average_price_per_day,
+        'total_meals_price': total_meals_price,
+        'total_price_incomplete': total_price_incomplete,
     }
 
     return render(request, 'meals/meals_list.html', context)

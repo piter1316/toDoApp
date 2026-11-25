@@ -559,6 +559,7 @@ function refreshOnMealChange(form_id, thToRefresh, checkbox, data){
   $('#td_' + form_id).replaceWith($('#td_' + form_id, data));
   $('#b-t-w').replaceWith($('#b-t-w', data));
   $('#mobileAverageContainer').replaceWith($('#mobileAverageContainer', data));
+  $('#mealsTotalCost').replaceWith($('#mealsTotalCost', data));
   
   if (thToRefresh) {
     $('#' + thToRefresh.id).replaceWith($('#' + thToRefresh.id, data));
@@ -570,9 +571,12 @@ function refreshOnMealChange(form_id, thToRefresh, checkbox, data){
   $(checkbox).prop('checked', true);
 }
 
-function refreshModal(form_id, opt_id, data){
-  $('#extrasSelect_'+ opt_id).val($('#extrasSelect_'+ opt_id + ' option:first').val());
-  $('#dismiss_extras_modal').click();
+function refreshModal(form_id, opt_id, data) {
+    const select = $('#extrasSelect_' + opt_id);
+
+    select.val(select.find('option:first').val()).trigger('change.select2');
+
+    $('#dismiss_extras_modal').click();
 }
 
 $('body').on('change','select[name="to_update"]',function(e){
@@ -711,5 +715,49 @@ $('body').on('change','select[name="to_update"]',function(e){
       }
     });
   });
+
+
+
+function initMealSelects(container) {
+    $(container).find('select[name="to_update"], select[name="extras_select"]').each(function () {
+        const select = $(this);
+
+        if (select.hasClass('select2-hidden-accessible')) {
+            return;
+        }
+
+        const isExtras = select.attr('name') === 'extras_select';
+
+        let parent;
+
+        if (isExtras) {
+            parent = select.parent('form');
+            parent.css('position', 'relative');
+        } else {
+            parent = select.closest('.dropdown-menu');
+        }
+
+        select.select2({
+            theme: 'bootstrap4',
+            width: '100%',
+            minimumResultsForSearch: 0,
+            dropdownParent: parent,
+            language: {
+                noResults: () => 'Brak wyników'
+            }
+        });
+    });
+}
+
+
+// Zmiana dania — inicjalizacja po otwarciu istniejącego dropdownu
+$(document).on('shown.bs.dropdown', '.dropdown', function () {
+    initMealSelects(this);
+});
+
+// Dodatki — inicjalizacja po otwarciu modala
+$(document).on('shown.bs.modal', '#extrasModal', function () {
+    initMealSelects(this);
+});
 
 
