@@ -427,7 +427,10 @@
 
    }); */
 
-
+  $(document).on('click', '.shoppingListSettingsButton', function () {
+    const id = this.id.split('_')[1];
+    $('#shopping_list_settings_' + id).stop(true, true).slideToggle(150);
+});
 </script>
 
 {% endblock %}
