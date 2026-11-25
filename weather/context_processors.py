@@ -1,4 +1,5 @@
 from .utils import get_weather_from_ose
+from django.conf import settings
 from budget.models import UserSettings  # Upewnij się, że nazwa modelu jest poprawna
 
 
@@ -21,3 +22,6 @@ def home_weather_processor(request):
         pass
 
     return {}
+
+
+

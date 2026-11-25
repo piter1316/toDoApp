@@ -10,10 +10,18 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 import os
+import subprocess
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+try:
+    STATIC_VERSION = subprocess.check_output(
+        ['git', 'rev-parse', '--short', 'HEAD'],
+        cwd=BASE_DIR
+    ).decode('utf-8').strip()
+except (OSError, subprocess.CalledProcessError):
+    STATIC_VERSION = '1'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
@@ -75,7 +83,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'weather.context_processors.home_weather_processor'
+                'weather.context_processors.home_weather_processor',
+                'todo.context_processors.static_version',
             ],
         },
     },
