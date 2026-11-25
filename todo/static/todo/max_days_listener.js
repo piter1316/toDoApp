@@ -228,12 +228,15 @@ $(document).ready(function(){
 
       if (current_extra && current_extra_kcal){
         $('#current_extras').text(current_extra)
-        $('#chart-extras-kcal').text(current_extra_kcal)
-        $('#chart-extras-b').text('B:' + current_extra_b + 'g')
+        $('#chart-extras-kcal').text(current_extra_kcal);
+        $('#chart-extras-b').text(current_extra_b + ' g');
+        $('#chart-extras-t').text(current_extra_t + ' g');
+        $('#chart-extras-w').text(current_extra_w + ' g');
 
-        $('#chart-extras-t').text('T:' + current_extra_t + 'g')
-
-        $('#chart-extras-w').text('W:' + current_extra_w + 'g')
+        // Proporcje makroskładników
+        $('#extras-progress-b').css('flex-grow', Math.max(0, Number(current_extra_b) || 0));
+        $('#extras-progress-t').css('flex-grow', Math.max(0, Number(current_extra_t) || 0));
+        $('#extras-progress-w').css('flex-grow', Math.max(0, Number(current_extra_w) || 0));
 
 
         var extras_link = $('#extras_link_'+ num_id).val()
@@ -245,52 +248,9 @@ $(document).ready(function(){
         $('#current_change_div').fadeIn('fast');
         $('#add_extras_span').fadeOut('fast');
         $('#extras-empty-container').fadeOut('fast');
-        const chartId = "chart-extras";
-        const canvas = document.getElementById(chartId);
 
-        if (canvas) {
-            // Pobieramy dane bezpośrednio z atrybutów data- tego konkretnego canvasa
-            var b = parseFloat(current_extra_b) || 0;
-            var t = parseFloat(current_extra_t) || 0;
-            var w = parseFloat(current_extra_w) || 0;
-
-            new Chart(canvas.getContext('2d'), {
-              type: 'doughnut',
-              data: {
-                  datasets: [{
-                      data: [b, t, w], // Twoje zmienne: Węgle, Tłuszcze, Białka
-                      backgroundColor: ['#6c757d', '#ffc107', '#343a40'], // Niebieski, Żółty, Zielony
-                      borderWidth: 0,
-                      cutout: '82%',     // Cieńszy pierścień wygląda nowocześniej
-                      spacing: 3         // Delikatne przerwy między kolorami
-                  }]
-              },
-              options: {
-                  responsive: true,
-                  maintainAspectRatio: true,
-                  aspectRatio: 2,        // Bardzo ważne dla półkola (szerokość 2 : wysokość 1)
-                  rotation: -90,         // Obraca start rysowania o 90 stopni w lewo
-                  circumference: 180,    // Rysuje tylko połowę okręgu
-                  layout: {
-                      padding: {
-                          bottom: 10     // Miejsce na ewentualny tekst pod wykresem
-                      }
-                  },
-                  plugins: {
-                      legend: { display: false },
-                      tooltip: {
-                          enabled: true,
-                          callbacks: {
-                              label: function(item) {
-                                  return ' ' + Math.round(item.raw) + ' g';
-                              }
-                          }
-                      }
-                  }
-              }
-          });
         }
-      }
+      })
       // Musisz mieć dostęp do zmiennej num_id (np. przekazanej z Django do JS)
 
 
@@ -308,13 +268,7 @@ $(document).ready(function(){
       $('#add_extras_span').fadeIn('fast');
       $('#extras-empty-container').fadeIn('fast');
 
-      let canvas = document.getElementById('chart-extras');
-      if (canvas) {
-          let chart = Chart.getChart(canvas);
-          if (chart) chart.destroy();
-      }
 
-    })
 
     $('.shoppingListSettingsButton').click(function(e){
     var id = e.target.id;
@@ -730,12 +684,19 @@ function initMealSelects(container) {
 
         let parent;
 
+
         if (isExtras) {
+            // Bez zmian dla modala dodatków
             parent = select.parent('form');
             parent.css('position', 'relative');
+        } else if (window.matchMedia('(max-width: 767.98px)').matches) {
+            // Na telefonie lista Select2 poza przewijanym panelem
+            parent = $(document.body);
         } else {
+            // Na komputerze zachowujemy dotychczasowe działanie
             parent = select.closest('.dropdown-menu');
         }
+
 
         select.select2({
             theme: 'bootstrap4',
@@ -755,53 +716,8 @@ $(document).on('shown.bs.dropdown', '.dropdown', function () {
     initMealSelects(this);
 });
 
-// Dodatki — inicjalizacja po otwarciu modala
 $(document).on('shown.bs.modal', '#extrasModal', function () {
     initMealSelects(this);
 });
 
 
-
-$(document).on('shown.bs.dropdown', '.dropdown', function () {
-    const menu = $(this).children('.dropdown-menu-modern').first();
-
-    if (!menu.length) return;
-
-    const parentRect = this.getBoundingClientRect();
-    const spaceBelow = window.innerHeight - parentRect.bottom - 10;
-    const spaceAbove = parentRect.top - 10;
-
-    // Reset poprzedniego pozycjonowania
-    menu.removeClass('open-up');
-    menu.css({
-        maxHeight: '',
-        overflowY: ''
-    });
-
-    const menuHeight = menu[0].scrollHeight;
-
-    // Otwórz w górę, jeśli tam jest więcej miejsca
-    const openUp = menuHeight > spaceBelow && spaceAbove > spaceBelow;
-
-    if (openUp) {
-        menu.addClass('open-up');
-    }
-
-    // Dopasuj wysokość listy do dostępnego miejsca
-    const availableHeight = openUp ? spaceAbove : spaceBelow;
-
-    menu.css({
-        maxHeight: Math.max(80, availableHeight) + 'px',
-        overflowY: 'auto'
-    });
-});
-
-// Przy zamknięciu resetujemy pozycjonowanie
-$(document).on('hidden.bs.dropdown', '.dropdown', function () {
-    $(this).children('.dropdown-menu-modern')
-        .removeClass('open-up')
-        .css({
-            maxHeight: '',
-            overflowY: ''
-        });
-});

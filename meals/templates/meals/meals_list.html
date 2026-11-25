@@ -142,38 +142,41 @@
   
   /* Forms and Modals Restored to light elegance */
   .dropdown-menu-modern {
-      background-color: #ffffff;
-      border: 1px solid #e1e5e8;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-      border-radius: 12px;
-      padding: 10px;
-      z-index: 4000 !important;
-      color: #333;
-      position: absolute !important;
-      top: 100% !important;
-      transform: none !important; /* Lock vertical position to the meal cell */
-      width: 100% !important;
-      min-width: 0 !important;
-      max-width: none !important;
-      left: 0 !important;
-      right: 0 !important;
-      box-sizing: border-box;
-  }
-
-  @media (max-width: 575.98px) {
-      .dropdown-menu-modern {
-          left: 0 !important;
-          transform: none !important;
-          margin-left: 0 !important;
-      }
-      .dropdown-menu-modern select {
-          max-width: 100% !important;
-      }
-  }
-  .dropdown-menu-modern.open-up {
-    top: auto !important;
-    bottom: 100% !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    box-sizing: border-box;
 }
+
+
+  @media (max-width: 767.98px) {
+    .dropdown-menu-modern {
+        position: fixed !important;
+
+        top: 50% !important;
+        left: 12px !important;
+        right: 12px !important;
+        bottom: auto !important;
+
+        transform: translateY(-50%) !important;
+        margin: 0 !important;
+
+        width: auto !important;
+        max-width: none !important;
+        max-height: calc(100vh - 24px) !important;
+        max-height: calc(100dvh - 24px) !important;
+
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        box-sizing: border-box;
+    }
+
+    .dropdown-menu-modern select {
+        max-width: 100% !important;
+    }
+}
+
+
   
   /* Ensure parent td doesn't clip or overlap wrongly */
   td.dropdown {
@@ -210,6 +213,71 @@
   .select2-container--open {
     z-index: 10001 !important;
 }
+
+.macro-summary {
+    background: #fff;
+    border: 1px solid #e1e5e8;
+    border-radius: 8px;
+    padding: 10px 12px;
+}
+
+.macro-progress {
+    display: flex;
+    gap: 2px;
+    height: 9px;
+    overflow: hidden;
+    border-radius: 10px;
+    background: #e9ecef;
+}
+
+.macro-progress > div {
+    flex-basis: 0;
+    flex-shrink: 1;
+    min-width: 0;
+}
+
+.macro-progress-b { background: #3378cc; }
+.macro-progress-t { background: #f3b728; }
+.macro-progress-w { background: #687583; }
+
+.macro-summary-values {
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+    margin-top: 9px;
+}
+
+.macro-summary-values > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    text-align: center;
+    white-space: nowrap;
+    font-size: 0.75rem;
+}
+
+.macro-summary-values small {
+    color: #6c757d;
+    font-size: 0.65rem;
+}
+
+.macro-summary-values strong {
+    color: #343a40;
+}
+
+.macro-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    margin-bottom: 3px;
+}
+
+.macro-dot-b { background: #3378cc; }
+.macro-dot-t { background: #f3b728; }
+.macro-dot-w { background: #687583; }
+
 </style>
 {% endblock %}
 
@@ -339,7 +407,7 @@
                 </div>
 
                 <div class="dropdown position-relative d-flex align-items-top justify-content-between">
-                    <div class="font-weight-bold {% if day.is_today %} text-light {% else %}text-dark{% endif %}  w-100 text-left mb-2 px-1" style="cursor:pointer;" id="dropdownMeal_{{meal_cell.list_id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <div data-boundary="viewport" class="font-weight-bold {% if day.is_today %} text-light {% else %}text-dark{% endif %}  w-100 text-left mb-2 px-1" style="cursor:pointer;" id="dropdownMeal_{{meal_cell.list_id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                       {% if meal_cell.meal_id %}
                         {{meal_cell.meal_name}}
                         {% if meal_cell.is_special %} <span class="text-danger">*</span> {% endif %}
@@ -382,38 +450,51 @@
                           {% endif %}
                         </span>
                         {% if meal_cell.meal_id %}
-                        <small class="text-muted font-weight-bold text-uppercase d-block mb-2">Makro:</small>
-                        <div class="card  text-dark ">
-                              <div class="card-body p-2">
-                                  <div class="position-relative">
-                                      <canvas id="chart-{{ meal_cell.meal_id }}"
-                                              class="macro-chart"
-                                              data-b="{{ meal_cell.b }}"
-                                              data-t="{{ meal_cell.t }}"
-                                              data-w="{{ meal_cell.w }}"
-                                              width="200" height="200"></canvas>
+                        <div class="macro-summary mt-1">
 
-                                      <div class="position-absolute w-100 text-center" style="top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none;">
-                                          <div class="h4 mb-0 font-weight-bold">{{meal_cell.kcal}}</div>
-                                          <small class="text-muted text-uppercase" style="font-size: 0.6rem;">kcal</small>
-                                      </div>
-                                  </div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted font-weight-bold"
+                                      style="font-size:0.65rem; letter-spacing:.04em;">
+                                    WARTOŚCI ODŻYWCZE
+                                </span>
 
-                                  <div class="d-flex justify-content-around text-center">
+                                <span class="font-weight-bold text-dark">
+                                    {{meal_cell.kcal}}
+                                    <small class="text-muted">kcal</small>
+                                </span>
+                            </div>
 
-                                    <div class="small">
-                                      <div>B:{{ meal_cell.b }}<small>g</small></div>
-                                    </div>
+                            <div class="macro-progress">
+                                <div class="macro-progress-b"
+                                     style="flex-grow:{{meal_cell.b|default:0}}"></div>
+                                <div class="macro-progress-t"
+                                     style="flex-grow:{{meal_cell.t|default:0}}"></div>
+                                <div class="macro-progress-w"
+                                     style="flex-grow:{{meal_cell.w|default:0}}"></div>
+                            </div>
 
-                                    <div class="small">
-                                      <div>T:{{ meal_cell.t }}<small>g</small></div>
-                                    </div>
-                                    <div class="small">
-                                      <div>W:{{ meal_cell.w }}<small>g</small></div>
-                                    </div>
-                                  </div>
-                                    </div>
+                            <div class="macro-summary-values">
+                                <div>
+                                    <span class="macro-dot macro-dot-b"></span>
+                                    <small>Białko</small>
+                                    <strong>{{meal_cell.b}} g</strong>
                                 </div>
+
+                                <div>
+                                    <span class="macro-dot macro-dot-t"></span>
+                                    <small>Tłuszcze</small>
+                                    <strong>{{meal_cell.t}} g</strong>
+                                </div>
+
+                                <div>
+                                    <span class="macro-dot macro-dot-w"></span>
+                                    <small>Węgle</small>
+                                    <strong>{{meal_cell.w}} g</strong>
+                                </div>
+                            </div>
+
+                        </div>
+
 
                           <hr class="dropdown-divider">
                           <div class="mb-1">
@@ -451,7 +532,7 @@
             </tbody>
           </table>
            <div id="mealsTotalCost"
-               class="card shadow-sm border-0 mt-3 mb-4"
+               class="card shadow-sm border-0 mt-5 mb-4"
                style="border-radius: 10px;">
               <div class="card-body py-3 px-3 text-center">
                   <div class="text-muted small font-weight-bold text-uppercase mb-1">
@@ -505,74 +586,141 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body py-1">
+      <div class="modal-body py-2">
 
-          <div class="row d-flex justify-content-between align-items-center">
-            <div class="col-12 col-xl-4"  >
-              <div id="extras-empty-container" class="text-center">Brak dodatków!</div>
-              <div style="display:none;" id="extras-cart-container">
-                <div class="text-center ">
-                <small id="current_extra_small" style="display:none;" class="text-muted">
-                  <a id="current_extras" class="text-dark font-weight-bold" href="#">
-                  </a>
-                </small>
-              </div>
-              <div class="card-body p-3" >
-                <div class="position-relative">
-                    <canvas id="chart-extras"
-                            class="macro-chart-extras"
-                            width="200" height="200" style="max-height: 150px;">
-                    </canvas>
-                    <div class="position-absolute w-100 text-center" style="top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none;">
-                      <div class="h4 mb-0 font-weight-bold" id="chart-extras-kcal"></div>
-                      <small class="text-muted text-uppercase" style="font-size: 0.6rem;">kcal</small>
-                    </div>
-              </div>
-              <div class="d-flex justify-content-around text-center">
-                  <div class="small">
-                    <div id="chart-extras-b">B: {{ meal_cell.extras_b }}<small>g</small></div>
-                  </div>
-                  <div class="small">
+          <div class="row align-items-start">
 
-                    <div id="chart-extras-t">T: {{ meal_cell.extras_t }}<small>g</small></div>
+              <!-- LEWA KOLUMNA: aktualny dodatek i makro -->
+              <div class="col-12 col-xl-4 mb-3 mb-xl-0">
+
+                  <div id="extras-empty-container"
+                       class="text-center text-muted small py-2">
+                      Brak dodatków!
                   </div>
-                  <div class="small">
-                       <div id="chart-extras-w">W: {{ meal_cell.extras_w }}<small>g</small></div>
+
+                  <div id="extras-cart-container" style="display:none;">
+
+                      <div class="text-center mb-2">
+                          <small id="current_extra_small"
+                                 style="display:none;"
+                                 class="text-muted">
+                              <a id="current_extras"
+                                 class="text-dark font-weight-bold"
+                                 href="#"></a>
+                          </small>
+                      </div>
+
+                      <div class="macro-summary" id="extras-macro-summary">
+
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                              <span class="text-muted font-weight-bold"
+                                    style="font-size:0.65rem;">
+                                  WARTOŚCI ODŻYWCZE
+                              </span>
+
+                              <span class="font-weight-bold text-dark text-nowrap">
+                                  <span id="chart-extras-kcal">0</span>
+                                  <small class="text-muted">kcal</small>
+                              </span>
+                          </div>
+
+                          <div class="macro-progress">
+                              <div class="macro-progress-b" id="extras-progress-b"></div>
+                              <div class="macro-progress-t" id="extras-progress-t"></div>
+                              <div class="macro-progress-w" id="extras-progress-w"></div>
+                          </div>
+
+                          <div class="macro-summary-values">
+                              <div>
+                                  <span class="macro-dot macro-dot-b"></span>
+                                  <small>Białko</small>
+                                  <strong id="chart-extras-b">0 g</strong>
+                              </div>
+
+                              <div>
+                                  <span class="macro-dot macro-dot-t"></span>
+                                  <small>Tłuszcze</small>
+                                  <strong id="chart-extras-t">0 g</strong>
+                              </div>
+
+                              <div>
+                                  <span class="macro-dot macro-dot-w"></span>
+                                  <small>Węgle</small>
+                                  <strong id="chart-extras-w">0 g</strong>
+                              </div>
+                          </div>
+
+                      </div>
+
+                      <a id="delete_extras"
+                         style="display:none;"
+                         href="{% url 'meals:delete_extras' ' ' %}"
+                         class="btn btn-block btn-sm btn-outline-danger font-weight-bold mt-2 shadow-sm">
+                      </a>
+
+                      <input id="base_delete_url"
+                             type="hidden"
+                             value="{% url 'meals:delete_extras' ' ' %}">
+
                   </div>
-                </div>
+              </div>
+
+              <!-- PRAWA KOLUMNA: wybór dodatków -->
+              <div class="col-12 col-xl-8">
+
+                  <div id="current_change_div"
+                       style="display:none;"
+                       class="text-muted text-center small mb-2">
+                      Zmiana
+                  </div>
+
+                  {% for option, meals in all_meals_in_option_dict.items %}
+
+                      <form method="post"
+                            action="{% url 'meals:edit_extras' %}"
+                            name="editExtras"
+                            id="editExtras_{{option.id}}">
+
+                          {% csrf_token %}
+
+                          <input type="hidden"
+                                 name="meals_list_position"
+                                 value="">
+
+                          <input type="hidden"
+                                 id="current_meal_id"
+                                 value="">
+
+                          <input type="hidden"
+                                 id="option_id"
+                                 value="{{option}}">
+
+                          <select class="form-control form-control-sm mt-2 shadow-sm"
+                                  name="extras_select"
+                                  id="extrasSelect_{{option.id}}">
+
+                              <option>{{option}}</option>
+
+                              {% for meal in meals %}
+                                  <option value="{{meal.id}}">
+                                      {{meal.name}} | {{meal.kcal}} kcal
+                                      {% if meal.hi_protein %} | B{% endif %}
+                                  </option>
+                              {% endfor %}
+
+                          </select>
+
+                      </form>
+
+                      <hr class="m-2 border-light">
+
+                  {% endfor %}
 
               </div>
-              <a id="delete_extras" style="display:none;" href="{%url 'meals:delete_extras' ' ' %}" class="btn btn-block btn-sm btn-outline-danger font-weight-bold m-1 shadow-sm"></a>
-              <input id="base_delete_url" type="hidden" value="{%url 'meals:delete_extras' ' ' %}">
-              </div>
-            </div>
-            <div class="col-12 col-xl-8">
-              <div id="current_change_div" style="display:none;" class="text-muted text-center">Zmiana</div>
-              {% for option, meals in all_meals_in_option_dict.items %}
-                <form method="post" action="{% url 'meals:edit_extras' %}" name="editExtras" id="editExtras_{{option.id}}" >{% csrf_token %}
-                  <input type="hidden" id="" name="meals_list_position" value="">
-                  <input type="hidden" id="current_meal_id" value="">
-                  <input type="hidden" id="option_id" value="{{option}}">
-                  <select onchange="" class="form-control form-control-sm mt-2 shadow-sm" name="extras_select" id="extrasSelect_{{option.id}}">
-                    <option>
-                      {{option}}
-                    </option>
-                    {% for meal in meals %}
-                    <option value="{{meal.id}}">{{meal.name}} | {{meal.kcal}} kcal {% if meal.hi_protein %} | B{% endif %} </option>
-                    {% endfor %}
-                  </select>
-                </form>
-                <hr class="m-2 border-light">
-                {% endfor %}
-            </div>
 
           </div>
       </div>
-      <div class="modal-footer p-1 bg-light border-top ">
-        <button type="button" class="btn btn-secondary btn-sm btn-block shadow-sm px-4 font-weight-bold" data-dismiss="modal">ZAMKNIJ</button>
-      </div>
-    </div>
-  </div>
+
 </div>
 
 <script>
@@ -604,32 +752,7 @@
             $(this).removeClass('stack-top');
         });
 
-        // Smart Boundary Adjuster: Prevents dropdowns from going off-screen
-        // without the "flicking/jumping" of native Popper.js
-        $(document).on('shown.bs.dropdown', '.dropdown', function () {
-            var $menu = $(this).find('.dropdown-menu-modern');
-            if (!$menu.length) return;
 
-            // Reset to prevent cumulative offsets
-            $menu.css('margin-left', '0');
-
-            var rect = $menu[0].getBoundingClientRect();
-            var viewportWidth = $(window).width();
-            var margin = 10; // Safety gap from screen edge
-
-            // Check Right Overflow
-            if (rect.right > viewportWidth) {
-                var shiftRight = rect.right - viewportWidth + margin;
-                $menu.css('margin-left', -shiftRight + 'px');
-            }
-
-            // Check Left Overflow
-            var updatedRect = $menu[0].getBoundingClientRect();
-            if (updatedRect.left < 0) {
-                var shiftLeft = -updatedRect.left + margin;
-                $menu.css('margin-left', shiftLeft + 'px');
-            }
-        });
     });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
