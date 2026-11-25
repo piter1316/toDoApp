@@ -138,28 +138,40 @@
         <ul class="list-group list-group-flush" id="ingredients_list">
 
           <!-- Sub-header -->
-          <li class="list-group-item px-3 py-1 d-flex justify-content-between align-items-center"
+          <li class="list-group-item px-3 py-1 d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center"
               style="background:#f8f9fa; border-bottom:1px solid #eee;
                      font-size:.73rem; color:#666; font-weight:600;
                      text-transform:uppercase; letter-spacing:.04em;">
-            <span>Składniki</span>{% if sum_meal_price %}
-              <div><i class="fas fa-coins text-warning mr-1"></i>{{sum_meal_price}} PLN</div>
-              {% endif %}
-            <span>
-              {% if meal.0.total_vegies %}
-                <span class="macro-badge">
-                  <i class="fas fa-carrot"></i> {{meal.0.total_vegies}}g
-                </span>
-              {% endif %}
-              {% if meal.0.total_fruits %}
-                <span class="macro-badge">
-                  <i class="fas fa-apple-alt"></i> {{meal.0.total_fruits}}g
-                </span>
-              {% endif %}
-              {% if meal.0.is_hi_protein_flag %}
-                <span class="macro-badge small"># {{meal.0.macro.is_hi_protein.1}}</span>
-              {% endif %}
-            </span>
+
+              <div class="d-flex justify-content-between align-items-center">
+                  <span>Składniki</span>
+
+                  {% if sum_meal_price %}
+                      <span class="ml-2">
+                          <i class="fas fa-coins text-warning mr-1"></i>{{sum_meal_price}} PLN
+                      </span>
+                  {% endif %}
+              </div>
+
+              <div class="d-flex flex-wrap justify-content-center justify-content-md-end align-items-center mt-1 mt-md-0">
+                  {% if meal.0.total_vegies %}
+                      <span class="macro-badge">
+                          <i class="fas fa-carrot"></i> {{meal.0.total_vegies}}g
+                      </span>
+                  {% endif %}
+
+                  {% if meal.0.total_fruits %}
+                      <span class="macro-badge">
+                          <i class="fas fa-apple-alt"></i> {{meal.0.total_fruits}}g
+                      </span>
+                  {% endif %}
+
+                  {% if meal.0.is_hi_protein_flag %}
+                      <span class="macro-badge small">
+                          # {{meal.0.macro.is_hi_protein.1}}
+                      </span>
+                  {% endif %}
+              </div>
           </li>
 
           {% for ingredient in ingredients %}
