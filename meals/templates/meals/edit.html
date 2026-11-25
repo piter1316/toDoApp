@@ -89,7 +89,7 @@
 
   <!-- Add Meal Option Form -->
   <div class="row justify-content-center mb-2">
-    <div class="col-12 col-md-8 col-xl-6">
+    <div class="col-12 col-md-8 col-xl-6 mb-1 ">
       <form class="input-group shadow-sm" style="border-radius:8px; overflow:hidden;" method="POST" action="{% url 'meals:add_meal_option' %}">
         {% csrf_token %}
         <input type="text" name="meal_option" class="form-control border-0" placeholder="Nowy posiłek. Np: Podwieczorek" required>
@@ -98,11 +98,25 @@
         </div>
       </form>
     </div>
+    <div class="col-12 col-md-8 col-xl-6">
+        <div class="input-group shadow-sm">
+            <div class="input-group-prepend">
+                <span class="input-group-text bg-white border-0">
+                    <i class="fas fa-search text-muted"></i>
+                </span>
+            </div>
+            <input type="search"
+                   id="mealSearch"
+                   class="form-control border-0"
+                   placeholder="Szukaj dania..."
+                   autocomplete="off">
+        </div>
+    </div>
   </div>
 
   <div class="row row-tight px-md-2">
     {% for meal_option, meals in meals_options_dict.items %}
-    <div class="col-12 col-md-6 col-lg-4 col-xl-3 mb-4 mb-2 p-0 p-md-1">
+    <div class="col-12 col-md-6 col-lg-4 col-xl-3 mb-4 mb-2 p-0 p-md-1 meal-search-section">
       <div class="card card-option shadow-sm h-100">
 
         <!-- Header with Settings Toggle -->
@@ -171,7 +185,8 @@
         <div class="list-group list-group-flush">
           {% for meal in meals %}
           <a href="{% url 'meals:edit_meal_ingredients' meal.0.id %}"
-             class="list-group-item list-group-item-action py-1 px-2 meal-item-link border-bottom"
+             class="list-group-item list-group-item-action py-1 px-2 meal-item-link meal-search-item border-bottom"
+             data-meal-name="{{meal.0.name}}"
              title="{{meal.1.4.1}}">
             <div class="d-flex justify-content-between align-items-center flex-wrap" style="gap:4px;">
               <span class="font-weight-bold" style="font-size:0.9rem; flex: 1; min-width: 100px;">
@@ -200,6 +215,28 @@
 
 <script>
 $(document).ready(function() {
+    $('#mealSearch').on('input', function () {
+      const query = $(this).val().trim().toLocaleLowerCase('pl-PL');
+
+      $('.meal-search-section').each(function () {
+          const section = $(this);
+          let visibleMeals = 0;
+
+          section.find('.meal-search-item').each(function () {
+              const item = $(this);
+              const name = (item.attr('data-meal-name') || '')
+                  .toLocaleLowerCase('pl-PL');
+
+              const matches = name.includes(query);
+
+              item.stop(true, true)[matches ? 'fadeIn' : 'fadeOut'](150);
+
+              if (matches) visibleMeals++;
+          });
+
+          section.stop(true, true)[query === '' || visibleMeals > 0 ? 'fadeIn' : 'fadeOut'](150);
+      });
+  });
   // Przełączanie panelu ustawień (zastępuje stare dropdownMeal z max_days_listener.js jeśli tamto sprawiało problemy)
   // Używamy delegacji zdarzeń dla pewności
   $(document).on('click', '.dropdownMealModern', function(e) {
