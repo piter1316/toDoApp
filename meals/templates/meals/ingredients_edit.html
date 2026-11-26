@@ -95,55 +95,72 @@
       </table>
     </div>
     <div class="tab-pane fade service show active" id="macro">
-    <div class="input-group mb-2">
-      <div class="input-group-prepend">
-          <span class="input-group-text bg-white">
-              <i class="fas fa-search text-muted"></i>
-          </span>
+      <!-- Wyszukiwarka i licznik wyników -->
+      <div class="d-flex align-items-center mb-2">
+        <div class="input-group input-group-sm shadow-sm flex-grow-1">
+          <div class="input-group-prepend">
+            <span class="input-group-text bg-light border-right-0"><i class="fas fa-search text-muted"></i></span>
+          </div>
+          <input type="search" id="ingredientSearch" class="form-control border-left-0 bg-light"
+                 placeholder="Szukaj składnika..." autocomplete="off">
+        </div>
+        <small id="ingredientSearchCount" class="text-muted text-nowrap ml-2">
+          {{ user_ingredients|length }} / {{ user_ingredients|length }}
+        </small>
       </div>
-      <input type="search"
-             id="ingredientSearch"
-             class="form-control"
-             placeholder="Szukaj składnika..."
-             autocomplete="off">
-      </div>
-      <div style="overflow-y:scroll; height:80vh;">
-        <table class="table table-light table-striped table-hover table-fixed ">
+
+      <div class="bg-light border rounded shadow-sm" style="overflow-y:auto; max-height:80vh;">
+        <table class="table table-striped table-hover table-sm mb-0 bg-light">
           <thead class="thead-dark text-center sticky-top">
-          <tr>
-            <th class="px-0">
-              <button class="btn btn-sm btn-outline-light p-1 p-md-2" data-toggle="modal" data-target="#addIngredientModal"><i
-                  class="fas fa-plus"></i></button>
-            </th>
-            <th class="align-items-center p-0">
-              <span class="">Składnik</span>
-            </th>
-            <th class="p-0">kcal/100g<br>btw</th>
-            <th class="p-0">szt./opak.</th>
-            <th class="p-0">Sklep</th>
-          </tr>
+            <tr>
+              <th class="align-middle px-1" style="width:48px;">
+                <button class="btn btn-sm btn-outline-light px-2 py-1" data-toggle="modal"
+                        data-target="#addIngredientModal" title="Dodaj składnik">
+                  <i class="fas fa-plus"></i>
+                </button>
+              </th>
+              <th class="align-middle text-left px-2">Składnik</th>
+              <th class="align-middle px-1">Makro / 100 g</th>
+              <th class="align-middle px-1"><span class="d-none d-sm-inline">Szt./opak.</span><span class="d-sm-none">Opak.</span></th>
+              <th class="align-middle px-1 d-table-cell">Sklep</th>
+            </tr>
           </thead>
-          <tbody class="table-sm">
-          {% for ingredient in user_ingredients %}
-          <tr class="ingredient-search-row">
-            <td class="p-0 text-center">
-              <a class="fas fa-edit text-dark px-1" href="{% url 'meals:edit_ingredient_index' ingredient.id %}"></a>
-              <a onclick="return confirm('Czy napewno usunąć składnik?')"
-                 href="{% url 'meals:delete_ingr' ingredient.id %}" class="fas fa-minus-circle text-secondary px-1"></a>
-            </td>
-            <td class="ingredient-search-name">
-              {{ingredient}}{% if ingredient.short_expiry %}
-                <sup class="fas fa-hourglass-start" ></sup>
-            {% endif %}
-            </td>
-            <td nowrap="" class="text-center px-0">{{ingredient.calories_per_100_gram}}
-            <br>
-            {{ingredient.protein_per_100_gram}}-{{ingredient.fat_per_100_gram}}-{{ingredient.carbohydrates_per_100_gram}}
-            </td>
-            <td class="text-center px-0">{{ingredient.weight_per_unit}}</td>
-            <td class="text-center px-0"><small>{{ingredient.shop}}</small></td>
-          </tr>
-          {% endfor %}
+          <tbody>
+            {% for ingredient in user_ingredients %}
+            <tr class="ingredient-search-row">
+              <td class="align-middle text-center px-1 text-nowrap">
+                <a class="fas fa-edit text-dark mr-1" title="Edytuj"
+                   href="{% url 'meals:edit_ingredient_index' ingredient.id %}"></a>
+                <a onclick="return confirm('Czy na pewno usunąć składnik?')"
+                   href="{% url 'meals:delete_ingr' ingredient.id %}"
+                   class="fas fa-minus-circle text-secondary" title="Usuń"></a>
+              </td>
+              <td class="ingredient-search-name align-middle px-2 font-weight-bold h6">
+                {{ingredient}}{% if ingredient.short_expiry %}
+                  <sup class="fas fa-hourglass-start text-secondary"></sup>
+                {% endif %}
+              </td>
+              <td class="align-middle text-center px-1">
+                <div class="d-flex justify-content-center align-items-center flex-nowrap mb-1 text-nowrap small">
+                    <span>{{ingredient.calories_per_100_gram}} kcal</span>
+
+                    {% if ingredient.price_per_100_gram %}
+                        <span class="mx-2">|</span>
+                        <span>
+                            <i class="fas fa-coins text-dark mr-1"></i>{{ingredient.price_per_100_gram}} zł
+                        </span>
+                    {% endif %}
+                </div>
+                <span class="badge badge-dark text-nowrap px-2 py-1">
+                  {{ingredient.protein_per_100_gram}} b |
+                  {{ingredient.fat_per_100_gram}} t |
+                  {{ingredient.carbohydrates_per_100_gram}} w
+              </span>
+              </td>
+              <td class="align-middle text-center px-1 small">{{ingredient.weight_per_unit}}</td>
+              <td class="align-middle text-center px-1 small text-muted d-table-cell">{{ingredient.shop}}</td>
+            </tr>
+            {% endfor %}
           </tbody>
         </table>
       </div>
@@ -336,20 +353,20 @@
     });
   });
 
+  // Dynamiczne filtrowanie nazw składników (bez naruszania pozostałych zakładek)
   $('#ingredientSearch').on('input', function () {
     const query = $(this).val().trim().toLocaleLowerCase('pl-PL');
-
+    let visible = 0;
     $('.ingredient-search-row').each(function () {
-        const row = $(this);
-        const name = row.find('.ingredient-search-name')
-                        .text().trim().toLocaleLowerCase('pl-PL');
-
-        const matches = name.includes(query);
-
-        if (matches !== row.is(':visible')) {
-            row.stop(true, true)[matches ? 'fadeIn' : 'fadeOut'](120);
-        }
+      const row = $(this);
+      const name = row.find('.ingredient-search-name').text().trim().toLocaleLowerCase('pl-PL');
+      const matches = name.includes(query);
+      if (matches) visible++;
+      if (matches !== row.is(':visible')) {
+        row.stop(true, true)[matches ? 'fadeIn' : 'fadeOut'](120);
+      }
     });
-});
+    $('#ingredientSearchCount').text(visible + ' / ' + $('.ingredient-search-row').length);
+  });
 </script>
 {% endblock %}
