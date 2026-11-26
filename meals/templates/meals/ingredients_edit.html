@@ -95,6 +95,18 @@
       </table>
     </div>
     <div class="tab-pane fade service show active" id="macro">
+    <div class="input-group mb-2">
+      <div class="input-group-prepend">
+          <span class="input-group-text bg-white">
+              <i class="fas fa-search text-muted"></i>
+          </span>
+      </div>
+      <input type="search"
+             id="ingredientSearch"
+             class="form-control"
+             placeholder="Szukaj składnika..."
+             autocomplete="off">
+      </div>
       <div style="overflow-y:scroll; height:80vh;">
         <table class="table table-light table-striped table-hover table-fixed ">
           <thead class="thead-dark text-center sticky-top">
@@ -113,13 +125,13 @@
           </thead>
           <tbody class="table-sm">
           {% for ingredient in user_ingredients %}
-          <tr>
+          <tr class="ingredient-search-row">
             <td class="p-0 text-center">
               <a class="fas fa-edit text-dark px-1" href="{% url 'meals:edit_ingredient_index' ingredient.id %}"></a>
               <a onclick="return confirm('Czy napewno usunąć składnik?')"
                  href="{% url 'meals:delete_ingr' ingredient.id %}" class="fas fa-minus-circle text-secondary px-1"></a>
             </td>
-            <td>
+            <td class="ingredient-search-name">
               {{ingredient}}{% if ingredient.short_expiry %}
                 <sup class="fas fa-hourglass-start" ></sup>
             {% endif %}
@@ -323,5 +335,21 @@
       }
     });
   });
+
+  $('#ingredientSearch').on('input', function () {
+    const query = $(this).val().trim().toLocaleLowerCase('pl-PL');
+
+    $('.ingredient-search-row').each(function () {
+        const row = $(this);
+        const name = row.find('.ingredient-search-name')
+                        .text().trim().toLocaleLowerCase('pl-PL');
+
+        const matches = name.includes(query);
+
+        if (matches !== row.is(':visible')) {
+            row.stop(true, true)[matches ? 'fadeIn' : 'fadeOut'](120);
+        }
+    });
+});
 </script>
 {% endblock %}
