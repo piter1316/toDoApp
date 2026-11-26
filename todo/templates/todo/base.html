@@ -126,8 +126,32 @@
         <li class="nav-item">
           <a class="nav-link" href="{% url 'gunsafe:gunsafe_home' %}">Szafa</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'budget:budget_dashboard' %}">Finanse</a>
+        <li class="nav-item dropdown d-flex align-items-center flex-wrap">
+          <a class="nav-link flex-grow-1 flex-lg-grow-0 pr-2"
+             href="{% url 'budget:budget_dashboard' %}">
+              Finanse
+          </a>
+
+          {% if pinned_budget_sections %}
+          <a class="nav-link dropdown-toggle dropdown-toggle-split"
+             href="#"
+             id="finanseDropdown"
+             role="button"
+             data-toggle="dropdown"
+             aria-haspopup="true"
+             aria-expanded="false">
+              &nbsp;<span class="sr-only">Rozwiń menu</span>
+          </a>
+
+          <div class="dropdown-menu mb-1" aria-labelledby="finanseDropdown">
+              {% for section in pinned_budget_sections %}
+                  <a class="dropdown-item"
+                     href="{% url 'budget:section_detail' section.pk %}">
+                      <i class="fas fa-thumbtack text-secondary mr-2"></i>{{section.name}} | {{section.ledger.name}}
+                  </a>
+              {% endfor %}
+          </div>
+          {% endif %}
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{% url 'weather:weather_dashboard' %}">Pogoda</a>
