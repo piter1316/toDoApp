@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import datetime
+from datetime import datetime, date
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -279,6 +279,27 @@ def add_service_form(request, pk):
             return render(request, 'cars/addService.html', context)
     else:
         return render(request, 'cars/addService.html', context)
+
+
+@login_required
+def update_car_deadlines(request, car_id):
+    car = get_object_or_404(Car, pk=car_id, user=request.user, sold=False)
+
+    if request.method == 'POST':
+        try:
+            oc = request.POST.get('oc_expiry', '')
+            inspection = request.POST.get('inspection_expiry', '')
+
+            car.oc_expiry = date.fromisoformat(oc) if oc else None
+            car.inspection_expiry = date.fromisoformat(inspection) if inspection else None
+            car.save(update_fields=['oc_expiry', 'inspection_expiry'])
+
+        except ValueError:
+            messages.error(request, 'Nieprawidłowa data.')
+
+    return redirect('{}#info'.format(
+        reverse('cars:car_details', kwargs={'car_id': car.pk})
+    ))
 
 
 def edit_parts_services(request, car_id, service_id):

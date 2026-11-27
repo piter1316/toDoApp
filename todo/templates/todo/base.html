@@ -234,7 +234,75 @@
   {% endif %}
 
 </div>
+{% if car_notifications %}
+  <div id="carNotifications"
+     class="position-fixed bg-white rounded shadow-lg overflow-hidden"
+     style="display:none; z-index:11000; top:12px; left:12px;
+            right:12px; max-width:440px; margin:auto; border:1px solid #dee2e6;">
 
+    <div class="bg-dark text-white d-flex justify-content-between align-items-center px-3 py-2">
+        <span class="font-weight-bold">
+            <i class="fas fa-car mr-2"></i>Terminy motoryzacyjne
+        </span>
+        <button type="button" class="close text-white"
+                style="opacity:1; text-shadow:none;"
+                onclick="$('#carNotifications').fadeOut(150)"
+                aria-label="Zamknij">
+            &times;
+        </button>
+    </div>
+
+    <div class="px-3 py-1">
+        {% for notification in car_notifications %}
+        <a href="{% url 'cars:car_details' notification.car_id %}#info"
+           class="d-flex justify-content-between align-items-center text-dark py-2 {% if not forloop.last %}border-bottom{% endif %}">
+
+            <div class="pr-2">
+                <div class="font-weight-bold small">
+                    {{notification.car_name}}
+                </div>
+                <small class="text-muted">
+                    {% if notification.label == 'OC' %}
+                        <i class="fas fa-shield-alt mr-1"></i>
+                    {% else %}
+                        <i class="fas fa-tools mr-1"></i>
+                    {% endif %}
+                    {{notification.label}}
+                </small>
+            </div>
+
+            <div class="text-right flex-shrink-0">
+                <span class="badge badge-pill {% if notification.urgent %}badge-danger{% else %}badge-dark{% endif %} px-3 py-2">
+                    {{notification.date|date:"d.m.Y"}}
+                </span>
+                <div class="small text-muted mt-1">
+                    {% if notification.days_left < 0 %}
+                        Po terminie!
+                    {% elif notification.days_left == 0 %}
+                        Dzisiaj!
+                    {% else %}
+                        Za {{notification.days_left}} dni
+                    {% endif %}
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+  $(function () {
+      const today = '{% now "Y-m-d" %}';
+      const key = 'carNotifications_{{ request.user.pk }}';
+      const lastShown = localStorage.getItem(key);
+
+      if (lastShown !== today) {
+          $('#carNotifications').fadeIn(200);
+          localStorage.setItem(key, today);
+      }
+  });
+</script>
+{% endif %}
 {% block body %}
 {% endblock %}
 

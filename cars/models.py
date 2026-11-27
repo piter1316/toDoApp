@@ -14,6 +14,8 @@ class Car(models.Model):
     logo = models.FileField(null=True, blank=True, default=None)
     image = models.FileField(null=True, blank=True, default=None)
     sold = models.BooleanField(default=False, null=False, blank=False)
+    oc_expiry = models.DateField(null=True, blank=True)
+    inspection_expiry = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return self.name

@@ -394,7 +394,42 @@
                 </a>
               </div>
             </div>
+            {% if not detail.sold %}
+              <div class="modern-card mb-3 shadow-sm">
+                  <div class="card-header-modern">
+                      <i class="fas fa-calendar-check mr-2"></i>OC i przegląd techniczny
+                  </div>
 
+                  <form method="post" action="{% url 'cars:update_car_deadlines' detail.pk %}">
+                      {% csrf_token %}
+                      <div class="card-body py-3">
+                          <div class="form-row">
+                              <div class="col-12 col-md-6 mb-2">
+                                  <label class="small font-weight-bold text-muted">
+                                      <i class="fas fa-shield-alt mr-1"></i>Ważność OC
+                                  </label>
+                                  <input type="date" name="oc_expiry"
+                                         value="{{detail.oc_expiry|date:'Y-m-d'}}"
+                                         class="form-control form-control-sm">
+                              </div>
+
+                              <div class="col-12 col-md-6 mb-2">
+                                  <label class="small font-weight-bold text-muted">
+                                      <i class="fas fa-tools mr-1"></i>Ważność przeglądu
+                                  </label>
+                                  <input type="date" name="inspection_expiry"
+                                         value="{{detail.inspection_expiry|date:'Y-m-d'}}"
+                                         class="form-control form-control-sm">
+                              </div>
+                          </div>
+
+                          <button type="submit" class="btn btn-dark btn-sm btn-block">
+                              <i class="fas fa-save mr-1"></i>Zapisz terminy
+                          </button>
+                      </div>
+                  </form>
+              </div>
+{% endif %}
             <!-- STATISTICS CARD -->
             <div class="modern-card mb-3 shadow-sm">
               <div class="card-header-modern text-center">

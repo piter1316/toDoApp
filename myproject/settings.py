@@ -86,6 +86,7 @@ TEMPLATES = [
                 'weather.context_processors.home_weather_processor',
                 'todo.context_processors.static_version',
                 'budget.context_processors.pinned_budget_sections',
+                'cars.context_processors.car_deadline_notifications'
             ],
         },
     },
