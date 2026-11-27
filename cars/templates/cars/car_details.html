@@ -758,4 +758,11 @@
 
 
 </script>
+<script>
+$(function () {
+    if (window.location.hash) {
+        $('a[data-toggle="tab"][href="' + window.location.hash + '"]').tab('show');
+    }
+});
+</script>
 {% endblock %}
