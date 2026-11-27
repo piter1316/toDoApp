@@ -1,28 +1,63 @@
 {% extends 'todo/base.html' %}
+
+{% block extra_head %}
+<style>
+  .service-detail-fields input,
+  .service-detail-fields select {
+    display: block;
+    width: 100%;
+    height: calc(1.5em + .75rem + 2px);
+    padding: .375rem .75rem;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    background: #fff;
+  }
+</style>
+{% endblock %}
+
 {% block body %}
-<div class="container-fluid" id="wrapper">
-  <div class="row">
-    <div class="col-12 mx-auto" id="">
-      <div class="container">
-        <div class="jumbotron shadow shadow-lg">
-          <div class="d-flex justify-content-between">
-            <h3>Edycja...</h3>
-            <a class="text-secondary" href="{{ reverse_url }}">Powrót</a>
+<div class="container mt-2 mb-4 px-2 px-md-3">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6">
+      <div class="card shadow-sm border-secondary">
+        <div class="card-header bg-dark text-white py-3 d-flex align-items-center justify-content-between">
+          <div>
+            <div class="text-white-50 small text-uppercase font-weight-bold">
+              <i class="fas fa-tools mr-1"></i> Historia serwisowa
+            </div>
+            <h5 class="font-weight-bold mb-0">Edycja serwisu</h5>
           </div>
-          <hr>
-          <form method="post">{% csrf_token %}
-            <span>Zmień datę:</span>
-            {{form.date}}
-            <span>Zmień przebieg:</span>
-            {{form.mileage}}
-            <hr>
-            <button type="submit" class="btn btn-block btn-secondary">Zapisz zmiany</button>
+          <i class="fas fa-tachometer-alt fa-lg text-white-50"></i>
+        </div>
+        <div class="card-body bg-light p-3">
+          <form method="post" class="service-detail-fields">
+            {% csrf_token %}
+            <div class="form-group">
+              <label class="small text-muted font-weight-bold text-uppercase mb-1" for="{{ form.date.id_for_label }}">
+                <i class="far fa-calendar-alt mr-1"></i>Data serwisu
+              </label>
+              {{ form.date }}
+              {{ form.date.errors }}
+            </div>
+            <div class="form-group">
+              <label class="small text-muted font-weight-bold text-uppercase mb-1" for="{{ form.mileage.id_for_label }}">
+                <i class="fas fa-tachometer-alt mr-1"></i>Przebieg (km)
+              </label>
+              {{ form.mileage }}
+              {{ form.mileage.errors }}
+            </div>
+            <div class="d-flex justify-content-end border-top pt-3 mt-3">
+              <a class="btn btn-outline-secondary btn-sm mr-2" href="{{ reverse_url }}">
+                <i class="fas fa-arrow-left mr-1"></i>Powrót
+              </a>
+              <button type="submit" class="btn btn-dark btn-sm font-weight-bold">
+                <i class="fas fa-save mr-1"></i>Zapisz zmiany
+              </button>
+            </div>
           </form>
         </div>
       </div>
     </div>
   </div>
 </div>
-
-
 {% endblock %}

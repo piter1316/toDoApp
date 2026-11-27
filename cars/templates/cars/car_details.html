@@ -226,101 +226,125 @@
         </div>
       </div>
     </div>
-    <div class="tab-pane fade p-2 service {% if active_tab == 'service' %} show active{% endif %}" id="service"
+    <div class="tab-pane fade p-1 p-md-2 service {% if active_tab == 'service' %} show active{% endif %}" id="service"
          role="tabpanel" aria-labelledby="service-tab">
-      <div class="btn-group btn-block mb-1">
-        <a href="{% url 'cars:add_service_form' car.0.pk %}" class="btn btn-outline-dark ">Nowy
-        serwis</a>
-      {% if service_dictionary.items %}
-        <a href="{% url 'cars:download_history' car.0.id %}" class="btn btn-outline-dark">Pobierz historię</a>
-      {% endif %}
 
-      </div>
-
-      <table class="d-none d-lg-table table table-bordered bg-light table-sm table-striped mb-0">
-        <thead class="bg-dark text-center text-light sticky-top">
-        <tr>
-          <td>Lp.</td>
-          <td>Data</td>
-          <td>Przebieg [km]</td>
-          <td>Części/Usługi - cena [PLN]</td>
-          <td>Koszt całkowity [PLN]</td>
-          <td>Faktury</td>
-          <td><i class="fas fa-cog"></i></td>
-        </tr>
-        </thead>
-        <tbody>
-        {% if service_dictionary.items %}
-          {% for service, lists in service_dictionary.items %}
-          <tr class="text-center" style="border-bottom:  double  !important;">
-            <td class="align-middle">
-              {{forloop.counter}}.
-            </td>
-            <td class="align-middle"><a class="text-dark pointer"
-                                        href="{% url 'cars:edit_service_details' car.0.pk service.id %}">{{service.date}}</a>
-            </td>
-            <td class="align-middle"><a class="text-dark pointer"
-                                        href="{% url 'cars:edit_service_details' car.0.pk service.id %}">{{service.mileage}}</a>
-            </td>
-            <td class="">
-              {% include 'cars/parts_table.html' %}
-            </td>
-            <td class="align-middle">{{ lists.2 }}</td>
-            <td class="text-left align-middle">
-              {% include 'cars/invoice_list.html' %}
-            </td>
-            <td class="align-middle">
-              <a onclick="return confirm('Czy napewno usunąć serwis i wszystkie dane?')"
-                 class="deleteServiceButton_{{service.id}}"
-                 href="{% url 'cars:delete_service' car.0.pk service.id %}">
-                <i title="Usuń serwis" class="far fa-trash-alt text-dark"></i>
-              </a>
-            </td>
-          </tr>
-          {% endfor %}
-        {% else %}
-        <td class="alert alert-info text-center" colspan=7>Brak histori serwisowej!</spa></td>
-        {% endif %}
-        </tbody>
-      </table>
-      <div class="container d-lg-none">
-      <div class="row ">
-        {% if service_dictionary.items %}
-        {% for service, lists in service_dictionary.items %}
-        <div class="col-12 mb-1 p-0">
-          <div class="card border-dark mb-3" style="height:100%;">
-            <a class="text-dark" title="edycja" href="{% url 'cars:edit_service_details' car.0.pk service.id %}">
-              <div class="card-header bg-transparent border-dark d-flex justify-content-between">
-                <i>{{forloop.counter}}. {{service.date}}</i> <i>{{service.mileage}} KM</i>
-              </div>
-            </a>
-            <div class="card-body text-secondary row  no-gutters p-1">
-              <div class="col-7 pr-1 border-right">
-                <p class="text-center m-0 small">Części/Usługi</p>
-                {% include 'cars/parts_table.html' %}
-              </div>
-              <div class="col-5  pl-1 text-left align-middle">
-                <p class="text-center m-0 small">Faktury/Paragony</p>
-                {% include 'cars/invoice_list.html' %}
+      <!-- Nagłówek historii serwisowej -->
+      <div class="card border-0 shadow-sm mb-2">
+        <div class="card-body bg-dark text-white p-2 p-md-3 rounded">
+          <div class="d-flex flex-wrap justify-content-between align-items-center">
+            <div class="mr-2 mb-2 mb-sm-0">
+              <div class="small text-uppercase text-light"><i class="fas fa-tools mr-1"></i> Historia serwisowa</div>
+              <div class="h5 font-weight-bold mb-0">
+                <i class="fas fa-coins mr-1 text-warning"></i>{{service_total_cost|floatformat:2}} <small>PLN łącznie</small>
               </div>
             </div>
-            <div class="card-footer bg-transparent border-dark d-flex justify-content-between">
-              <span>KOSZT CAŁKOWITY: {{ lists.2 }} PLN</span>
-              <span>
-                    <a onclick="return confirm('Czy napewno usunąć serwis i wszystkie dane?')"
-                       class="deleteServiceButton_{{service.id}} mr-2"
-                       href="{% url 'cars:delete_service' car.0.pk service.id %}">
-                      <i title="Usuń serwis" class="far fa-trash-alt text-dark"></i>
-                    </a>
-                  </span>
+            <div class="btn-group btn-group-sm">
+              <a href="{% url 'cars:add_service_form' car.0.pk %}" class="btn btn-light font-weight-bold">
+                <i class="fas fa-plus mr-1"></i> Nowy serwis
+              </a>
+              {% if service_dictionary.items %}
+              <a href="{% url 'cars:download_history' car.0.id %}" class="btn btn-outline-light">
+                <i class="fas fa-file-download mr-1"></i> Historia
+              </a>
+              {% endif %}
             </div>
           </div>
         </div>
-        {% endfor %}
-        {% else %}
-        <div class="col-12 alert alert-info text-center">Brak historii serwisowej!</div>
-        {% endif %}
       </div>
+
+      <!-- Duże ekrany: tabela -->
+      <div class="d-none d-lg-block shadow-sm rounded border overflow-auto">
+        <table class="table table-sm table-striped table-hover bg-light mb-0">
+          <thead class="thead-dark text-center">
+            <tr>
+              <th class="align-middle border-0">#</th>
+              <th class="align-middle border-0"><i class="far fa-calendar-alt mr-1"></i>Data</th>
+              <th class="align-middle border-0"><i class="fas fa-tachometer-alt mr-1"></i>Przebieg</th>
+              <th class="align-middle border-0"><i class="fas fa-wrench mr-1"></i>Części / usługi</th>
+              <th class="align-middle border-0"><i class="fas fa-coins mr-1"></i>Koszt</th>
+              <th class="align-middle border-0"><i class="far fa-file-alt mr-1"></i>Dokumenty</th>
+              <th class="align-middle border-0"><i class="fas fa-cog"></i></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if service_dictionary.items %}
+              {% for service, lists in service_dictionary.items %}
+              <tr class="text-center">
+                <td class="align-middle text-muted small">{{forloop.counter}}.</td>
+                <td class="align-middle text-nowrap">
+                  <a class="text-dark font-weight-bold" href="{% url 'cars:edit_service_details' car.0.pk service.id %}">{{service.date|date:"d.m.Y"}}</a>
+                </td>
+                <td class="align-middle text-nowrap">
+                  <a class="text-dark" href="{% url 'cars:edit_service_details' car.0.pk service.id %}">{{service.mileage}} km</a>
+                </td>
+                <td class="align-middle text-left">{% include 'cars/parts_table.html' %}</td>
+                <td class="align-middle text-nowrap font-weight-bold">{{lists.2|floatformat:2}} PLN</td>
+                <td class="align-middle text-left">{% include 'cars/invoice_list.html' %}</td>
+                <td class="align-middle">
+                  <a onclick="return confirm('Czy na pewno usunąć serwis i wszystkie dane?')"
+                     class="deleteServiceButton_{{service.id}} text-secondary"
+                     href="{% url 'cars:delete_service' car.0.pk service.id %}">
+                    <i title="Usuń serwis" class="far fa-trash-alt"></i>
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            {% else %}
+              <tr><td class="text-muted text-center py-4" colspan="7">Brak historii serwisowej</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Telefony i tablety: kompaktowe karty -->
+      <div class="d-lg-none">
+        {% if service_dictionary.items %}
+          {% for service, lists in service_dictionary.items %}
+          <div class="card shadow-sm border mb-2">
+            <div class="card-header bg-dark text-white p-2">
+              <div class="d-flex justify-content-between align-items-center">
+                <a class="text-white font-weight-bold text-decoration-none"
+                   href="{% url 'cars:edit_service_details' car.0.pk service.id %}">
+                  <i class="fas fa-wrench mr-1 text-warning"></i>{{service.date|date:"d.m.Y"}}
+                </a>
+                <span class="small text-nowrap"><i class="fas fa-tachometer-alt mr-1"></i>{{service.mileage}} km</span>
+              </div>
+            </div>
+
+            <div class="card-body p-2">
+              <div class="row no-gutters">
+                <div class="col-12 col-md-7 pr-md-2">
+                  <div class="small text-muted font-weight-bold text-uppercase mb-1">
+                    <i class="fas fa-tools mr-1"></i>Części i usługi
+                  </div>
+                  {% include 'cars/parts_table.html' %}
+                </div>
+                <div class="col-12 col-md-5 pl-md-2 border-top mt-2 pt-2">
+                  <div class="small text-muted font-weight-bold text-uppercase mb-1">
+                    <i class="far fa-file-alt mr-1"></i>Faktury / paragony
+                  </div>
+                  {% include 'cars/invoice_list.html' %}
+                </div>
+              </div>
+            </div>
+
+            <div class="card-footer bg-light p-2 d-flex justify-content-between align-items-center">
+              <div class="small text-muted">
+                KOSZT SERWISU
+                <strong class="text-dark ml-1">{{lists.2|floatformat:2}} PLN</strong>
+              </div>
+              <a onclick="return confirm('Czy na pewno usunąć serwis i wszystkie dane?')"
+                 class="deleteServiceButton_{{service.id}} text-secondary px-2"
+                 href="{% url 'cars:delete_service' car.0.pk service.id %}">
+                <i title="Usuń serwis" class="far fa-trash-alt"></i>
+              </a>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="alert alert-light border text-center text-muted">Brak historii serwisowej</div>
+        {% endif %}
       </div>
     </div>
     <div class="tab-pane fade p-0 p-md-3 info {% if active_tab == 'info' %} show active{% endif %}" id="info" role="tabpanel"

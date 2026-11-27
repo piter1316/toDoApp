@@ -285,7 +285,7 @@ def edit_parts_services(request, car_id, service_id):
     service_instance = get_object_or_404(Service, pk=service_id)
     car_id = car_id
 
-    LinkFormSet = formset_factory(LinkForm, formset=BaseLinkFormSet, extra=0, min_num=1)
+    LinkFormSet = formset_factory(LinkForm, formset=BaseLinkFormSet, extra=0, min_num=0)
     # Get our existing link data for this user.  This is used as initial data.
     user_links = SparePart.objects.filter(service_id=service_id)
 

@@ -1,98 +1,144 @@
 {% extends 'todo/base.html' %}
 {% load static %}
 
+{% block extra_head %}
+<style>
+  .service-form-row input:not([type="checkbox"]),
+  .service-form-row select {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    height: calc(1.5em + .5rem + 2px);
+    padding: .25rem .5rem;
+    font-size: .875rem;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    background: #fff;
+  }
+  .service-form-row input[type="checkbox"] { width: 18px; height: 18px; }
+  .service-form-row .delete-item { min-width: 0; }
+  .service-form-row .delete-item input { flex: 1 1 0; width: 1% !important; }
+  .service-form-row .delete-item .delete-row {
+    flex: 0 0 34px;
+    width: 34px;
+    height: 31px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+    color: #dc3545 !important;
+    border: 1px solid #dc3545;
+    border-radius: 4px;
+    text-decoration: none;
+  }
+</style>
+{% endblock %}
+
 {% block body %}
-<div class="container mt-1">
-  <div class="jumbotron shadow shadow-lg">
-    <h3 class="">{{service_instance.date}} | {{service_instance.mileage}} km</h3>
-    <hr>
-    <div>
-      <form method="post" id="test">
-        <div class="form-row">
-          <div class="col">
-            <span class="ml-1">Część / Usługa</span>
+<div class="container mt-2 mb-4 px-2 px-md-3">
+  <div class="card shadow-sm border-secondary">
+    <div class="card-header bg-dark text-white py-3 px-3">
+      <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <div>
+          <div class="small text-uppercase text-white-50 font-weight-bold">
+            <i class="fas fa-tools mr-1"></i> Historia serwisowa
           </div>
-          <div class="col d-flex justify-content-between">
-            <span class="ml-1">Cena</span>
-            <span class="mr-1">Usługa</span>
-          </div>
+          <h5 class="font-weight-bold mb-0">Edycja części i usług</h5>
         </div>
+        <div class="text-right small mt-2 mt-sm-0">
+          <div><i class="far fa-calendar-alt mr-1"></i>{{service_instance.date}}</div>
+          <div><i class="fas fa-tachometer-alt mr-1"></i>{{service_instance.mileage}} km</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-body bg-light p-2 p-md-3">
+      <form method="post" id="test">
         {% csrf_token %}
         {{ link_formset.management_form }}
+
+        <div class="row no-gutters text-muted font-weight-bold small text-uppercase mb-2 px-2">
+          <div class="col-12 col-sm-6">Część / usługa</div>
+          <div class="col-8 col-sm-4">Cena (PLN)</div>
+          <div class="col-4 col-sm-2 text-center">Usługa</div>
+        </div>
+
         {% for link_form in link_formset %}
-        <div class="link-formset mx-auto">
-          <div class="form-row">
-            <div class="col delete-item d-flex flex-row-reverse align-items-center">
+        <div class="link-formset service-form-row bg-white border rounded p-2 mb-2">
+          <div class="form-row align-items-center">
+            <div class="col-12 col-sm-6 delete-item d-flex flex-row-reverse align-items-center mb-2 mb-sm-0">
               {{ link_form.part_service }}
               {% if link_form.anchor.errors %}
                 {% for error in link_form.anchor.errors %}
-                {{ error|escape }}
+                  <small class="text-danger">{{ error|escape }}</small>
                 {% endfor %}
               {% endif %}
             </div>
-            <div class="col d-flex align-items-center">
+            <div class="col-8 col-sm-4 d-flex align-items-center">
               {{ link_form.price }}
               {% if link_form.url.errors %}
                 {% for error in link_form.url.errors %}
-                {{ error|escape }}
+                  <small class="text-danger">{{ error|escape }}</small>
                 {% endfor %}
               {% endif %}
-              <div class="col d-flex align-items-center">
-                {{ link_form.service }}
-                {% if link_form.service.errors %}
-                  {% for error in link_form.service.errors %}
-                  {{ error|escape }}
-                  {% endfor %}
-                {% endif %}
-              </div>
+            </div>
+            <div class="col-4 col-sm-2 d-flex align-items-center justify-content-center">
+              {{ link_form.service }}
+              {% if link_form.service.errors %}
+                {% for error in link_form.service.errors %}
+                  <small class="text-danger">{{ error|escape }}</small>
+                {% endfor %}
+              {% endif %}
             </div>
           </div>
         </div>
         {% endfor %}
+
         <div id="addButtonContainer" class="addNewRow"></div>
         {% if part_service_formset.non_form_errors %}
-        {% for error in part_service_formset.non_form_errors %}
-        {{ error|escape }}
-        {% endfor %}
-        <div class="addButtonContainer"></div>
+          {% for error in part_service_formset.non_form_errors %}
+            <div class="text-danger small">{{ error|escape }}</div>
+          {% endfor %}
+          <div class="addButtonContainer"></div>
         {% endif %}
-        <hr>
-        <div class="d-flex flex-row-reverse bd-highlight">
-          <a href="{% url 'cars:car_details' car_id %}#service" class="btn btn-secondary btn-sm ">Wróć</a>
-          <button type="submit" class="btn btn-success btn-sm mr-1">Zapisz zmiany</button>
-        </div>
 
+        <div class="d-flex justify-content-end border-top pt-3 mt-3">
+          <a href="{% url 'cars:car_details' car_id %}#service" class="btn btn-outline-secondary btn-sm mr-2">
+            <i class="fas fa-arrow-left mr-1"></i>Wróć
+          </a>
+          <button type="submit" class="btn btn-dark btn-sm font-weight-bold">
+            <i class="fas fa-save mr-1"></i>Zapisz zmiany
+          </button>
+        </div>
       </form>
     </div>
   </div>
 </div>
 
-<!-- Include formset plugin - including jQuery dependency -->
-
 <script src="{% static 'todo/jquery.formset.js' %}"></script>
 <script>
-function addSpecialFonts(){
-  $('.delete-row').addClass('far fa-trash-alt text-dark mr-2');
-  $('.add-row').addClass('btn btn-block btn-sm btn-secondary mt-1');
+function addSpecialFonts() {
+    $('.delete-row')
+        .addClass('far fa-trash-alt text-danger mr-2')
+        .css('cursor', 'pointer');
+
+    $('.add-row').addClass('btn btn-block btn-sm btn-secondary mt-1');
 }
+$('.link-formset').formset({
+    deleteContainerClass: 'delete-item',
+    addContainerClass: 'addNewRow',
+    addText: 'Dodaj część/usługę',
+    deleteText: '',
+    keepFieldValues: '.delete-row'
+});
+addSpecialFonts();
 
-    $('.link-formset').formset({
-        deleteContainerClass: 'delete-item',
-        addContainerClass: 'addNewRow',
-        addText: 'Dodaj część/usługę',
-        deleteText: '',
-        keepFieldValues: '.delete-row'
-    });
-    addSpecialFonts();
+$('body').on('mouseout mouseover','#addButtonContainer',function(e){
+  addSpecialFonts();
+});
 
-
-  $('body').on('mouseout mouseover','#addButtonContainer',function(e){
-    addSpecialFonts();
-  });
-
-  $('body').on('touchstart ','#addButtonContainer',function(e){
-      setTimeout(function(){ addSpecialFonts(); }, 150);
-  });
-
+$('body').on('touchstart ','#addButtonContainer',function(e){
+    setTimeout(function(){ addSpecialFonts(); }, 150);
+});
 </script>
 {% endblock %}
